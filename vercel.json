@@ -1,7 +1,8 @@
 {
-  "framework": "nextjs",
-  "installCommand": "cd webapp && npm ci",
-  "buildCommand": "cd webapp && npm run build",
-  "outputDirectory": "webapp/.next",
-  "devCommand": "cd webapp && npm run dev"
+  "builds": [
+    {
+      "src": "webapp/package.json",
+      "use": "@vercel/next"
+    }
+  ]
 }
