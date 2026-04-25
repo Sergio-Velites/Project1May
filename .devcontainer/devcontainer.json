@@ -1,0 +1,47 @@
+{
+  "name": "TaskFlow Dev — iOS optimized",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+
+  "postCreateCommand": "cd webapp && npm install && npm install -g @anthropic-ai/claude-code",
+
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "TaskFlow App",
+      "onAutoForward": "openPreview"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.fontSize": 16,
+        "terminal.integrated.lineHeight": 1.5,
+        "terminal.integrated.scrollback": 5000,
+        "editor.fontSize": 15,
+        "editor.lineHeight": 1.6,
+        "editor.wordWrap": "on",
+        "editor.minimap.enabled": false,
+        "workbench.colorTheme": "Default Dark+",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      },
+      "extensions": [
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "formulahendry.auto-rename-tag"
+      ]
+    },
+    "codespaces": {
+      "openFiles": ["README.md"]
+    }
+  },
+
+  "containerEnv": {
+    "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}"
+  }
+}
