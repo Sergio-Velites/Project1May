@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TaskFlow",
-  description: "Gestiona tus tareas desde cualquier dispositivo",
+  title: "My App",
+  description: "Built with Next.js, Supabase and Vercel",
 };
 
 export default function RootLayout({
