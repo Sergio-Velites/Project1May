@@ -1,26 +1,284 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* ── Paleta Game Boy clásica ────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --gb-lightest: #9bbc0f;
+  --gb-light:    #8bac0f;
+  --gb-dark:     #306230;
+  --gb-darkest:  #0f380f;
+  --gb-screen-bg: #9bbc0f;
+
+  --gb-body:     #c8c8c8;
+  --gb-body-dark:#a0a0a0;
+  --gb-btn-a:    #8b0000;
+  --gb-btn-b:    #800080;
+
+  --background: var(--gb-darkest);
+  --foreground: var(--gb-lightest);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ── Reset y base ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--gb-darkest);
+  color: var(--gb-lightest);
+  font-family: 'Press Start 2P', monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 16px;
+  overflow-x: hidden;
+}
+
+/* ── Animaciones globales ───────────────────────────────────────── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Cuerpo de la consola Game Boy ──────────────────────────────── */
+.gamebody {
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  max-width: 100%;
+  background: var(--gb-body);
+  border-radius: 8px 8px 40% 40% / 8px 8px 20px 20px;
+  border: 3px solid var(--gb-body-dark);
+  box-shadow: 4px 4px 0 #888, inset 0 1px 0 rgba(255,255,255,0.4);
+  overflow: hidden;
+}
+
+.gb-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 4px;
+}
+
+.gb-header-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7c3aed;
+  box-shadow: 0 0 4px #7c3aed;
+}
+
+.gb-brand {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--gb-darkest);
+  letter-spacing: 1px;
+}
+
+.gb-tagline {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: var(--gb-btn-a);
+  margin-left: auto;
+}
+
+/* ── Bisel y pantalla ───────────────────────────────────────────── */
+.gb-screen-bezel {
+  margin: 0 16px 8px;
+  background: #444;
+  border-radius: 6px;
+  padding: 10px;
+  position: relative;
+  border: 2px solid #333;
+}
+
+.gb-power-led {
+  position: absolute;
+  top: 6px;
+  left: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00ff44;
+  box-shadow: 0 0 6px #00ff44;
+}
+
+.gb-screen-frame {
+  background: var(--gb-screen-bg);
+  border: 3px inset #222;
+  border-radius: 2px;
+  overflow: hidden;
+  /* Efecto pantalla LCD */
+  image-rendering: pixelated;
+}
+
+/* ── Clases de utilidad para el juego ──────────────────────────── */
+.gb-screen {
+  width: 320px;
+  height: 288px;
+  background: var(--gb-screen-bg);
+  font-family: 'Press Start 2P', monospace;
+}
+
+.gb-screen-inner {
+  width: 320px;
+  height: 288px;
+  font-family: 'Press Start 2P', monospace;
+}
+
+.gb-text-lightest { color: var(--gb-lightest); }
+.gb-text-light    { color: var(--gb-light); }
+.gb-text-dark     { color: var(--gb-dark); }
+.gb-text-darkest  { color: var(--gb-darkest); }
+
+.bg-gb-lightest { background: var(--gb-lightest); }
+.bg-gb-light    { background: var(--gb-light); }
+.bg-gb-dark     { background: var(--gb-dark); }
+.bg-gb-darkest  { background: var(--gb-darkest); }
+
+.border-gb-lightest { border-color: var(--gb-lightest); }
+.border-gb-light    { border-color: var(--gb-light); }
+.border-gb-dark     { border-color: var(--gb-dark); }
+.border-gb-darkest  { border-color: var(--gb-darkest); }
+
+/* ── Controles on-screen ────────────────────────────────────────── */
+.gb-controls {
+  background: var(--gb-body);
+  padding: 8px 16px;
+}
+
+/* D-Pad */
+.dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.dpad-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.dpad-center {
+  width: 28px;
+  height: 28px;
+  background: #666;
+}
+
+.dpad-btn {
+  width: 28px;
+  height: 28px;
+  background: #555;
+  color: #ddd;
+  border: none;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 2px;
+}
+
+.dpad-btn:active {
+  background: #333;
+  transform: scale(0.95);
+}
+
+/* Select / Start */
+.small-btn {
+  background: #888;
+  border: none;
+  border-radius: 10px;
+  padding: 3px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: #333;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0.5px;
+}
+
+.small-btn:active {
+  background: #555;
+  color: #eee;
+}
+
+/* Botones A y B */
+.ab-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #333;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 3px 0 #333;
+}
+
+.action-btn.bg-gb-dark     { background: var(--gb-btn-b); }
+.action-btn.bg-gb-darkest  { background: var(--gb-btn-a); }
+
+.action-btn:active {
+  box-shadow: none;
+  transform: translateY(2px);
+}
+
+/* ── Altavoz ────────────────────────────────────────────────────── */
+.gb-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 20px 12px;
+}
+
+.gb-speaker {
+  display: grid;
+  grid-template-columns: repeat(3, 6px);
+  grid-template-rows: repeat(2, 6px);
+  gap: 3px;
+}
+
+.gb-speaker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #aaa;
+  border: 1px solid #888;
+}
+
+/* ── Responsive mobile ──────────────────────────────────────────── */
+@media (max-width: 380px) {
+  .gamebody {
+    width: 100%;
+    border-radius: 4px 4px 20px 20px;
+  }
+
+  .gb-screen-frame {
+    transform-origin: top left;
+  }
+
+  .gb-screen,
+  .gb-screen-inner {
+    width: 280px;
+    height: 252px;
+    transform: scale(0.875);
+    transform-origin: top left;
+  }
+
+  .gb-screen-bezel {
+    padding: 8px;
+    margin: 0 8px 6px;
+  }
 }

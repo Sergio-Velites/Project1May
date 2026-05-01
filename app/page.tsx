@@ -1,7 +1,6 @@
+import { redirect } from 'next/navigation';
+
+// El juego está en /public/game/ - servido como estático en /game/index.html
 export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center">
-      <p className="text-2xl font-semibold">Hello world</p>
-    </main>
-  );
+  redirect('/game/index.html');
 }

@@ -1,0 +1,36 @@
+{
+  "files": {
+    "main.css": "/game/static/css/main.6fe4ff28.css",
+    "main.js": "/game/static/js/main.e996365d.js",
+    "static/media/pewter-city.mp3": "/game/static/media/pewter-city.dbfe2794208a91f807e7.mp3",
+    "static/media/opening.mp3": "/game/static/media/opening.748ee0ac43d13ce59a36.mp3",
+    "static/media/mt-moon.mp3": "/game/static/media/mt-moon.d3c96e8c603b742504e6.mp3",
+    "static/media/battle.mp3": "/game/static/media/battle.e1882961bf442d7c3f9c.mp3",
+    "static/media/route-3.mp3": "/game/static/media/route-3.53c38face16d48d00e38.mp3",
+    "static/media/pallet-town.mp3": "/game/static/media/pallet-town.2e9078a124682633219e.mp3",
+    "static/media/pokemon-center.mp3": "/game/static/media/pokemon-center.20b36113d6de251d3be6.mp3",
+    "static/media/pokemon-gym.mp3": "/game/static/media/pokemon-gym.a3da1d8d6f27441caec9.mp3",
+    "static/media/route-1.mp3": "/game/static/media/route-1.572cef47cd79f805a37b.mp3",
+    "static/media/oaks-laboratory.mp3": "/game/static/media/oaks-laboratory.f09217759916aaa60959.mp3",
+    "static/media/pokemon-recovery.mp3": "/game/static/media/pokemon-recovery.93a55dfdb15fe288cf36.mp3",
+    "static/media/PressStart2P-Regular.ttf": "/game/static/media/PressStart2P-Regular.4bfcf8b92a857ee248e8.ttf",
+    "service-worker.js": "/game/service-worker.js",
+    "static/media/button-press.wav": "/game/static/media/button-press.8a824ede28efe6b70d20.wav",
+    "static/media/viridian-forrest.png": "/game/static/media/viridian-forrest.8fa48ebfd05a497b419d.png",
+    "static/media/route-3.png": "/game/static/media/route-3.a91b90fbfbe854c97586.png",
+    "static/media/pewter-city.png": "/game/static/media/pewter-city.c023a2d90c229bee1306.png",
+    "static/media/route-2.png": "/game/static/media/route-2.5268416a49ed69de67ac.png",
+    "static/media/viridian-city.png": "/game/static/media/viridian-city.f95725866ad31ef03358.png",
+    "static/media/mt-moon-2f.png": "/game/static/media/mt-moon-2f.c061760b47cfa4a2342d.png",
+    "static/media/mt-moon-1f.png": "/game/static/media/mt-moon-1f.aa00738da6c7531edef5.png",
+    "static/media/enter-door.mp3": "/game/static/media/enter-door.5c7611fd475684592d99.mp3",
+    "static/media/route-1.png": "/game/static/media/route-1.b5306ff1a7701c4ec057.png",
+    "static/media/route-22.png": "/game/static/media/route-22.3c8362605c65014ec130.png",
+    "static/media/Pokemon-GB.ttf": "/game/static/media/Pokemon-GB.6211ee48ea626f34681e.ttf",
+    "index.html": "/game/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.6fe4ff28.css",
+    "static/js/main.e996365d.js"
+  ]
+}
