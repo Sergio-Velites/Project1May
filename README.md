@@ -1,141 +1,114 @@
-# TestRuflo — Claude Code desde el móvil
+# WeddingBoy — Invitación de Boda estilo Game Boy
 
-Entorno de desarrollo multiagente con **Claude Code + Ruflo**, con una webapp **TaskFlow** de ejemplo desplegable en Vercel + Supabase.
+Web interactiva para una invitación de boda con estética Game Boy clásica (Pokémon Rojo/Azul).  
+Motor base: [chase-manning/pokemon-js](https://github.com/chase-manning/pokemon-js) (MIT).
 
----
-
-## Configuración inicial (una sola vez, desde escritorio o Codespaces)
-
-### 1. Supabase — crear la base de datos
-
-1. Entra en [supabase.com/dashboard](https://supabase.com/dashboard) → tu proyecto
-2. Ve a **SQL Editor** → pega el contenido de `webapp/supabase/migrations/001_tasks.sql` → ejecutar
-3. Copia tus credenciales: **Settings → API → Project URL** y **anon public key**
-
-### 2. Variables de entorno en Vercel
-
-1. En [vercel.com](https://vercel.com) → tu proyecto → **Settings → Environment Variables**
-2. Añade:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-
-### 3. Conectar repo a Vercel
-
-1. En Vercel → **New Project** → importa este repo de GitHub
-2. **Root Directory**: cambia a `webapp`
-3. Deploy — Vercel detecta Next.js automáticamente
+**Demo**: desplegado en Vercel · Jugable en cualquier navegador, escritorio y móvil.
 
 ---
 
-## Flujo diario desde iOS (GitHub Codespaces)
+## Stack
 
-### Abrir el entorno de desarrollo
+| Capa | Tecnología |
+|---|---|
+| Shell | Next.js 16 (App Router) + TypeScript |
+| Juego | React 18 + TypeScript + Redux + styled-components (CRA build) |
+| Despliegue | Vercel |
+| Guardado | Supabase (partidas por dispositivo vía UUID) |
 
-1. Abre **Safari** (o Chrome) en tu iPhone/iPad
-2. Ve a `github.com/TU_USUARIO/TestRuflo`
-3. Pulsa el botón verde **Code** → **Codespaces** → **Create codespace on main**
-4. Se abre VS Code en el navegador (tarda ~1 min la primera vez)
+---
 
-### Usar Claude Code con Ruflo
-
-Una vez en Codespaces, abre el **terminal** (`Ctrl+\`` o menú Terminal):
+## Desarrollo local
 
 ```bash
-# Configura tu API key (solo la primera vez en cada Codespace)
-export ANTHROPIC_API_KEY="sk-ant-..."
+# 1. Instalar dependencias del shell Next.js
+npm install
 
-# Inicia Claude Code con Ruflo habilitado
-claude
-
-# Para inicializar Ruflo la primera vez
-npx ruflo@latest init
+# 2. Servidor local
+npm run dev
+# → http://localhost:3000 (redirige a /game/index.html)
 ```
 
-### Pedir cosas a los agentes (ejemplos)
+### Editar el juego (fuente)
 
-```
-# Dentro de claude:
+```bash
+# Clonar la fuente del juego (una sola vez, fuera del repo)
+git clone https://github.com/chase-manning/pokemon-js.git game-src
+cd game-src && npm install --legacy-peer-deps
 
-"Añade un campo de prioridad (alta/media/baja) a las tareas"
-→ coordinator descompone → database-architect crea migración SQL
-  → backend-developer actualiza actions.ts → frontend-developer
-  actualiza TaskCard y NewTaskForm → code-reviewer valida
+# Hacer cambios en game-src/src/ ...
 
-"Crea una vista de calendario para ver tareas por fecha"
-→ frontend-developer crea página /calendar con componente
-
-"Añade login con Google"
-→ auth-specialist configura OAuth en Supabase + frontend-developer
-  actualiza páginas de auth
-
-"El deploy está fallando"
-→ devops-engineer diagnostica GitHub Actions + variables de entorno
+# Recompilar y copiar al shell
+PUBLIC_URL=/game DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false npm run build
+cp -r build/* ../public/game/
 ```
 
-### Ver la app en producción
+El juego compilado vive en `/public/game/` y Next.js lo sirve como archivos estáticos.  
+**No editar `/public/game/` directamente** — ese directorio es output de build.
 
-Cada push a `main` → Vercel despliega automáticamente en ~30 segundos.
+---
+
+## Variables de entorno
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
+```
+
+Crear `.env.local` en la raíz con esas dos variables.
+
+---
+
+## Despliegue en Vercel
+
+1. Importar el repo en [vercel.com](https://vercel.com) → **New Project**
+2. Framework: **Next.js** (detección automática)
+3. Añadir las variables de entorno en Settings → Environment Variables
+4. Cada push a `master` despliega automáticamente
+
+---
+
+## Sistema de guardado (Supabase)
+
+Cada dispositivo recibe un UUID anónimo en su primera visita (`localStorage`).  
+Las partidas se sincronizan con Supabase — sin login, sin PII.
+
+Schema SQL:
+```sql
+CREATE TABLE saves (
+  player_id  UUID        PRIMARY KEY,
+  game_state JSONB       NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE saves ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "open_saves" ON saves FOR ALL USING (true);
+```
+
+---
+
+## Controles
+
+| Acción | Teclado | On-screen |
+|---|---|---|
+| Mover | Flechas ← ↑ ↓ → | D-pad |
+| Confirmar / Hablar | Z / Enter | Botón A |
+| Cancelar | X / Escape | Botón B |
+| Menú Start | Enter | START |
 
 ---
 
 ## Estructura del proyecto
 
 ```
-TestRuflo/
-├── .devcontainer/
-│   └── devcontainer.json       # Config GitHub Codespaces (iOS optimizada)
-├── .github/
-│   └── workflows/
-│       └── deploy.yml          # CI: type check en cada PR
-├── .mcp.json                   # Ruflo MCP server para Claude Code
-├── CLAUDE.md                   # Definición de agentes y reglas
-└── webapp/                     # Next.js 15 App
-    ├── app/
-    │   ├── auth/callback/      # OAuth redirect handler
-    │   ├── login/              # Página de login
-    │   ├── signup/             # Página de registro
-    │   └── tasks/              # Dashboard principal
-    │       ├── page.tsx
-    │       └── actions.ts      # Server Actions (CRUD)
-    ├── components/
-    │   ├── TaskCard.tsx
-    │   └── NewTaskForm.tsx
-    ├── lib/supabase/
-    │   ├── client.ts           # Cliente browser
-    │   └── server.ts           # Cliente server (SSR)
-    ├── middleware.ts            # Protección de rutas
-    └── supabase/
-        └── migrations/
-            └── 001_tasks.sql   # Schema inicial
+/
+├── app/                    # Next.js shell (mínimo)
+│   ├── layout.tsx
+│   ├── page.tsx            # Redirect → /game/index.html
+│   └── globals.css
+├── lib/supabase/           # Cliente Supabase
+├── public/game/            # Build del juego (no editar directamente)
+├── CLAUDE.md               # Documentación técnica del motor del juego
+└── package.json
 ```
 
----
-
-## Desarrollo local (desde Mac)
-
-```bash
-cd webapp
-cp .env.example .env.local
-# Edita .env.local con tus credenciales de Supabase
-npm run dev
-# → http://localhost:3000
-```
-
----
-
-## Tips para iOS + Codespaces
-
-- **Teclado**: usa un teclado bluetooth para mayor comodidad en sesiones largas
-- **Terminal**: el devcontainer tiene fuente 16px, óptimo para móvil
-- **Codespaces gratis**: 60h/mes en GitHub Free, 90h en GitHub Pro
-- **Suspender**: cierra el tab y el Codespace se suspende automáticamente (no cuenta tiempo)
-- **Reanudar**: vuelve a `github.com/TU_USUARIO/TestRuflo` → Code → Codespaces → tu codespace existente
-
-## Comandos Claude Code útiles
-
-```bash
-claude          # Modo interactivo (ideal para móvil)
-claude -p "..."  # Modo no interactivo (una sola petición)
-/clear          # Limpiar contexto
-/help           # Ayuda
-```
+Para la documentación técnica completa del motor (mapas, NPCs, combates, quests, etc.) ver **CLAUDE.md**.

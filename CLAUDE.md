@@ -357,30 +357,11 @@ cd game-src && npm install --legacy-peer-deps
 
 ---
 
-## Limitaciones conocidas
+## Reglas legales y creativas
 
-### Limitaciones de diseño de juego
-1. **No hay diálogo ramificado**: los textos son arrays lineales de strings. No hay árbol de opciones (sólo el confirmationMenu Sí/No via quests).
-2. **Los entrenadores siempre pelean**: no existe un modo NPC "sólo habla sin combate". La alternativa es usar el campo `text` del mapa (tiles interactivos sin sprite visible).
-3. **Los NPCs no se mueven** salvo los `spinners` (rotan) y el rival (se mueve en eventos scripted de quests).
-4. **Line of sight fija en 5 tiles**: todos los entrenadores tienen el mismo radio de detección.
-5. **No hay NPCs de tienda custom**: sólo un tipo de tienda por mapa, con ítems fijos del `ItemType` enum.
-
-### Limitaciones técnicas
-6. **Sin guardar en servidor**: el save usa localStorage, se pierde al limpiar el navegador.
-7. **Los mapas son imágenes PNG + colisiones en código**: para editar visualmente el mapa hay que usar Tiled y recodificar los `walls`, `fences`, `grass` en TypeScript a mano (no hay importador automático).
-8. **151 criaturas con sprites de Pokémon Gen1**: los sprites de los Pokémon son de los juegos originales. Para una parodia completa habría que reemplazar las 151 imágenes o reducir el número.
-9. **No hay RSVP ni conexión a Supabase en el juego**: el juego es completamente client-side. Integrar un formulario RSVP requeriría añadir un componente React nuevo y llamadas a Supabase desde dentro del juego.
-10. **Música: un solo MP3 por mapa**: no hay sistema de capas de audio ni eventos de música dinámica.
-11. **Sin internacionalización**: todos los textos están hardcodeados en inglés por el motor base.
-12. **Imagen de título con sprites de Pokémon**: los 3 PNGs de la pantalla de título son de Gen1. Son los más urgentes de reemplazar antes de compartir con invitados.
-
-### Lo más fácil de cambiar
-- Textos de carteles y diálogos de NPCs → sólo strings en los archivos de mapas
-- Música → cambiar el MP3 referenciado
-- Nombre del jugador y Pokémon iniciales → 5 líneas en gameSlice.ts
-- Imagen de fondo de un mapa → cambiar el PNG importado
-- Pantalla de título → 3 PNG nuevos
+- ✅ Motor fan-made, licencia MIT (chase-manning/pokemon-js)
+- ✅ No se usan ROMs ni assets de Nintendo / Game Freak / The Pokémon Company
+- ✅ Los sprites son originales del repo base
 
 ---
 
@@ -421,19 +402,56 @@ cp -r build/* ../public/game/
 
 - [x] Base jugable en navegador (chase-manning/pokemon-js)
 - [x] Integración en Next.js / Vercel sin cambios al motor
-- [ ] Reemplazar 3 imágenes de pantalla de título con nombres de la pareja
-- [ ] Cambiar nombre del jugador por defecto
-- [ ] Sustituir textos de carteles y diálogos por contenido de boda
-- [ ] Crear mapa personalizado del lugar de la boda
-- [ ] Añadir NPCs de boda (novio, novia, invitados)
-- [ ] Reemplazar música por canciones de la boda
-- [ ] Reducir/renombrar criaturas (o reemplazar sprites)
-- [ ] Integrar RSVP con Supabase
+- [ ] Guardado de partida por dispositivo en Supabase (ver diseño abajo)
 - [ ] Compartir con invitados vía Vercel
 
 ---
 
-## Variables de entorno
+## Sistema de guardado por dispositivo (diseño técnico)
+
+El juego es completamente client-side. Para que cada invitado guarde su partida
+de forma independiente y la recupere en futuras visitas **sin necesidad de cuenta**:
+
+### Estrategia: UUID en localStorage + Supabase
+
+1. Al primer acceso se genera `crypto.randomUUID()` → guardado en localStorage
+   como `wedding_player_id`.
+2. El estado del juego se sincroniza a Supabase en una tabla `saves` con ese UUID
+   como clave primaria.
+3. Al volver al juego: lee UUID de localStorage → carga partida de Supabase.
+4. Funciona en el mismo navegador/dispositivo de forma transparente.
+5. Sin datos personales. Sin cuentas. Sin auth. GDPR-friendly.
+
+**Limitación aceptada**: si el invitado limpia el localStorage del navegador, la
+conexión con su partida se pierde y empieza de nuevo. Para una invitación de boda
+esto es completamente aceptable.
+
+### Esquema Supabase
+
+```sql
+CREATE TABLE saves (
+  player_id  UUID        PRIMARY KEY,
+  game_state JSONB       NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE saves ENABLE ROW LEVEL SECURITY;
+-- Sin auth: cualquiera puede leer/escribir su fila por UUID
+CREATE POLICY "open_saves" ON saves FOR ALL USING (true);
+```
+
+### Flujo de integración
+
+El juego (CRA) no llama directamente a Supabase. El puente se hace desde Next.js:
+
+```
+Juego (iframe/static) → postMessage → Next.js page → Supabase client
+```
+
+O bien, añadiendo el cliente Supabase directamente dentro del bundle del juego
+(game-src), intercalando las llamadas en el dispatch de `save`/`load` de Redux.
+
+### Variables de entorno
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
