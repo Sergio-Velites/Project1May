@@ -33,7 +33,7 @@ El motor base proviene del proyecto open source **chase-manning/pokemon-js** (MI
 ```
 
 El juego vive en `/public/game/` como archivos estáticos.  
-Next.js los sirve automáticamente sin ninguna configuración adicional.
+Next.js los sirve automáticamente sin configuración adicional.
 
 ---
 
@@ -41,87 +41,371 @@ Next.js los sirve automáticamente sin ninguna configuración adicional.
 
 ```
 /
-├── app/
-│   ├── layout.tsx          # Layout raíz de Next.js
-│   ├── page.tsx            # Redirect a /game/index.html
-│   └── globals.css         # CSS global (mínimo)
-├── lib/supabase/           # Cliente Supabase (reservado para futuras funciones)
-│   ├── client.ts
-│   └── server.ts
-├── public/
-│   └── game/               # ← BUILD DEL JUEGO (no editar aquí, son archivos compilados)
-│       ├── index.html
-│       ├── static/js/      # Bundle compilado
-│       ├── static/css/
-│       └── styles/         # CSS adicional del motor
-├── vercel.json
-└── package.json            # Next.js deps
+├── app/                        # Next.js shell (mínimo)
+│   ├── layout.tsx
+│   ├── page.tsx                # Redirect a /game/index.html
+│   └── globals.css
+├── lib/supabase/               # Cliente Supabase (futuras funciones)
+├── public/game/                # ← BUILD del juego (no editar directamente)
+└── package.json                # Next.js deps
 ```
+
+Para editar el juego: clonar la fuente (ver sección "Dónde editar").
+
+---
+
+## Arquitectura interna del juego (game-src/)
+
+### Estado global: Redux Toolkit
+
+Dos slices:
+
+**`game` slice** (`state/gameSlice.ts`) — estado del mundo:
+```
+pos             posición del jugador {x, y}
+map             mapa actual (MapId enum)
+direction       dirección del jugador (up/down/left/right)
+moving          bool
+jumping         bool (al saltar vallas)
+name            nombre del jugador (default: "Blue")
+pokemon         array de PokemonInstance (equipo, máx 6)
+pc              array de PokemonInstance (almacenados)
+activePokemonIndex  índice del primer pokémon activo
+inventory       array de {item, amount}
+money           número
+trainerEncounter    TrainerType | undefined
+pokemonEncounter    PokemonEncounterType | undefined
+defeatedTrainers    string[] (IDs "mapa-x-y")
+collectedItems      string[] (IDs "mapa-x-y")
+completedQuests     string[] (IDs de quests completadas)
+```
+
+**`ui` slice** (`state/uiSlice.ts`) — estado de la interfaz:
+```
+text                string[] | null     (caja de texto activa)
+startMenu           bool
+itemsMenu           bool
+playerMenu          bool
+titleMenu           bool                (pantalla de título visible)
+loadMenu            bool
+gameboyMenu         bool
+pokemonCenterMenu   bool
+pcMenu              bool
+pokeMartMenu        bool
+textThenAction      {text, action} | null  (texto → ejecutar función)
+learningMove        objeto | null
+blackScreen         bool
+confirmationMenu    {preMessage, postMessage, confirm, cancel} | null
+evolution           {index, evolveToId} | null
+```
+
+**Save/Load**: `localStorage` con la clave = nombre del jugador.  
+`dispatch(save())` → guarda. `dispatch(load())` → carga.
+
+---
+
+### Sistema de eventos: mitt
+
+`app/emitter.ts` exporta un bus de eventos global con estos eventos:
+
+| Evento | Cuándo se emite |
+|---|---|
+| `up/down/left/right` | cada tick de movimiento |
+| `start-up/start-down/...` | inicio del movimiento en esa dirección |
+| `stop-up/stop-down/...` | fin del movimiento |
+| `a` | botón A pulsado |
+| `b` | botón B pulsado |
+| `start` | botón START pulsado |
+| `select` | botón SELECT pulsado |
+| `stop-moving` | jugador para |
+| `enter-door` | al entrar en un edificio |
+| `heal-pokemon` | al curar en el Centro |
+
+Cualquier componente puede suscribirse con `useEvent(Event.A, callback)`.
+
+---
+
+### Sistema de mapas (`src/maps/`)
+
+Cada mapa es un objeto TypeScript con esta estructura:
+
+```typescript
+interface MapType {
+  name: string           // Nombre visible
+  image: string          // PNG de fondo (importado como asset)
+  height: number         // Alto en tiles
+  width: number          // Ancho en tiles
+  start: {x, y}          // Posición inicial del jugador
+  
+  // Colisiones
+  walls: Record<fila, columna[]>       // Tiles bloqueantes
+  fences: Record<fila, columna[]>      // Vallas (se puede saltar hacia abajo)
+  
+  // Hierba alta (activa encuentros aleatorios)
+  grass: Record<fila, columna[]>
+  
+  // Texto interactivo (carteles, personas estáticas)
+  text: Record<fila, Record<col, string[]>>
+  
+  // Transiciones entre mapas
+  maps: Record<fila, Record<col, MapId>>        // Tile → cargar mapa en su start
+  teleports: Record<fila, Record<col, {map, pos}>>  // Tile → mapa + posición exacta
+  exits: Record<fila, columna[]>               // Tiles de salida del mapa
+  exitReturnMap: MapId                          // A qué mapa van esos exits
+  exitReturnPos: {x, y}                         // En qué posición
+
+  // Opcionales
+  music: string                    // MP3 de la música de fondo
+  encounters: EncountersType       // Tablas de encuentros salvajes
+  cave: boolean                    // Flag para tratarlo como cueva
+  recoverLocation: {x, y}          // Dónde respawnea el jugador tras KO
+  pokemonCenter: {x, y}            // Posición del mostrador del Centro
+  pc: {x, y}                       // Posición del PC
+  store: {x, y}                    // Posición de la tienda
+  storeItems: ItemType[]           // Qué vende la tienda
+  spinners: Record<fila, Record<col, Direction>>  // Entrenadores que giran
+  stoppers: Record<fila, columna[]>
+  trainers: TrainerType[]          // Entrenadores NPCs
+  items: MapItemType[]             // Objetos recogibles en el suelo
+}
+```
+
+**Los 33 mapas actuales:**
+- Pallet Town + Lab + 2 casas
+- Viridian City + Gym + PokéCenter + PokéMart + Academia + Casa NPC
+- Route 1, Route 2, Route 22, Route 3 + PokéCenter
+- Gate House, Route 2 Gate, Route 2 Gate North
+- Viridian Forest
+- Pewter City + Gym + PokéCenter + PokéMart + 2 casas NPC + Museo 1F/2F
+- Mt. Moon 1F/2F/3F
+
+**Para añadir un mapa se requieren 3 cambios:**
+1. Añadir valor al enum `MapId` en `maps/map-types.ts`
+2. Crear archivo del mapa (copiar `maps/template.ts`)
+3. Importar y registrar en `maps/map-data.ts`
+
+---
+
+### Sistema de NPCs (`app/npcs.ts`)
+
+```typescript
+interface NpcType {
+  canBattle: boolean       // si true, necesita portrait
+  canWalk: boolean         // si true, necesita sprites de animación
+  name: string
+  portrait?: string        // imagen de portrait (batalla/diálogo)
+  sprites: {
+    down, up, left, right          // sprites estáticos
+    downWalk1?, downWalk2?         // animación caminando
+    upWalk1?, upWalk2?
+    leftWalk1?, rightWalk1?
+  }
+}
+```
+
+**40 tipos de NPC disponibles** con sprites ya integrados:
+`ash`, `oak`, `rival`, `beauty`, `birdKeeper`, `blackBelt`, `bugCatcher`,
+`burglar`, `channeler`, `aceTrainerMale/Female`, `cueBall`, `engineer`,
+`fisher`, `gambler`, `gentleman`, `hiker`, `jrTrainerMale/Female`, `juggler`,
+`lass`, `pokeManiac`, `psychic`, `rocker`, `teamRocketGrunt`, `sailor`,
+`scientist`, `superNerd`, `swimmer`, `tamer`, `youngster`, `biker`,
++ líderes de gimnasio: `brock`, `misty`, `ltSurge`, `erica`, `koga`, `sabrina`, `blaine`, `giovanni`
+
+**Para la boda, los más útiles:**
+- Novio formal: `gentleman`, `oak`, `aceTrainerMale`
+- Novia formal: `beauty`, `misty`, `erica`, `aceTrainerFemale`
+- Invitados: `youngster`, `lass`, `sailor`, `fisher`
+- Fotógrafo: `scientist`
+
+---
+
+### Entrenadores / NPCs con diálogo
+
+Los NPCs que interactúan son `TrainerType`:
+
+```typescript
+interface TrainerType {
+  npc: NpcType          // sprite y nombre
+  pokemon: [{id, level}]  // equipo (necesario aunque no luchen realmente)
+  facing: Direction       // dirección que miran
+  pos: {x, y}             // posición en el mapa (en tiles)
+  intro: string[]         // diálogo al acercarse / al combatir
+  outtro: string[]        // diálogo tras la batalla
+  money: number           // dinero que da al ganar
+  postGame?: { message: string[], items?: ItemType[] }  // post-batalla
+}
+```
+
+El jugador ve el `intro` cuando entra en la línea de visión del entrenador (radio: **5 tiles**).  
+Si el entrenador aún no ha sido derrotado → combate automático.  
+Si ya fue derrotado → sólo dice el `postGame.message`.
+
+> **Para NPCs de boda sin combate**: el sistema no tiene modo "hablar sin combate" nativo para entrenadores. La alternativa es usar el campo `text` del mapa (signs interactivos que no requieren NpcType).
+
+---
+
+### Sistema de diálogos
+
+Hay dos mecanismos:
+
+1. **`text` en el mapa** — tiles que al pulsarlos muestran texto. Formato:
+   ```typescript
+   text: {
+     5: { 3: ["Línea 1", "Línea 2"] }  // fila 5, col 3
+   }
+   ```
+   Cualquier tile con coordenadas en `text` muestra el texto al presionar A.
+
+2. **`TrainerType.intro/outtro/postGame`** — diálogo de entrenadores.  
+   Arrays de strings. Se muestran uno a uno en la caja de texto estándar.
+
+**No hay diálogo ramificado nativo.** La única "bifurcación" disponible es `confirmationMenu` (Sí/No) via el sistema de quests.
+
+---
+
+### Sistema de quests (`app/use-quests.ts`)
+
+```typescript
+interface QuestType {
+  trigger: "talk" | "walk"          // al hablar con NPC o pisar tile
+  map: MapId                         // en qué mapa se activa
+  positions: Record<fila, col[]>     // tiles que lo disparan
+  active: () => boolean              // condición (¿completada? ¿badge obtenida?)
+  text: string[]                     // texto mostrado
+  action: () => void                 // función ejecutada tras el texto
+}
+```
+
+Las quests pueden:
+- Mostrar texto
+- Ejecutar código arbitrario de Redux (mover al jugador, dar dinero, teletransportar, etc.)
+- Mostrar `confirmationMenu` (Sí/No con callbacks)
+- Marcar quests como completadas (`dispatch(completeQuest("id"))`)
+
+**Actualmente hay 2 quests** (guía a Brock, cobro del museo).
+
+---
+
+### Sistema de combates
+
+**Encuentros salvajes**: al caminar sobre hierba (`grass` tiles), se activa con probabilidad `encounters.walk.rate`. El Pokémon encontrado se decide por tabla de probabilidades en `location-data.json`.
+
+**Encuentros de entrenador**: al entrar en la línea de visión de un trainer (5 tiles frontales), si no está en `defeatedTrainers`, se inicia un combate. Los `spinners` rotan continuamente y pueden activarse al pasar cerca.
+
+**Flujo de combate**: `encounterTrainer(trainerData)` → Redux → el componente `TrainerEncounter` detecta el cambio y renderiza la escena de combate.
+
+**La lógica de combate** incluye: por turnos, cálculo de daño (stats + tipos + movimientos), efectividad de tipos, críticos (10%), lanzar Pokéballs, usar ítems, huir, KO y recuperación.
+
+---
+
+### Pantalla de título
+
+**Archivo**: `components/TitleScreen.tsx`
+
+Muestra 3 imágenes PNG:
+- `assets/title-screen/pokemon.png` → el logo del juego
+- `assets/title-screen/version.png` → el subtítulo "versión"
+- `assets/title-screen/player.png` → el personaje jugador
+
++ Un Pokémon aleatorio (#1-151) que desfila de derecha a izquierda y cambia cada 5 segundos.
+
+**Para personalizar**: reemplazar esos 3 PNG por imágenes con el nombre de la pareja y la fecha.
+
+---
+
+### Criaturas / Pokémon
+
+- **151 criaturas** con ID 1-151
+- Cada una tiene: nombre, tipos, stats base (HP/Ataque/Defensa/Velocidad/Especial), sprites (front + back)
+- Los stats reales se calculan en `app/use-pokemon-stats.ts` con fórmulas Gen1
+- Las evoluciones por piedra están hardcodeadas en `use-item-data.ts`
+
+---
+
+### Ítems
+
+**100+ ítems** definidos: pociones, Pokéballs, piedras evolutivas, TMs/HMs, medallas, llaves de historia.
+Cada ítem tiene: nombre, precio, precio de venta, si es consumible, si es usable en combate, acción al usarlo.
 
 ---
 
 ## Dónde editar el juego
 
-La fuente editable es el repo **chase-manning/pokemon-js**. Para modificar:
-
-### 1. Clonar la fuente de edición (una sola vez)
-
 ```bash
+# Clonar fuente (una sola vez)
 git clone https://github.com/chase-manning/pokemon-js.git game-src
-cd game-src
-npm install --legacy-peer-deps
+cd game-src && npm install --legacy-peer-deps
 ```
 
-### 2. Archivos clave a modificar
+### Guía rápida de modificaciones
 
-| Qué cambiar | Archivo |
-|---|---|
-| Mapas / escenarios | `game-src/src/maps/*.ts` |
-| Textos y diálogos de NPCs | `game-src/src/maps/pallet-town.ts` (y demás mapas) |
-| Datos de personajes | Buscar `npc`, `character`, `dialogue` en `game-src/src/` |
-| Sprites / imágenes | `game-src/src/assets/` |
-| Nombre del juego / título | `game-src/public/index.html` y componentes en `game-src/src/` |
-| Música / sonidos | `game-src/src/assets/` |
-| Shell CSS Game Boy | `game-src/public/styles/css-pokemon-gameboy.css` |
-
-### 3. Compilar y actualizar el build
-
-Después de editar, recompilar y copiar al proyecto:
-
-```bash
-cd game-src
-PUBLIC_URL=/game DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false npm run build
-cp -r build/* ../public/game/
-```
-
-> `PUBLIC_URL=/game` no modifica el código fuente — solo indica al bundler desde qué ruta se servirán los assets estáticos.
+| Qué quiero cambiar | Archivo | Campo |
+|---|---|---|
+| Nombre del jugador por defecto | `src/state/gameSlice.ts` | `initialState.name` |
+| Pokémon iniciales del jugador | `src/state/gameSlice.ts` | `initialState.pokemon` |
+| Mapa de inicio | `src/state/gameSlice.ts` | `initialState.map` + `pos` |
+| Texto de un cartel | `src/maps/<mapa>.ts` | campo `text` |
+| Diálogo de un entrenador NPC | `src/maps/<mapa>.ts` | `trainers[i].intro/outtro` |
+| Música de un mapa | `src/maps/<mapa>.ts` | campo `music` (MP3 en assets/) |
+| Mapa de fondo (imagen) | `src/maps/<mapa>.ts` | campo `image` (PNG en assets/) |
+| Añadir un NPC nuevo | `src/maps/<mapa>.ts` | añadir a array `trainers` |
+| Logo pantalla de título | `src/assets/title-screen/pokemon.png` | reemplazar PNG |
+| Subtítulo pantalla de título | `src/assets/title-screen/version.png` | reemplazar PNG |
+| Nombre de una criatura | `src/app/pokemon-metadata.ts` | campo `name` en cada entrada |
+| Quest / evento con condición | `src/app/use-quests.ts` | añadir nueva entrada |
+| Nuevo mapa completo | `src/maps/template.ts` + 3 cambios (ver arriba) | |
 
 ---
 
-## Comandos de desarrollo
+## Limitaciones conocidas
+
+### Limitaciones de diseño de juego
+1. **No hay diálogo ramificado**: los textos son arrays lineales de strings. No hay árbol de opciones (sólo el confirmationMenu Sí/No via quests).
+2. **Los entrenadores siempre pelean**: no existe un modo NPC "sólo habla sin combate". La alternativa es usar el campo `text` del mapa (tiles interactivos sin sprite visible).
+3. **Los NPCs no se mueven** salvo los `spinners` (rotan) y el rival (se mueve en eventos scripted de quests).
+4. **Line of sight fija en 5 tiles**: todos los entrenadores tienen el mismo radio de detección.
+5. **No hay NPCs de tienda custom**: sólo un tipo de tienda por mapa, con ítems fijos del `ItemType` enum.
+
+### Limitaciones técnicas
+6. **Sin guardar en servidor**: el save usa localStorage, se pierde al limpiar el navegador.
+7. **Los mapas son imágenes PNG + colisiones en código**: para editar visualmente el mapa hay que usar Tiled y recodificar los `walls`, `fences`, `grass` en TypeScript a mano (no hay importador automático).
+8. **151 criaturas con sprites de Pokémon Gen1**: los sprites de los Pokémon son de los juegos originales. Para una parodia completa habría que reemplazar las 151 imágenes o reducir el número.
+9. **No hay RSVP ni conexión a Supabase en el juego**: el juego es completamente client-side. Integrar un formulario RSVP requeriría añadir un componente React nuevo y llamadas a Supabase desde dentro del juego.
+10. **Música: un solo MP3 por mapa**: no hay sistema de capas de audio ni eventos de música dinámica.
+11. **Sin internacionalización**: todos los textos están hardcodeados en inglés por el motor base.
+12. **Imagen de título con sprites de Pokémon**: los 3 PNGs de la pantalla de título son de Gen1. Son los más urgentes de reemplazar antes de compartir con invitados.
+
+### Lo más fácil de cambiar
+- Textos de carteles y diálogos de NPCs → sólo strings en los archivos de mapas
+- Música → cambiar el MP3 referenciado
+- Nombre del jugador y Pokémon iniciales → 5 líneas en gameSlice.ts
+- Imagen de fondo de un mapa → cambiar el PNG importado
+- Pantalla de título → 3 PNG nuevos
+
+---
+
+## Comandos
 
 ```bash
-# Servidor local Next.js (puerto 3000)
+# Servidor local Next.js
 npm run dev
-# → abre http://localhost:3000  (redirige a /game/index.html automáticamente)
+# → http://localhost:3000 (redirige a /game/index.html)
 
-# Build de producción Next.js
-npm run build
-
-# TypeScript check (CI)
+# TypeScript check
 npx tsc --noEmit
 
-# Recompilar el juego tras editar game-src/
+# Editar y recompilar el juego
 cd game-src
 PUBLIC_URL=/game DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false npm run build
 cp -r build/* ../public/game/
+
+# Modo debug del juego (movimiento rápido, ver colisiones)
+# En game-src/src/app/constants.ts → DEBUG_MODE = true (no commitear)
 ```
 
 ---
 
-## Controles del juego
-
-El motor ya tiene controles on-screen + teclado implementados.
+## Controles
 
 | Acción | Teclado | On-screen |
 |---|---|---|
@@ -133,27 +417,18 @@ El motor ya tiene controles on-screen + teclado implementados.
 
 ---
 
-## Reglas legales y creativas
-
-- ✅ Motor fan-made, licencia MIT (chase-manning/pokemon-js)
-- ✅ No se usan ROMs ni assets de Nintendo / Game Freak / The Pokémon Company
-- ✅ Los sprites son originales del repo base
-- ❌ No usar nombres registrados: Pokémon, Pikachu, Pallet Town, Professor Oak, etc.
-- ❌ No redistribuir con marcas de Nintendo
-
----
-
 ## Roadmap
 
 - [x] Base jugable en navegador (chase-manning/pokemon-js)
 - [x] Integración en Next.js / Vercel sin cambios al motor
-- [ ] Sustituir textos y diálogos por contenido de boda
-- [ ] Crear mapa personalizado (pueblo / lugar de la boda)
-- [ ] Reemplazar sprites de NPCs por novio / novia / invitados
-- [ ] Pantalla título con nombres de la pareja y fecha
-- [ ] Integrar datos (fecha, lugar, menú) desde JSON o Supabase
-- [ ] Formulario de RSVP integrado
-- [ ] Música personalizada
+- [ ] Reemplazar 3 imágenes de pantalla de título con nombres de la pareja
+- [ ] Cambiar nombre del jugador por defecto
+- [ ] Sustituir textos de carteles y diálogos por contenido de boda
+- [ ] Crear mapa personalizado del lugar de la boda
+- [ ] Añadir NPCs de boda (novio, novia, invitados)
+- [ ] Reemplazar música por canciones de la boda
+- [ ] Reducir/renombrar criaturas (o reemplazar sprites)
+- [ ] Integrar RSVP con Supabase
 - [ ] Compartir con invitados vía Vercel
 
 ---
@@ -161,9 +436,6 @@ El motor ya tiene controles on-screen + teclado implementados.
 ## Variables de entorno
 
 ```bash
-# Requeridas en .env.local (para futuras funciones con Supabase)
 NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
 ```
-
-El juego en `/game/` no necesita variables de entorno para funcionar.
