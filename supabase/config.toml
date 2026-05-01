@@ -1,0 +1,25 @@
+[api]
+# Rellenar con el project-ref de tu proyecto Supabase
+# Se encuentra en: Dashboard → Settings → General → Reference ID
+project_id = "your-project-ref"
+
+[functions.webauthn-register-start]
+verify_jwt = false
+
+[functions.webauthn-register-finish]
+verify_jwt = false
+
+[functions.webauthn-auth-start]
+verify_jwt = false
+
+[functions.webauthn-auth-finish]
+verify_jwt = false
+
+[functions.create-user]
+verify_jwt = false
+
+[functions.save-game]
+verify_jwt = false
+
+[functions.load-game]
+verify_jwt = false
