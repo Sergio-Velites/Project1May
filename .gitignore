@@ -4,8 +4,13 @@ node_modules/
 .pnp.js
 
 # Next.js
-webapp/.next/
-webapp/out/
+.next/
+out/
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# Game source (no incluir en repo, se clona aparte)
+game-src/
 
 # Env files
 .env
