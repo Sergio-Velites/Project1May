@@ -1,0 +1,42 @@
+name: Deploy Supabase Edge Functions
+
+on:
+  workflow_dispatch:  # Solo se lanza manualmente desde GitHub
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        run: supabase link --project-ref kplfjrjibjptigvfgdvy
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+      - name: Set Edge Function secrets
+        run: |
+          supabase secrets set \
+            RP_ID="game.bodasym26.es" \
+            RP_NAME="WeddingBoy" \
+            RP_ORIGIN="https://game.bodasym26.es"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Deploy Edge Functions
+        run: |
+          supabase functions deploy webauthn-register-start --no-verify-jwt
+          supabase functions deploy webauthn-register-finish --no-verify-jwt
+          supabase functions deploy webauthn-auth-start      --no-verify-jwt
+          supabase functions deploy webauthn-auth-finish     --no-verify-jwt
+          supabase functions deploy create-user              --no-verify-jwt
+          supabase functions deploy save-game                --no-verify-jwt
+          supabase functions deploy load-game                --no-verify-jwt
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
