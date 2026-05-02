@@ -11,6 +11,7 @@ tsconfig.tsbuildinfo
 
 # Game source (no incluir en repo, se clona aparte)
 game-src/
+supabase/.temp/
 
 # Env files
 .env
