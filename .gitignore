@@ -32,3 +32,6 @@ Thumbs.db
 # Editor
 .vscode/settings.json
 *.swp
+
+# Supabase CLI temp files
+supabase/.temp/
