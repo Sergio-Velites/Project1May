@@ -41,10 +41,14 @@ const IntroVideo = () => {
     }
   }, [gameboyOpen]);
 
+  // IMPORTANTE: comprobar 'active' dentro del callback para que el listener
+  // no dispare showTitleMenu() cuando el vídeo ya terminó y el jugador está
+  // en otra pantalla (OakIntro, TitleScreen, etc.).
   const skip = useCallback(() => {
+    if (!active) return;
     dispatch(showTitleMenu());
     setActive(false);
-  }, [dispatch]);
+  }, [dispatch, active]);
 
   useEffect(() => {
     if (!active) return;

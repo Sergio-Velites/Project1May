@@ -1,7 +1,8 @@
 import styled, { keyframes } from "styled-components";
-import { useEffect } from "react";
 import nintendo from "../assets/title-screen/nintendo.png";
 import { useDispatch, useSelector } from "react-redux";
+import useEvent from "../app/use-event";
+import { Event } from "../app/emitter";
 import { hideGameboyMenu, selectGameboyMenu } from "../state/uiSlice";
 import PixelImage from "../styles/PixelImage";
 
@@ -123,14 +124,15 @@ const GameboyMenu = () => {
   const dispatch = useDispatch();
   const show = useSelector(selectGameboyMenu);
 
-  // La pantalla dura exactamente 3 s (igual que la animación CSS) y pasa sola.
-  // No hay botón para saltarla.
-  useEffect(() => {
-    const t = setTimeout(() => {
-      dispatch(hideGameboyMenu());
-    }, 3000);
-    return () => clearTimeout(t);
-  }, [dispatch]);
+  // El usuario pulsa A, B o START para confirmar que ha interactuado con la
+  // pantalla — esto desbloquea el autoplay del vídeo en todos los navegadores.
+  const dismiss = () => {
+    if (show) dispatch(hideGameboyMenu());
+  };
+
+  useEvent(Event.A, dismiss);
+  useEvent(Event.B, dismiss);
+  useEvent(Event.Start, dismiss);
 
   if (!show) return null;
 
