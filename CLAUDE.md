@@ -331,29 +331,73 @@ Cada ítem tiene: nombre, precio, precio de venta, si es consumible, si es usabl
 
 ## Dónde editar el juego
 
+> **Desde la rama `local-src` usamos el source local en `game-src/`.**
+> `game-src/` está en `.gitignore` y solo existe en tu máquina.
+> Al repo solo va el build compilado en `public/game/`.
+
+### Primera vez (clonar el source)
+
 ```bash
-# Clonar fuente (una sola vez)
+# Desde la raíz del proyecto, una sola vez:
 git clone https://github.com/chase-manning/pokemon-js.git game-src
 cd game-src && npm install --legacy-peer-deps
 ```
 
+### Flujo de trabajo habitual (editar → compilar → commitear)
+
+```bash
+# 1. Editar lo que quieras en game-src/src/
+#    (ver tabla de modificaciones abajo)
+
+# 2. Compilar desde DENTRO de game-src:
+cd game-src
+PUBLIC_URL=/game DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false \
+  node_modules/.bin/react-scripts build
+
+# 3. Copiar el build al proyecto Next.js:
+cp -r build/* ../public/game/
+
+# 4. Commitear solo el build (game-src queda ignorado):
+cd ..
+git add public/game/
+git commit -m "feat: <descripción del cambio>"
+```
+
+> ⚠️ Nunca usar `npx react-scripts build` desde la raíz del proyecto —
+> hay que estar en `game-src/` y usar `node_modules/.bin/react-scripts`.
+
+### Archivos propios de WeddingBoy (NO son del repo original)
+
+Estos archivos han sido creados/modificados para la boda y están en `game-src/src/`:
+
+| Archivo | Qué hace |
+|---|---|
+| `app/cloud-save.ts` | Supabase Edge Functions + WebAuthn passkey (save/load remoto) |
+| `components/LoadScreen.tsx` | Flujo de inicio: checking → choose/prompt → oak-intro → name-picker |
+| `components/OakIntro.tsx` | Secuencia de diálogo del Prof. Oak antes de nueva partida |
+| `components/NameKeyboard.tsx` | Teclado estilo Game Boy para elegir nombre del jugador (7 chars) |
+| `state/gameSlice.ts` | Añadido `loadFromState()` para cargar save desde la nube |
+
 ### Guía rápida de modificaciones
 
-| Qué quiero cambiar | Archivo | Campo |
+| Qué quiero cambiar | Archivo en `game-src/src/` | Campo |
 |---|---|---|
-| Nombre del jugador por defecto | `src/state/gameSlice.ts` | `initialState.name` |
-| Pokémon iniciales del jugador | `src/state/gameSlice.ts` | `initialState.pokemon` |
-| Mapa de inicio | `src/state/gameSlice.ts` | `initialState.map` + `pos` |
-| Texto de un cartel | `src/maps/<mapa>.ts` | campo `text` |
-| Diálogo de un entrenador NPC | `src/maps/<mapa>.ts` | `trainers[i].intro/outtro` |
-| Música de un mapa | `src/maps/<mapa>.ts` | campo `music` (MP3 en assets/) |
-| Mapa de fondo (imagen) | `src/maps/<mapa>.ts` | campo `image` (PNG en assets/) |
-| Añadir un NPC nuevo | `src/maps/<mapa>.ts` | añadir a array `trainers` |
-| Logo pantalla de título | `src/assets/title-screen/pokemon.png` | reemplazar PNG |
-| Subtítulo pantalla de título | `src/assets/title-screen/version.png` | reemplazar PNG |
-| Nombre de una criatura | `src/app/pokemon-metadata.ts` | campo `name` en cada entrada |
-| Quest / evento con condición | `src/app/use-quests.ts` | añadir nueva entrada |
-| Nuevo mapa completo | `src/maps/template.ts` + 3 cambios (ver arriba) | |
+| Nombre del jugador por defecto | `state/gameSlice.ts` | `initialState.name` |
+| Pokémon iniciales del jugador | `state/gameSlice.ts` | `initialState.pokemon` |
+| Mapa de inicio | `state/gameSlice.ts` | `initialState.map` + `pos` |
+| Texto de un cartel | `maps/<mapa>.ts` | campo `text` |
+| Diálogo de un entrenador NPC | `maps/<mapa>.ts` | `trainers[i].intro/outtro` |
+| Música de un mapa | `maps/<mapa>.ts` | campo `music` (MP3 en assets/) |
+| Mapa de fondo (imagen) | `maps/<mapa>.ts` | campo `image` (PNG en assets/) |
+| Añadir un NPC nuevo | `maps/<mapa>.ts` | añadir a array `trainers` |
+| Logo pantalla de título | `assets/title-screen/pokemon.png` | reemplazar PNG |
+| Subtítulo pantalla de título | `assets/title-screen/version.png` | reemplazar PNG |
+| Nombre de una criatura | `app/pokemon-metadata.ts` | campo `name` en cada entrada |
+| Quest / evento con condición | `app/use-quests.ts` | añadir nueva entrada |
+| Nuevo mapa completo | `maps/template.ts` + 3 cambios (ver arriba) | |
+| Diálogo intro Prof. Oak | `components/OakIntro.tsx` | array `OAK_DIALOGUE` |
+| Textos cloud save (Continuar, etc.) | `components/LoadScreen.tsx` | strings inline |
+| URL de Supabase | `.env` o variable en `app/cloud-save.ts` | `REACT_APP_SUPABASE_URL` |
 
 ---
 
@@ -372,12 +416,13 @@ cd game-src && npm install --legacy-peer-deps
 npm run dev
 # → http://localhost:3000 (redirige a /game/index.html)
 
-# TypeScript check
-npx tsc --noEmit
+# TypeScript check del juego
+cd game-src && npx tsc --noEmit
 
-# Editar y recompilar el juego
+# Compilar el juego (siempre desde game-src/)
 cd game-src
-PUBLIC_URL=/game DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false npm run build
+PUBLIC_URL=/game DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false \
+  node_modules/.bin/react-scripts build
 cp -r build/* ../public/game/
 
 # Modo debug del juego (movimiento rápido, ver colisiones)
