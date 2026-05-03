@@ -28,7 +28,7 @@ const BASE_DIALOGUE: DialogueLine[] = [
 const POST_NAME_DIALOGUE = (name: string): DialogueLine[] => [
   { sprite: "player",     text: `¡Correcto!\n¡Tu nombre es ${name}!` },
   { sprite: "player",     text: "¡Tu propia leyenda POKÉMON\nestá a punto de comenzar!" },
-  { sprite: "silhouette", text: "¡Te espera un mundo de\nsueños y aventuras\ncon POKÉMON! ¡Vamos!", pauseAfter: "start-game" },
+  { sprite: "player",     text: "¡Te espera un mundo de\nsueños y aventuras\ncon POKÉMON! ¡Vamos!", pauseAfter: "start-game" },
 ];
 
 // ── Animations ───────────────────────────────────────────────────────────────
