@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { MapId, MapItemType, MapWithPos, TrainerType } from "../maps/map-types";
 import palletTown from "../maps/pallet-town";
+import houseA2f from "../maps/house-a-2f";
 import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
@@ -17,11 +18,11 @@ import {
 } from "./state-types";
 
 const initialState: GameState = {
-  pos: palletTown.start,
+  pos: { x: 3, y: 6 },
   jumping: false,
   moving: false,
-  direction: Direction.Down,
-  map: MapId.PalletTown,
+  direction: Direction.Up,
+  map: MapId.PalletTownHouseA2F,
   money: 400,
   inventory: [
     {
