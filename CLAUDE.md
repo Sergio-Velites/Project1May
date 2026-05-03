@@ -45,12 +45,15 @@ Next.js los sirve automáticamente sin configuración adicional.
 │   ├── layout.tsx
 │   ├── page.tsx                # Redirect a /game/index.html
 │   └── globals.css
+├── game-src/                   # ← SOURCE del juego (editar aquí)
+│   └── src/                   # React 18 + CRA
 ├── lib/supabase/               # Cliente Supabase (futuras funciones)
 ├── public/game/                # ← BUILD del juego (no editar directamente)
 └── package.json                # Next.js deps
 ```
 
-Para editar el juego: clonar la fuente (ver sección "Dónde editar").
+> `game-src/` está en el repo (comprometido en `3e9990a`). No hay que clonarlo.
+> El `tsconfig.json` raíz excluye `game-src/` para que Next.js no intente compilarlo.
 
 ---
 
@@ -331,15 +334,14 @@ Cada ítem tiene: nombre, precio, precio de venta, si es consumible, si es usabl
 
 ## Dónde editar el juego
 
-> **Desde la rama `local-src` usamos el source local en `game-src/`.**
-> `game-src/` está en `.gitignore` y solo existe en tu máquina.
-> Al repo solo va el build compilado en `public/game/`.
+> **`game-src/` está en el repo** (commit `3e9990a`, rama `local-src`).
+> El source se edita en `game-src/src/`. El build va a `public/game/`.
+> Next.js no toca `game-src/` — está excluido en el `tsconfig.json` raíz.
 
-### Primera vez (clonar el source)
+### Primera vez (instalar dependencias del juego)
 
 ```bash
-# Desde la raíz del proyecto, una sola vez:
-git clone https://github.com/chase-manning/pokemon-js.git game-src
+# Solo la primera vez, o tras clonar el repo:
 cd game-src && npm install --legacy-peer-deps
 ```
 
@@ -386,7 +388,7 @@ Estos archivos han sido creados/modificados para la boda y están en `game-src/s
 | `app/move-helper.ts` | Daño Gen I completo: stat stages (20 movimientos), críticos 10%, efectividad |
 | `app/xp-helper.ts` | XP de entrenadores × 1.5 (bonus Gen I) |
 | `app/pokeball-helper.ts` | Fórmula de captura Gen I con 4 sacudidas reales |
-| `components/IntroVideo.tsx` | Video intro antes del TitleScreen; se reproduce cada sesión (sessionStorage) |
+| `components/IntroVideo.tsx` | Video intro antes del TitleScreen; se reproduce **siempre** al arrancar (después de GameboyMenu) |
 | `components/LoadScreen.tsx` | Flujo de inicio: checking → choose/prompt → oak-intro → name-picker → done |
 | `components/OakIntro.tsx` | Intro Prof. Oak con typewriter (40ms/char), sprites por línea, pauseAfter |
 | `components/NameKeyboard.tsx` | Teclado Game Boy: 4 filas (A-Z + DEL) + botón FIN siempre visible |
@@ -466,6 +468,8 @@ cd game-src && npx tsc --noEmit
 - [x] Teclado de nombre (4 filas + FIN siempre visible)
 - [x] Layout Game Boy Color responsive (cqw, aspect ratio 3:5)
 - [x] Oak NPC en el laboratorio con diálogo de boda
+- [x] `game-src/` añadido al repo GitHub (commit `3e9990a`)
+- [x] `tsconfig.json` raíz excluye `game-src/` (fix Vercel build)
 - [ ] Guardado en Supabase (WebAuthn passkey — estructura lista, pendiente activar)
 - [ ] Personalizar pantalla de título (logos de la pareja y fecha)
 - [ ] Personalizar video de intro
