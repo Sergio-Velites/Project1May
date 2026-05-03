@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { selectMap, selectPokemonEncounter } from "../state/gameSlice";
-import { selectGameboyMenu, selectLoadMenu } from "../state/uiSlice";
+import { selectGameboyMenu, selectLoadMenu, selectVideoShown } from "../state/uiSlice";
 
 import mapData from "../maps/map-data";
 import { MapType } from "../maps/map-types";
@@ -18,13 +18,15 @@ const SoundHandler = () => {
   const map = useSelector(selectMap);
   const isLoadScreen = useSelector(selectLoadMenu);
   const isGameboyMenu = useSelector(selectGameboyMenu);
+  const videoShown = useSelector(selectVideoShown);
   const [uiSound, setUiSound] = useState<string | undefined>(undefined);
   const uiSoundRef = useRef<HTMLAudioElement>(null);
   const inBattle = !!useSelector(selectPokemonEncounter);
 
   const [musicOverride, setMusicOverride] = useState(null);
 
-  const isOpening = !isGameboyMenu && isLoadScreen;
+  // Solo reproducir música de apertura después de que el vídeo haya terminado
+  const isOpening = !isGameboyMenu && isLoadScreen && videoShown;
 
   const getMapMusic = (map: MapType): string => {
     if (map.music) return map.music;

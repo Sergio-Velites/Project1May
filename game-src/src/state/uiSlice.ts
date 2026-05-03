@@ -35,6 +35,7 @@ interface UiState {
   titleMenu: boolean;
   loadMenu: boolean;
   gameboyMenu: boolean;
+  videoShown: boolean;
   pokemonCenterMenu: boolean;
   pcMenu: boolean;
   pokeMartMenu: boolean;
@@ -53,9 +54,10 @@ const initialState: UiState = {
   startMenu: false,
   itemsMenu: false,
   playerMenu: false,
-  titleMenu: true,
+  titleMenu: false,
   loadMenu: true,
   gameboyMenu: true,
+  videoShown: false,
   actionOnPokemon: null,
   pokeballThrowing: null,
   pokemonCenterMenu: false,
@@ -90,6 +92,10 @@ export const uiSlice = createSlice({
     },
     hidePlayerMenu: (state) => {
       state.playerMenu = false;
+    },
+    showTitleMenu: (state) => {
+      state.titleMenu = true;
+      state.videoShown = true;
     },
     hideTitleMenu: (state) => {
       state.titleMenu = false;
@@ -188,6 +194,7 @@ export const {
   hideItemsMenu,
   showPlayerMenu,
   hidePlayerMenu,
+  showTitleMenu,
   hideTitleMenu,
   hideLoadMenu,
   hideGameboyMenu,
@@ -231,6 +238,8 @@ export const selectTitleMenu = (state: RootState) => state.ui.titleMenu;
 export const selectLoadMenu = (state: RootState) => state.ui.loadMenu;
 
 export const selectGameboyMenu = (state: RootState) => state.ui.gameboyMenu;
+
+export const selectVideoShown = (state: RootState) => state.ui.videoShown;
 
 export const selectPcMenu = (state: RootState) => state.ui.pcMenu;
 

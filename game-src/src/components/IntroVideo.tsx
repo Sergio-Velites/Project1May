@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useSelector } from "react-redux";
-import { selectGameboyMenu } from "../state/uiSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { selectGameboyMenu, showTitleMenu } from "../state/uiSlice";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import introSrc from "../assets/video/intro.mp4";
@@ -30,6 +30,7 @@ const Video = styled.video`
 
 const IntroVideo = () => {
   const gameboyOpen = useSelector(selectGameboyMenu);
+  const dispatch = useDispatch();
   const [active, setActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -41,8 +42,9 @@ const IntroVideo = () => {
   }, [gameboyOpen]);
 
   const skip = useCallback(() => {
+    dispatch(showTitleMenu());
     setActive(false);
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (!active) return;
@@ -78,6 +80,7 @@ const IntroVideo = () => {
 
   useEvent(Event.A, skip);
   useEvent(Event.B, skip);
+  useEvent(Event.Start, skip);
 
   if (!active) return null;
 
@@ -89,6 +92,7 @@ const IntroVideo = () => {
         autoPlay
         playsInline
         onEnded={skip}
+        onError={skip}
       />
     </Overlay>
   );
