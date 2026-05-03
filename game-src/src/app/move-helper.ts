@@ -40,7 +40,7 @@ export interface StatChange {
 const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
   // Lower enemy attack
   "growl":         { stat: "attack",  target: "defender", delta: -1 },
-  "confuse-ray":   { stat: "attack",  target: "defender", delta: -1 },
+  "confuse-ray":   { stat: "special", target: "defender", delta: -1 }, // confusión → desorientación especial
 
   // Lower enemy defense
   "leer":          { stat: "defense", target: "defender", delta: -1 },
@@ -75,7 +75,48 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
   // Raise own special
   "amnesia":       { stat: "special", target: "attacker", delta: +2 },
   "growth":        { stat: "special", target: "attacker", delta: +1 },
+
+  // Movimientos de estado — aproximados como bajada de stat (sin sistema de estados completo)
+  "supersonic":    { stat: "special", target: "defender", delta: -1 }, // confusión
+  "sing":          { stat: "speed",   target: "defender", delta: -2 }, // sueño → inmóvil
+  "hypnosis":      { stat: "speed",   target: "defender", delta: -2 }, // sueño → inmóvil
+  "sleep-powder":  { stat: "speed",   target: "defender", delta: -2 }, // sueño → inmóvil
+  "spore":         { stat: "speed",   target: "defender", delta: -2 }, // sueño → inmóvil
+  "lovely-kiss":   { stat: "speed",   target: "defender", delta: -2 }, // sueño → inmóvil
+  "stun-spore":    { stat: "speed",   target: "defender", delta: -2 }, // parálisis → -velocidad
+  "thunder-wave":  { stat: "speed",   target: "defender", delta: -2 }, // parálisis → -velocidad
+  "poison-powder": { stat: "special", target: "defender", delta: -1 }, // veneno → desgaste especial
+  "toxic":         { stat: "special", target: "defender", delta: -2 }, // veneno grave → -2 especial
+  "leech-seed":    { stat: "defense", target: "defender", delta: -1 }, // drenado → -defensa
+  "disable":       { stat: "attack",  target: "defender", delta: -1 }, // deshabilita movimiento
+  "spite":         { stat: "attack",  target: "defender", delta: -1 }, // reduce PP → -ataque
 };
+
+// ── Movimientos de efecto especial ──────────────────────────────────────────
+
+/** KO de un golpe — falla además si el defensor tiene mayor nivel (Gen I) */
+const OHKO_MOVES = new Set(["guillotine", "horn-drill", "fissure"]);
+
+/** Movimientos de daño fijo (no usan la fórmula de daño estándar) */
+const FIXED_DAMAGE_MOVES: Record<string, (level: number) => number> = {
+  "seismic-toss": (lv) => lv,         // daño = nivel del atacante (Gen I)
+  "night-shade":  (lv) => lv,         // daño = nivel del atacante
+  "dragon-rage":  () => 40,           // siempre 40 PS
+  "sonic-boom":   () => 20,           // siempre 20 PS
+  "counter":      (lv) => lv * 2,     // representa "doble del daño recibido" (aproximado)
+  "psywave":      (lv) => Math.max(1, Math.floor(lv * (0.5 + Math.random()))), // aleatorio 0.5–1.5×nivel
+};
+
+/** Movimientos de curación — fracción del HP máximo que se restaura */
+const HEAL_FRACTION: Record<string, number> = {
+  "recover":    0.5,
+  "softboiled": 0.5,
+  "milk-drink": 0.5,
+  "rest":       1.0, // curación total (omitimos el sueño por simplicidad)
+};
+
+/** Movimientos sin efecto visible en combate */
+const NO_EFFECT_MOVES = new Set(["splash", "teleport", "bide"]);
 
 // ── MoveResult ───────────────────────────────────────────────────────────────
 
@@ -138,7 +179,47 @@ const processMove = (
     return { ...defaultReturn, missed: true };
   }
 
-  // ── Status moves (no power) ───────────────────────────────────────────────
+  // ── Sin efecto (Splash, Teleport, Bide) ──────────────────────────────────
+  if (NO_EFFECT_MOVES.has(move)) {
+    return defaultReturn;
+  }
+
+  // ── OHKO (Guillotine, Horn Drill, Fissure) ────────────────────────────────
+  // En Gen I también falla si el defensor tiene mayor nivel que el atacante
+  if (OHKO_MOVES.has(move)) {
+    const attackerLevel = isAttacking ? us.level : them.level;
+    const defenderLevel = isAttacking ? them.level : us.level;
+    if (defenderLevel > attackerLevel) {
+      return { ...defaultReturn, missed: true };
+    }
+    if (isAttacking) {
+      return { ...defaultReturn, them: { ...them, hp: 0 } };
+    }
+    return { ...defaultReturn, us: { ...usAfterPP, hp: 0 } };
+  }
+
+  // ── Curación (Recover, Rest) ──────────────────────────────────────────────
+  const healFraction = HEAL_FRACTION[move];
+  if (healFraction !== undefined) {
+    if (isAttacking) {
+      const healed = Math.min(ourStats.hp, us.hp + Math.floor(ourStats.hp * healFraction));
+      return { ...defaultReturn, isBuff: true, us: { ...usAfterPP, hp: healed } };
+    }
+    const healed = Math.min(theirStats.hp, them.hp + Math.floor(theirStats.hp * healFraction));
+    return { ...defaultReturn, isBuff: true, them: { ...them, hp: healed } };
+  }
+
+  // ── Daño fijo (Seismic Toss, Dragon Rage, Sonic Boom, etc.) ──────────────
+  const fixedDamageFn = FIXED_DAMAGE_MOVES[move];
+  if (fixedDamageFn) {
+    const dmg = fixedDamageFn(isAttacking ? us.level : them.level);
+    if (isAttacking) {
+      return { ...defaultReturn, them: { ...them, hp: Math.max(0, them.hp - dmg) } };
+    }
+    return { ...defaultReturn, us: { ...usAfterPP, hp: Math.max(0, us.hp - dmg) } };
+  }
+
+  // ── Movimientos de estado (sin daño) ─────────────────────────────────────
   if (!moveMetadata.power) {
     const effect = STATUS_MOVE_EFFECTS[move];
     if (effect) {
@@ -149,7 +230,7 @@ const processMove = (
         statChange: effect,
       };
     }
-    // Unknown status move — treat as debuff with no extra effect
+    // Movimiento de estado desconocido — tratar como debuff visual
     return { ...defaultReturn, isDebuff: true };
   }
 
@@ -170,14 +251,26 @@ const processMove = (
     const superEffective  = typeEff > 1;
     const notVeryEffective = typeEff < 1;
 
-    const damage = Math.round(
+    const baseDamage = Math.round(
       ((((2 * us.level * critical) / 5 + 2) * moveMetadata.power * (attack / defense)) / 50 + 2) *
         stab * typeEff
     );
 
+    // Movimientos multihit (Double Slap, Fury Attack, Pin Missile, etc.)
+    const { minHits, maxHits } = moveMetadata.meta ?? {};
+    const hitCount =
+      minHits != null && maxHits != null
+        ? minHits + Math.floor(Math.random() * (maxHits - minHits + 1))
+        : 1;
+    const totalDamage = baseDamage * hitCount;
+
+    // Autodestrucción / Explosión: el atacante también se debilita
+    const selfDestructs = move === "self-destruct" || move === "explosion";
+
     return {
       ...defaultReturn,
-      them: { ...them, hp: Math.max(0, them.hp - damage) },
+      them: { ...them, hp: Math.max(0, them.hp - totalDamage) },
+      us: selfDestructs ? { ...usAfterPP, hp: 0 } : usAfterPP,
       superEffective,
       notVeryEffective,
       critical: critical > 1,
@@ -197,14 +290,26 @@ const processMove = (
   const superEffective  = typeEff > 1;
   const notVeryEffective = typeEff < 1;
 
-  const damage = Math.round(
+  const baseDmg = Math.round(
     ((((2 * them.level * critical) / 5 + 2) * moveMetadata.power * (attack / defense)) / 50 + 2) *
       stab * typeEff
   );
 
+  // Movimientos multihit (Double Slap, Fury Attack, Pin Missile, etc.)
+  const { minHits: eMin, maxHits: eMax } = moveMetadata.meta ?? {};
+  const eHits =
+    eMin != null && eMax != null
+      ? eMin + Math.floor(Math.random() * (eMax - eMin + 1))
+      : 1;
+  const eTotalDmg = baseDmg * eHits;
+
+  // Autodestrucción / Explosión: el atacante (enemigo) también se debilita
+  const enemyExplodes = move === "self-destruct" || move === "explosion";
+
   return {
     ...defaultReturn,
-    us: { ...usAfterPP, hp: Math.max(0, us.hp - damage) },
+    us: { ...usAfterPP, hp: Math.max(0, us.hp - eTotalDmg) },
+    them: enemyExplodes ? { ...them, hp: 0 } : them,
     superEffective,
     notVeryEffective,
     critical: critical > 1,

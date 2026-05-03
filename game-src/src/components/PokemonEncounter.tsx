@@ -1269,6 +1269,11 @@ const PokemonEncounter = () => {
           setStage(20);
         }
 
+        // Player self-destructed (Explosion / Self-Destruct) — no counter-attack
+        else if (us.hp <= 0) {
+          setStage(24);
+        }
+
         // Enemy attacking
         else {
           const { us: usNew } = processMoveResult(
@@ -1307,7 +1312,7 @@ const PokemonEncounter = () => {
 
         // We are attacking
         else {
-          const { them: themAfterAttack } = processMoveResult(
+          const { us: playerAfterAttack, them: themAfterAttack } = processMoveResult(
             processMove(us, them, attackId, true, stagesSnapshot),
             true
           );
@@ -1316,6 +1321,11 @@ const PokemonEncounter = () => {
             // If enemy fainted
             if (themAfterAttack.hp <= 0) {
               setStage(20);
+            }
+
+            // Player self-destructed (Explosion / Self-Destruct)
+            else if (playerAfterAttack.hp <= 0) {
+              setStage(24);
             }
 
             // Ending battle

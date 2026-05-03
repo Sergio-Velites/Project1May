@@ -169,8 +169,11 @@ const getTypeEffectiveness = (
   let effectiveness = 1;
 
   defendingTypes.forEach((defendingType) => {
-    const multiplier = typeChart[attackingType][defendingType];
-    if (multiplier) effectiveness *= multiplier;
+    const chart = typeChart[attackingType];
+    if (!chart) return effectiveness;
+    const multiplier = chart[defendingType];
+    // Usar !== undefined para que las inmunidades (×0) funcionen correctamente
+    if (multiplier !== undefined) effectiveness *= multiplier;
   });
 
   return effectiveness;
