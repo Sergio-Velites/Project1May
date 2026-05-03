@@ -15,7 +15,7 @@ const ActionOnPokemon = () => {
         action(index);
         dispatch(hideActionOnPokemon());
       }}
-      text="Choose a Pokémon."
+      text="Elige un POKÉMON."
     />
   );
 };

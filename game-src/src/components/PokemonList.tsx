@@ -132,8 +132,8 @@ const PokemonList = ({
           {text
             ? text
             : switching
-            ? "Move POKéMON where?"
-            : "Choose a POKéMON."}
+            ? "¿Dónde mover al POKÉMON?"
+            : "Elige un POKÉMON."}
         </Frame>
       </Container>
       <Menu
@@ -142,14 +142,14 @@ const PokemonList = ({
         show={selected}
         menuItems={[
           {
-            label: "Stats",
+            label: "Datos",
             action: () => {
               setSelected(false);
               setViewingStats(true);
             },
           },
           {
-            label: "Switch",
+            label: "Cambiar",
             action: () => {
               setSelected(false);
               if (switchAction) switchAction(active);

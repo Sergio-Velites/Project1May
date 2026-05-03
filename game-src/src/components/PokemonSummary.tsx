@@ -1,226 +1,212 @@
 /**
- * PokemonSummary — Pantalla de datos del Pokémon al estilo Gen I (RBY).
+ * PokemonSummary — Pantalla de datos del Pokémon fiel al estilo Gen I (RBY).
  *
- * Página 1 — INFO:  sprite grande, nº, nombre, tipo, altura, PS actuales/máx
- * Página 2 — STATS: stats numéricos (PS / ATQ / DEF / VEL / ESP) + movimientos
+ * Página 1 — ESTADO:      sprite, Nº, nombre, tipos, FE/OT, IDNº, PS bar
+ * Página 2 — HABILIDADES: movimientos con PS, stats (ATAQ/DEF/VEL/ESP)
  *
- * Navegación: A/B cierra, ←/→ cambia de página.
+ * Navegación: A / → avanza página, ← retrocede, B cierra.
  */
 
-import { useCallback } from "react";
-import styled from "styled-components";
+import { useCallback, useState } from "react";
+import styled, { css } from "styled-components";
+import { useSelector } from "react-redux";
 import { PokemonInstance } from "../state/state-types";
 import usePokemonMetadata from "../app/use-pokemon-metadata";
 import usePokemonStats from "../app/use-pokemon-stats";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import PixelImage from "../styles/PixelImage";
-import HealthBar from "./HealthBar";
 import { getMoveMetadata } from "../app/use-move-metadata";
-import { useState } from "react";
-
-// ── Layout ───────────────────────────────────────────────────────────────────
-
-const Overlay = styled.div`
-  position: absolute;
-  inset: 0;
-  z-index: 200;
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  font-family: "PokemonGB";
-  color: #181010;
-  overflow: hidden;
-`;
-
-// ── Page 1 — INFO ────────────────────────────────────────────────────────────
-
-const InfoPage = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 4px 6px 2px;
-`;
-
-const TopRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 4px;
-`;
-
-const SpriteBox = styled.div`
-  border: 3px solid #181010;
-  width: 44%;
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg);
-  flex-shrink: 0;
-`;
-
-const Sprite = styled(PixelImage)`
-  width: 90%;
-  height: 90%;
-  object-fit: contain;
-`;
-
-const InfoRight = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-`;
-
-const Label = styled.p<{ $size?: string }>`
-  font-size: ${(p) => p.$size ?? "7px"};
-  line-height: 1.6;
-  @media (min-width: 1000px) {
-    font-size: ${(p) =>
-      p.$size === "9px" ? "3.8vh" : p.$size === "8px" ? "3.3vh" : "2.8vh"};
-  }
-`;
-
-const TypeBadge = styled.span`
-  display: inline-block;
-  border: 2px solid #181010;
-  padding: 1px 4px;
-  font-size: 6px;
-  margin-right: 2px;
-  text-transform: uppercase;
-  @media (min-width: 1000px) {
-    font-size: 2.5vh;
-    border-width: 1px;
-  }
-`;
-
-const Divider = styled.div`
-  height: 2px;
-  background: #181010;
-  margin: 3px 0;
-`;
-
-const HpRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 2px;
-`;
-
-const HpNum = styled.p`
-  font-size: 7px;
-  white-space: nowrap;
-  @media (min-width: 1000px) {
-    font-size: 2.8vh;
-  }
-`;
-
-const NavHint = styled.p`
-  font-size: 6px;
-  text-align: right;
-  margin-top: auto;
-  padding-top: 2px;
-  @media (min-width: 1000px) {
-    font-size: 2.3vh;
-  }
-`;
-
-// ── Page 2 — STATS ───────────────────────────────────────────────────────────
-
-const StatsPage = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 4px 6px 2px;
-  gap: 2px;
-`;
-
-const StatsTitle = styled.p`
-  font-size: 8px;
-  text-align: center;
-  margin-bottom: 2px;
-  @media (min-width: 1000px) {
-    font-size: 3.2vh;
-  }
-`;
-
-const StatRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #c8c8c8;
-  padding: 1px 0;
-`;
-
-const StatName = styled.span`
-  font-size: 6px;
-  @media (min-width: 1000px) {
-    font-size: 2.5vh;
-  }
-`;
-
-const StatVal = styled.span`
-  font-size: 7px;
-  @media (min-width: 1000px) {
-    font-size: 2.8vh;
-  }
-`;
-
-const MovesSection = styled.div`
-  margin-top: 4px;
-`;
-
-const MovesTitleRow = styled.p`
-  font-size: 7px;
-  margin-bottom: 2px;
-  @media (min-width: 1000px) {
-    font-size: 2.8vh;
-  }
-`;
-
-const MoveRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 1px 0;
-  border-bottom: 1px dotted #aaa;
-`;
-
-const MoveName = styled.span`
-  font-size: 6px;
-  text-transform: uppercase;
-  @media (min-width: 1000px) {
-    font-size: 2.4vh;
-  }
-`;
-
-const MovePP = styled.span`
-  font-size: 6px;
-  @media (min-width: 1000px) {
-    font-size: 2.4vh;
-  }
-`;
+import { selectName } from "../state/gameSlice";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Altura en formato "X'YY" (décimas de metro → pies y pulgadas como Gen I) */
 const fmtHeight = (dm: number): string => {
   const inches = Math.round((dm * 10) / 2.54);
   const ft = Math.floor(inches / 12);
   const inch = inches % 12;
-  return `${ft}'${String(inch).padStart(2, "0")}`;
+  return `${ft}'${String(inch).padStart(2, "0")}"`;
 };
 
-/** Mapeo de tipo a nombre en español */
 const TYPE_ES: Record<string, string> = {
-  normal: "NORMAL", fire: "FUEGO", water: "AGUA", electric: "ELÉCT",
-  grass: "PLANTA", ice: "HIELO", fighting: "LUCHA", poison: "VENENO",
-  ground: "TIERRA", flying: "VOLAD", psychic: "PSÍQUI", bug: "BICHO",
-  rock: "ROCA", ghost: "FANTAS", dragon: "DRAGÓN", dark: "SINIS",
-  steel: "ACERO", fairy: "HADA",
+  normal: "NORMAL",   fire: "FUEGO",   water: "AGUA",    electric: "ELÉCTRICO",
+  grass: "PLANTA",    ice: "HIELO",    fighting: "LUCHA", poison: "VENENO",
+  ground: "TIERRA",   flying: "VOLADOR", psychic: "PSÍQUICO", bug: "BICHO",
+  rock: "ROCA",       ghost: "FANTASMA", dragon: "DRAGÓN",  dark: "SINIESTRO",
+  steel: "ACERO",     fairy: "HADA",
 };
 
-// ── Component ────────────────────────────────────────────────────────────────
+const hpColor = (cur: number, max: number) => {
+  const pct = cur / max;
+  if (pct > 0.5) return "#58b858";
+  if (pct > 0.25) return "#f8b800";
+  return "#f83800";
+};
+
+// ── Base layout ───────────────────────────────────────────────────────────────
+
+const Screen = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  background: var(--bg);
+  font-family: "PokemonGB", monospace;
+  color: #181010;
+  display: flex;
+  flex-direction: column;
+  border: 3px solid #181010;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  /* all font-sizes scale with container */
+  font-size: 7cqw;
+  @media (min-width: 600px) { font-size: 1.8vh; }
+`;
+
+const HRule = styled.div`
+  height: 2px;
+  background: #181010;
+  flex-shrink: 0;
+`;
+
+const Row = styled.div<{ $gap?: string; $align?: string; $justify?: string }>`
+  display: flex;
+  flex-direction: row;
+  align-items: ${(p) => p.$align ?? "stretch"};
+  justify-content: ${(p) => p.$justify ?? "flex-start"};
+  gap: ${(p) => p.$gap ?? "0"};
+`;
+
+const Col = styled.div<{ $flex?: string; $gap?: string; $pad?: string }>`
+  display: flex;
+  flex-direction: column;
+  flex: ${(p) => p.$flex ?? "unset"};
+  gap: ${(p) => p.$gap ?? "0"};
+  padding: ${(p) => p.$pad ?? "0"};
+`;
+
+const Txt = styled.span<{ $size?: number; $bold?: boolean }>`
+  font-size: ${(p) => (p.$size ? `${p.$size}em` : "1em")};
+  font-weight: ${(p) => (p.$bold ? "bold" : "normal")};
+  line-height: 1.6;
+`;
+
+// ── Page 1 — ESTADO ───────────────────────────────────────────────────────────
+
+const HeaderBar = styled(Row)`
+  background: #181010;
+  color: var(--bg);
+  padding: 1px 4px;
+  flex-shrink: 0;
+`;
+
+const TypeTag = styled.span`
+  display: inline-block;
+  border: 1px solid #181010;
+  padding: 0 3px;
+  font-size: 0.85em;
+  line-height: 1.5;
+  margin-right: 2px;
+`;
+
+const SpriteBox = styled.div`
+  border: 2px solid #181010;
+  width: 46%;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+`;
+
+const SpriteImg = styled(PixelImage)`
+  width: 86%;
+  height: 86%;
+  object-fit: contain;
+`;
+
+const InfoBlock = styled(Col)`
+  flex: 1;
+  padding: 2px 4px;
+  gap: 1px;
+  border-left: 2px solid #181010;
+  justify-content: center;
+`;
+
+interface BarProps { $pct: number; $color: string; }
+const BarTrack = styled.div`
+  height: 4px;
+  border: 1px solid #181010;
+  background: var(--bg);
+  flex: 1;
+`;
+const BarFill = styled.div<BarProps>`
+  height: 100%;
+  width: ${(p) => Math.min(100, p.$pct)}%;
+  background: ${(p) => p.$color};
+  transition: width 0.8s ease-out;
+`;
+
+const HpSection = styled(Col)`
+  padding: 3px 4px 2px;
+  gap: 1px;
+`;
+
+const NavHint = styled.div`
+  font-size: 0.75em;
+  text-align: right;
+  padding: 1px 4px;
+  border-top: 1px solid #aaa;
+  color: #555;
+  flex-shrink: 0;
+`;
+
+// ── Page 2 — HABILIDADES ─────────────────────────────────────────────────────
+
+const MovesHeader = styled(Row)`
+  padding: 1px 4px;
+  border-bottom: 2px solid #181010;
+  flex-shrink: 0;
+`;
+
+const MoveSlot = styled(Row)`
+  padding: 1px 4px;
+  border-bottom: 1px solid #c8c0b0;
+  align-items: center;
+`;
+
+const MoveLabel = styled.span`
+  flex: 1;
+  font-size: 0.9em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const MovePP = styled.span`
+  font-size: 0.85em;
+  white-space: nowrap;
+`;
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 2px solid #181010;
+  margin-top: auto;
+  flex-shrink: 0;
+`;
+
+const StatCell = styled.div<{ $border?: boolean }>`
+  padding: 1px 4px;
+  display: flex;
+  justify-content: space-between;
+  ${(p) => p.$border && css`border-right: 1px solid #181010;`}
+  border-bottom: 1px solid #c8c0b0;
+`;
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 interface Props {
   pokemon: PokemonInstance;
@@ -228,109 +214,133 @@ interface Props {
 }
 
 const PokemonSummary = ({ pokemon, onClose }: Props) => {
-  const [page, setPage] = useState<0 | 1>(0); // 0 = INFO, 1 = STATS
-  const meta  = usePokemonMetadata(pokemon.id);
-  const stats = usePokemonStats(pokemon.id, pokemon.level);
+  const [page, setPage] = useState<0 | 1>(0);
+  const meta   = usePokemonMetadata(pokemon.id);
+  const stats  = usePokemonStats(pokemon.id, pokemon.level);
+  const otName = useSelector(selectName) as string;
 
-  const handleLeft = useCallback(() => setPage(0), []);
-  const handleRight = useCallback(() => setPage(1), []);
-
-  useEvent(Event.Left,  handleLeft);
-  useEvent(Event.Right, handleRight);
+  useEvent(Event.Left,  useCallback(() => setPage(0), []));
+  useEvent(Event.Right, useCallback(() => setPage(1), []));
   useEvent(Event.B,     onClose);
-  // A también cierra (si estamos en página 0 ya no hay más que ver)
-  useEvent(Event.A, useCallback(() => {
-    if (page === 0) setPage(1);
-    else onClose();
+  useEvent(Event.A,     useCallback(() => {
+    if (page === 0) setPage(1); else onClose();
   }, [page, onClose]));
 
   if (!meta) return null;
 
-  const maxHp = stats.hp;
+  const maxHp  = stats.hp;
+  const hpPct  = (pokemon.hp / maxHp) * 100;
+  const hpCol  = hpColor(pokemon.hp, maxHp);
+  const idStr  = String(meta.id).padStart(5, "0");
+  const noStr  = `Nº${String(meta.id).padStart(3, "0")}`;
 
-  // ── Página 1 — INFO ────────────────────────────────────────────────────────
+  // ── Página 1 — ESTADO ──────────────────────────────────────────────────────
   if (page === 0) {
     return (
-      <Overlay>
-        <InfoPage>
-          <TopRow>
-            <SpriteBox>
-              <Sprite src={meta.images.front} alt={meta.name} />
-            </SpriteBox>
+      <Screen>
+        {/* Header */}
+        <HeaderBar $align="center" $justify="space-between">
+          <Txt $size={0.9}>{noStr}</Txt>
+          <Txt $size={1.05} $bold>{meta.name.toUpperCase()}</Txt>
+        </HeaderBar>
 
-            <InfoRight>
-              <Label $size="6px">Nº{String(meta.id).padStart(3, "0")}</Label>
-              <Label $size="9px">{meta.name.toUpperCase()}</Label>
-              <Label $size="6px">
-                {meta.types.map((t) => (
-                  <TypeBadge key={t}>{TYPE_ES[t] ?? t.toUpperCase()}</TypeBadge>
-                ))}
-              </Label>
-              <Divider />
-              <Label $size="6px">ALTURA</Label>
-              <Label $size="7px">{fmtHeight(meta.height)}</Label>
-            </InfoRight>
-          </TopRow>
+        {/* Types */}
+        <Row $align="center" $gap="4px" style={{ padding: "2px 4px", flexShrink: 0 }}>
+          {meta.types.map((t) => (
+            <Txt key={t} $size={0.85}>
+              TIPO{meta.types.indexOf(t) + 1}
+              <TypeTag>{TYPE_ES[t] ?? t.toUpperCase()}</TypeTag>
+            </Txt>
+          ))}
+        </Row>
 
-          <Divider />
+        <HRule />
 
-          <Label $size="7px">NV. {pokemon.level}</Label>
+        {/* Middle: sprite + info */}
+        <Row style={{ flex: 1, minHeight: 0 }}>
+          <SpriteBox>
+            <SpriteImg src={meta.images.front} alt={meta.name} />
+          </SpriteBox>
+          <InfoBlock>
+            <Txt $size={0.8}>FE/{otName.toUpperCase()}</Txt>
+            <Txt $size={0.8}>IDNº{idStr}</Txt>
+            <Txt $size={0.8} style={{ marginTop: "auto" }}>Nv.{pokemon.level}</Txt>
+            <Txt $size={0.75}>Alt.{fmtHeight(meta.height)}</Txt>
+          </InfoBlock>
+        </Row>
 
-          <HpRow>
-            <Label $size="7px">PS</Label>
-            <div style={{ flex: 1 }}>
-              <HealthBar currentHealth={pokemon.hp} maxHealth={maxHp} big />
-            </div>
-          </HpRow>
-          <HpNum>
-            {pokemon.hp}/{maxHp}
-          </HpNum>
+        <HRule />
 
-          <NavHint>A: STATS  B: VOLVER</NavHint>
-        </InfoPage>
-      </Overlay>
+        {/* HP section */}
+        <HpSection>
+          <Row $align="center" $gap="4px">
+            <Txt $size={0.9} $bold>PS</Txt>
+            <BarTrack>
+              <BarFill $pct={hpPct} $color={hpCol} />
+            </BarTrack>
+            <Txt $size={0.9}>{pokemon.hp}/{maxHp}</Txt>
+          </Row>
+        </HpSection>
+
+        <NavHint>A: HABILIDADES   B: VOLVER</NavHint>
+      </Screen>
     );
   }
 
-  // ── Página 2 — STATS ───────────────────────────────────────────────────────
+  // ── Página 2 — HABILIDADES ─────────────────────────────────────────────────
+  // 4 empty move slots
+  const moves = [...pokemon.moves];
+  while (moves.length < 4) moves.push({ id: "", pp: 0 });
+
   return (
-    <Overlay>
-      <StatsPage>
-        <StatsTitle>{meta.name.toUpperCase()}  NV.{pokemon.level}</StatsTitle>
+    <Screen>
+      {/* Header */}
+      <MovesHeader $align="center" $justify="space-between">
+        <Txt $size={1.0} $bold>{meta.name.toUpperCase()}</Txt>
+        <Txt $size={0.85}>Nv.{pokemon.level}</Txt>
+      </MovesHeader>
 
-        <Divider />
+      {/* Move slots */}
+      <Col style={{ flex: 1 }}>
+        {moves.map((m, i) => {
+          const md = m.id ? getMoveMetadata(m.id) : null;
+          const maxPp = md?.pp ?? 0;
+          return (
+            <MoveSlot key={i}>
+              <MoveLabel>
+                {md ? md.name.toUpperCase() : "-----"}
+              </MoveLabel>
+              <MovePP>
+                PS{String(m.id ? m.pp : 0).padStart(3, " ")}/
+                {String(maxPp).padStart(2, " ")}
+              </MovePP>
+            </MoveSlot>
+          );
+        })}
+      </Col>
 
-        {(
-          [
-            ["PS",      `${pokemon.hp}/${maxHp}`],
-            ["ATAQUE",  stats.attack],
-            ["DEFENSA", stats.defense],
-            ["VELOC.",  stats.speed],
-            ["ESPECIAL",stats.specialAttack],
-          ] as [string, string | number][]
-        ).map(([name, val]) => (
-          <StatRow key={name}>
-            <StatName>{name}</StatName>
-            <StatVal>{val}</StatVal>
-          </StatRow>
-        ))}
+      {/* Stats grid */}
+      <StatsGrid>
+        <StatCell $border>
+          <Txt $size={0.85}>ATAQ</Txt>
+          <Txt $size={0.85}>{stats.attack}</Txt>
+        </StatCell>
+        <StatCell>
+          <Txt $size={0.85}>DEF</Txt>
+          <Txt $size={0.85}>{stats.defense}</Txt>
+        </StatCell>
+        <StatCell $border>
+          <Txt $size={0.85}>VEL</Txt>
+          <Txt $size={0.85}>{stats.speed}</Txt>
+        </StatCell>
+        <StatCell>
+          <Txt $size={0.85}>ESP</Txt>
+          <Txt $size={0.85}>{stats.specialAttack}</Txt>
+        </StatCell>
+      </StatsGrid>
 
-        <MovesSection>
-          <MovesTitleRow>MOVIMIENTOS</MovesTitleRow>
-          {pokemon.moves.map((m) => {
-            const md = getMoveMetadata(m.id);
-            return (
-              <MoveRow key={m.id}>
-                <MoveName>{(md?.name ?? m.id).toUpperCase()}</MoveName>
-                <MovePP>PP {m.pp}/{md?.pp ?? "–"}</MovePP>
-              </MoveRow>
-            );
-          })}
-        </MovesSection>
-
-        <NavHint>← INFO  B: VOLVER</NavHint>
-      </StatsPage>
-    </Overlay>
+      <NavHint>← ESTADO   B: VOLVER</NavHint>
+    </Screen>
   );
 };
 

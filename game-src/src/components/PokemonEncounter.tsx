@@ -794,7 +794,7 @@ const PokemonEncounter = () => {
   useEffect(() => {
     if (pokeballThrowing && enemy) {
       if (isTrainer) {
-        setClickableNotice("The trainer blocked the ball!");
+        setClickableNotice("¡El entrenador bloqueó la Poké Ball!");
         return;
       }
 
@@ -1081,15 +1081,13 @@ const PokemonEncounter = () => {
       if (!processingMetadata) throw new Error("No processing metadata found");
       const move = getLearnedMove(processingPokemon);
       if (!move) throw new Error("No move found");
-      return `¡${processingMetadata.name.toUpperCase()} aprendió ${move.id}!`;
+      return `¡${processingMetadata.name.toUpperCase()} aprendió ${(getMoveMetadata(move.id)?.name ?? move.id).toUpperCase()}!`;
     }
     if (stage === 30) {
       if (!processingMetadata) throw new Error("No processing metadata found");
       const move = getLearnedMove(processingPokemon);
       if (!move) throw new Error("No move found");
-      return `${processingMetadata.name.toUpperCase()} intenta aprender ${
-        move.id
-      }.`;
+      return `${processingMetadata.name.toUpperCase()} intenta aprender ${(getMoveMetadata(move.id)?.name ?? move.id).toUpperCase()}.`;
     }
     if (stage === 31) return `Pero no puede aprender más de 4 movimientos`;
     if (stage === 32) return `Elige el movimiento que quieres olvidar`;
@@ -1536,7 +1534,7 @@ const PokemonEncounter = () => {
                     action: () => {},
                   };
                 const item: MenuItemType = {
-                  label: m.id,
+                  label: (getMoveMetadata(m.id)?.name ?? m.id).toUpperCase(),
                   action: () => {
                     endEncounter_();
                     dispatch(
@@ -1558,7 +1556,7 @@ const PokemonEncounter = () => {
                 return item;
               }),
               {
-                label: getLearnedMove(processingPokemon)?.id || "Error",
+                label: "NO APRENDER",
                 action: () => {
                   endEncounter_();
                 },

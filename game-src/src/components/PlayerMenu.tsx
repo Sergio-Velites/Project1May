@@ -19,11 +19,11 @@ const PlayerMenu = () => {
       close={() => dispatch(hidePlayerMenu())}
       menuItems={[
         {
-          label: `Player ${name}`,
+          label: `Jugador ${name}`,
           action: () => {},
         },
         {
-          label: "Badges",
+          label: "Medallas",
           value: badges.length,
           action: () => {},
         },
@@ -33,7 +33,7 @@ const PlayerMenu = () => {
         //   action: () => {},
         // },
         {
-          label: "Time",
+          label: "Hora",
           value: dateformat(new Date(), "hh:MM"),
           action: () => {},
         },

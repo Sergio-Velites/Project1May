@@ -233,7 +233,7 @@ const Menu = ({
       : [
           ...menuItems,
           {
-            label: "Exit",
+            label: "Salir",
             action: close,
           },
         ];

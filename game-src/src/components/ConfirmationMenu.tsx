@@ -56,14 +56,14 @@ const ConfirmationMenu = () => {
         noExit
         menuItems={[
           {
-            label: "Yes",
+            label: "SÍ",
             action: () => {
               setConfirmed(true);
               data.confirm();
             },
           },
           {
-            label: "No",
+            label: "NO",
             action: () => {
               if (data.cancel) data.cancel();
               dispatch(hideConfirmationMenu());
