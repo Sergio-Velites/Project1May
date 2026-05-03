@@ -7,7 +7,7 @@ El juego es una parodia original: sin ROMs, sin assets de Nintendo, sin nombres 
 El motor base proviene del proyecto open source **chase-manning/pokemon-js** (MIT).
 
 **Jugable en**: cualquier navegador, escritorio y móvil.  
-**Desplegado en**: Vercel (rama `master`).
+**Desplegado en**: Vercel (rama `local-src` → producción).
 
 ---
 
@@ -346,25 +346,34 @@ cd game-src && npm install --legacy-peer-deps
 ### Flujo de trabajo habitual (editar → compilar → commitear)
 
 ```bash
+# Flujo de trabajo habitual (editar → compilar → commitear)
+
 # 1. Editar lo que quieras en game-src/src/
-#    (ver tabla de modificaciones abajo)
 
 # 2. Compilar desde DENTRO de game-src:
 cd game-src
 PUBLIC_URL=/game DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false \
   node_modules/.bin/react-scripts build
 
-# 3. Copiar el build al proyecto Next.js:
-cp -r build/* ../public/game/
+# 3. Ver el hash del bundle nuevo:
+ls build/static/js/main.*.js
 
-# 4. Commitear solo el build (game-src queda ignorado):
+# 4. Copiar el build y borrar el bundle anterior (sustituir OLDHASH y NEWHASH):
 cd ..
+cp -r game-src/build/* public/game/
+rm -f public/game/static/js/main.OLDHASH.js \
+      public/game/static/js/main.OLDHASH.js.LICENSE.txt
+
+# 5. Commitear y pushear:
 git add public/game/
 git commit -m "feat: <descripción del cambio>"
+git push origin local-src
 ```
 
 > ⚠️ Nunca usar `npx react-scripts build` desde la raíz del proyecto —
 > hay que estar en `game-src/` y usar `node_modules/.bin/react-scripts`.
+> ⚠️ El hash del bundle cambia con cada compilación. Si no borras el bundle
+> antiguo, el repo acumula archivos JS obsoletos innecesariamente.
 
 ### Archivos propios de WeddingBoy (NO son del repo original)
 
@@ -373,10 +382,16 @@ Estos archivos han sido creados/modificados para la boda y están en `game-src/s
 | Archivo | Qué hace |
 |---|---|
 | `app/cloud-save.ts` | Supabase Edge Functions + WebAuthn passkey (save/load remoto) |
-| `components/LoadScreen.tsx` | Flujo de inicio: checking → choose/prompt → oak-intro → name-picker |
-| `components/OakIntro.tsx` | Secuencia de diálogo del Prof. Oak antes de nueva partida |
-| `components/NameKeyboard.tsx` | Teclado estilo Game Boy para elegir nombre del jugador (7 chars) |
-| `state/gameSlice.ts` | Añadido `loadFromState()` para cargar save desde la nube |
+| `app/level-helper.ts` | Fórmula XP Gen I corregida (Medium-Fast: `nextLevel³ − currentLevel³`) |
+| `app/move-helper.ts` | Daño Gen I completo: stat stages (20 movimientos), críticos 10%, efectividad |
+| `app/xp-helper.ts` | XP de entrenadores × 1.5 (bonus Gen I) |
+| `app/pokeball-helper.ts` | Fórmula de captura Gen I con 4 sacudidas reales |
+| `components/IntroVideo.tsx` | Video intro antes del TitleScreen; se reproduce cada sesión (sessionStorage) |
+| `components/LoadScreen.tsx` | Flujo de inicio: checking → choose/prompt → oak-intro → name-picker → done |
+| `components/OakIntro.tsx` | Intro Prof. Oak con typewriter (40ms/char), sprites por línea, pauseAfter |
+| `components/NameKeyboard.tsx` | Teclado Game Boy: 4 filas (A-Z + DEL) + botón FIN siempre visible |
+| `state/gameSlice.ts` | `loadFromState()` para cloud save; Oak pre-derrotado en defeatedTrainers |
+| `maps/lab.ts` | Oak como NPC con diálogo de boda (posición 5,2) |
 
 ### Guía rápida de modificaciones
 
@@ -395,9 +410,10 @@ Estos archivos han sido creados/modificados para la boda y están en `game-src/s
 | Nombre de una criatura | `app/pokemon-metadata.ts` | campo `name` en cada entrada |
 | Quest / evento con condición | `app/use-quests.ts` | añadir nueva entrada |
 | Nuevo mapa completo | `maps/template.ts` + 3 cambios (ver arriba) | |
-| Diálogo intro Prof. Oak | `components/OakIntro.tsx` | array `OAK_DIALOGUE` |
+| Diálogo intro Prof. Oak | `components/OakIntro.tsx` | array `BASE_DIALOGUE` y `POST_NAME_DIALOGUE` |
 | Textos cloud save (Continuar, etc.) | `components/LoadScreen.tsx` | strings inline |
 | URL de Supabase | `.env` o variable en `app/cloud-save.ts` | `REACT_APP_SUPABASE_URL` |
+| Video de introducción | `public/game/static/media/intro.*.mp4` | reemplazar el archivo MP4 |
 
 ---
 
@@ -416,14 +432,10 @@ Estos archivos han sido creados/modificados para la boda y están en `game-src/s
 npm run dev
 # → http://localhost:3000 (redirige a /game/index.html)
 
-# TypeScript check del juego
+# TypeScript check del juego (sin compilar)
 cd game-src && npx tsc --noEmit
 
-# Compilar el juego (siempre desde game-src/)
-cd game-src
-PUBLIC_URL=/game DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false \
-  node_modules/.bin/react-scripts build
-cp -r build/* ../public/game/
+# Compilar el juego — ver "Flujo de trabajo habitual" arriba para el proceso completo
 
 # Modo debug del juego (movimiento rápido, ver colisiones)
 # En game-src/src/app/constants.ts → DEBUG_MODE = true (no commitear)
@@ -446,9 +458,18 @@ cp -r build/* ../public/game/
 ## Roadmap
 
 - [x] Base jugable en navegador (chase-manning/pokemon-js)
-- [x] Integración en Next.js / Vercel sin cambios al motor
-- [ ] Guardado de partida por dispositivo en Supabase (ver diseño abajo)
-- [ ] Compartir con invitados vía Vercel
+- [x] Integración en Next.js / Vercel
+- [x] Traducciones al español (batallas, menús, diálogos)
+- [x] Mecánicas Gen I corregidas (XP, stat stages, captura, HP nivel)
+- [x] Video de intro por sesión (saltable con A/B)
+- [x] Intro Oak con typewriter + sprites por línea
+- [x] Teclado de nombre (4 filas + FIN siempre visible)
+- [x] Layout Game Boy Color responsive (cqw, aspect ratio 3:5)
+- [x] Oak NPC en el laboratorio con diálogo de boda
+- [ ] Guardado en Supabase (WebAuthn passkey — estructura lista, pendiente activar)
+- [ ] Personalizar pantalla de título (logos de la pareja y fecha)
+- [ ] Personalizar video de intro
+- [ ] Compartir enlace con invitados
 
 ---
 
