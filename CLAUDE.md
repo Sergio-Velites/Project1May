@@ -7,7 +7,7 @@ El juego es una parodia original: sin ROMs, sin assets de Nintendo, sin nombres 
 El motor base proviene del proyecto open source **chase-manning/pokemon-js** (MIT).
 
 **Jugable en**: cualquier navegador, escritorio y móvil.  
-**Desplegado en**: Vercel (rama `master`).
+**Desplegado en**: Vercel (rama `local-src` → producción).
 
 ---
 
@@ -45,12 +45,15 @@ Next.js los sirve automáticamente sin configuración adicional.
 │   ├── layout.tsx
 │   ├── page.tsx                # Redirect a /game/index.html
 │   └── globals.css
+├── game-src/                   # ← SOURCE del juego (editar aquí)
+│   └── src/                   # React 18 + CRA
 ├── lib/supabase/               # Cliente Supabase (futuras funciones)
 ├── public/game/                # ← BUILD del juego (no editar directamente)
 └── package.json                # Next.js deps
 ```
 
-Para editar el juego: clonar la fuente (ver sección "Dónde editar").
+> `game-src/` está en el repo (comprometido en `3e9990a`). No hay que clonarlo.
+> El `tsconfig.json` raíz excluye `game-src/` para que Next.js no intente compilarlo.
 
 ---
 
@@ -331,29 +334,88 @@ Cada ítem tiene: nombre, precio, precio de venta, si es consumible, si es usabl
 
 ## Dónde editar el juego
 
+> **`game-src/` está en el repo** (commit `3e9990a`, rama `local-src`).
+> El source se edita en `game-src/src/`. El build va a `public/game/`.
+> Next.js no toca `game-src/` — está excluido en el `tsconfig.json` raíz.
+
+### Primera vez (instalar dependencias del juego)
+
 ```bash
-# Clonar fuente (una sola vez)
-git clone https://github.com/chase-manning/pokemon-js.git game-src
+# Solo la primera vez, o tras clonar el repo:
 cd game-src && npm install --legacy-peer-deps
 ```
 
+### Flujo de trabajo habitual (editar → compilar → commitear)
+
+```bash
+# Flujo de trabajo habitual (editar → compilar → commitear)
+
+# 1. Editar lo que quieras en game-src/src/
+
+# 2. Compilar desde DENTRO de game-src:
+cd game-src
+PUBLIC_URL=/game DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false \
+  node_modules/.bin/react-scripts build
+
+# 3. Ver el hash del bundle nuevo:
+ls build/static/js/main.*.js
+
+# 4. Copiar el build y borrar el bundle anterior (sustituir OLDHASH y NEWHASH):
+cd ..
+cp -r game-src/build/* public/game/
+rm -f public/game/static/js/main.OLDHASH.js \
+      public/game/static/js/main.OLDHASH.js.LICENSE.txt
+
+# 5. Commitear y pushear:
+git add public/game/
+git commit -m "feat: <descripción del cambio>"
+git push origin local-src
+```
+
+> ⚠️ Nunca usar `npx react-scripts build` desde la raíz del proyecto —
+> hay que estar en `game-src/` y usar `node_modules/.bin/react-scripts`.
+> ⚠️ El hash del bundle cambia con cada compilación. Si no borras el bundle
+> antiguo, el repo acumula archivos JS obsoletos innecesariamente.
+
+### Archivos propios de WeddingBoy (NO son del repo original)
+
+Estos archivos han sido creados/modificados para la boda y están en `game-src/src/`:
+
+| Archivo | Qué hace |
+|---|---|
+| `app/cloud-save.ts` | Supabase Edge Functions + WebAuthn passkey (save/load remoto) |
+| `app/level-helper.ts` | Fórmula XP Gen I corregida (Medium-Fast: `nextLevel³ − currentLevel³`) |
+| `app/move-helper.ts` | Daño Gen I completo: stat stages (20 movimientos), críticos 10%, efectividad |
+| `app/xp-helper.ts` | XP de entrenadores × 1.5 (bonus Gen I) |
+| `app/pokeball-helper.ts` | Fórmula de captura Gen I con 4 sacudidas reales |
+| `components/IntroVideo.tsx` | Video intro antes del TitleScreen; se reproduce **siempre** al arrancar (después de GameboyMenu) |
+| `components/LoadScreen.tsx` | Flujo de inicio: checking → choose/prompt → oak-intro → name-picker → done |
+| `components/OakIntro.tsx` | Intro Prof. Oak con typewriter (40ms/char), sprites por línea, pauseAfter |
+| `components/NameKeyboard.tsx` | Teclado Game Boy: 4 filas (A-Z + DEL) + botón FIN siempre visible |
+| `state/gameSlice.ts` | `loadFromState()` para cloud save; Oak pre-derrotado en defeatedTrainers |
+| `maps/lab.ts` | Oak como NPC con diálogo de boda (posición 5,2) |
+
 ### Guía rápida de modificaciones
 
-| Qué quiero cambiar | Archivo | Campo |
+| Qué quiero cambiar | Archivo en `game-src/src/` | Campo |
 |---|---|---|
-| Nombre del jugador por defecto | `src/state/gameSlice.ts` | `initialState.name` |
-| Pokémon iniciales del jugador | `src/state/gameSlice.ts` | `initialState.pokemon` |
-| Mapa de inicio | `src/state/gameSlice.ts` | `initialState.map` + `pos` |
-| Texto de un cartel | `src/maps/<mapa>.ts` | campo `text` |
-| Diálogo de un entrenador NPC | `src/maps/<mapa>.ts` | `trainers[i].intro/outtro` |
-| Música de un mapa | `src/maps/<mapa>.ts` | campo `music` (MP3 en assets/) |
-| Mapa de fondo (imagen) | `src/maps/<mapa>.ts` | campo `image` (PNG en assets/) |
-| Añadir un NPC nuevo | `src/maps/<mapa>.ts` | añadir a array `trainers` |
-| Logo pantalla de título | `src/assets/title-screen/pokemon.png` | reemplazar PNG |
-| Subtítulo pantalla de título | `src/assets/title-screen/version.png` | reemplazar PNG |
-| Nombre de una criatura | `src/app/pokemon-metadata.ts` | campo `name` en cada entrada |
-| Quest / evento con condición | `src/app/use-quests.ts` | añadir nueva entrada |
-| Nuevo mapa completo | `src/maps/template.ts` + 3 cambios (ver arriba) | |
+| Nombre del jugador por defecto | `state/gameSlice.ts` | `initialState.name` |
+| Pokémon iniciales del jugador | `state/gameSlice.ts` | `initialState.pokemon` |
+| Mapa de inicio | `state/gameSlice.ts` | `initialState.map` + `pos` |
+| Texto de un cartel | `maps/<mapa>.ts` | campo `text` |
+| Diálogo de un entrenador NPC | `maps/<mapa>.ts` | `trainers[i].intro/outtro` |
+| Música de un mapa | `maps/<mapa>.ts` | campo `music` (MP3 en assets/) |
+| Mapa de fondo (imagen) | `maps/<mapa>.ts` | campo `image` (PNG en assets/) |
+| Añadir un NPC nuevo | `maps/<mapa>.ts` | añadir a array `trainers` |
+| Logo pantalla de título | `assets/title-screen/pokemon.png` | reemplazar PNG |
+| Subtítulo pantalla de título | `assets/title-screen/version.png` | reemplazar PNG |
+| Nombre de una criatura | `app/pokemon-metadata.ts` | campo `name` en cada entrada |
+| Quest / evento con condición | `app/use-quests.ts` | añadir nueva entrada |
+| Nuevo mapa completo | `maps/template.ts` + 3 cambios (ver arriba) | |
+| Diálogo intro Prof. Oak | `components/OakIntro.tsx` | array `BASE_DIALOGUE` y `POST_NAME_DIALOGUE` |
+| Textos cloud save (Continuar, etc.) | `components/LoadScreen.tsx` | strings inline |
+| URL de Supabase | `.env` o variable en `app/cloud-save.ts` | `REACT_APP_SUPABASE_URL` |
+| Video de introducción | `public/game/static/media/intro.*.mp4` | reemplazar el archivo MP4 |
 
 ---
 
@@ -372,13 +434,10 @@ cd game-src && npm install --legacy-peer-deps
 npm run dev
 # → http://localhost:3000 (redirige a /game/index.html)
 
-# TypeScript check
-npx tsc --noEmit
+# TypeScript check del juego (sin compilar)
+cd game-src && npx tsc --noEmit
 
-# Editar y recompilar el juego
-cd game-src
-PUBLIC_URL=/game DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false npm run build
-cp -r build/* ../public/game/
+# Compilar el juego — ver "Flujo de trabajo habitual" arriba para el proceso completo
 
 # Modo debug del juego (movimiento rápido, ver colisiones)
 # En game-src/src/app/constants.ts → DEBUG_MODE = true (no commitear)
@@ -401,9 +460,20 @@ cp -r build/* ../public/game/
 ## Roadmap
 
 - [x] Base jugable en navegador (chase-manning/pokemon-js)
-- [x] Integración en Next.js / Vercel sin cambios al motor
-- [ ] Guardado de partida por dispositivo en Supabase (ver diseño abajo)
-- [ ] Compartir con invitados vía Vercel
+- [x] Integración en Next.js / Vercel
+- [x] Traducciones al español (batallas, menús, diálogos)
+- [x] Mecánicas Gen I corregidas (XP, stat stages, captura, HP nivel)
+- [x] Video de intro por sesión (saltable con A/B)
+- [x] Intro Oak con typewriter + sprites por línea
+- [x] Teclado de nombre (4 filas + FIN siempre visible)
+- [x] Layout Game Boy Color responsive (cqw, aspect ratio 3:5)
+- [x] Oak NPC en el laboratorio con diálogo de boda
+- [x] `game-src/` añadido al repo GitHub (commit `3e9990a`)
+- [x] `tsconfig.json` raíz excluye `game-src/` (fix Vercel build)
+- [ ] Guardado en Supabase (WebAuthn passkey — estructura lista, pendiente activar)
+- [ ] Personalizar pantalla de título (logos de la pareja y fecha)
+- [ ] Personalizar video de intro
+- [ ] Compartir enlace con invitados
 
 ---
 

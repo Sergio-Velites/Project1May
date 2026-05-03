@@ -1,0 +1,203 @@
+// Cloud save utilities — Supabase Edge Functions + WebAuthn passkey
+// All API calls go through Supabase Edge Functions hosted in supabase/functions/
+
+const SUPABASE_URL =
+  (process.env.REACT_APP_SUPABASE_URL as string | undefined) ||
+  "https://kplfjrjibjptigvfgdvy.supabase.co";
+
+// In-memory current user ID (also persisted in localStorage)
+let currentUserId: string | null = null;
+
+export const setCurrentUserId = (id: string) => {
+  currentUserId = id;
+};
+
+export const getCurrentUserId = () => currentUserId;
+
+export const isWebAuthnAvailable = (): boolean => {
+  if (!SUPABASE_URL || !window.PublicKeyCredential) return false;
+  return (
+    typeof navigator.credentials?.create === "function" &&
+    typeof navigator.credentials?.get === "function"
+  );
+};
+
+// ---- Low-level helpers ----
+
+const callEdge = (endpoint: string, body: unknown) =>
+  fetch(`${SUPABASE_URL}/functions/v1/${endpoint}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+const base64urlToBuffer = (base64url: string): ArrayBuffer => {
+  const base64 = base64url.replace(/-/g, "+").replace(/_/g, "/");
+  const binary = atob(base64);
+  const buf = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) buf[i] = binary.charCodeAt(i);
+  return buf.buffer;
+};
+
+const bufferToBase64url = (buffer: ArrayBuffer): string => {
+  const bytes = new Uint8Array(buffer);
+  let str = "";
+  for (let i = 0; i < bytes.length; i++) str += String.fromCharCode(bytes[i]);
+  return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+};
+
+// ---- Cloud save / load ----
+
+export const saveToCloud = async (
+  userId: string,
+  gameState: unknown
+): Promise<void> => {
+  if (!SUPABASE_URL) return;
+  try {
+    await callEdge("save-game", { userId, gameState });
+  } catch {
+    // Silently ignore — local save is still intact
+  }
+};
+
+export const loadFromCloud = async (userId: string): Promise<unknown | null> => {
+  if (!SUPABASE_URL) return null;
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/functions/v1/load-game?userId=${userId}`
+    );
+    if (!res.ok) return null;
+    const { gameState } = await res.json();
+    return gameState ?? null;
+  } catch {
+    return null;
+  }
+};
+
+// ---- User creation (guest UUID) ----
+
+export const createUser = async (): Promise<string | null> => {
+  if (!SUPABASE_URL) return null;
+  try {
+    const res = await callEdge("create-user", {});
+    if (!res.ok) return null;
+    const { userId } = await res.json();
+    localStorage.setItem("wedding_user_id", userId);
+    return userId;
+  } catch {
+    return null;
+  }
+};
+
+// ---- WebAuthn Registration ----
+
+export const webauthnRegister = async (): Promise<string | null> => {
+  try {
+    const startRes = await callEdge("webauthn-register-start", {});
+    if (!startRes.ok) return null;
+    const { challengeId, userId, options } = await startRes.json();
+
+    const pubKeyOptions: PublicKeyCredentialCreationOptions = {
+      ...options,
+      challenge: base64urlToBuffer(options.challenge),
+      user: {
+        ...options.user,
+        id: base64urlToBuffer(options.user.id),
+      },
+      excludeCredentials: (options.excludeCredentials ?? []).map(
+        (c: { id: string; type: string }) => ({
+          ...c,
+          id: base64urlToBuffer(c.id),
+        })
+      ),
+    };
+
+    const credential = await navigator.credentials.create({
+      publicKey: pubKeyOptions,
+    }) as PublicKeyCredential | null;
+    if (!credential) return null;
+
+    const response = credential.response as AuthenticatorAttestationResponse;
+    const credentialJSON = {
+      id: credential.id,
+      rawId: bufferToBase64url(credential.rawId),
+      type: credential.type,
+      response: {
+        attestationObject: bufferToBase64url(response.attestationObject),
+        clientDataJSON: bufferToBase64url(response.clientDataJSON),
+        transports: response.getTransports?.() ?? [],
+      },
+      clientExtensionResults: credential.getClientExtensionResults(),
+    };
+
+    const finishRes = await callEdge("webauthn-register-finish", {
+      challengeId,
+      userId,
+      credential: credentialJSON,
+    });
+    if (!finishRes.ok) return null;
+
+    const { userId: confirmedId } = await finishRes.json();
+    localStorage.setItem("wedding_user_id", confirmedId);
+    localStorage.setItem("wedding_credential_id", credential.id);
+    return confirmedId;
+  } catch (err) {
+    console.warn("[WebAuthn] Registration failed:", err);
+    return null;
+  }
+};
+
+// ---- WebAuthn Authentication ----
+
+export const webauthnAuth = async (credentialId: string): Promise<string | null> => {
+  try {
+    const startRes = await callEdge("webauthn-auth-start", { credentialId });
+    if (!startRes.ok) return null;
+    const { challengeId, options } = await startRes.json();
+
+    const pubKeyOptions: PublicKeyCredentialRequestOptions = {
+      ...options,
+      challenge: base64urlToBuffer(options.challenge),
+      allowCredentials: (options.allowCredentials ?? []).map(
+        (c: { id: string; type: string }) => ({
+          ...c,
+          id: base64urlToBuffer(c.id),
+        })
+      ),
+    };
+
+    const assertion = await navigator.credentials.get({
+      publicKey: pubKeyOptions,
+    }) as PublicKeyCredential | null;
+    if (!assertion) return null;
+
+    const response = assertion.response as AuthenticatorAssertionResponse;
+    const assertionJSON = {
+      id: assertion.id,
+      rawId: bufferToBase64url(assertion.rawId),
+      type: assertion.type,
+      response: {
+        authenticatorData: bufferToBase64url(response.authenticatorData),
+        clientDataJSON: bufferToBase64url(response.clientDataJSON),
+        signature: bufferToBase64url(response.signature),
+        userHandle: response.userHandle
+          ? bufferToBase64url(response.userHandle)
+          : null,
+      },
+      clientExtensionResults: assertion.getClientExtensionResults(),
+    };
+
+    const finishRes = await callEdge("webauthn-auth-finish", {
+      challengeId,
+      credentialId,
+      assertion: assertionJSON,
+    });
+    if (!finishRes.ok) return null;
+
+    const { userId } = await finishRes.json();
+    return userId;
+  } catch (err) {
+    console.warn("[WebAuthn] Auth failed:", err);
+    return null;
+  }
+};

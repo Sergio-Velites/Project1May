@@ -6,7 +6,7 @@
     "ghcr.io/devcontainers/features/git:1": {}
   },
 
-  "postCreateCommand": "npm install && npm install -g @anthropic-ai/claude-code && echo \"NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}\\nNEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}\" > .env.local && echo 'game-src/' >> .gitignore",
+  "postCreateCommand": "npm install && npm install -g @anthropic-ai/claude-code && echo \"NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}\\nNEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}\" > .env.local",
 
   "forwardPorts": [3000],
   "portsAttributes": {
