@@ -435,6 +435,13 @@ Estos archivos han sido creados/modificados para la boda y están en `game-src/s
 
 ## Problemas conocidos y soluciones probadas
 
+### Bucle infinito en pantalla passkey (`require-passkey`)
+Ocurre cuando la Edge Function `webauthn-register-finish` falla: iOS registra la passkey  
+localmente pero el servidor devuelve error → `webauthnRegister()` retorna `null` →  
+se vuelve a `require-passkey` sin escape. **Solución**: tras primer fallo, `registrationFailed`  
+se pone a `true` y la segunda opción cambia a "Jugar sin guardar" que crea un UUID  
+local con `crypto.randomUUID()` sin depender de Supabase.
+
 ### `cd X && comando` pierde el directorio con run_in_terminal
 El tool colapsa o simplifica `cd X && cmd`. **Solución siempre**: subshell:
 ```bash

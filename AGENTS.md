@@ -51,7 +51,7 @@ desde dentro de `game-src/`.
 
 ---
 
-## Estado actual del juego (commit 8433186)
+## Estado actual del juego (commit a9c874a)
 
 ### Flujo de inicio
 1. **GameboyMenu** → menú de encendido
@@ -59,7 +59,7 @@ desde dentro de `game-src/`.
 3. **TitleScreen** → pantalla título
 4. **LoadScreen** → gestión save/load:
    - Detecta WebAuthn disponible → **obliga** registro de passkey (Face ID / huella)
-   - No hay opción de saltarse el registro
+   - Si el registro falla → opción "Jugar sin guardar" (UUID local, sin Supabase)
    - Si no hay partida guardada → solo "Nueva partida"
    - Si hay partida → "Continuar" + "Nueva partida"
 5. **OakIntro** → intro del Profesor Oak con typewriter
@@ -92,6 +92,14 @@ desde dentro de `game-src/`.
 ---
 
 ## Problemas conocidos y soluciones
+
+### Bucle infinito en pantalla passkey (`require-passkey`)
+Ocurre cuando `webauthn-register-finish` (Edge Function Supabase) falla: la passkey  
+se registra en el dispositivo pero el servidor no confirma → `webauthnRegister()` devuelve  
+`null` → fase vuelve a `require-passkey` → bucle sin salida. **Solución aplicada**: tras el  
+primer fallo de registro se activa `registrationFailed=true` y la segunda opción del menú  
+cambia de "Reintentar" (que no servía) a "Jugar sin guardar", que genera un UUID local  
+con `crypto.randomUUID()` sin necesidad de Supabase y permite entrar al juego.
 
 ### El tool run_in_terminal no preserva `cd`
 El tool colapsa `cd X && cmd` — el `cd` se pierde. **Solución**: usar subshell:
