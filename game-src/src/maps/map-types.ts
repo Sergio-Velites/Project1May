@@ -85,6 +85,7 @@ export interface TrainerType {
   outtro: string[];
   money: number;
   pos: PosType;
+  persistent?: boolean;
   postGame?: {
     message: string[];
     items?: ItemType[];

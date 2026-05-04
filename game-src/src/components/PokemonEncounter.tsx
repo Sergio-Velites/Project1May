@@ -731,6 +731,15 @@ const PokemonEncounter = () => {
   };
 
   useEffect(() => {
+    // Si hay encuentro pero el jugador no tiene pokémon activo (equipo vacío o
+    // todos KO antes de que se repare), limpiar el encounter para evitar bloqueo.
+    if (enemy && !active) {
+      dispatch(faintToTrainer());
+      dispatch(endEncounter());
+    }
+  }, [enemy, active, dispatch]);
+
+  useEffect(() => {
     if (isInBattle) {
       dispatch(resetActivePokemon());
       setPlayerStages(DEFAULT_STAGES);
