@@ -68,7 +68,17 @@ const StatusText = styled.h1<FlashProps>`
   }
 `;
 
-type Phase = "checking" | "require-passkey" | "registering" | "choose" | "name-picker" | "oak-intro" | "done";
+// Fases de la secuencia de arranque. Las fases "idle" y "bootstrapping" muestran
+// solo la pantalla de carga; las fases interactivas aparecen DESPUÉS de que el
+// TitleScreen se haya cerrado, con un guard timer para evitar selecciones accidentales.
+type Phase =
+  | "idle"
+  | "bootstrapping"
+  | "require-passkey"
+  | "registering"
+  | "choose"
+  | "name-picker"
+  | "oak-intro";
 
 const LoadScreen = () => {
   const dispatch = useDispatch();
@@ -76,73 +86,100 @@ const LoadScreen = () => {
   const show = useSelector(selectLoadMenu);
   const gameboyOpen = useSelector(selectGameboyMenu);
 
-  const [phase, setPhase] = useState<Phase>("checking");
-  const [loaded, setLoaded] = useState(false);
+  const [phase, setPhase] = useState<Phase>("idle");
+  // menuReady: false hasta 500 ms después de entrar en una fase interactiva.
+  // Previene que el botón A que cerró el TitleScreen seleccione una opción.
+  const [menuReady, setMenuReady] = useState(false);
   const [confirmedName, setConfirmedName] = useState<string | null>(null);
   const cloudSave = useRef<GameState | null>(null);
+  const readyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadComplete = () => {
-    setLoaded(true);
-    setTimeout(() => {
-      dispatch(hideLoadMenu());
-    }, 300);
+    setTimeout(() => dispatch(hideLoadMenu()), 300);
   };
 
-  // Bootstrap: al cargar, intenta autenticar silenciosamente si ya tiene credencial.
-  // El diálogo biométrico SOLO se dispara si hay credencial guardada (regreso) o si
-  // el usuario pulsa "Guardar con Face ID/Huella" (primera vez).
-  useEffect(() => {
-    if (!show) return;
+  // Transiciona a una fase interactiva. Si la fase muestra un menú, activa el
+  // guard timer: el menú solo acepta input 500 ms después de aparecer.
+  const transitionTo = (p: Phase) => {
+    if (readyTimerRef.current) clearTimeout(readyTimerRef.current);
+    setMenuReady(false);
+    setPhase(p);
+    if (p === "require-passkey" || p === "choose") {
+      readyTimerRef.current = setTimeout(() => setMenuReady(true), 500);
+    }
+  };
 
-    (async () => {
-      const userId = localStorage.getItem("wedding_user_id");
-      const credentialId = localStorage.getItem("wedding_credential_id");
-      const webAuthnOk = isWebAuthnAvailable();
+  // Bootstrap: verifica credenciales y carga partida. Solo se llama una vez,
+  // DESPUÉS de que el TitleScreen se cierre, para que la secuencia de pantallas
+  // sea estrictamente: GameboyMenu → Video → TitleScreen → passskey/choose.
+  const runBootstrap = async () => {
+    const userId = localStorage.getItem("wedding_user_id");
+    const credentialId = localStorage.getItem("wedding_credential_id");
+    const webAuthnOk = isWebAuthnAvailable();
 
-      // Usuario que regresa con passkey registrada → autenticar automáticamente
-      if (userId && credentialId && webAuthnOk) {
-        const authedId = await webauthnAuth(credentialId);
-        if (authedId) {
-          setCurrentUserId(authedId);
-          const save = await loadFromCloud(authedId);
-          if (save) {
-            cloudSave.current = save as GameState;
-            setPhase("choose");
-            return;
-          }
-          setPhase("oak-intro");
+    if (userId && credentialId && webAuthnOk) {
+      const authedId = await webauthnAuth(credentialId);
+      if (authedId) {
+        setCurrentUserId(authedId);
+        const save = await loadFromCloud(authedId);
+        if (save) {
+          cloudSave.current = save as GameState;
+          transitionTo("choose");
           return;
         }
-        // Auth falló (cambió de dispositivo, etc.) → ofrecer opciones sin bucle
-        setPhase("require-passkey");
+        transitionTo("oak-intro");
         return;
       }
+      transitionTo("require-passkey");
+      return;
+    }
 
-      // Sin WebAuthn: flujo anónimo
-      if (!webAuthnOk) {
-        if (userId) {
-          setCurrentUserId(userId);
-          const save = await loadFromCloud(userId);
-          if (save) {
-            cloudSave.current = save as GameState;
-            setPhase("choose");
-            return;
-          }
-        } else {
-          const newId = await createUser();
-          if (newId) setCurrentUserId(newId);
+    if (!webAuthnOk) {
+      if (userId) {
+        setCurrentUserId(userId);
+        const save = await loadFromCloud(userId);
+        if (save) {
+          cloudSave.current = save as GameState;
+          transitionTo("choose");
+          return;
         }
-        setPhase("oak-intro");
-        return;
+      } else {
+        const newId = await createUser();
+        if (newId) setCurrentUserId(newId);
       }
+      transitionTo("oak-intro");
+      return;
+    }
 
-      // WebAuthn disponible pero sin credencial → pedir registro
-      setPhase("require-passkey");
-    })();
+    transitionTo("require-passkey");
+  };
+
+  // Arranca el bootstrap solo cuando el TitleScreen se cierra (y el juego aún no
+  // ha empezado). Esto garantiza que la pantalla de passkey/choose aparece siempre
+  // DESPUÉS del TitleScreen y nunca interfiere con sus eventos de teclado.
+  useEffect(() => {
+    if (!show) return;
+    if (titleOpen !== false) return; // esperar a que se cierre el TitleScreen
+    if (phase !== "idle") return;    // no relanzar si ya está en marcha
+
+    setPhase("bootstrapping");
+    runBootstrap();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show]);
+  }, [show, titleOpen]);
+
+  // Limpieza del timer al desmontar
+  useEffect(() => {
+    return () => {
+      if (readyTimerRef.current) clearTimeout(readyTimerRef.current);
+    };
+  }, []);
 
   if (!show) return null;
+
+  // Mientras el GameboyMenu o el TitleScreen estén visibles, este componente no
+  // renderiza nada. Esto es CRÍTICO: evita que los useEvent del Menu estén activos
+  // y que el botón A de esas pantallas provoque selecciones accidentales aquí.
+  if (gameboyOpen || titleOpen) return null;
 
   // ---- Teclado para elegir nombre ----
   if (phase === "name-picker") {
@@ -159,7 +196,7 @@ const LoadScreen = () => {
     );
   }
 
-  // ---- Intro del Prof. Oak (con nombre ya confirmado o en espera) ----
+  // ---- Intro del Prof. Oak ----
   if (phase === "oak-intro") {
     return (
       <StyledLoadScreen>
@@ -172,126 +209,132 @@ const LoadScreen = () => {
     );
   }
 
-  const handleContinue = () => {
-    if (cloudSave.current) {
-      const name = cloudSave.current.name ?? "Blue";
-      localStorage.setItem(name, JSON.stringify(cloudSave.current));
-      dispatch(loadFromState(cloudSave.current));
-    }
-    loadComplete();
-  };
-
-  const handleNewGame = () => {
-    setConfirmedName(null);
-    setPhase("oak-intro");
-  };
-
-  return (
-    <StyledLoadScreen>
-      {/* Checking / done: pulsing WEDDINGBOY text */}
-      {(phase === "checking" || phase === "registering" || phase === "done") && (
+  // ---- Pantalla de carga (idle / bootstrapping / registering) ----
+  if (phase === "idle" || phase === "bootstrapping" || phase === "registering") {
+    return (
+      <StyledLoadScreen>
         <TextArea>
           <Frame>
             <StatusText $flashing>WEDDINGBOY...</StatusText>
           </Frame>
         </TextArea>
-      )}
+      </StyledLoadScreen>
+    );
+  }
 
-      {/* Require passkey: el diálogo biométrico SOLO se activa al pulsar el botón */}
-      {phase === "require-passkey" && (
-        <>
-          <TextArea>
-            <Frame>
-              <StatusText $flashing={false}>
-                Activa guardado para confirmar asistencia.
-              </StatusText>
-            </Frame>
-          </TextArea>
-          <Menu
-            disabled={titleOpen || gameboyOpen}
-            show={!loaded}
-            noExit
-            top="2px"
-            left="2px"
-            padding="7vw"
-            close={() => {}}
-            menuItems={[
-              {
-                label: "Guardar con Face ID/Huella",
-                action: async () => {
-                  setPhase("registering");
-                  try {
-                    // Si ya tiene credencial registrada, intentar auth primero
-                    const credentialId = localStorage.getItem("wedding_credential_id");
-                    let userId: string | null = null;
-                    if (credentialId) {
-                      userId = await webauthnAuth(credentialId);
-                    }
-                    // Si no tiene credencial o la auth falló → registrar nueva passkey
-                    if (!userId) {
-                      userId = await webauthnRegister();
-                    }
-                    if (userId) {
-                      setCurrentUserId(userId);
-                      const save = await loadFromCloud(userId);
-                      if (save) {
-                        cloudSave.current = save as GameState;
-                        setPhase("choose");
-                        return;
-                      }
-                      setPhase("oak-intro");
-                    } else {
-                      setPhase("require-passkey");
-                    }
-                  } catch {
-                    setPhase("require-passkey");
+  // ---- Registro / autenticación passkey ----
+  if (phase === "require-passkey") {
+    return (
+      <StyledLoadScreen>
+        <TextArea>
+          <Frame>
+            <StatusText $flashing={false}>
+              Activa guardado para confirmar asistencia.
+            </StatusText>
+          </Frame>
+        </TextArea>
+        <Menu
+          show={menuReady}
+          disabled={!menuReady}
+          noExit
+          top="2px"
+          left="2px"
+          padding="7vw"
+          close={() => {}}
+          menuItems={[
+            {
+              label: "Guardar con Face ID/Huella",
+              action: async () => {
+                setPhase("registering");
+                setMenuReady(false);
+                try {
+                  const credentialId = localStorage.getItem("wedding_credential_id");
+                  let userId: string | null = null;
+                  if (credentialId) {
+                    userId = await webauthnAuth(credentialId);
                   }
-                },
+                  if (!userId) {
+                    userId = await webauthnRegister();
+                  }
+                  if (userId) {
+                    setCurrentUserId(userId);
+                    const save = await loadFromCloud(userId);
+                    if (save) {
+                      cloudSave.current = save as GameState;
+                      transitionTo("choose");
+                      return;
+                    }
+                    transitionTo("oak-intro");
+                  } else {
+                    transitionTo("require-passkey");
+                  }
+                } catch {
+                  transitionTo("require-passkey");
+                }
               },
-              {
-                label: "Jugar sin guardar",
-                action: () => {
-                  // Limpiar credencial para evitar futuros bucles de auth
-                  localStorage.removeItem("wedding_credential_id");
-                  const existingId = localStorage.getItem("wedding_user_id");
-                  const localId = existingId ?? crypto.randomUUID();
-                  localStorage.setItem("wedding_user_id", localId);
-                  setCurrentUserId(localId);
-                  setPhase("oak-intro");
-                },
+            },
+            {
+              label: "Jugar sin guardar",
+              action: () => {
+                localStorage.removeItem("wedding_credential_id");
+                const existingId = localStorage.getItem("wedding_user_id");
+                const localId = existingId ?? crypto.randomUUID();
+                localStorage.setItem("wedding_user_id", localId);
+                setCurrentUserId(localId);
+                transitionTo("oak-intro");
               },
-            ]}
-          />
-        </>
-      )}
+            },
+          ]}
+        />
+      </StyledLoadScreen>
+    );
+  }
 
-      {/* Choose: continue or new game */}
-      {phase === "choose" && (
-        <>
-          <TextArea>
-            <Frame>
-              <StatusText $flashing={!loaded}>
-                ¡Bienvenido de nuevo!
-              </StatusText>
-            </Frame>
-          </TextArea>
-          <Menu
-            disabled={titleOpen || gameboyOpen}
-            show={!loaded}
-            noExit
-            top="2px"
-            left="2px"
-            padding="7vw"
-            close={() => setLoaded(true)}
-            menuItems={[
-              { label: "Continuar", action: handleContinue },
-              { label: "Nueva partida", action: handleNewGame },
-            ]}
-          />
-        </>
-      )}
-    </StyledLoadScreen>
-  );
+  // ---- Continuar / Nueva partida ----
+  if (phase === "choose") {
+    const handleContinue = () => {
+      setMenuReady(false);
+      if (cloudSave.current) {
+        const name = cloudSave.current.name ?? "Blue";
+        localStorage.setItem(name, JSON.stringify(cloudSave.current));
+        dispatch(loadFromState(cloudSave.current));
+      }
+      loadComplete();
+    };
+
+    const handleNewGame = () => {
+      setMenuReady(false);
+      setConfirmedName(null);
+      setPhase("oak-intro");
+    };
+
+    return (
+      <StyledLoadScreen>
+        <TextArea>
+          <Frame>
+            <StatusText $flashing={false}>
+              ¿Continuamos la aventura?
+            </StatusText>
+          </Frame>
+        </TextArea>
+        <Menu
+          show={menuReady}
+          disabled={!menuReady}
+          noExit
+          top="2px"
+          left="2px"
+          padding="7vw"
+          close={() => {}}
+          menuItems={[
+            { label: "Continuar", action: handleContinue },
+            { label: "Nueva partida", action: handleNewGame },
+          ]}
+        />
+      </StyledLoadScreen>
+    );
+  }
+
+  return null;
 };
 
 export default LoadScreen;
