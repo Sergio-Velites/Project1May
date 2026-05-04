@@ -1,7 +1,7 @@
 import palletTownImage from "../assets/map/pallet-town.png";
 import { MapId, MapType } from "./map-types";
 import { Direction } from "../state/state-types";
-import { youngster, teamRocketGrunt } from "../app/npcs";
+import { lass, teamRocketGrunt } from "../app/npcs";
 
 import music from "../assets/music/maps/pallet-town.mp3";
 import getEncounterData from "./get-location-data";
@@ -17,7 +17,7 @@ const palletTown: MapType = {
   },
   walls: {
     0: [9, 12],
-    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19],
+    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 15, 16, 17, 18, 19],
     2: [0, 19],
     3: [0, 4, 5, 6, 7, 12, 13, 14, 15, 19],
     4: [0, 4, 5, 6, 7, 12, 13, 14, 15, 19],
@@ -72,19 +72,18 @@ const palletTown: MapType = {
   encounters: getEncounterData("pallet-town-area"),
   grass: {},
   recoverLocation: { x: 5, y: 6 },
-  // Borrachos bloqueadores: solo visibles, sus posiciones son "text" tiles
   // NPCs del pueblo con los que se puede hablar (no combaten):
   trainers: [
     {
-      npc: youngster,
-      pokemon: [{ id: 19, level: 2 }],
-      facing: Direction.Right,
-      pos: { x: 3, y: 8 },
+      npc: lass,
+      pokemon: [{ id: 35, level: 3 }],
+      facing: Direction.Down,
+      pos: { x: 15, y: 6 },
       intro: [],
       outtro: [
-        "No sé qué demonios pasa hoy pero,",
-        "me noto como un cancaneo por el cuerpo.",
-        "Presiento algo importante.",
+        "Me voy a poner como el kiko en la preboda.",
+        "Dicen que hay que llegar hasta EL BOSQUECILLO,",
+        "pero merecerá la pena.",
       ],
       money: 0,
     },
@@ -92,7 +91,8 @@ const palletTown: MapType = {
       npc: teamRocketGrunt,
       pokemon: [{ id: 19, level: 2 }],
       facing: Direction.Right,
-      pos: { x: 10, y: 1 },
+      pos: { x: 10, y: 0 },
+      persistent: true,
       intro: [],
       outtro: [
         "¡Aquí no pasa nadie sin un POKEMON!",
@@ -104,7 +104,8 @@ const palletTown: MapType = {
       npc: teamRocketGrunt,
       pokemon: [{ id: 19, level: 2 }],
       facing: Direction.Left,
-      pos: { x: 11, y: 1 },
+      pos: { x: 11, y: 0 },
+      persistent: true,
       intro: [],
       outtro: [
         "¡Sin POKEMON no sales de Pueblo Paleta!",

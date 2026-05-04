@@ -35,7 +35,7 @@ const initialState: GameState = {
   pc: [],
   activePokemonIndex: 0,
   trainerEncounter: undefined,
-  defeatedTrainers: ["pallet-town-lab-5-1", "pallet-town-house-a-1f-6-3"],
+  defeatedTrainers: ["pallet-town-lab-5-1", "pallet-town-house-a-1f-6-3", "pallet-town-10-0", "pallet-town-11-0"],
   collectedItems: [],
   completedQuests: [],
   seenPokemon: [],

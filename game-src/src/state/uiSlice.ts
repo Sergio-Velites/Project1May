@@ -48,6 +48,7 @@ interface UiState {
   blackScreen: boolean;
   confirmationMenu: ConfimationMenuType | null;
   evolution: EvolutionType | null;
+  pokeballCardId: number | null;
 }
 
 const initialState: UiState = {
@@ -71,6 +72,7 @@ const initialState: UiState = {
   blackScreen: false,
   confirmationMenu: null,
   evolution: null,
+  pokeballCardId: null,
 };
 
 export const uiSlice = createSlice({
@@ -192,6 +194,12 @@ export const uiSlice = createSlice({
     hideEvolution: (state) => {
       state.evolution = null;
     },
+    openPokeballCard: (state, action: PayloadAction<number>) => {
+      state.pokeballCardId = action.payload;
+    },
+    closePokeballCard: (state) => {
+      state.pokeballCardId = null;
+    },
   },
 });
 
@@ -231,6 +239,8 @@ export const {
   hideConfirmationMenu,
   showEvolution,
   hideEvolution,
+  openPokeballCard,
+  closePokeballCard,
 } = uiSlice.actions;
 
 export const selectText = (state: RootState) => state.ui.text;
@@ -278,7 +288,8 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.textThenAction !== null ||
   state.ui.learningMove !== null ||
   state.ui.confirmationMenu !== null ||
-  state.ui.evolution !== null;
+  state.ui.evolution !== null ||
+  state.ui.pokeballCardId !== null;
 
 export const selectStartMenuSubOpen = (state: RootState) =>
   state.ui.itemsMenu || state.ui.playerMenu;
@@ -302,5 +313,8 @@ export const selectConfirmationMenu = (state: RootState) =>
   state.ui.confirmationMenu;
 
 export const selectEvolution = (state: RootState) => state.ui.evolution;
+
+export const selectPokeballCardId = (state: RootState) =>
+  state.ui.pokeballCardId;
 
 export default uiSlice.reducer;
