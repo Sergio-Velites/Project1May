@@ -20,6 +20,8 @@ import {
   updatePokemon,
   updatePokemonEncounter,
   updateSpecificPokemon,
+  seePokemon,
+  catchPokemonPokedex,
 } from "../state/gameSlice";
 import usePokemonMetadata from "../app/use-pokemon-metadata";
 import Frame from "./Frame";
@@ -27,7 +29,7 @@ import HealthBar from "./HealthBar";
 import usePokemonStats from "../app/use-pokemon-stats";
 
 import corner from "../assets/ui/corner.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 
@@ -56,7 +58,7 @@ import {
 import useIsMobile from "../app/use-is-mobile";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { MoveMetadata } from "../app/move-metadata";
-import processMove, { MoveResult, StatStages, DEFAULT_STAGES } from "../app/move-helper";
+import processMove, { MoveResult, StatStages, DEFAULT_STAGES, getStageMult } from "../app/move-helper";
 import getXp from "../app/xp-helper";
 import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp } from "../app/level-helper";
 import MoveSelect from "./MoveSelect";
@@ -615,6 +617,8 @@ const PokemonEncounter = () => {
 
   const [alertText, setAlertText] = useState<string | null>(null);
   const [clickableNotice, setClickableNotice] = useState<string | null>(null);
+  // Ref to pass computed XP from stage 20 to stage 21 without stale closure
+  const pendingXpRef = useRef<number | null>(null);
 
   // Stat stages — reset al inicio de cada combate
   const [playerStages, setPlayerStages] = useState<StatStages>(DEFAULT_STAGES);
@@ -732,6 +736,8 @@ const PokemonEncounter = () => {
       setPlayerStages(DEFAULT_STAGES);
       setEnemyStages(DEFAULT_STAGES);
       setStage(0);
+      // Register enemy as SEEN in Pokédex
+      dispatch(seePokemon(enemy.id));
       setTimeout(() => {
         setStage(1);
       }, 2000);
@@ -794,7 +800,7 @@ const PokemonEncounter = () => {
   useEffect(() => {
     if (pokeballThrowing && enemy) {
       if (isTrainer) {
-        setClickableNotice("The trainer blocked the ball!");
+        setClickableNotice("¡El entrenador bloqueó la Poké Ball!");
         return;
       }
 
@@ -897,26 +903,32 @@ const PokemonEncounter = () => {
     if (stage === 20) {
       setStage(21);
       if (enemy) {
+        // BUG FIX: compute total XP here and pass it through so stage 21
+        // reads the updated value (avoids stale closure on processingPokemon.xp)
+        const earnedXp = Math.round(
+          getXp(enemy.id, enemy.level, isTrainer) / involvedPokemon.length
+        );
+        const updatedXp = processingPokemon.xp + earnedXp;
         dispatch(
           updateSpecificPokemon({
             index: involvedPokemon[processingInvolvedPokemon],
             pokemon: {
               ...processingPokemon,
-              xp:
-                processingPokemon.xp +
-                Math.round(
-                  getXp(enemy.id, enemy.level, isTrainer) / involvedPokemon.length
-                ),
+              xp: updatedXp,
             },
           })
         );
+        // Store computed xp so stage 21 handler can use it reliably
+        pendingXpRef.current = updatedXp;
       }
     }
 
     if (stage === 21) {
+      // Use pendingXpRef to avoid stale closure from Redux dispatch above
+      const xpToUse = pendingXpRef.current ?? processingPokemon.xp;
       const { level, leveledUp, remainingXp } = getLevelData(
         processingPokemon.level,
-        processingPokemon.xp
+        xpToUse
       );
       if (leveledUp) {
         // Gen I: current HP increases by the same amount as max HP
@@ -932,8 +944,10 @@ const PokemonEncounter = () => {
             },
           })
         );
+        pendingXpRef.current = null;
         setStage(22);
       } else {
+        pendingXpRef.current = null;
         endEncounter_();
       }
     }
@@ -1023,6 +1037,8 @@ const PokemonEncounter = () => {
           hp: Math.max(1, enemy.hp),
         })
       );
+      // Register as CAUGHT in Pokédex
+      dispatch(catchPokemonPokedex(enemy.id));
       endEncounter_();
     }
 
@@ -1081,15 +1097,13 @@ const PokemonEncounter = () => {
       if (!processingMetadata) throw new Error("No processing metadata found");
       const move = getLearnedMove(processingPokemon);
       if (!move) throw new Error("No move found");
-      return `¡${processingMetadata.name.toUpperCase()} aprendió ${move.id}!`;
+      return `¡${processingMetadata.name.toUpperCase()} aprendió ${(getMoveMetadata(move.id)?.name ?? move.id).toUpperCase()}!`;
     }
     if (stage === 30) {
       if (!processingMetadata) throw new Error("No processing metadata found");
       const move = getLearnedMove(processingPokemon);
       if (!move) throw new Error("No move found");
-      return `${processingMetadata.name.toUpperCase()} intenta aprender ${
-        move.id
-      }.`;
+      return `${processingMetadata.name.toUpperCase()} intenta aprender ${(getMoveMetadata(move.id)?.name ?? move.id).toUpperCase()}.`;
     }
     if (stage === 31) return `Pero no puede aprender más de 4 movimientos`;
     if (stage === 32) return `Elige el movimiento que quieres olvidar`;
@@ -1123,7 +1137,13 @@ const PokemonEncounter = () => {
   ) => {
     if (activeMove.priority > enemyMove.priority) return true;
     if (activeMove.priority < enemyMove.priority) return false;
-    return activeStats.speed > enemyStats.speed;
+    // Apply speed stat stages for priority calculation (Gen I)
+    const playerSpeed = activeStats.speed * getStageMult(playerStages.speed);
+    const enemySpeed  = enemyStats.speed  * getStageMult(enemyStages.speed);
+    if (playerSpeed > enemySpeed) return true;
+    if (playerSpeed < enemySpeed) return false;
+    // Speed tie: random (Gen I)
+    return Math.random() < 0.5;
   };
 
   const STAT_NAMES_ES: Record<string, string> = {
@@ -1305,6 +1325,12 @@ const PokemonEncounter = () => {
       );
 
       setTimeout(() => {
+        // BUG FIX: if the enemy self-destructed, it has 0 HP — player wins
+        if (them.hp <= 0) {
+          setStage(20);
+          return;
+        }
+
         // We fainted
         if (us.hp <= 0) {
           setStage(24);
@@ -1536,7 +1562,7 @@ const PokemonEncounter = () => {
                     action: () => {},
                   };
                 const item: MenuItemType = {
-                  label: m.id,
+                  label: (getMoveMetadata(m.id)?.name ?? m.id).toUpperCase(),
                   action: () => {
                     endEncounter_();
                     dispatch(
@@ -1558,7 +1584,7 @@ const PokemonEncounter = () => {
                 return item;
               }),
               {
-                label: getLearnedMove(processingPokemon)?.id || "Error",
+                label: "NO APRENDER",
                 action: () => {
                   endEncounter_();
                 },

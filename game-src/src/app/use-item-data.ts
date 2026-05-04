@@ -177,7 +177,7 @@ const useItemData = () => {
   const data: Record<string, ItemData> = {
     [ItemType.MaxPotion]: {
       type: ItemType.MaxPotion,
-      name: "Max Potion",
+      name: "Poción Máx.",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -205,7 +205,7 @@ const useItemData = () => {
     },
     [ItemType.HyperPotion]: {
       type: ItemType.HyperPotion,
-      name: "Hyper Potion",
+      name: "Hiperpoción",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -235,7 +235,7 @@ const useItemData = () => {
     },
     [ItemType.SuperPotion]: {
       type: ItemType.SuperPotion,
-      name: "Super Potion",
+      name: "Superpoción",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -265,7 +265,7 @@ const useItemData = () => {
     },
     [ItemType.Potion]: {
       type: ItemType.Potion,
-      name: "Potion",
+      name: "Poción",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -295,7 +295,7 @@ const useItemData = () => {
     },
     [ItemType.Nugget]: {
       type: ItemType.Nugget,
-      name: "Nugget",
+      name: "Pepita de Oro",
       countable: true,
       consumable: false,
       usableInBattle: false,
@@ -307,7 +307,7 @@ const useItemData = () => {
     },
     [ItemType.PpUp]: {
       type: ItemType.PpUp,
-      name: "PP Up",
+      name: "PS Más",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -342,7 +342,7 @@ const useItemData = () => {
     },
     [ItemType.Revive]: {
       type: ItemType.Revive,
-      name: "Revive",
+      name: "Revivir",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -372,7 +372,7 @@ const useItemData = () => {
     },
     [ItemType.MaxRevive]: {
       type: ItemType.MaxRevive,
-      name: "Max Revive",
+      name: "Revivir Máx.",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -401,7 +401,7 @@ const useItemData = () => {
     },
     [ItemType.FreshWater]: {
       type: ItemType.FreshWater,
-      name: "Fresh Water",
+      name: "Agua Fresca",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -431,7 +431,7 @@ const useItemData = () => {
     },
     [ItemType.SodaPop]: {
       type: ItemType.SodaPop,
-      name: "Soda Pop",
+      name: "Soda",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -461,7 +461,7 @@ const useItemData = () => {
     },
     [ItemType.Lemondade]: {
       type: ItemType.Lemondade,
-      name: "Lemondade",
+      name: "Limonada",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -491,7 +491,7 @@ const useItemData = () => {
     },
     [ItemType.Ether]: {
       type: ItemType.Ether,
-      name: "Ether",
+      name: "Éter",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -524,7 +524,7 @@ const useItemData = () => {
     },
     [ItemType.MaxEther]: {
       type: ItemType.MaxEther,
-      name: "Max Ether",
+      name: "Éter Máx.",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -554,7 +554,7 @@ const useItemData = () => {
     },
     [ItemType.Elixer]: {
       type: ItemType.Elixer,
-      name: "Elixer",
+      name: "Elixir",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -587,7 +587,7 @@ const useItemData = () => {
     },
     [ItemType.MaxElixer]: {
       type: ItemType.MaxElixer,
-      name: "Max Elixer",
+      name: "Elixir Máx.",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -617,7 +617,7 @@ const useItemData = () => {
     },
     [ItemType.MoonStone]: {
       type: ItemType.MoonStone,
-      name: "Moon Stone",
+      name: "Piedra Lunar",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -651,7 +651,7 @@ const useItemData = () => {
     },
     [ItemType.LeafStone]: {
       type: ItemType.LeafStone,
-      name: "Leaf Stone",
+      name: "Piedra Hoja",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -684,7 +684,7 @@ const useItemData = () => {
     },
     [ItemType.FireStone]: {
       type: ItemType.FireStone,
-      name: "Fire Stone",
+      name: "Piedra Fuego",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -717,7 +717,7 @@ const useItemData = () => {
     },
     [ItemType.WaterStone]: {
       type: ItemType.WaterStone,
-      name: "Water Stone",
+      name: "Piedra Agua",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -751,7 +751,7 @@ const useItemData = () => {
     },
     [ItemType.ThunderStone]: {
       type: ItemType.ThunderStone,
-      name: "Thunder Stone",
+      name: "Piedra Trueno",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -815,7 +815,7 @@ const useItemData = () => {
     },
     [ItemType.GreatBall]: {
       type: ItemType.GreatBall,
-      name: "Great Ball",
+      name: "Super Ball",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -831,7 +831,7 @@ const useItemData = () => {
     },
     [ItemType.PokeBall]: {
       type: ItemType.PokeBall,
-      name: "Poke Ball",
+      name: "Poké Ball",
       countable: true,
       consumable: true,
       usableInBattle: true,
@@ -847,7 +847,7 @@ const useItemData = () => {
     },
     [ItemType.BoulderBadge]: {
       type: ItemType.BoulderBadge,
-      name: "Boulder Badge",
+      name: "Medalla Roca",
       countable: false,
       consumable: false,
       usableInBattle: false,
@@ -859,7 +859,7 @@ const useItemData = () => {
     },
     [ItemType.CascadeBadge]: {
       type: ItemType.CascadeBadge,
-      name: "Cascade Badge",
+      name: "Medalla Cascada",
       countable: false,
       consumable: false,
       usableInBattle: false,
@@ -871,7 +871,7 @@ const useItemData = () => {
     },
     [ItemType.ThunderBadge]: {
       type: ItemType.ThunderBadge,
-      name: "Thunder Badge",
+      name: "Medalla Trueno",
       countable: false,
       consumable: false,
       usableInBattle: false,
@@ -883,7 +883,7 @@ const useItemData = () => {
     },
     [ItemType.RainbowBadge]: {
       type: ItemType.RainbowBadge,
-      name: "Rainbow Badge",
+      name: "Medalla Arco Iris",
       countable: false,
       consumable: false,
       usableInBattle: false,
@@ -895,7 +895,7 @@ const useItemData = () => {
     },
     [ItemType.SoulBadge]: {
       type: ItemType.SoulBadge,
-      name: "Soul Badge",
+      name: "Medalla Alma",
       countable: false,
       consumable: false,
       usableInBattle: false,
@@ -907,7 +907,7 @@ const useItemData = () => {
     },
     [ItemType.MarshBadge]: {
       type: ItemType.MarshBadge,
-      name: "Marsh Badge",
+      name: "Medalla Pantano",
       countable: false,
       consumable: false,
       usableInBattle: false,
@@ -919,7 +919,7 @@ const useItemData = () => {
     },
     [ItemType.VolcanoBadge]: {
       type: ItemType.VolcanoBadge,
-      name: "Volcano Badge",
+      name: "Medalla Volcán",
       countable: false,
       consumable: false,
       usableInBattle: false,
@@ -931,7 +931,7 @@ const useItemData = () => {
     },
     [ItemType.EarthBadge]: {
       type: ItemType.EarthBadge,
-      name: "Earth Badge",
+      name: "Medalla Tierra",
       countable: false,
       consumable: false,
       usableInBattle: false,
@@ -943,7 +943,7 @@ const useItemData = () => {
     },
     [ItemType.Tm01]: {
       type: ItemType.Tm01,
-      name: "TM01",
+      name: "MT01",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -964,7 +964,7 @@ const useItemData = () => {
     },
     [ItemType.Tm02]: {
       type: ItemType.Tm02,
-      name: "TM02",
+      name: "MT02",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -985,7 +985,7 @@ const useItemData = () => {
     },
     [ItemType.Tm03]: {
       type: ItemType.Tm03,
-      name: "TM03",
+      name: "MT03",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1006,7 +1006,7 @@ const useItemData = () => {
     },
     [ItemType.Tm04]: {
       type: ItemType.Tm04,
-      name: "TM04",
+      name: "MT04",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1027,7 +1027,7 @@ const useItemData = () => {
     },
     [ItemType.Tm05]: {
       type: ItemType.Tm05,
-      name: "TM05",
+      name: "MT05",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1048,7 +1048,7 @@ const useItemData = () => {
     },
     [ItemType.Tm06]: {
       type: ItemType.Tm06,
-      name: "TM06",
+      name: "MT06",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1069,7 +1069,7 @@ const useItemData = () => {
     },
     [ItemType.Tm07]: {
       type: ItemType.Tm07,
-      name: "TM07",
+      name: "MT07",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1090,7 +1090,7 @@ const useItemData = () => {
     },
     [ItemType.Tm08]: {
       type: ItemType.Tm08,
-      name: "TM08",
+      name: "MT08",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1111,7 +1111,7 @@ const useItemData = () => {
     },
     [ItemType.Tm09]: {
       type: ItemType.Tm09,
-      name: "TM09",
+      name: "MT09",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1132,7 +1132,7 @@ const useItemData = () => {
     },
     [ItemType.Tm10]: {
       type: ItemType.Tm10,
-      name: "TM10",
+      name: "MT10",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1153,7 +1153,7 @@ const useItemData = () => {
     },
     [ItemType.Tm11]: {
       type: ItemType.Tm11,
-      name: "TM11",
+      name: "MT11",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1174,7 +1174,7 @@ const useItemData = () => {
     },
     [ItemType.Tm12]: {
       type: ItemType.Tm12,
-      name: "TM12",
+      name: "MT12",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1195,7 +1195,7 @@ const useItemData = () => {
     },
     [ItemType.Tm13]: {
       type: ItemType.Tm13,
-      name: "TM13",
+      name: "MT13",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1216,7 +1216,7 @@ const useItemData = () => {
     },
     [ItemType.Tm14]: {
       type: ItemType.Tm14,
-      name: "TM14",
+      name: "MT14",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1237,7 +1237,7 @@ const useItemData = () => {
     },
     [ItemType.Tm15]: {
       type: ItemType.Tm15,
-      name: "TM15",
+      name: "MT15",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1258,7 +1258,7 @@ const useItemData = () => {
     },
     [ItemType.Tm16]: {
       type: ItemType.Tm16,
-      name: "TM16",
+      name: "MT16",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1279,7 +1279,7 @@ const useItemData = () => {
     },
     [ItemType.Tm17]: {
       type: ItemType.Tm17,
-      name: "TM17",
+      name: "MT17",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1300,7 +1300,7 @@ const useItemData = () => {
     },
     [ItemType.Tm18]: {
       type: ItemType.Tm18,
-      name: "TM18",
+      name: "MT18",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1321,7 +1321,7 @@ const useItemData = () => {
     },
     [ItemType.Tm19]: {
       type: ItemType.Tm19,
-      name: "TM19",
+      name: "MT19",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1342,7 +1342,7 @@ const useItemData = () => {
     },
     [ItemType.Tm20]: {
       type: ItemType.Tm20,
-      name: "TM20",
+      name: "MT20",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1363,7 +1363,7 @@ const useItemData = () => {
     },
     [ItemType.Tm21]: {
       type: ItemType.Tm21,
-      name: "TM21",
+      name: "MT21",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1384,7 +1384,7 @@ const useItemData = () => {
     },
     [ItemType.Tm22]: {
       type: ItemType.Tm22,
-      name: "TM22",
+      name: "MT22",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1405,7 +1405,7 @@ const useItemData = () => {
     },
     [ItemType.Tm23]: {
       type: ItemType.Tm23,
-      name: "TM23",
+      name: "MT23",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1426,7 +1426,7 @@ const useItemData = () => {
     },
     [ItemType.Tm24]: {
       type: ItemType.Tm24,
-      name: "TM24",
+      name: "MT24",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1447,7 +1447,7 @@ const useItemData = () => {
     },
     [ItemType.Tm25]: {
       type: ItemType.Tm25,
-      name: "TM25",
+      name: "MT25",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1468,7 +1468,7 @@ const useItemData = () => {
     },
     [ItemType.Tm26]: {
       type: ItemType.Tm26,
-      name: "TM26",
+      name: "MT26",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1489,7 +1489,7 @@ const useItemData = () => {
     },
     [ItemType.Tm27]: {
       type: ItemType.Tm27,
-      name: "TM27",
+      name: "MT27",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1510,7 +1510,7 @@ const useItemData = () => {
     },
     [ItemType.Tm28]: {
       type: ItemType.Tm28,
-      name: "TM28",
+      name: "MT28",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1531,7 +1531,7 @@ const useItemData = () => {
     },
     [ItemType.Tm29]: {
       type: ItemType.Tm29,
-      name: "TM29",
+      name: "MT29",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1552,7 +1552,7 @@ const useItemData = () => {
     },
     [ItemType.Tm30]: {
       type: ItemType.Tm30,
-      name: "TM30",
+      name: "MT30",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1573,7 +1573,7 @@ const useItemData = () => {
     },
     [ItemType.Tm31]: {
       type: ItemType.Tm31,
-      name: "TM31",
+      name: "MT31",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1594,7 +1594,7 @@ const useItemData = () => {
     },
     [ItemType.Tm32]: {
       type: ItemType.Tm32,
-      name: "TM32",
+      name: "MT32",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1615,7 +1615,7 @@ const useItemData = () => {
     },
     [ItemType.Tm33]: {
       type: ItemType.Tm33,
-      name: "TM33",
+      name: "MT33",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1636,7 +1636,7 @@ const useItemData = () => {
     },
     [ItemType.Tm34]: {
       type: ItemType.Tm34,
-      name: "TM34",
+      name: "MT34",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1657,7 +1657,7 @@ const useItemData = () => {
     },
     [ItemType.Tm35]: {
       type: ItemType.Tm35,
-      name: "TM35",
+      name: "MT35",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1678,7 +1678,7 @@ const useItemData = () => {
     },
     [ItemType.Tm36]: {
       type: ItemType.Tm36,
-      name: "TM36",
+      name: "MT36",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1699,7 +1699,7 @@ const useItemData = () => {
     },
     [ItemType.Tm37]: {
       type: ItemType.Tm37,
-      name: "TM37",
+      name: "MT37",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1720,7 +1720,7 @@ const useItemData = () => {
     },
     [ItemType.Tm38]: {
       type: ItemType.Tm38,
-      name: "TM38",
+      name: "MT38",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1741,7 +1741,7 @@ const useItemData = () => {
     },
     [ItemType.Tm39]: {
       type: ItemType.Tm39,
-      name: "TM39",
+      name: "MT39",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1762,7 +1762,7 @@ const useItemData = () => {
     },
     [ItemType.Tm40]: {
       type: ItemType.Tm40,
-      name: "TM40",
+      name: "MT40",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1783,7 +1783,7 @@ const useItemData = () => {
     },
     [ItemType.Tm41]: {
       type: ItemType.Tm41,
-      name: "TM41",
+      name: "MT41",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1804,7 +1804,7 @@ const useItemData = () => {
     },
     [ItemType.Tm42]: {
       type: ItemType.Tm42,
-      name: "TM42",
+      name: "MT42",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1825,7 +1825,7 @@ const useItemData = () => {
     },
     [ItemType.Tm43]: {
       type: ItemType.Tm43,
-      name: "TM43",
+      name: "MT43",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1846,7 +1846,7 @@ const useItemData = () => {
     },
     [ItemType.Tm44]: {
       type: ItemType.Tm44,
-      name: "TM44",
+      name: "MT44",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1867,7 +1867,7 @@ const useItemData = () => {
     },
     [ItemType.Tm45]: {
       type: ItemType.Tm45,
-      name: "TM45",
+      name: "MT45",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1888,7 +1888,7 @@ const useItemData = () => {
     },
     [ItemType.Tm46]: {
       type: ItemType.Tm46,
-      name: "TM46",
+      name: "MT46",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1909,7 +1909,7 @@ const useItemData = () => {
     },
     [ItemType.Tm47]: {
       type: ItemType.Tm47,
-      name: "TM47",
+      name: "MT47",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1930,7 +1930,7 @@ const useItemData = () => {
     },
     [ItemType.Tm48]: {
       type: ItemType.Tm48,
-      name: "TM48",
+      name: "MT48",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1951,7 +1951,7 @@ const useItemData = () => {
     },
     [ItemType.Tm49]: {
       type: ItemType.Tm49,
-      name: "TM49",
+      name: "MT49",
       countable: true,
       consumable: true,
       usableInBattle: false,
@@ -1972,7 +1972,7 @@ const useItemData = () => {
     },
     [ItemType.Tm50]: {
       type: ItemType.Tm50,
-      name: "TM50",
+      name: "MT50",
       countable: true,
       consumable: true,
       usableInBattle: false,

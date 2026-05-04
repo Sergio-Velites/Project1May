@@ -55,4 +55,6 @@ export interface GameState {
   defeatedTrainers: string[];
   collectedItems: string[];
   completedQuests: string[];
+  seenPokemon: number[];    // IDs vistos en la Pokédex
+  caughtPokemon: number[]; // IDs capturados
 }

@@ -289,8 +289,8 @@ const Evolution = () => {
       <TextContainer>
         <Frame wide tall flashing={evolved}>
           {!evolved
-            ? `What? ${metadata.name.toUpperCase()} is evolving!`
-            : `${metadata.name.toUpperCase()} evolved into ${evolvesMetadata.name.toUpperCase()}!`}
+            ? `¡Eh? ¡${metadata.name.toUpperCase()} está evolucionando!`
+            : `¡${metadata.name.toUpperCase()} evolucionó a ${evolvesMetadata.name.toUpperCase()}!`}
         </Frame>
       </TextContainer>
     </>

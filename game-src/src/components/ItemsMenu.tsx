@@ -58,7 +58,7 @@ const ItemsMenu = () => {
           close={() => setSelected(null)}
           menuItems={[
             {
-              label: "Use",
+              label: "Usar",
               action: () => {
                 // Can't use
                 if (
@@ -68,8 +68,8 @@ const ItemsMenu = () => {
                 ) {
                   dispatch(
                     showText([
-                      `OAK: ${name}! This isn't the`,
-                      "time to use that!",
+                      `OAK: ¡${name}! ¡Éste no es`,
+                      "el momento de usarlo!",
                     ])
                   );
                 }
@@ -82,12 +82,12 @@ const ItemsMenu = () => {
               },
             },
             {
-              label: "Toss",
+              label: "Tirar",
               action: () => {
                 dispatch(
                   showConfirmationMenu({
-                    preMessage: `Is it OK to toss ${selected.name}`,
-                    postMessage: `${name} tossed ${selected.name}`,
+                    preMessage: `¿Tirar ${selected.name}?`,
+                    postMessage: `${name} tiró ${selected.name}`,
                     confirm: () => dispatch(consumeItem(selected.type)),
                   })
                 );

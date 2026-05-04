@@ -5,6 +5,7 @@ import { Event } from "../app/emitter";
 import PixelImage from "../styles/PixelImage";
 import oakPortrait from "../assets/portraits/oak.png";
 import playerPortrait from "../assets/portraits/ash.png";
+import ashDownSprite from "../assets/walk-sprites/ash-down.png";
 import usePokemon from "../app/use-pokemon-metadata";
 
 // ── Dialogue data ────────────────────────────────────────────────────────────
@@ -45,15 +46,20 @@ const blink = keyframes`
 `;
 
 const shrink = keyframes`
-  0%   { transform: scale(1);   opacity: 1; }
-  60%  { transform: scale(0.15); opacity: 1; }
-  80%  { transform: scale(0.15); opacity: 0; }
-  100% { transform: scale(0.15); opacity: 0; }
+  0%   { transform: scale(1);    opacity: 1; }
+  70%  { transform: scale(0.08); opacity: 1; }
+  100% { transform: scale(0.08); opacity: 0; }
 `;
 
 const appear = keyframes`
   0%   { opacity: 0; }
   100% { opacity: 1; }
+`;
+
+const popIn = keyframes`
+  0%   { transform: scale(0.4); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
 `;
 
 // ── Styled components ────────────────────────────────────────────────────────
@@ -106,6 +112,17 @@ const PokemonImage = styled(PixelImage)`
   @media (max-width: 1000px) {
     height: 28%;
     max-height: 100px;
+  }
+`;
+
+const MapSprite = styled(PixelImage)`
+  width: 16px;
+  height: 16px;
+  animation: ${popIn} 0.3s ease-out forwards;
+
+  @media (min-width: 1000px) {
+    width: 32px;
+    height: 32px;
   }
 `;
 
@@ -231,7 +248,7 @@ const OakIntro = ({ onNameRequired, confirmedName, onComplete }: Props) => {
   const [displayed, setDisplayed] = useState("");  // typewriter buffer
   const [finished, setFinished] = useState(false); // all chars shown
   const [waitingForName, setWaitingForName] = useState(false); // showing name panel
-  const [shrinking, setShrinking] = useState(false); // silhouette shrink anim
+  const [shrinkPhase, setShrinkPhase] = useState<"idle" | "shrinking" | "overworld">("idle");
 
   const currentLine = linesRef.current[lineIndex];
   const fullText = currentLine?.text ?? "";
@@ -283,8 +300,9 @@ const OakIntro = ({ onNameRequired, confirmedName, onComplete }: Props) => {
     }
 
     if (pause === "start-game") {
-      setShrinking(true);
-      setTimeout(() => onComplete(), 2600);
+      setShrinkPhase("shrinking");
+      setTimeout(() => setShrinkPhase("overworld"), 900);
+      setTimeout(() => onComplete(), 1700);
       return;
     }
 
@@ -312,8 +330,14 @@ const OakIntro = ({ onNameRequired, confirmedName, onComplete }: Props) => {
         {sprite === "pokemon" && pokemon && (
           <PokemonImage key="pokemon" src={pokemon.images.front} alt="POKÉMON" />
         )}
-        {sprite === "player" && (
-          <OakImage key="player" src={playerPortrait} alt="Player" />
+        {sprite === "player" && shrinkPhase === "idle" && (
+          <OakImage key="player-idle" src={playerPortrait} alt="Player" />
+        )}
+        {sprite === "player" && shrinkPhase === "shrinking" && (
+          <OakImage key="player-shrink" src={playerPortrait} alt="Player" $shrink />
+        )}
+        {sprite === "player" && shrinkPhase === "overworld" && (
+          <MapSprite key="map-sprite" src={ashDownSprite} alt="Player" />
         )}
         {sprite === "silhouette" && (
           <OakImage
@@ -321,7 +345,6 @@ const OakIntro = ({ onNameRequired, confirmedName, onComplete }: Props) => {
             src={playerPortrait}
             alt="Player"
             $silhouette
-            $shrink={shrinking}
           />
         )}
 

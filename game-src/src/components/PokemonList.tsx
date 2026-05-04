@@ -9,6 +9,7 @@ import Menu from "./Menu";
 import Frame from "./Frame";
 import { PokemonInstance } from "../state/state-types";
 import { MoveMetadata } from "../app/move-metadata";
+import PokemonSummary from "./PokemonSummary";
 
 const StyledPokemonList = styled.div`
   position: absolute;
@@ -59,11 +60,12 @@ const PokemonList = ({
   const [selected, setSelected] = useState(false);
   const [switching, setSwitching] = useState<number | null>(null);
   const [scroll, setScroll] = useState(0);
+  const [viewingStats, setViewingStats] = useState(false);
 
   const pokemon = customPokemon ?? pokemon_;
 
   useEvent(Event.Up, () => {
-    if (selected) return;
+    if (selected || viewingStats) return;
 
     if (active === 0) return;
 
@@ -72,7 +74,7 @@ const PokemonList = ({
   });
 
   useEvent(Event.Down, () => {
-    if (selected) return;
+    if (selected || viewingStats) return;
 
     if (active === pokemon.length - 1) return;
     if (scroll === pokemon.length - 5) return;
@@ -82,13 +84,12 @@ const PokemonList = ({
   });
 
   useEvent(Event.B, () => {
-    if (selected) return;
-
+    if (selected || viewingStats) return;
     close();
   });
 
   useEvent(Event.A, () => {
-    if (selected) return;
+    if (selected || viewingStats) return;
 
     if (clickPokemon) {
       clickPokemon(active + scroll);
@@ -108,6 +109,12 @@ const PokemonList = ({
 
   return (
     <>
+      {viewingStats && (
+        <PokemonSummary
+          pokemon={pokemon[active + scroll]}
+          onClose={() => setViewingStats(false)}
+        />
+      )}
       <StyledPokemonList>
         {pokemon.slice(scroll, scroll + 6).map((p, i) => {
           return (
@@ -125,8 +132,8 @@ const PokemonList = ({
           {text
             ? text
             : switching
-            ? "Move POKéMON where?"
-            : "Choose a POKéMON."}
+            ? "¿Dónde mover al POKÉMON?"
+            : "Elige un POKÉMON."}
         </Frame>
       </Container>
       <Menu
@@ -134,13 +141,15 @@ const PokemonList = ({
         bottom="0"
         show={selected}
         menuItems={[
-          // TODO Implement stats
-          // {
-          //   label: "Stats",
-          //   action: () => console.log("Stats"),
-          // },
           {
-            label: "Switch",
+            label: "Datos",
+            action: () => {
+              setSelected(false);
+              setViewingStats(true);
+            },
+          },
+          {
+            label: "Cambiar",
             action: () => {
               setSelected(false);
               if (switchAction) switchAction(active);

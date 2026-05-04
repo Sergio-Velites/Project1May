@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
@@ -128,6 +128,34 @@ const EndButton = styled.button<EndBtnProps>`
   }
 `;
 
+const MobileKeyboardBtn = styled.button`
+  font-family: "PokemonGB";
+  font-size: 16px;
+  padding: 3% 5%;
+  background: var(--bg);
+  color: black;
+  border: 2px solid black;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  align-self: flex-end;
+  margin-bottom: 1%;
+
+  @media (max-width: 1000px) {
+    font-size: 7px;
+    padding: 4% 5%;
+  }
+`;
+
+const HiddenInput = styled.input`
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+`;
+
 interface Props {
   onConfirm: (name: string) => void;
 }
@@ -136,6 +164,7 @@ const NameKeyboard = ({ onConfirm }: Props) => {
   const [chars, setChars] = useState<string[]>([]);
   const [row, setRow] = useState(0);
   const [col, setCol] = useState(0);
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
 
   const handleKey = useCallback(
     (key: string) => {
@@ -159,9 +188,29 @@ const NameKeyboard = ({ onConfirm }: Props) => {
     }
   }, [row, col, handleKey]);
 
-  // Teclado físico
+  // Teclado físico — escritura directa de letras + navegación del grid
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
+      // Escritura directa: cualquier letra o espacio escribe en el nombre
+      if (e.key.length === 1 && /[a-zA-Z ]/.test(e.key)) {
+        e.preventDefault();
+        const letter = e.key.toUpperCase();
+        setChars((prev) => (prev.length < MAX_LEN ? [...prev, letter] : prev));
+        return;
+      }
+      // Borrar con Backspace o Delete
+      if (e.key === "Backspace" || e.key === "Delete") {
+        e.preventDefault();
+        setChars((prev) => prev.slice(0, -1));
+        return;
+      }
+      // Confirmar con Enter
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleKey("END");
+        return;
+      }
+      // Navegación del grid (por si el usuario prefiere usar el grid)
       if (e.key === "ArrowUp")
         setRow((r) => (r - 1 + TOTAL_ROWS) % TOTAL_ROWS);
       else if (e.key === "ArrowDown")
@@ -170,14 +219,38 @@ const NameKeyboard = ({ onConfirm }: Props) => {
         setCol((c) => (c - 1 + 7) % 7);
       else if (e.key === "ArrowRight")
         setCol((c) => (c + 1) % 7);
-      else if (e.key === "z" || e.key === "Z" || e.key === "Enter")
+      else if (e.key === "+" || e.key === "Add")
         pressCurrentKey();
-      else if (e.key === "x" || e.key === "X" || e.key === "Escape")
+      else if (e.key === "-" || e.key === "Subtract")
         handleKey("DEL");
     };
     window.addEventListener("keydown", onKeydown);
     return () => window.removeEventListener("keydown", onKeydown);
   }, [pressCurrentKey, handleKey]);
+
+  // Teclado nativo móvil — sincronizar el input oculto con chars
+  const handleHiddenInput = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const raw = e.target.value.toUpperCase().replace(/[^A-Z ]/g, "");
+      const limited = raw.slice(0, MAX_LEN).split("");
+      setChars(limited);
+      // Mantener el cursor al final del input
+      const el = e.target;
+      requestAnimationFrame(() => {
+        el.setSelectionRange(el.value.length, el.value.length);
+      });
+    },
+    []
+  );
+
+  const openMobileKeyboard = () => {
+    const el = hiddenInputRef.current;
+    if (!el) return;
+    // Sincronizar valor actual antes de abrir
+    el.value = chars.join("");
+    el.focus();
+    el.setSelectionRange(el.value.length, el.value.length);
+  };
 
   // Botones Game Boy on-screen via emitter
   useEvent(
@@ -203,6 +276,22 @@ const NameKeyboard = ({ onConfirm }: Props) => {
 
   return (
     <Wrapper>
+      {/* Input oculto para teclado nativo en móvil */}
+      <HiddenInput
+        ref={hiddenInputRef}
+        type="text"
+        maxLength={MAX_LEN}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="characters"
+        spellCheck={false}
+        onChange={handleHiddenInput}
+        onKeyDown={(e) => {
+          // Confirmar con Enter desde el teclado nativo
+          if (e.key === "Enter") { e.preventDefault(); handleKey("END"); }
+        }}
+      />
+
       <NameDisplay>
         {slots.map((_, i) => {
           const ch = chars[i];
@@ -216,6 +305,11 @@ const NameKeyboard = ({ onConfirm }: Props) => {
           );
         })}
       </NameDisplay>
+
+      {/* Botón para abrir teclado nativo (útil en móvil) */}
+      <MobileKeyboardBtn onClick={openMobileKeyboard} type="button">
+        ⌨ TECLADO
+      </MobileKeyboardBtn>
 
       <Grid>
         {ROWS.map((rowKeys, r) =>

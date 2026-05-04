@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectPos, selectMap } from "../state/gameSlice";
 import Character from "./Character";
 import Text from "./Text";
@@ -34,6 +34,8 @@ import QuestHandler from "./QuestHandler";
 import ConfirmationMenu from "./ConfirmationMenu";
 import Evolution from "./Evolution";
 import IntroVideo from "./IntroVideo";
+import Pokedex from "./Pokedex";
+import { selectPokedexOpen, hidePokedex } from "../state/uiSlice";
 
 const Container = styled.div`
   position: absolute;
@@ -88,6 +90,8 @@ const ColorOverlay = styled.div`
 const Game = () => {
   const pos = useSelector(selectPos);
   const map = useSelector(selectMap);
+  const dispatch = useDispatch();
+  const pokedexOpen = useSelector(selectPokedexOpen);
 
   return (
     <Container>
@@ -126,6 +130,7 @@ const Game = () => {
       <ActionOnPokemon />
       <Evolution />
       <ConfirmationMenu />
+      {pokedexOpen && <Pokedex onClose={() => dispatch(hidePokedex())} />}
       <LoadScreen />
       <TitleScreen />
       <IntroVideo />

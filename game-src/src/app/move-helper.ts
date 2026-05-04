@@ -40,19 +40,33 @@ export interface StatChange {
 const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
   // Lower enemy attack
   "growl":         { stat: "attack",  target: "defender", delta: -1 },
-  "confuse-ray":   { stat: "special", target: "defender", delta: -1 }, // confusión → desorientación especial
 
   // Lower enemy defense
   "leer":          { stat: "defense", target: "defender", delta: -1 },
   "tail-whip":     { stat: "defense", target: "defender", delta: -1 },
   "screech":       { stat: "defense", target: "defender", delta: -2 },
-  "sand-attack":   { stat: "defense", target: "defender", delta: -1 }, // simplified from accuracy
-  "smokescreen":   { stat: "defense", target: "defender", delta: -1 }, // simplified from accuracy
-  "flash":         { stat: "defense", target: "defender", delta: -1 }, // simplified from accuracy
-  "kinesis":       { stat: "defense", target: "defender", delta: -1 }, // simplified from accuracy
+  "sand-attack":   { stat: "defense", target: "defender", delta: -1 },
+  "smokescreen":   { stat: "defense", target: "defender", delta: -1 },
+  "flash":         { stat: "defense", target: "defender", delta: -1 },
+  "kinesis":       { stat: "defense", target: "defender", delta: -1 },
 
   // Lower enemy speed
   "string-shot":   { stat: "speed",   target: "defender", delta: -2 },
+  // Status → speed penalty (sleep/paralysis approximation)
+  "sing":          { stat: "speed",   target: "defender", delta: -2 },
+  "hypnosis":      { stat: "speed",   target: "defender", delta: -2 },
+  "sleep-powder":  { stat: "speed",   target: "defender", delta: -2 },
+  "spore":         { stat: "speed",   target: "defender", delta: -2 },
+  "lovely-kiss":   { stat: "speed",   target: "defender", delta: -2 },
+  "stun-spore":    { stat: "speed",   target: "defender", delta: -2 },
+  "thunder-wave":  { stat: "speed",   target: "defender", delta: -2 },
+  // Status → special penalty
+  "confuse-ray":   { stat: "special", target: "defender", delta: -1 },
+  "supersonic":    { stat: "special", target: "defender", delta: -1 },
+  "poison-powder": { stat: "special", target: "defender", delta: -1 },
+  "toxic":         { stat: "special", target: "defender", delta: -2 },
+  "leech-seed":    { stat: "defense", target: "defender", delta: -1 },
+  "disable":       { stat: "attack",  target: "defender", delta: -1 },
 
   // Raise own attack
   "sharpen":       { stat: "attack",  target: "attacker", delta: +1 },
@@ -66,8 +80,8 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
   "defense-curl":  { stat: "defense", target: "attacker", delta: +1 },
   "acid-armor":    { stat: "defense", target: "attacker", delta: +2 },
   "barrier":       { stat: "defense", target: "attacker", delta: +2 },
-  "double-team":   { stat: "defense", target: "attacker", delta: +1 }, // simplified from evasion
-  "minimize":      { stat: "defense", target: "attacker", delta: +2 }, // simplified from evasion
+  "double-team":   { stat: "defense", target: "attacker", delta: +1 },
+  "minimize":      { stat: "defense", target: "attacker", delta: +2 },
 
   // Raise own speed
   "agility":       { stat: "speed",   target: "attacker", delta: +2 },
@@ -75,21 +89,6 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
   // Raise own special
   "amnesia":       { stat: "special", target: "attacker", delta: +2 },
   "growth":        { stat: "special", target: "attacker", delta: +1 },
-
-  // Movimientos de estado — aproximados como bajada de stat (sin sistema de estados completo)
-  "supersonic":    { stat: "special", target: "defender", delta: -1 }, // confusión
-  "sing":          { stat: "speed",   target: "defender", delta: -2 }, // sueño → inmóvil
-  "hypnosis":      { stat: "speed",   target: "defender", delta: -2 }, // sueño → inmóvil
-  "sleep-powder":  { stat: "speed",   target: "defender", delta: -2 }, // sueño → inmóvil
-  "spore":         { stat: "speed",   target: "defender", delta: -2 }, // sueño → inmóvil
-  "lovely-kiss":   { stat: "speed",   target: "defender", delta: -2 }, // sueño → inmóvil
-  "stun-spore":    { stat: "speed",   target: "defender", delta: -2 }, // parálisis → -velocidad
-  "thunder-wave":  { stat: "speed",   target: "defender", delta: -2 }, // parálisis → -velocidad
-  "poison-powder": { stat: "special", target: "defender", delta: -1 }, // veneno → desgaste especial
-  "toxic":         { stat: "special", target: "defender", delta: -2 }, // veneno grave → -2 especial
-  "leech-seed":    { stat: "defense", target: "defender", delta: -1 }, // drenado → -defensa
-  "disable":       { stat: "attack",  target: "defender", delta: -1 }, // deshabilita movimiento
-  "spite":         { stat: "attack",  target: "defender", delta: -1 }, // reduce PP → -ataque
 };
 
 // ── Movimientos de efecto especial ──────────────────────────────────────────
@@ -235,14 +234,25 @@ const processMove = (
   }
 
   // ── Damage moves ──────────────────────────────────────────────────────────
-  const critical = Math.random() < CRITICAL_HIT_PERCENTAGE ? CRITICAL_HIT_MULTIPLIER : 1;
+  //
+  // Gen I damage formula:
+  //   floor( ( floor(2*L/5 + 2) * Power * A/D ) / 50 + 2 ) * STAB * TypeEff * Crit * RND
+  //   where RND = floor(rand(217..255)) / 255  (≈ 0.85 – 1.00)
+  //
+  // CRITICAL HIT in Gen I: ignores all stat stage modifiers (uses base stats).
+
+  // Random factor: uniform integer in [217, 255] → [0.851, 1.0]
+  const randFactor = (217 + Math.floor(Math.random() * 39)) / 255;
+  const isCrit = Math.random() < CRITICAL_HIT_PERCENTAGE;
+  const critMult = isCrit ? CRITICAL_HIT_MULTIPLIER : 1;
 
   if (isAttacking) {
     // Player attacking enemy
+    // If critical hit, ignore stat stages (Gen I behaviour)
     const rawAtk = moveMetadata.damageClass === "physical" ? ourStats.attack    : ourStats.specialAttack;
     const rawDef = moveMetadata.damageClass === "physical" ? theirStats.defense : theirStats.specialDefense;
-    const atkStage  = moveMetadata.damageClass === "physical" ? myStages.attack    : myStages.special;
-    const defStage  = moveMetadata.damageClass === "physical" ? theirStages.defense : theirStages.special;
+    const atkStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? myStages.attack    : myStages.special);
+    const defStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? theirStages.defense : theirStages.special);
     const attack  = rawAtk * getStageMult(atkStage);
     const defense = rawDef * getStageMult(defStage);
 
@@ -251,10 +261,10 @@ const processMove = (
     const superEffective  = typeEff > 1;
     const notVeryEffective = typeEff < 1;
 
-    const baseDamage = Math.round(
-      ((((2 * us.level * critical) / 5 + 2) * moveMetadata.power * (attack / defense)) / 50 + 2) *
-        stab * typeEff
-    );
+    const baseDamage = Math.max(1, Math.floor(
+      (Math.floor(((2 * us.level) / 5 + 2) * moveMetadata.power * (attack / defense)) / 50 + 2) *
+        stab * typeEff * critMult * randFactor
+    ));
 
     // Movimientos multihit (Double Slap, Fury Attack, Pin Missile, etc.)
     const { minHits, maxHits } = moveMetadata.meta ?? {};
@@ -273,15 +283,16 @@ const processMove = (
       us: selfDestructs ? { ...usAfterPP, hp: 0 } : usAfterPP,
       superEffective,
       notVeryEffective,
-      critical: critical > 1,
+      critical: isCrit,
     };
   }
 
   // Enemy attacking player
+  // If critical hit, ignore stat stages (Gen I behaviour)
   const rawAtk = moveMetadata.damageClass === "physical" ? theirStats.attack    : theirStats.specialAttack;
   const rawDef = moveMetadata.damageClass === "physical" ? ourStats.defense     : ourStats.specialDefense;
-  const atkStage  = moveMetadata.damageClass === "physical" ? theirStages.attack    : theirStages.special;
-  const defStage  = moveMetadata.damageClass === "physical" ? myStages.defense      : myStages.special;
+  const atkStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? theirStages.attack    : theirStages.special);
+  const defStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? myStages.defense      : myStages.special);
   const attack  = rawAtk * getStageMult(atkStage);
   const defense = rawDef * getStageMult(defStage);
 
@@ -290,10 +301,10 @@ const processMove = (
   const superEffective  = typeEff > 1;
   const notVeryEffective = typeEff < 1;
 
-  const baseDmg = Math.round(
-    ((((2 * them.level * critical) / 5 + 2) * moveMetadata.power * (attack / defense)) / 50 + 2) *
-      stab * typeEff
-  );
+  const baseDmg = Math.max(1, Math.floor(
+    (Math.floor(((2 * them.level) / 5 + 2) * moveMetadata.power * (attack / defense)) / 50 + 2) *
+      stab * typeEff * critMult * randFactor
+  ));
 
   // Movimientos multihit (Double Slap, Fury Attack, Pin Missile, etc.)
   const { minHits: eMin, maxHits: eMax } = moveMetadata.meta ?? {};
@@ -312,7 +323,7 @@ const processMove = (
     them: enemyExplodes ? { ...them, hp: 0 } : them,
     superEffective,
     notVeryEffective,
-    critical: critical > 1,
+    critical: isCrit,
   };
 };
 

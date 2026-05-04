@@ -91,18 +91,18 @@ const Pc = () => {
   if (!show) return null;
 
   const text = () => {
-    if (stage === 0) return `${name.toUpperCase()} turned on the PC.`;
-    if (stage === 2) return "Accessed my PC.";
-    if (stage === 3) return "Accessed POKéMON Storage System.";
-    if (stage === 7) return "No space in party.";
+    if (stage === 0) return `${name.toUpperCase()} encendió el PC.`;
+    if (stage === 2) return "Accediste a tu PC.";
+    if (stage === 3) return "Accediste al Sistema de Almacenamiento POKÉMON.";
+    if (stage === 7) return "El equipo está lleno.";
     if (stage === 8)
       return `${getPokemonMetadata(
         pokemon[pokemon.length - 1].id
-      ).name.toUpperCase()} was withdrawn.`;
+      ).name.toUpperCase()} fue retirado.`;
     if (stage === 9)
       return `${getPokemonMetadata(
         pcPokemon[pcPokemon.length - 1].id
-      ).name.toUpperCase()} was deposited.`;
+      ).name.toUpperCase()} fue guardado.`;
   };
 
   return (
@@ -123,11 +123,11 @@ const Pc = () => {
         close={() => close()}
         menuItems={[
           {
-            label: `${name.toUpperCase()}'s PC`,
+            label: `PC de ${name.toUpperCase()}`,
             action: () => setStage(2),
           },
           {
-            label: "LOG OFF",
+            label: "DESCONECTAR",
             action: () => close(),
           },
         ]}
@@ -141,7 +141,7 @@ const Pc = () => {
         close={() => close()}
         menuItems={[
           {
-            label: "WITHDRAW",
+            label: "RETIRAR",
             action: () => {
               if (pcPokemon.length === 0) return;
               if (pokemon.length === 6) setStage(7);
@@ -149,7 +149,7 @@ const Pc = () => {
             },
           },
           {
-            label: "DEPOSIT",
+            label: "GUARDAR",
             action: () => {
               if (pokemon.length === 0) return;
               if (pokemon.length === 1) return;
@@ -157,7 +157,7 @@ const Pc = () => {
             },
           },
           {
-            label: "SEE YA!",
+            label: "HASTA LUEGO!",
             action: () => close(),
           },
         ]}
@@ -170,7 +170,7 @@ const Pc = () => {
             setStage(8);
           }}
           customPokemon={pcPokemon}
-          text="Which POKéMON should be withdrawn?"
+          text="¿Qué POKÉMON quieres retirar?"
         />
       )}
       {stage === 6 && (
@@ -181,7 +181,7 @@ const Pc = () => {
             setStage(9);
           }}
           customPokemon={pokemon}
-          text="Which POKéMON should be deposited?"
+          text="¿Qué POKÉMON quieres guardar?"
         />
       )}
     </StyledPc>
