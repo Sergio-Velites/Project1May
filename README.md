@@ -10,12 +10,14 @@ Motor base: [chase-manning/pokemon-js](https://github.com/chase-manning/pokemon-
 ## Características
 
 - Juego completo estilo Pokémon Rojo/Azul en el navegador
-- Flujo narrativo: habitación del jugador → combate con la madre → laboratorio → Route 1
-- 3 starters interactivos en el laboratorio (Bulbasaur, Charmander, Squirtle)
+- Flujo narrativo: habitación del jugador → madre → laboratorio → Route 1
+- 3 starters interactivos en el laboratorio (Bulbasaur, Charmander, Squirtle) — modal centrado en pantalla con ←/→ para Sí/No
 - Passkey / Face ID para guardar partida; fallback local si el registro falla (sin bucles)
 - Todos los textos en español, con diálogos temáticos de boda
 - Video de introducción saltable · Intro del Profesor Oak con efecto typewriter
 - Layout Game Boy Color responsive (escritorio y móvil)
+- NPCs con diálogo puro (sin combate): se giran hacia el jugador al hablar
+- Team Rocket en salida norte solo visibles hasta que el jugador recoge un pokémon
 
 ---
 
