@@ -108,6 +108,7 @@ const Game = () => {
           {map.trainers &&
             map.trainers
               .filter((trainer: TrainerType) => {
+                if (trainer.persistent) return true;
                 const id = `${mapId}-${trainer.pos.x}-${trainer.pos.y}`;
                 return !defeatedTrainers.includes(id);
               })

@@ -49,6 +49,7 @@ const lab: MapType = {
       pokemon: [{ id: 1, level: 5 }],
       facing: Direction.Down,
       pos: { x: 5, y: 2 },
+      persistent: true,
       intro: [
         "Hoy no hay tiempo de tonterías.",
         "Pon las pilas que es un día importante.",

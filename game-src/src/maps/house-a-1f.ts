@@ -1,5 +1,7 @@
 import houseA1FImage from "../assets/map/house-a-1f.png";
 import { MapId, MapType } from "./map-types";
+import { Direction } from "../state/state-types";
+import { beauty } from "../app/npcs";
 
 const houseA1f: MapType = {
   name: "House A 1F",
@@ -38,7 +40,21 @@ const houseA1f: MapType = {
   },
   exitReturnMap: MapId.PalletTown,
   grass: {},
-  trainers: [],
+  trainers: [
+    {
+      npc: beauty,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Left,
+      pos: { x: 2, y: 5 },
+      persistent: true,
+      intro: [],
+      outtro: [
+        "¡Date prisa! ¡El Profesor Oak te espera!",
+        "¡Y no te olvides de elegir un POKEMON!",
+      ],
+      money: 0,
+    },
+  ],
 };
 
 export default houseA1f;
