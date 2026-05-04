@@ -23,7 +23,7 @@ const lab: MapType = {
   },
   text: {
     1: {
-      0: ["ASH turned on the PC.", "It's not working..."],
+      0: ["Enciendes el PC.", "No funciona..."],
     },
     // Texto descriptivo de la mesa con pokéballs
     2: {

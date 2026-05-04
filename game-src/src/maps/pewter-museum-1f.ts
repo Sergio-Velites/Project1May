@@ -27,13 +27,13 @@ const pewterMuseum1f: MapType = {
   grass: {},
   text: {
     3: {
-      2: [arodactyl, "AERODACTYL FOSSIL", "A primitive and rare POKEMON."],
+      2: [arodactyl, "FÓSIL DE AERODACTYL", "Un PKMN primitivo y muy raro."],
     },
     4: {
-      11: ["Take plenty of time to look!"],
+      11: ["¡Tómate tu tiempo para mirar!"],
     },
     6: {
-      2: [kabutops, "KABUTOPS FOSSIL", "A primitive and rare POKEMON."],
+      2: [kabutops, "FÓSIL DE KABUTOPS", "Un PKMN primitivo y muy raro."],
     },
   },
   maps: {

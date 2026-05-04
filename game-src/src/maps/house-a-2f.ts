@@ -20,10 +20,10 @@ const houseA2f: MapType = {
   },
   text: {
     5: {
-      3: ["ASH is playing the SNES!", "... Okay! It's time to go!"],
+      3: ["¡Estás jugando a la SNES!", "... ¡Vamos! ¡Es hora de salir!"],
     },
     1: {
-      0: ["ASH turned on the PC.", "It's not working..."],
+      0: ["Enciendes el PC.", "No funciona..."],
     },
   },
   maps: {},
