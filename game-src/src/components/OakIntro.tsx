@@ -282,8 +282,12 @@ const OakIntro = ({ onNameRequired, confirmedName, onComplete }: Props) => {
 
   // ── Advance handler (A button) ───────────────────────────────────────────
   const advance = useCallback(() => {
-    // If waiting for name selection, do nothing (handled by name panel click)
-    if (waitingForName) return;
+    // Si está esperando elección de nombre, A equivale a pulsar "NUEVO NOMBRE"
+    if (waitingForName) {
+      setWaitingForName(false);
+      onNameRequired();
+      return;
+    }
 
     if (!finished) {
       // Skip typewriter: show all text at once
@@ -359,7 +363,7 @@ const OakIntro = ({ onNameRequired, confirmedName, onComplete }: Props) => {
                 onNameRequired();
               }}
             >
-              ▶ NUEVO NOMBRE
+              NUEVO NOMBRE
             </NamePromptOption>
           </NamePromptPanel>
         )}
