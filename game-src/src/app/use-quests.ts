@@ -64,17 +64,15 @@ const useQuests = () => {
       trigger: "walk",
       map: MapId.PalletTown,
       positions: {
-        0: [10, 11],
-        1: [10, 11],
+        2: [10, 11],
       },
       active: () => pokemon.length === 0,
       text: [
-        "¡Viva el vino!... hip!",
-        "¡Aquí no pasa nadie sin su POKEMON!",
+        "¡Aquí no pasa nadie sin un POKEMON!",
         "¡Ve al laboratorio primero!",
       ],
       action: () => {
-        dispatch(setPos({ x: pos.x, y: 2 }));
+        dispatch(setPos({ x: pos.x, y: 3 }));
       },
     },
     // Pewter City

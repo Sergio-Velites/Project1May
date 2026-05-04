@@ -119,6 +119,7 @@ const Game = () => {
             map.items.map((item: MapItemType, index: number) => (
               <Item key={index} item={item} />
             ))}
+          <LabPokeballs />
           <DebugOverlay />
         </BackgroundContainer>
         <Character />
@@ -139,7 +140,6 @@ const Game = () => {
       <ActionOnPokemon />
       <Evolution />
       <ConfirmationMenu />
-      <LabPokeballs />
       {pokedexOpen && <Pokedex onClose={() => dispatch(hidePokedex())} />}
       <LoadScreen />
       <TitleScreen />
