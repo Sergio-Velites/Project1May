@@ -55,7 +55,9 @@ const houseA1f: MapType = {
       pos: { x: 6, y: 3 },
       persistent: true,
       intro: [],
-      outtro: [],
+      outtro: [
+        "¡Espabila pringao!",
+      ],
       money: 0,
     },
   ],

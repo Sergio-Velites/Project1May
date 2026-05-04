@@ -36,9 +36,9 @@ import pokeball from "../assets/misc/pokeball.png";
 
 // ── Starters config ────────────────────────────────────────────────────────
 const STARTERS = [
-  { id: 1,  pos: { x: 2, y: 2 }, moveId: "tackle",  movePp: 35, move2Id: "growl",     move2Pp: 40 },
-  { id: 4,  pos: { x: 4, y: 2 }, moveId: "scratch", movePp: 35, move2Id: "growl",     move2Pp: 40 },
-  { id: 7,  pos: { x: 5, y: 2 }, moveId: "tackle",  movePp: 35, move2Id: "tail-whip", move2Pp: 30 },
+  { id: 1,  pos: { x: 1, y: 2 }, moveId: "tackle",  movePp: 35, move2Id: "growl",     move2Pp: 40 },
+  { id: 4,  pos: { x: 2, y: 2 }, moveId: "scratch", movePp: 35, move2Id: "growl",     move2Pp: 40 },
+  { id: 7,  pos: { x: 3, y: 2 }, moveId: "tackle",  movePp: 35, move2Id: "tail-whip", move2Pp: 30 },
 ];
 
 // The quest ID we use to track each starter being taken
@@ -53,7 +53,6 @@ const StyledBall = styled.div<{ $dx: number; $dy: number }>`
   position: absolute;
   top: calc(50% + (${BLOCK_PIXEL_HEIGHT}cqw / 2.34) * ${(p) => p.$dy - 0.5});
   left: calc(50% + (${BLOCK_PIXEL_WIDTH}cqw / 2.34) * ${(p) => p.$dx - 0.5});
-  transform: translateY(-20%);
   z-index: 50;
 `;
 
