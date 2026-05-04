@@ -110,28 +110,28 @@ const TypeTag = styled.span`
 `;
 
 const SpriteBox = styled.div`
-  border: 2px solid #181010;
-  width: 46%;
-  aspect-ratio: 1 / 1;
+  border-right: 2px solid #181010;
+  width: 44%;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg);
+  padding: 4px;
 `;
 
 const SpriteImg = styled(PixelImage)`
-  width: 86%;
-  height: 86%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 `;
 
 const InfoBlock = styled(Col)`
   flex: 1;
-  padding: 2px 4px;
-  gap: 1px;
-  border-left: 2px solid #181010;
-  justify-content: center;
+  padding: 3px 4px;
+  gap: 2px;
+  justify-content: space-between;
+  overflow: hidden;
 `;
 
 interface BarProps { $pct: number; $color: string; }
@@ -261,16 +261,20 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
 
         <HRule />
 
-        {/* Middle: sprite + info */}
+        {/* Middle: sprite + info — fixed height, no overlap */}
         <Row style={{ flex: 1, minHeight: 0 }}>
           <SpriteBox>
             <SpriteImg src={meta.images.front} alt={meta.name} />
           </SpriteBox>
           <InfoBlock>
-            <Txt $size={0.8}>FE/{otName.toUpperCase()}</Txt>
-            <Txt $size={0.8}>IDNº{idStr}</Txt>
-            <Txt $size={0.8} style={{ marginTop: "auto" }}>Nv.{pokemon.level}</Txt>
-            <Txt $size={0.75}>Alt.{fmtHeight(meta.height)}</Txt>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+              <Txt $size={0.8}>FE/{otName.toUpperCase()}</Txt>
+              <Txt $size={0.8}>IDNº{idStr}</Txt>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+              <Txt $size={0.8}>Nv.{pokemon.level}</Txt>
+              <Txt $size={0.75}>Alt.{fmtHeight(meta.height)}</Txt>
+            </div>
           </InfoBlock>
         </Row>
 

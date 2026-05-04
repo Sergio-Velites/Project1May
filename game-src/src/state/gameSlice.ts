@@ -26,66 +26,20 @@ const initialState: GameState = {
   money: 400,
   inventory: [
     {
-      item: ItemType.MaxPotion,
-      amount: 1,
-    },
-    {
       item: ItemType.PokeBall,
       amount: 2,
     },
   ],
   name: "Blue",
-  pokemon: [
-    {
-      id: 1,
-      level: 5,
-      xp: 0,
-      hp: 20,
-      moves: [
-        { id: "tackle", pp: 35 },
-        { id: "growl", pp: 40 },
-      ],
-    },
-    {
-      id: 4,
-      level: 5,
-      xp: 0,
-      hp: 19,
-      moves: [
-        { id: "scratch", pp: 35 },
-        { id: "growl", pp: 40 },
-      ],
-    },
-    {
-      id: 7,
-      level: 5,
-      xp: 0,
-      hp: 19,
-      moves: [
-        { id: "tackle", pp: 35 },
-        { id: "tail-whip", pp: 30 },
-      ],
-    },
-  ],
-  pc: [
-    {
-      id: 1,
-      level: 5,
-      xp: 0,
-      hp: 20,
-      moves: [
-        { id: "tackle", pp: 35 },
-        { id: "growl", pp: 40 },
-      ],
-    },
-  ],
+  pokemon: [],
+  pc: [],
   activePokemonIndex: 0,
   trainerEncounter: undefined,
   defeatedTrainers: ["pallet-town-lab-5-2"],
   collectedItems: [],
   completedQuests: [],
-  seenPokemon: [1, 4, 7],  // los tres del equipo inicial son conocidos
-  caughtPokemon: [1, 4, 7],
+  seenPokemon: [],
+  caughtPokemon: [],
 };
 
 export const gameSlice = createSlice({
