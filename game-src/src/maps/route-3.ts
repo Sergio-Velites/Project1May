@@ -133,8 +133,8 @@ const route3: MapType = {
         },
       ],
       facing: Direction.Left,
-      intro: ["You looked at me, didn't you?"],
-      outtro: ["Quit staring if you don't want to fight!"],
+      intro: ["¿Me has mirado, verdad?"],
+      outtro: ["¡Deja de mirarme si no quieres pelea!"],
       money: 135,
       pos: {
         x: 16,
@@ -158,10 +158,10 @@ const route3: MapType = {
         },
       ],
       facing: Direction.Right,
-      intro: ["Hey! I met you in VIRIDIAN FORREST!"],
+      intro: ["¡Ey! ¡Te vi en el BOSQUE AÑIL!"],
       outtro: [
-        "There are other kinds of POKEMON",
-        "than those found in the forests!",
+        "Hay otros tipos de PKMN",
+        "además de los del bosque!",
       ],
       money: 100,
       pos: {
@@ -182,10 +182,10 @@ const route3: MapType = {
         },
       ],
       facing: Direction.Down,
-      intro: ["Hi! I like shorts! They're comfy and easy to wear!"],
+      intro: ["¡Hola! ¡Me gustan los pantalones cortos! ¡Son cómodos y fáciles de llevar!"],
       outtro: [
-        "Are you storing your POKEMON on PC?",
-        "Each box can hold up to 20 POKEMON!",
+        "¿Guardas PKMN en el PC?",
+        "¡Cada caja tiene capacidad para 20 PKMN!",
       ],
       money: 165,
       pos: {
@@ -214,10 +214,10 @@ const route3: MapType = {
         },
       ],
       facing: Direction.Down,
-      intro: ["Are you a trainer? Let's fight!"],
+      intro: ["¿Eres entrenador? ¡A pelear!"],
       outtro: [
-        "If a POKEMON BOX on the PC gets full,",
-        "just switch to another BOX!",
+        "Si una CAJA del PC se llena,",
+        "¡cambia a otra CAJA!",
       ],
       money: 90,
       pos: {
@@ -234,8 +234,8 @@ const route3: MapType = {
         },
       ],
       facing: Direction.Left,
-      intro: ["Hey! You're not wearing shorts!"],
-      outtro: ["I always wear shorts, even in winter!"],
+      intro: ["¡Ey! ¡Tú no llevas pantalones cortos!"],
+      outtro: ["¡Yo siempre llevo pantalones cortos, hasta en invierno!"],
       money: 210,
       pos: {
         x: 22,
@@ -255,8 +255,8 @@ const route3: MapType = {
         },
       ],
       facing: Direction.Left,
-      intro: ["That look you gave me,", "it's so intriguing!"],
-      outtro: ["Avoid fights by not letting people see you!"],
+      intro: ["Esa mirada que me has echado...", "¡me resulta muy intrigante!"],
+      outtro: ["¡Evita peleas sin que te vean!"],
       money: 150,
       pos: {
         x: 23,
@@ -276,8 +276,8 @@ const route3: MapType = {
         },
       ],
       facing: Direction.Right,
-      intro: ["You can fight my new POKEMON!"],
-      outtro: ["Trained POKEMON are stronger than the wild ones!"],
+      intro: ["¡Ven a pelear contra mi nuevo PKMN!"],
+      outtro: ["¡Los PKMN entrenados son más fuertes que los salvajes!"],
       money: 110,
       pos: {
         x: 24,
@@ -293,8 +293,8 @@ const route3: MapType = {
         },
       ],
       facing: Direction.Up,
-      intro: ["Eek! Did you touch me?"],
-      outtro: ["ROUTE 4 is at the foot of MT. MOON."],
+      intro: ["¡Uy! ¿Me has tocado?"],
+      outtro: ["La RUTA 4 está al pie del MONTE LUNA."],
       money: 210,
       pos: {
         x: 33,

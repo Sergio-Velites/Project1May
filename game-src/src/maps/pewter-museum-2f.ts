@@ -23,10 +23,10 @@ const pewterMuseum2f: MapType = {
   grass: {},
   text: {
     2: {
-      11: ["SPACE SHUTTLE COLUMBIA"],
+      11: ["TRANSBORDADOR ESPACIAL COLUMBIA"],
     },
     5: {
-      2: ["Meteorite that fell on Mt. Moon", "(MOON STONE?)"],
+      2: ["Meteorito caído en el Monte Luna", "(\u00bfPIEDRA LUNAR?"],
     },
   },
   maps: {},

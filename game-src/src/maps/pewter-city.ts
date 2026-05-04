@@ -64,29 +64,29 @@ const pewterCity: MapType = {
   grass: {},
   text: {
     9: {
-      15: ["PEWTER MUSEUM OF SCIENCE"],
+      15: ["MUSEO DE CIENCIAS DE PLATEADA"],
     },
     17: {
       11: [
-        "PEWTER CITY POKEMON GYM LEADER: BROCK",
-        "The Rock Solid POKEMON Trainer!",
+        "LÍDER DEL GIMNASIO DE CIUDAD PLATEADA: BROCK",
+        "El entrenador sólido como la roca!",
       ],
     },
     19: {
       33: [
-        "NOTICE!",
-        "Thieves have been stealing POKEMON fossils at MT. MOON!",
-        "Please call PEWTER POLICE with any info!",
+        "¡AVISO!",
+        "¡Ladrones roban fósiles PKMN en el MONTE LUNA!",
+        "¡Llama a la POLICÍA DE PLATEADA si tienes info!",
       ],
     },
     23: {
-      25: ["PEWTER CITY", "A Stone Gray City"],
+      25: ["CIUDAD PLATEADA", "Una ciudad gris como las rocas"],
     },
     29: {
       19: [
-        "TRAINER TIPS",
-        "Any Pokemon that takes part in battle,",
-        "however short, earns Exp!",
+        "CONSEJOS DE ENTRENADOR",
+        "Todo PKMN que participe en combate,",
+        "¡aunque sea poco, gana experiencia!",
       ],
     },
   },

@@ -20,8 +20,8 @@ const gateHouse: MapType = {
   grass: {},
   text: {
     0: {
-      4: ["The door is locked."],
-      5: ["The door is locked."],
+      4: ["La puerta está cerrada."],
+      5: ["La puerta está cerrada."],
     },
   },
   maps: {},

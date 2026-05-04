@@ -137,37 +137,37 @@ const viridianForrest: MapType = {
   text: {
     45: {
       18: [
-        "TRAINER TIPS",
-        "Weaken Pokemon before attempting capture.",
-        "When healthy, they may escape.",
+        "CONSEJOS DE ENTRENADOR",
+        "Debilita a los PKMN antes de intentar capturarlos.",
+        "Con vida, ¡pueden escapar!",
       ],
     },
     32: {
-      16: ["For POISON use ANTIDOTE!", "Get it at a POKEMON MARTs!"],
+      16: ["¡Para el VENENO usa ANTIDOTO!", "¡Cómpralo en cualquier PKMART!"],
     },
     40: {
       24: [
-        "TRAINER TIPS",
-        "If you want to avoid battles,",
-        "stay away from grassy areas!",
+        "CONSEJOS DE ENTRENADOR",
+        "Si quieres evitar combates,",
+        "¡mantente alejado de la hierba alta!",
       ],
     },
     17: {
       26: [
-        "TRAINER TIPS",
-        "Contact PROF. OAK via PC to get",
-        "your POKEDEX evaluated!",
+        "CONSEJOS DE ENTRENADOR",
+        "Contacta al PROF. OAK por PC para que",
+        "¡evalúe tu POKEDÉX!",
       ],
     },
     42: {
       4: [
-        "TRAINER TIPS",
-        "No stealing of POKEMON from other trainers!",
-        "Catch only wild POKEMON!",
+        "CONSEJOS DE ENTRENADOR",
+        "¡No robes PKMN a otros entrenadores!",
+        "¡Captura solo PKMN salvajes!",
       ],
     },
     1: {
-      2: ["LEAVING VIRIDIAN FOREST", "PEWTER CITY AHEAD"],
+      2: ["SALIENDO DEL BOSQUE AÑIL", "CIUDAD PLATEADA ADELANTE"],
     },
   },
   maps: {

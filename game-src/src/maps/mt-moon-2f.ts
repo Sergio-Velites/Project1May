@@ -151,8 +151,8 @@ const mtMoon2f: MapType = {
         },
       ],
       facing: Direction.Down,
-      intro: ["We, Team Rocket, are POKEMON gangsters!"],
-      outtro: ["Darn it all! MY associates won't stand for this!"],
+      intro: ["Nosotros, el EQUIPO ROCKET, ¡somos los malos del PKMN!"],
+      outtro: ["¡Maldición! ¡Mis compañeros no perdonarán esto!"],
       money: 330,
       pos: {
         x: 15,
@@ -172,8 +172,8 @@ const mtMoon2f: MapType = {
         },
       ],
       facing: Direction.Up,
-      intro: ["We're pulling a big job here! Get lost, kid!"],
-      outtro: ["If you find a fossil, give it to me and scram!"],
+      intro: ["¡Estamos haciendo un trabajo aquí! ¡Larga, crío!"],
+      outtro: ["¡Si encuentras un fósil, dámelo y pírate!"],
       money: 360,
       pos: {
         x: 29,
@@ -189,8 +189,8 @@ const mtMoon2f: MapType = {
         },
       ],
       facing: Direction.Left,
-      intro: ["Little kid should leave grown-ups alone!"],
-      outtro: ["Pokemon lived here long before people came."],
+      intro: ["¡Los niños no deben meterse con los mayores!"],
+      outtro: ["Los PKMN vivieron aquí mucho antes que las personas."],
       money: 390,
       pos: {
         x: 29,
@@ -211,9 +211,9 @@ const mtMoon2f: MapType = {
       ],
       facing: Direction.Down,
       intro: [
-        "TEAM ROCKET will find the fossils, revive and sell them for cash!",
+        "¡El EQUIPO ROCKET encontrará los fósiles, los revivirá y los venderá!",
       ],
-      outtro: ["You made me mad! TEAM ROCKET will blacklist you!"],
+      outtro: ["¡Me has enfadado! ¡El EQUIPO ROCKET te tendrá fichado!"],
       money: 390,
       pos: {
         x: 11,
@@ -237,8 +237,8 @@ const mtMoon2f: MapType = {
         },
       ],
       facing: Direction.Right,
-      intro: ["Hey stop!", "I found these fossils! They're both mine!"],
-      outtro: ["We'll each take one!", "No being greedy!"],
+      intro: ["¡Eh, para! ¡Estos fósiles los encontré yo! ¡Son míos los dos!"],
+      outtro: ["¡Nos quedamos uno cada uno!", "¡Nada de avaricia!"],
       money: 300,
       pos: {
         x: 12,

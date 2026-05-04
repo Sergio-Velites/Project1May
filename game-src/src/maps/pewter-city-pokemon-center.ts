@@ -23,10 +23,10 @@ const pewterCityPokemonCenter: MapType = {
   text: {
     4: {
       0: [
-        "Yawn!",
-        "When Jigglypuff sings, POKEMON get drowsy.",
-        "...Me too...",
-        "Snore...",
+        "¡Bostezo!",
+        "Cuando Jigglypuff canta, los PKMN se duermen.",
+        "...Yo también...",
+        "Ronczzz...",
       ],
     },
   },
