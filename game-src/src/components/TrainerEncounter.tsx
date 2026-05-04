@@ -23,7 +23,7 @@ import Frame from "./Frame";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
-import { showText } from "../state/uiSlice";
+import { showText, selectMenuOpen } from "../state/uiSlice";
 import { Direction } from "../state/state-types";
 
 const oppositeDirection = (dir: Direction): Direction => {
@@ -58,6 +58,7 @@ const TrainerEncounter = () => {
 
   const [introIndex, setIntroIndex] = useState(-1);
   const playerName = useSelector(selectName);
+  const menuOpen = useSelector(selectMenuOpen);
 
   const { trainers, walls, fences } = map;
 
@@ -83,6 +84,10 @@ const TrainerEncounter = () => {
   }, [trainers, walls, fences, pos, dispatch, defeatedTrainers, mapId]);
 
   useEvent(Event.A, () => {
+    // No interactuar con NPCs mientras hay texto u otro menú abierto.
+    // Sin este guard, cada pulsación de A para avanzar texto volvería a
+    // despachar showText() reiniciando el diálogo al inicio.
+    if (menuOpen) return;
     const facingPos = directionModifier(direction);
     if (
       map.trainers &&
