@@ -40,6 +40,7 @@ const initialState: GameState = {
   completedQuests: [],
   seenPokemon: [],
   caughtPokemon: [],
+  npcFacings: {} as Record<string, Direction>,
 };
 
 export const gameSlice = createSlice({
@@ -105,10 +106,12 @@ export const gameSlice = createSlice({
       state.map = action.payload;
       const map = mapData[action.payload];
       state.pos = map.start;
+      state.npcFacings = {};
     },
     setMapWithPos: (state, action: PayloadAction<MapWithPos>) => {
       state.map = action.payload.map;
       state.pos = action.payload.pos;
+      state.npcFacings = {};
     },
     exitMap(state) {
       const map = mapData[state.map];
@@ -120,7 +123,14 @@ export const gameSlice = createSlice({
       if (previousMap && newPos) {
         state.map = map.exitReturnMap;
         state.pos = newPos;
+        state.npcFacings = {};
       }
+    },
+    setNpcFacing: (
+      state,
+      action: PayloadAction<{ id: string; direction: Direction }>
+    ) => {
+      state.npcFacings[action.payload.id] = action.payload.direction;
     },
     setMoving: (state, action: PayloadAction<boolean>) => {
       state.moving = action.payload;
@@ -371,6 +381,7 @@ export const {
   completeQuest,
   seePokemon,
   catchPokemonPokedex,
+  setNpcFacing,
 } = gameSlice.actions;
 
 export const selectPos = (state: RootState) => state.game.pos;
@@ -426,6 +437,8 @@ export const selectCaughtPokemon = (state: RootState) => state.game.caughtPokemo
 
 export const selectActivePokemonIndex = (state: RootState) =>
   state.game.activePokemonIndex;
+
+export const selectNpcFacings = (state: RootState) => state.game.npcFacings;
 
 export const selectGameState = (state: RootState) => state.game;
 

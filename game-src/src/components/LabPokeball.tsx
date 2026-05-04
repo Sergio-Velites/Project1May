@@ -26,9 +26,9 @@ import pokeball from "../assets/misc/pokeball.png";
 
 // ── Starters config ────────────────────────────────────────────────────────
 const STARTERS = [
-  { id: 1,  pos: { x: 1, y: 2 }, moveId: "tackle",  movePp: 35, move2Id: "growl",     move2Pp: 40 },
-  { id: 4,  pos: { x: 2, y: 2 }, moveId: "scratch", movePp: 35, move2Id: "growl",     move2Pp: 40 },
-  { id: 7,  pos: { x: 3, y: 2 }, moveId: "tackle",  movePp: 35, move2Id: "tail-whip", move2Pp: 30 },
+  { id: 1,  pos: { x: 7, y: 3 }, moveId: "tackle",  movePp: 35, move2Id: "growl",     move2Pp: 40 },
+  { id: 4,  pos: { x: 8, y: 3 }, moveId: "scratch", movePp: 35, move2Id: "growl",     move2Pp: 40 },
+  { id: 7,  pos: { x: 9, y: 3 }, moveId: "tackle",  movePp: 35, move2Id: "tail-whip", move2Pp: 30 },
 ];
 
 // The quest ID we use to track each starter being taken

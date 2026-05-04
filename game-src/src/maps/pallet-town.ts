@@ -1,7 +1,7 @@
 import palletTownImage from "../assets/map/pallet-town.png";
 import { MapId, MapType } from "./map-types";
 import { Direction } from "../state/state-types";
-import { lass, teamRocketGrunt } from "../app/npcs";
+import { lass, youngster, teamRocketGrunt } from "../app/npcs";
 
 import music from "../assets/music/maps/pallet-town.mp3";
 import getEncounterData from "./get-location-data";
@@ -74,6 +74,18 @@ const palletTown: MapType = {
   recoverLocation: { x: 5, y: 6 },
   // NPCs del pueblo con los que se puede hablar (no combaten):
   trainers: [
+    {
+      npc: youngster,
+      pokemon: [{ id: 19, level: 2 }],
+      facing: Direction.Right,
+      pos: { x: 3, y: 7 },
+      intro: [],
+      outtro: [
+        "Hoy noto como un cancaneo por mi cuerpo.",
+        "Parece que algo gordo se avecina!",
+      ],
+      money: 0,
+    },
     {
       npc: lass,
       pokemon: [{ id: 35, level: 3 }],

@@ -11,6 +11,7 @@ import {
   selectPokemonEncounter,
   selectPos,
   selectTrainerEncounter,
+  setNpcFacing,
 } from "../state/gameSlice";
 import { useEffect, useState } from "react";
 import {
@@ -23,6 +24,14 @@ import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
 import { showText } from "../state/uiSlice";
+import { Direction } from "../state/state-types";
+
+const oppositeDirection = (dir: Direction): Direction => {
+  if (dir === Direction.Up) return Direction.Down;
+  if (dir === Direction.Down) return Direction.Up;
+  if (dir === Direction.Left) return Direction.Right;
+  return Direction.Left;
+};
 
 const StyledTrainerEncounter = styled.div`
   position: absolute;
@@ -87,6 +96,8 @@ const TrainerEncounter = () => {
       );
       if (!trainer) throw new Error("Trainer not found");
       const trainerId = `${mapId}-${trainer.pos.x}-${trainer.pos.y}`;
+      // Girar NPC hacia el jugador
+      dispatch(setNpcFacing({ id: trainerId, direction: oppositeDirection(direction) }));
       if (defeatedTrainers.includes(trainerId)) {
         if (trainer.outtro && trainer.outtro.length > 0) {
           dispatch(showText(trainer.outtro));
