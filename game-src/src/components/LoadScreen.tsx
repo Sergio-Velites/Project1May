@@ -93,6 +93,9 @@ const LoadScreen = () => {
   const [confirmedName, setConfirmedName] = useState<string | null>(null);
   const cloudSave = useRef<GameState | null>(null);
   const readyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Guard atómico: previene que un doble-click o un closure stale dispare
+  // handleNewGame tras haber ya ejecutado handleContinue (o viceversa).
+  const choosingRef = useRef(false);
 
   const loadComplete = () => {
     setTimeout(() => dispatch(hideLoadMenu()), 300);
@@ -102,6 +105,7 @@ const LoadScreen = () => {
   // guard timer: el menú solo acepta input 500 ms después de aparecer.
   const transitionTo = (p: Phase) => {
     if (readyTimerRef.current) clearTimeout(readyTimerRef.current);
+    choosingRef.current = false; // Resetear guard al entrar en cualquier fase nueva
     setMenuReady(false);
     setPhase(p);
     if (p === "require-passkey" || p === "choose") {
@@ -293,7 +297,10 @@ const LoadScreen = () => {
   // ---- Continuar / Nueva partida ----
   if (phase === "choose") {
     const handleContinue = () => {
+      if (choosingRef.current) return; // Evitar doble ejecución por closure stale
+      choosingRef.current = true;
       setMenuReady(false);
+      setPhase("registering"); // Mostrar spinner inmediatamente, desactiva el menú
       if (cloudSave.current) {
         const name = cloudSave.current.name ?? "Blue";
         localStorage.setItem(name, JSON.stringify(cloudSave.current));
@@ -303,6 +310,8 @@ const LoadScreen = () => {
     };
 
     const handleNewGame = () => {
+      if (choosingRef.current) return; // Evitar doble ejecución por closure stale
+      choosingRef.current = true;
       setMenuReady(false);
       setConfirmedName(null);
       setPhase("oak-intro");
