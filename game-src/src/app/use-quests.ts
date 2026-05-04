@@ -5,6 +5,7 @@ import {
   completeQuest,
   moveLeft,
   selectCompletedQuests,
+  selectName,
   selectPos,
   selectPokemon,
   setPos,
@@ -32,9 +33,31 @@ const useQuests = () => {
   const completedQuests = useSelector(selectCompletedQuests);
   const pos = useSelector(selectPos);
   const pokemon = useSelector(selectPokemon);
+  const playerName = useSelector(selectName);
 
   const quests: QuestType[] = [
-    // ── Pallet Town: bloqueo norte si no tienes pokémon ────────────────────
+    // ── House A 1F: madre bloquea la salida hasta que el jugador recibe la bronca ─
+    {
+      trigger: "walk",
+      map: MapId.PalletTownHouseA1F,
+      positions: {
+        7: [2, 3],
+      },
+      active: () => !completedQuests.includes("madre-bronca-done"),
+      text: [
+        `¡${playerName.toUpperCase()}! ¡Que coño haces!`,
+        "¿Te has quedado otra vez jugando?",
+        "¡Ya te lo dije! ¡Es un día importante!",
+        "¡El Profesor Oak te está esperando!",
+        "¡Debe llevar ya 8 vinos!",
+        "¡Date prisa y no te entretengas más!",
+        "¡Yo ya me voy a comprar mucho anís!",
+      ],
+      action: () => {
+        dispatch(setPos({ x: 3, y: 6 }));
+        dispatch(completeQuest("madre-bronca-done"));
+      },
+    },
     {
       trigger: "walk",
       map: MapId.PalletTown,

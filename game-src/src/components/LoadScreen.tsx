@@ -88,16 +88,38 @@ const LoadScreen = () => {
     }, 300);
   };
 
-  // Bootstrap: decide fase inicial SIN disparar ningún diálogo biométrico
+  // Bootstrap: al cargar, intenta autenticar silenciosamente si ya tiene credencial.
+  // El diálogo biométrico SOLO se dispara si hay credencial guardada (regreso) o si
+  // el usuario pulsa "Guardar con Face ID/Huella" (primera vez).
   useEffect(() => {
     if (!show) return;
 
     (async () => {
+      const userId = localStorage.getItem("wedding_user_id");
+      const credentialId = localStorage.getItem("wedding_credential_id");
       const webAuthnOk = isWebAuthnAvailable();
 
+      // Usuario que regresa con passkey registrada → autenticar automáticamente
+      if (userId && credentialId && webAuthnOk) {
+        const authedId = await webauthnAuth(credentialId);
+        if (authedId) {
+          setCurrentUserId(authedId);
+          const save = await loadFromCloud(authedId);
+          if (save) {
+            cloudSave.current = save as GameState;
+            setPhase("choose");
+            return;
+          }
+          setPhase("oak-intro");
+          return;
+        }
+        // Auth falló (cambió de dispositivo, etc.) → ofrecer opciones sin bucle
+        setPhase("require-passkey");
+        return;
+      }
+
+      // Sin WebAuthn: flujo anónimo
       if (!webAuthnOk) {
-        // Sin WebAuthn: juego anónimo directo
-        const userId = localStorage.getItem("wedding_user_id");
         if (userId) {
           setCurrentUserId(userId);
           const save = await loadFromCloud(userId);
@@ -114,8 +136,7 @@ const LoadScreen = () => {
         return;
       }
 
-      // WebAuthn disponible → siempre mostrar pantalla de passkey
-      // El diálogo biométrico SOLO se dispara cuando el usuario pulsa el botón
+      // WebAuthn disponible pero sin credencial → pedir registro
       setPhase("require-passkey");
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
