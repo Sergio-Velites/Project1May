@@ -83,13 +83,18 @@ collectedItems      string[] (IDs "mapa-x-y")
 completedQuests     string[] (IDs de quests completadas)
 seenPokemon         number[] (IDs vistos en Pokédex)
 caughtPokemon       number[] (IDs capturados)
+npcFacings          Record<string, Direction>  (giros temporales de NPCs, ID = "mapId-x-y")
 ```
 
 **Estado inicial** (`initialState` en gameSlice.ts):
 - **Sin pokémon** en equipo ni en PC (arrays vacíos)
 - Mapa: `PalletTownHouseA2F` pos (3,6)
 - Inventario: 2 PokéBalls
-- `defeatedTrainers: ["pallet-town-lab-5-2"]` (Oak ya pre-derrotado para evitar combate)
+- `defeatedTrainers: ["pallet-town-lab-5-1", "pallet-town-house-a-1f-6-3", "pallet-town-10-0", "pallet-town-11-0"]`
+  - `pallet-town-lab-5-1`: Oak pre-derrotado (evita combate)
+  - `pallet-town-house-a-1f-6-3`: madre pre-derrotada (para `persistent:true` → muestra `outtro` al hablar)
+  - `pallet-town-10-0`, `pallet-town-11-0`: Team Rocket norte pre-derrotados
+- `npcFacings: {}` (se limpia al cambiar de mapa)
 
 **`ui` slice** (`state/uiSlice.ts`) — estado de la interfaz:
 ```
@@ -459,7 +464,8 @@ trainer no derrotado. **Para bloquear sin combate** → usar quest tipo `"walk"`
 
 ### Pokéballs del lab no usan `collectItem` (que requiere ItemType real)
 Usan `completeQuest("lab-starter-taken-{id}")`. El estado vive en `completedQuests[]`.  
-El componente `LabPokeball.tsx` es el único lugar que gestiona esto.
+El componente `LabPokeball.tsx` exporta `STARTERS` y `starterQuestId` para que
+`LabPokeballModal.tsx` pueda usarlos sin importar el mapa.
 
 ### `showText` + setTimeout no es seguro para texto → acción
 El usuario puede cerrar el texto antes de que se ejecute el setTimeout. Siempre usar:
@@ -467,16 +473,31 @@ El usuario puede cerrar el texto antes de que se ejecute el setTimeout. Siempre 
 dispatch(showTextThenAction({ text: ["..."], action: () => doSomething() }));
 ```
 
-### Pokéballs del lab: posiciones alcanzables en y:3
-Los tiles y:3 en el lab con walls `3: [6,7,8]`. Posiciones libres: x:0..5,x:9.  
-Las 3 pokéballs están en x:2 (Bulbasaur), x:4 (Charmander), x:5 (Squirtle).  
-El jugador en y:4 mirando arriba llega a y:3.
+### Modal/overlay dentro del BackgroundContainer no queda centrado en pantalla
+`BackgroundContainer` aplica `transform: translate(-pos.x, -pos.y)` para hacer scroll
+del mapa. Todo lo que se renderiza dentro se desplaza con el mapa.
 
-### Menú de batalla: navegación Up/Down
-El `Menu.tsx` en modo `compact` (usado solo en `PokemonEncounter.tsx`) navega  
-linealmente con ±1 (no en 2x2). Left/Right siguen haciendo ±1 columna.
+**Solución**: renderizar el modal **fuera** de `BackgroundContainer` en `Game.tsx`.
+Compartir el estado via Redux (campo en `uiSlice`) en vez de estado local del componente.
 
----
+Ejemplo implementado: `LabPokeballModal.tsx` lee `pokeballCardId` de `uiSlice` y se
+monta después del `</BackgroundContainer>` en `Game.tsx`.
+
+### Freezing del jugador durante un overlay/modal propio
+Si el modal no usa `showText`/`confirmationMenu` de uiSlice, el movimiento no se
+congela automáticamente. **Solución**: añadir el flag del modal a `selectMenuOpen`:
+```typescript
+// En uiSlice.ts:
+export const selectMenuOpen = (state: RootState) =>
+  state.ui.startMenu || ... ||
+  state.ui.pokeballCardId !== null;  // ← congela movimiento
+```
+
+### NPCs que no se giran al hablar
+`Trainer.tsx` usa `npcFacings[trainerId]` como override de `trainer.facing`.
+El ID es `"${mapId}-${pos.x}-${pos.y}"`. Si el NPC está en `defeatedTrainers`
+con `persistent:true`, `TrainerEncounter.tsx` dispatcha `setNpcFacing` antes de
+mostrar el `outtro`. El mapa de `npcFacings` se limpia al cambiar de mapa.
 
 ## Reglas legales y creativas
 
@@ -954,12 +975,18 @@ Estos archivos han sido creados/modificados para la boda y están en `game-src/s
 | `app/move-helper.ts` | Daño Gen I completo: stat stages (20 movimientos), críticos 10%, efectividad |
 | `app/xp-helper.ts` | XP de entrenadores × 1.5 (bonus Gen I) |
 | `app/pokeball-helper.ts` | Fórmula de captura Gen I con 4 sacudidas reales |
-| `components/IntroVideo.tsx` | Video intro antes del TitleScreen; se reproduce **siempre** al arrancar (después de GameboyMenu) |
-| `components/LoadScreen.tsx` | Flujo de inicio: checking → choose/prompt → oak-intro → name-picker → done |
-| `components/OakIntro.tsx` | Intro Prof. Oak con typewriter (40ms/char), sprites por línea, pauseAfter |
+| `components/IntroVideo.tsx` | Video intro antes del TitleScreen; se reproduce siempre (saltable A/B) |
+| `components/LoadScreen.tsx` | Passkey **obligatorio** → save/load → oak-intro → name-picker → done |
+| `components/OakIntro.tsx` | Intro Prof. Oak con typewriter (40ms/char), sprites por línea |
 | `components/NameKeyboard.tsx` | Teclado Game Boy: 4 filas (A-Z + DEL) + botón FIN siempre visible |
-| `state/gameSlice.ts` | `loadFromState()` para cloud save; Oak pre-derrotado en defeatedTrainers |
-| `maps/lab.ts` | Oak como NPC con diálogo de boda (posición 5,2) |
+| `components/LabPokeball.tsx` | Sprites de pokéball en coordenadas mundo (dentro de BackgroundContainer) |
+| `components/LabPokeballModal.tsx` | Modal de selección de starter en coordenadas pantalla (fuera de BackgroundContainer) |
+| `components/Trainer.tsx` | Renderiza sprite NPC; usa `npcFacings[trainerId]` como override de dirección |
+| `components/TrainerEncounter.tsx` | Maneja encuentros; dispatcha `setNpcFacing` al pulsar A frente a NPC |
+| `state/gameSlice.ts` | `loadFromState()` para cloud save; `npcFacings` + `setNpcFacing`; estado inicial sin pokémon |
+| `maps/lab.ts` | Oak como NPC (pos 5,1); mesa con 3 pokéballs en y:3 x:6,7,8 |
+| `maps/pallet-town.ts` | youngster (x:3,y:7), lass (x:15,y:6), Team Rocket (x:10-11,y:0 persistent) |
+| `maps/house-a-1f.ts` | Madre (beauty, pos 6,3, persistent) con Ratata lvl 1 |
 
 ### Guía rápida de modificaciones
 
