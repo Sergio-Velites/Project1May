@@ -46,7 +46,7 @@ const Trainer = ({ trainer }: Props) => {
 
   const [stage, setStage] = useState<number>(0);
 
-  const isEncountered = encounter && encounter.pos === trainer.pos;
+  const isEncountered = !!encounter && encounter.pos.x === trainer.pos.x && encounter.pos.y === trainer.pos.y;
 
   useEffect(() => {
     if (isEncountered) {
