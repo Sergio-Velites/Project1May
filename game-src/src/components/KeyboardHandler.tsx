@@ -24,14 +24,23 @@ const KeyboardHandler = () => {
           emitter.emit(Event.Right);
           emitter.emit(Event.StartRight);
           break;
-        case "Enter":
+        // Botón A → tecla +
+        case "+":
+        case "Add":
           emitter.emit(Event.A);
           break;
-        case "Shift":
+        // Botón B → tecla -
+        case "-":
+        case "Subtract":
           emitter.emit(Event.B);
           break;
-        case " ":
+        // START → Enter (Intro)
+        case "Enter":
           emitter.emit(Event.Start);
+          break;
+        // SELECT → punto
+        case ".":
+          emitter.emit(Event.Select);
           break;
       }
     };
