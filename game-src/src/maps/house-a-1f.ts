@@ -15,6 +15,7 @@ const houseA1f: MapType = {
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7],
     1: [0, 1, 3],
+    3: [6],
     4: [3, 4],
     5: [3, 4],
   },
@@ -23,6 +24,12 @@ const houseA1f: MapType = {
       3: [
         "Hoy es un día muy especial.",
         "¡El Profesor Oak está esperando!",
+      ],
+    },
+    3: {
+      6: [
+        "¿Se puede saber qué haces?",
+        "¡Pareces tonto, hijo!",
       ],
     },
   },
@@ -44,14 +51,11 @@ const houseA1f: MapType = {
     {
       npc: beauty,
       pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Left,
-      pos: { x: 2, y: 5 },
+      facing: Direction.Up,
+      pos: { x: 6, y: 3 },
       persistent: true,
       intro: [],
-      outtro: [
-        "¡Date prisa! ¡El Profesor Oak te espera!",
-        "¡Y no te olvides de elegir un POKEMON!",
-      ],
+      outtro: [],
       money: 0,
     },
   ],

@@ -16,7 +16,7 @@ const lab: MapType = {
   },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    1: [0, 1, 2, 3, 6, 7, 8, 9],
+    1: [0, 1, 2, 3, 5, 6, 7, 8, 9],
     3: [6, 7, 8],
     6: [0, 1, 2, 3, 6, 7, 8, 9],
     7: [0, 1, 2, 3, 6, 7, 8, 9],
@@ -24,12 +24,12 @@ const lab: MapType = {
   text: {
     1: {
       0: ["Enciendes el PC.", "No funciona..."],
-    },
-    // Texto descriptivo de la mesa con pokéballs
-    2: {
-      2: ["BULBASAUR. Pulsa A para verlo."],
-      4: ["CHARMANDER. Pulsa A para verlo."],
-      5: ["SQUIRTLE. Pulsa A para verlo."],
+      5: [
+        "¡Hip! ¡Hoy estamos todos de boda!",
+        "¡Elige un POKEMON de la mesa... hip!",
+        "¡Y date prisa al BOSQUECILLO!",
+        "¡Yo ya voy de buen borraja!",
+      ],
     },
   },
   maps: {},
@@ -48,7 +48,7 @@ const lab: MapType = {
       npc: oak,
       pokemon: [{ id: 1, level: 5 }],
       facing: Direction.Down,
-      pos: { x: 5, y: 2 },
+      pos: { x: 5, y: 1 },
       persistent: true,
       intro: [
         "Hoy no hay tiempo de tonterías.",
