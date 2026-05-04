@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 import { useDispatch, useSelector } from "react-redux";
-import { selectPos, selectMap } from "../state/gameSlice";
+import { selectPos, selectMap, selectDefeatedTrainers, selectMapId } from "../state/gameSlice";
 import Character from "./Character";
 import Text from "./Text";
 import MapChangeHandler from "./MapChangeHandler";
@@ -91,6 +91,8 @@ const ColorOverlay = styled.div`
 const Game = () => {
   const pos = useSelector(selectPos);
   const map = useSelector(selectMap);
+  const mapId = useSelector(selectMapId);
+  const defeatedTrainers = useSelector(selectDefeatedTrainers);
   const dispatch = useDispatch();
   const pokedexOpen = useSelector(selectPokedexOpen);
 
@@ -104,9 +106,14 @@ const Game = () => {
         >
           <Background src={map.image} width={map.width} height={map.height} />
           {map.trainers &&
-            map.trainers.map((trainer: TrainerType, index: number) => (
-              <Trainer key={index} trainer={trainer} />
-            ))}
+            map.trainers
+              .filter((trainer: TrainerType) => {
+                const id = `${mapId}-${trainer.pos.x}-${trainer.pos.y}`;
+                return !defeatedTrainers.includes(id);
+              })
+              .map((trainer: TrainerType, index: number) => (
+                <Trainer key={index} trainer={trainer} />
+              ))}
           {map.items &&
             map.items.map((item: MapItemType, index: number) => (
               <Item key={index} item={item} />

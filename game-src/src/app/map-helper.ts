@@ -67,13 +67,17 @@ export const canWalk = (
   x: number,
   y: number,
   mapId: MapId,
-  collectedItems: string[]
+  collectedItems: string[],
+  defeatedTrainers: string[] = []
 ) => {
   const map = mapData[mapId];
   if (isItem(map.items, x, y, collectedItems, mapId)) return false;
   if (isWall(map.walls, x, y)) return false;
   if (isFence(map.fences, x, y)) return false;
-  if (isTrainer(map.trainers, x, y)) return false;
+  const activeTrainers = (map.trainers ?? []).filter(
+    (t) => !defeatedTrainers.includes(`${mapId}-${t.pos.x}-${t.pos.y}`)
+  );
+  if (isTrainer(activeTrainers, x, y)) return false;
   return true;
 };
 

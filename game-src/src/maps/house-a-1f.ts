@@ -17,6 +17,7 @@ const houseA1f: MapType = {
     1: [0, 1, 3],
     4: [3, 4],
     5: [3, 4],
+    7: [2],
   },
   text: {
     1: {
@@ -45,7 +46,7 @@ const houseA1f: MapType = {
       npc: beauty,
       pokemon: [{ id: 19, level: 1 }],
       facing: Direction.Up,
-      pos: { x: 2, y: 6 },
+      pos: { x: 3, y: 7 },
       intro: [
         "¡{name}!, ¡que coño haces!",
         "¿Te has quedado otra vez jugando?",

@@ -50,7 +50,7 @@ export const gameSlice = createSlice({
       state.direction = Direction.Left;
       if (state.pos.x === 0) return;
       if (
-        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems)
+        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers)
       )
         return;
       state.pos.x -= 1;
@@ -60,7 +60,7 @@ export const gameSlice = createSlice({
       const map = mapData[state.map];
       if (state.pos.x === map.width - 1) return;
       if (
-        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems)
+        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers)
       )
         return;
       state.pos.x += 1;
@@ -69,7 +69,7 @@ export const gameSlice = createSlice({
       state.direction = Direction.Up;
       if (state.pos.y === 0) return;
       if (
-        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems)
+        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers)
       )
         return;
       state.pos.y -= 1;
@@ -82,7 +82,10 @@ export const gameSlice = createSlice({
         state.jumping = true;
       }
       if (isWall(map.walls, state.pos.x, state.pos.y + 1)) return;
-      if (isTrainer(map.trainers, state.pos.x, state.pos.y + 1)) return;
+      const activeTrainersDown = (map.trainers ?? []).filter(
+        (t) => !state.defeatedTrainers.includes(`${state.map}-${t.pos.x}-${t.pos.y}`)
+      );
+      if (isTrainer(activeTrainersDown, state.pos.x, state.pos.y + 1)) return;
       if (
         isItem(
           map.items,

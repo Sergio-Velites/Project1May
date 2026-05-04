@@ -7,6 +7,7 @@ import {
   selectDirection,
   selectMap,
   selectMapId,
+  selectName,
   selectPokemonEncounter,
   selectPos,
   selectTrainerEncounter,
@@ -47,6 +48,7 @@ const TrainerEncounter = () => {
   const mapId = useSelector(selectMapId);
 
   const [introIndex, setIntroIndex] = useState(-1);
+  const playerName = useSelector(selectName);
 
   const { trainers, walls, fences } = map;
 
@@ -108,10 +110,12 @@ const TrainerEncounter = () => {
 
   if (!trainers || !encounter || introIndex === -1) return null;
 
+  const introText = (encounter.intro[introIndex] ?? "").replace("{name}", playerName);
+
   return (
     <StyledTrainerEncounter>
       <Frame wide tall flashing>
-        {encounter.intro[introIndex]}
+        {introText}
       </Frame>
     </StyledTrainerEncounter>
   );
