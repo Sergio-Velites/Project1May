@@ -54,9 +54,8 @@ const route1: MapType = {
   text: {
     27: {
       9: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "RUTA 1: Camino al pueblo de la boda.",
+        "¡Sigue el sendero del amor!",
       ],
     },
   },

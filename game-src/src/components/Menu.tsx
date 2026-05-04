@@ -124,8 +124,7 @@ const Menu = ({
     if (compact) {
       setActiveIndex((prev) => {
         if (prev === 0) return prev;
-        if (prev === 1) return prev;
-        return prev - 2;
+        return prev - 1;
       });
       return;
     }
@@ -150,8 +149,7 @@ const Menu = ({
     if (compact) {
       setActiveIndex((prev) => {
         if (prev === menuItems.length - 1) return prev;
-        if (prev === menuItems.length - 2) return prev;
-        return prev + 2;
+        return prev + 1;
       });
       return;
     }

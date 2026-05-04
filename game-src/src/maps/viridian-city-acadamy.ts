@@ -21,16 +21,16 @@ const viridianCityAcadamy: MapType = {
   text: {
     0: {
       3: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "TITULO: EL AMOR Y LOS POKEMON.",
+        "Cap. 1: El primer encuentro.",
+        "Cap. 2: La batalla del corazon.",
       ],
     },
     4: {
       3: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "TITULO: GUIA PARA NOVIOS.",
+        "Cap. 1: Como compartir un equipo.",
+        "Cap. 2: Entrenando juntos.",
       ],
     },
   },

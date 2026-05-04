@@ -195,8 +195,8 @@ const viridianForrest: MapType = {
           level: 9,
         },
       ],
-      intro: ["Lorem ipsum dolor sit amet, consectetur"],
-      outtro: ["Lorem ipsum dolor sit amet, consectetur"],
+      intro: ["¡Detente, invitado de la boda!", "¡Primero debes combatir!"],
+      outtro: ["¡Qué batalla tan emocionante!", "¡Sigue tu camino, valiente!"],
       money: 60,
       pos: {
         x: 2,
@@ -220,8 +220,8 @@ const viridianForrest: MapType = {
           level: 7,
         },
       ],
-      intro: ["Lorem ipsum dolor sit amet, consectetur"],
-      outtro: ["Lorem ipsum dolor sit amet, consectetur"],
+      intro: ["¡Los insectos son los mejores!", "¡Protegen el bosque de la boda!"],
+      outtro: ["¡Bien luchado!", "¡Disfruta la celebración!"],
       money: 70,
       pos: {
         x: 29,
@@ -241,8 +241,8 @@ const viridianForrest: MapType = {
           level: 6,
         },
       ],
-      intro: ["Lorem ipsum dolor sit amet, consectetur"],
-      outtro: ["Lorem ipsum dolor sit amet, consectetur"],
+      intro: ["¡Nadie pasa sin combatir!", "¡Así lo dice la ley del bosque!"],
+      outtro: ["¡Felicidades a los novios!", "¡Que sean muy felices!"],
       money: 60,
       pos: {
         x: 30,

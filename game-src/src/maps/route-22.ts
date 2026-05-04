@@ -47,9 +47,8 @@ const route22: MapType = {
   text: {
     11: {
       7: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "RUTA 22: La ruta del desafío.",
+        "¡Solo los fuertes merecen bailar!",
       ],
     },
   },

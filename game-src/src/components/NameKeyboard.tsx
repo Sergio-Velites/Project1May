@@ -134,16 +134,22 @@ const MobileKeyboardBtn = styled.button`
   padding: 3% 5%;
   background: var(--bg);
   color: black;
-  border: 2px solid black;
+  border: 3px solid black;
   cursor: pointer;
   letter-spacing: 0.1em;
-  align-self: flex-end;
-  margin-bottom: 1%;
+  flex: 1;
 
   @media (max-width: 1000px) {
     font-size: 7px;
-    padding: 4% 5%;
+    padding: 5% 3%;
+    border-width: 2px;
   }
+`;
+
+const BottomRow = styled.div`
+  display: flex;
+  gap: 2%;
+  flex-shrink: 0;
 `;
 
 const HiddenInput = styled.input`
@@ -306,11 +312,6 @@ const NameKeyboard = ({ onConfirm }: Props) => {
         })}
       </NameDisplay>
 
-      {/* Botón para abrir teclado nativo (útil en móvil) */}
-      <MobileKeyboardBtn onClick={openMobileKeyboard} type="button">
-        ⌨ TECLADO
-      </MobileKeyboardBtn>
-
       <Grid>
         {ROWS.map((rowKeys, r) =>
           rowKeys.map((key, c) => (
@@ -330,10 +331,15 @@ const NameKeyboard = ({ onConfirm }: Props) => {
         )}
       </Grid>
 
-      {/* Botón FIN siempre visible — D-pad ↓ desde última fila o tocar directamente */}
-      <EndButton $active={row === END_ROW} onClick={() => handleKey("END")}>
-        FIN
-      </EndButton>
+      {/* Fila inferior: teclado nativo (móvil) + FIN, siempre visibles */}
+      <BottomRow>
+        <MobileKeyboardBtn onClick={openMobileKeyboard} type="button">
+          ⌨ TECLADO
+        </MobileKeyboardBtn>
+        <EndButton $active={row === END_ROW} onClick={() => handleKey("END")} style={{ flex: 2 }}>
+          FIN
+        </EndButton>
+      </BottomRow>
     </Wrapper>
   );
 };
