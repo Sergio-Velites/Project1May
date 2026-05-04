@@ -88,64 +88,35 @@ const LoadScreen = () => {
     }, 300);
   };
 
-  // Bootstrap cloud-save on first show
+  // Bootstrap: decide fase inicial SIN disparar ningún diálogo biométrico
   useEffect(() => {
     if (!show) return;
 
     (async () => {
-      const userId = localStorage.getItem("wedding_user_id");
-      const credentialId = localStorage.getItem("wedding_credential_id");
       const webAuthnOk = isWebAuthnAvailable();
 
-      if (userId && credentialId && webAuthnOk) {
-        // Known user + registered passkey → authenticate
-        const authedId = await webauthnAuth(credentialId);
-        if (authedId) {
-          setCurrentUserId(authedId);
-          const save = await loadFromCloud(authedId);
+      if (!webAuthnOk) {
+        // Sin WebAuthn: juego anónimo directo
+        const userId = localStorage.getItem("wedding_user_id");
+        if (userId) {
+          setCurrentUserId(userId);
+          const save = await loadFromCloud(userId);
           if (save) {
             cloudSave.current = save as GameState;
             setPhase("choose");
             return;
           }
-          // Registered but no cloud save yet — new game
-          setPhase("oak-intro");
-          return;
-        }
-        // Auth failed — ask to re-register
-        setPhase("require-passkey");
-        return;
-      }
-
-      if (userId && !credentialId && webAuthnOk) {
-        // Has userId but no passkey yet — require registration
-        setPhase("require-passkey");
-        return;
-      }
-
-      if (userId && !webAuthnOk) {
-        // No WebAuthn available — load existing save if any
-        setCurrentUserId(userId);
-        const save = await loadFromCloud(userId);
-        if (save) {
-          cloudSave.current = save as GameState;
-          setPhase("choose");
-          return;
+        } else {
+          const newId = await createUser();
+          if (newId) setCurrentUserId(newId);
         }
         setPhase("oak-intro");
         return;
       }
 
-      if (webAuthnOk) {
-        // Brand new user with WebAuthn — require passkey before anything
-        setPhase("require-passkey");
-        return;
-      }
-
-      // Fallback: no WebAuthn, new user — create anonymous id
-      const newId = await createUser();
-      if (newId) setCurrentUserId(newId);
-      setPhase("oak-intro");
+      // WebAuthn disponible → siempre mostrar pantalla de passkey
+      // El diálogo biométrico SOLO se dispara cuando el usuario pulsa el botón
+      setPhase("require-passkey");
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
@@ -205,7 +176,7 @@ const LoadScreen = () => {
         </TextArea>
       )}
 
-      {/* Require passkey: mandatory for wedding confirmation */}
+      {/* Require passkey: el diálogo biométrico SOLO se activa al pulsar el botón */}
       {phase === "require-passkey" && (
         <>
           <TextArea>
@@ -225,11 +196,20 @@ const LoadScreen = () => {
             close={() => {}}
             menuItems={[
               {
-                label: "Activar guardado",
+                label: "Guardar con Face ID/Huella",
                 action: async () => {
                   setPhase("registering");
                   try {
-                    const userId = await webauthnRegister();
+                    // Si ya tiene credencial registrada, intentar auth primero
+                    const credentialId = localStorage.getItem("wedding_credential_id");
+                    let userId: string | null = null;
+                    if (credentialId) {
+                      userId = await webauthnAuth(credentialId);
+                    }
+                    // Si no tiene credencial o la auth falló → registrar nueva passkey
+                    if (!userId) {
+                      userId = await webauthnRegister();
+                    }
                     if (userId) {
                       setCurrentUserId(userId);
                       const save = await loadFromCloud(userId);
@@ -252,7 +232,6 @@ const LoadScreen = () => {
                 action: () => {
                   // Limpiar credencial para evitar futuros bucles de auth
                   localStorage.removeItem("wedding_credential_id");
-                  // Reutilizar userId existente o crear uno nuevo local
                   const existingId = localStorage.getItem("wedding_user_id");
                   const localId = existingId ?? crypto.randomUUID();
                   localStorage.setItem("wedding_user_id", localId);
