@@ -25,13 +25,12 @@ import {
 import { showText, showTextThenAction } from "../state/uiSlice";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
-import { BLOCK_PIXEL_HEIGHT, BLOCK_PIXEL_WIDTH } from "../app/constants";
 import { MapId } from "../maps/map-types";
 import { directionModifier } from "../app/map-helper";
 import usePokemonMetadata from "../app/use-pokemon-metadata";
 import usePokemonStats from "../app/use-pokemon-stats";
 import PixelImage from "../styles/PixelImage";
-import { xToPx } from "../app/position-helper";
+import { xToPx, yToPx } from "../app/position-helper";
 import pokeball from "../assets/misc/pokeball.png";
 
 // ── Starters config ────────────────────────────────────────────────────────
@@ -46,13 +45,13 @@ const starterQuestId = (pokemonId: number) =>
   `lab-starter-taken-${pokemonId}`;
 
 // ── Styled ────────────────────────────────────────────────────────────────
-// $dx/$dy = starter.pos - jugador.pos (en tiles).
-// El jugador siempre está centrado en pantalla, así que la pokéball
-// debe aparecer a dx/dy tiles de distancia del centro.
-const StyledBall = styled.div<{ $dx: number; $dy: number }>`
+// Coordenadas mundo (iguales que Trainer.tsx e Item.tsx).
+// La pokéball se renderiza dentro de BackgroundContainer, que se
+// desplaza con el mapa, por lo que queda fija sobre la mesa.
+const StyledBall = styled.div<{ $x: number; $y: number }>`
   position: absolute;
-  top: calc(50% + (${BLOCK_PIXEL_HEIGHT}cqw / 2.34) * ${(p) => p.$dy - 0.5});
-  left: calc(50% + (${BLOCK_PIXEL_WIDTH}cqw / 2.34) * ${(p) => p.$dx - 0.5});
+  top: ${(p) => yToPx(p.$y)};
+  left: ${(p) => xToPx(p.$x)};
   z-index: 50;
 `;
 
@@ -225,7 +224,7 @@ const SingleBall = ({
 
   return (
     <>
-      <StyledBall $dx={starter.pos.x - pos.x} $dy={starter.pos.y - pos.y}>
+      <StyledBall $x={starter.pos.x} $y={starter.pos.y}>
         <BallSprite src={pokeball} />
       </StyledBall>
 

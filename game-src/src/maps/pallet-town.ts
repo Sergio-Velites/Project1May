@@ -1,7 +1,7 @@
 import palletTownImage from "../assets/map/pallet-town.png";
 import { MapId, MapType } from "./map-types";
 import { Direction } from "../state/state-types";
-import { youngster, lass } from "../app/npcs";
+import { youngster, teamRocketGrunt } from "../app/npcs";
 
 import music from "../assets/music/maps/pallet-town.mp3";
 import getEncounterData from "./get-location-data";
@@ -17,7 +17,7 @@ const palletTown: MapType = {
   },
   walls: {
     0: [9, 12],
-    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 15, 16, 17, 18, 19],
+    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19],
     2: [0, 19],
     3: [0, 4, 5, 6, 7, 12, 13, 14, 15, 19],
     4: [0, 4, 5, 6, 7, 12, 13, 14, 15, 19],
@@ -53,26 +53,6 @@ const palletTown: MapType = {
         "Puedes guardar POKEMON en el PC.",
       ],
     },
-    // Los borrachos bloqueadores visuales (tiles que el jugador puede ver/leer)
-    1: {
-      10: ["¡Viva el vino!... hip!"],
-      11: ["¡Viva el vino!... hip!"],
-    },
-    // NPCs andantes — sus textos de diálogo
-    8: {
-      2: [
-        "No sé qué demonios pasa hoy pero,",
-        "me noto como un cancaneo por el cuerpo.",
-        "Presiento algo importante.",
-      ],
-    },
-    6: {
-      16: [
-        "Me voy a poner como el kiko en la preboda.",
-        "Dicen que hay que llegar hasta EL BOSQUECILLO,",
-        "pero merecerá la pena.",
-      ],
-    },
   },
   maps: {
     5: {
@@ -100,28 +80,35 @@ const palletTown: MapType = {
       pokemon: [{ id: 19, level: 2 }],
       facing: Direction.Right,
       pos: { x: 3, y: 8 },
-      intro: [
+      intro: [],
+      outtro: [
         "No sé qué demonios pasa hoy pero,",
         "me noto como un cancaneo por el cuerpo.",
         "Presiento algo importante.",
       ],
+      money: 0,
+    },
+    {
+      npc: teamRocketGrunt,
+      pokemon: [{ id: 19, level: 2 }],
+      facing: Direction.Right,
+      pos: { x: 10, y: 1 },
+      intro: [],
       outtro: [
-        "¡Se me ha ido el cancaneo con tanto vino!",
+        "¡Aquí no pasa nadie sin un POKEMON!",
+        "Ve al laboratorio y busca uno.",
       ],
       money: 0,
     },
     {
-      npc: lass,
-      pokemon: [{ id: 35, level: 2 }],
+      npc: teamRocketGrunt,
+      pokemon: [{ id: 19, level: 2 }],
       facing: Direction.Left,
-      pos: { x: 15, y: 6 },
-      intro: [
-        "Me voy a poner como el kiko en la preboda.",
-        "Dicen que hay que llegar hasta EL BOSQUECILLO,",
-        "pero merecerá la pena.",
-      ],
+      pos: { x: 11, y: 1 },
+      intro: [],
       outtro: [
-        "¡Qué viva la boda! ¡Al bosquecillo!",
+        "¡Sin POKEMON no sales de Pueblo Paleta!",
+        "Jefe’s orders.",
       ],
       money: 0,
     },

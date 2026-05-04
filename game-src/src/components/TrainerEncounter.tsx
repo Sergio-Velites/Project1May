@@ -65,6 +65,8 @@ const TrainerEncounter = () => {
     );
 
     if (!encounter_) return;
+    // No disparar encuentro si el trainer no tiene intro (NPC decorativo sin combate)
+    if (!encounter_.intro || encounter_.intro.length === 0) return;
     dispatch(encounterTrainer(encounter_));
     setTimeout(() => {
       setIntroIndex(0);
@@ -91,8 +93,13 @@ const TrainerEncounter = () => {
         }
         return;
       }
-      // No iniciar encuentro si el trainer no tiene intro (NPC decorativo)
-      if (!trainer.intro || trainer.intro.length === 0) return;
+      // NPC decorativo (intro vacío): mostrar outtro si existe, nunca iniciar batalla
+      if (!trainer.intro || trainer.intro.length === 0) {
+        if (trainer.outtro && trainer.outtro.length > 0) {
+          dispatch(showText(trainer.outtro));
+        }
+        return;
+      }
       dispatch(encounterTrainer(trainer));
       setTimeout(() => {
         setIntroIndex(0);
