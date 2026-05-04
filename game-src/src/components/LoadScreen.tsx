@@ -79,7 +79,6 @@ const LoadScreen = () => {
   const [phase, setPhase] = useState<Phase>("checking");
   const [loaded, setLoaded] = useState(false);
   const [confirmedName, setConfirmedName] = useState<string | null>(null);
-  const [registrationFailed, setRegistrationFailed] = useState(false);
   const cloudSave = useRef<GameState | null>(null);
 
   const loadComplete = () => {
@@ -212,7 +211,7 @@ const LoadScreen = () => {
           <TextArea>
             <Frame>
               <StatusText $flashing={false}>
-                Para confirmar asistencia necesitas guardar con huella / Face ID.
+                Activa guardado para confirmar asistencia.
               </StatusText>
             </Frame>
           </TextArea>
@@ -241,29 +240,25 @@ const LoadScreen = () => {
                       }
                       setPhase("oak-intro");
                     } else {
-                      // Falló el registro (Edge Function o usuario canceló)
-                      setRegistrationFailed(true);
                       setPhase("require-passkey");
                     }
                   } catch {
-                    setRegistrationFailed(true);
                     setPhase("require-passkey");
                   }
                 },
               },
               {
-                label: registrationFailed ? "Jugar sin guardar" : "Reintentar",
-                action: registrationFailed
-                  ? () => {
-                      // Fallback local: UUID sin Supabase → el juego funciona
-                      const localId = crypto.randomUUID();
-                      localStorage.setItem("wedding_user_id", localId);
-                      setCurrentUserId(localId);
-                      setPhase("oak-intro");
-                    }
-                  : () => {
-                      window.location.reload();
-                    },
+                label: "Jugar sin guardar",
+                action: () => {
+                  // Limpiar credencial para evitar futuros bucles de auth
+                  localStorage.removeItem("wedding_credential_id");
+                  // Reutilizar userId existente o crear uno nuevo local
+                  const existingId = localStorage.getItem("wedding_user_id");
+                  const localId = existingId ?? crypto.randomUUID();
+                  localStorage.setItem("wedding_user_id", localId);
+                  setCurrentUserId(localId);
+                  setPhase("oak-intro");
+                },
               },
             ]}
           />
