@@ -310,13 +310,6 @@ const LoadScreen = () => {
 
     return (
       <StyledLoadScreen>
-        <TextArea>
-          <Frame>
-            <StatusText $flashing={false}>
-              ¿Continuamos la aventura?
-            </StatusText>
-          </Frame>
-        </TextArea>
         <Menu
           show={menuReady}
           disabled={!menuReady}
