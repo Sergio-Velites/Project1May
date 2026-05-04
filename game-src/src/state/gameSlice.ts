@@ -84,6 +84,8 @@ const initialState: GameState = {
   defeatedTrainers: ["pallet-town-lab-5-2"],
   collectedItems: [],
   completedQuests: [],
+  seenPokemon: [1, 4, 7],  // los tres del equipo inicial son conocidos
+  caughtPokemon: [1, 4, 7],
 };
 
 export const gameSlice = createSlice({
@@ -356,6 +358,19 @@ export const gameSlice = createSlice({
     completeQuest: (state, action: PayloadAction<string>) => {
       state.completedQuests.push(action.payload);
     },
+    seePokemon: (state, action: PayloadAction<number>) => {
+      if (!state.seenPokemon.includes(action.payload)) {
+        state.seenPokemon.push(action.payload);
+      }
+    },
+    catchPokemonPokedex: (state, action: PayloadAction<number>) => {
+      if (!state.seenPokemon.includes(action.payload)) {
+        state.seenPokemon.push(action.payload);
+      }
+      if (!state.caughtPokemon.includes(action.payload)) {
+        state.caughtPokemon.push(action.payload);
+      }
+    },
   },
 });
 
@@ -397,6 +412,8 @@ export const {
   faintToTrainer,
   collectItem,
   completeQuest,
+  seePokemon,
+  catchPokemonPokedex,
 } = gameSlice.actions;
 
 export const selectPos = (state: RootState) => state.game.pos;
@@ -446,6 +463,9 @@ export const selectCollectedItems = (state: RootState) =>
 
 export const selectCompletedQuests = (state: RootState) =>
   state.game.completedQuests;
+
+export const selectSeenPokemon = (state: RootState) => state.game.seenPokemon;
+export const selectCaughtPokemon = (state: RootState) => state.game.caughtPokemon;
 
 export const selectActivePokemonIndex = (state: RootState) =>
   state.game.activePokemonIndex;

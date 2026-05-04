@@ -39,6 +39,7 @@ interface UiState {
   pokemonCenterMenu: boolean;
   pcMenu: boolean;
   pokeMartMenu: boolean;
+  pokedexOpen: boolean;
   actionOnPokemon: ((index: number) => void) | null;
   pokeballThrowing?: ItemType | null;
   spinning: Direction | null;
@@ -63,6 +64,7 @@ const initialState: UiState = {
   pokemonCenterMenu: false,
   pcMenu: false,
   pokeMartMenu: false,
+  pokedexOpen: false,
   spinning: null,
   textThenAction: null,
   learningMove: null,
@@ -145,6 +147,12 @@ export const uiSlice = createSlice({
     hidePokeMartMenu: (state) => {
       state.pokeMartMenu = false;
     },
+    showPokedex: (state) => {
+      state.pokedexOpen = true;
+    },
+    hidePokedex: (state) => {
+      state.pokedexOpen = false;
+    },
     startSpinning: (stage, action: PayloadAction<Direction>) => {
       stage.spinning = action.payload;
     },
@@ -210,6 +218,8 @@ export const {
   hidePcMenu,
   showPokeMartMenu,
   hidePokeMartMenu,
+  showPokedex,
+  hidePokedex,
   startSpinning,
   stopSpinning,
   showTextThenAction,
@@ -250,6 +260,8 @@ export const selectActionOnPokemon = (state: RootState) =>
   state.ui.actionOnPokemon;
 
 export const selectPokeMartMenu = (state: RootState) => state.ui.pokeMartMenu;
+
+export const selectPokedexOpen = (state: RootState) => state.ui.pokedexOpen;
 
 export const selectMenuOpen = (state: RootState) =>
   state.ui.startMenu ||

@@ -234,6 +234,11 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
   const idStr  = String(meta.id).padStart(5, "0");
   const noStr  = `Nº${String(meta.id).padStart(3, "0")}`;
 
+  // XP to next level — Gen I Medium Fast: nextLevel³
+  const nextLvl = pokemon.level + 1;
+  const xpForNext = Math.pow(nextLvl, 3) - Math.pow(pokemon.level, 3);
+  const xpPct = Math.min(100, (pokemon.xp / xpForNext) * 100);
+
   // ── Página 1 — ESTADO ──────────────────────────────────────────────────────
   if (page === 0) {
     return (
@@ -338,6 +343,20 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
           <Txt $size={0.85}>{stats.specialAttack}</Txt>
         </StatCell>
       </StatsGrid>
+
+      {/* XP bar */}
+      <HpSection style={{ borderTop: "2px solid #181010" }}>
+        <Row $align="center" $gap="4px">
+          <Txt $size={0.8}>EXP</Txt>
+          <BarTrack style={{ flex: 1 }}>
+            <BarFill $pct={xpPct} $color="#4880f8" />
+          </BarTrack>
+        </Row>
+        <Row $justify="space-between">
+          <Txt $size={0.75}>actual {pokemon.xp}</Txt>
+          <Txt $size={0.75}>siguiente {xpForNext}</Txt>
+        </Row>
+      </HpSection>
 
       <NavHint>← ESTADO   B: VOLVER</NavHint>
     </Screen>

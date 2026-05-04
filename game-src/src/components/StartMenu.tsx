@@ -9,6 +9,7 @@ import {
   showItemsMenu,
   showPlayerMenu,
   showStartMenu,
+  showPokedex,
 } from "../state/uiSlice";
 import useEvent from "../app/use-event";
 import emitter, { Event } from "../app/emitter";
@@ -45,10 +46,13 @@ const StartMenu = () => {
         show={show}
         close={() => dispatch(hideStartMenu())}
         menuItems={[
-          // {
-          //   label: "Pokédex",
-          //   action: () => console.log("TODO"),
-          // },
+          {
+            label: "Pokédex",
+            action: () => {
+              dispatch(showPokedex());
+              dispatch(hideStartMenu());
+            },
+          },
           {
             label: "Pokémon",
             action: () => {
