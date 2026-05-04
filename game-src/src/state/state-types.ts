@@ -57,4 +57,5 @@ export interface GameState {
   completedQuests: string[];
   seenPokemon: number[];    // IDs vistos en la Pokédex
   caughtPokemon: number[]; // IDs capturados
+  npcFacings: Record<string, Direction>;
 }

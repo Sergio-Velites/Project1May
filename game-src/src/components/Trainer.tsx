@@ -3,7 +3,7 @@ import { TrainerType } from "../maps/map-types";
 import PixelImage from "../styles/PixelImage";
 import { xToPx, yToPx } from "../app/position-helper";
 import { useSelector } from "react-redux";
-import { selectTrainerEncounter } from "../state/gameSlice";
+import { selectTrainerEncounter, selectNpcFacings, selectMapId } from "../state/gameSlice";
 import { useEffect, useState } from "react";
 
 import alert from "../assets/ui/alert.png";
@@ -43,8 +43,13 @@ interface Props {
 
 const Trainer = ({ trainer }: Props) => {
   const encounter = useSelector(selectTrainerEncounter);
+  const npcFacings = useSelector(selectNpcFacings);
+  const mapId = useSelector(selectMapId);
 
   const [stage, setStage] = useState<number>(0);
+
+  const trainerId = `${mapId}-${trainer.pos.x}-${trainer.pos.y}`;
+  const effectiveFacing = npcFacings[trainerId] ?? trainer.facing;
 
   const isEncountered = !!encounter && encounter.pos.x === trainer.pos.x && encounter.pos.y === trainer.pos.y;
 
@@ -59,10 +64,10 @@ const Trainer = ({ trainer }: Props) => {
   }, [isEncountered]);
 
   const sprite = () => {
-    if (trainer.facing === Direction.Left) return trainer.npc.sprites.left;
-    if (trainer.facing === Direction.Right) return trainer.npc.sprites.right;
-    if (trainer.facing === Direction.Up) return trainer.npc.sprites.up;
-    if (trainer.facing === Direction.Down) return trainer.npc.sprites.down;
+    if (effectiveFacing === Direction.Left) return trainer.npc.sprites.left;
+    if (effectiveFacing === Direction.Right) return trainer.npc.sprites.right;
+    if (effectiveFacing === Direction.Up) return trainer.npc.sprites.up;
+    if (effectiveFacing === Direction.Down) return trainer.npc.sprites.down;
     throw new Error("Invalid direction");
   };
 
