@@ -86,9 +86,13 @@ const TrainerEncounter = () => {
       if (!trainer) throw new Error("Trainer not found");
       const trainerId = `${mapId}-${trainer.pos.x}-${trainer.pos.y}`;
       if (defeatedTrainers.includes(trainerId)) {
-        dispatch(showText(trainer.outtro));
+        if (trainer.outtro && trainer.outtro.length > 0) {
+          dispatch(showText(trainer.outtro));
+        }
         return;
       }
+      // No iniciar encuentro si el trainer no tiene intro (NPC decorativo)
+      if (!trainer.intro || trainer.intro.length === 0) return;
       dispatch(encounterTrainer(trainer));
       setTimeout(() => {
         setIntroIndex(0);

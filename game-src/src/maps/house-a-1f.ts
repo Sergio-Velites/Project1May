@@ -26,12 +26,6 @@ const houseA1f: MapType = {
         "¡El Profesor Oak está esperando!",
       ],
     },
-    3: {
-      6: [
-        "¿Se puede saber qué haces?",
-        "¡Pareces tonto, hijo!",
-      ],
-    },
   },
   maps: {
     1: {
