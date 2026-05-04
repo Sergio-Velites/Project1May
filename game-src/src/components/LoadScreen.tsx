@@ -68,7 +68,7 @@ const StatusText = styled.h1<FlashProps>`
   }
 `;
 
-type Phase = "checking" | "choose" | "prompt" | "name-picker" | "oak-intro" | "done";
+type Phase = "checking" | "require-passkey" | "registering" | "choose" | "name-picker" | "oak-intro" | "done";
 
 const LoadScreen = () => {
   const dispatch = useDispatch();
@@ -108,13 +108,23 @@ const LoadScreen = () => {
             setPhase("choose");
             return;
           }
+          // Registered but no cloud save yet — new game
+          setPhase("oak-intro");
+          return;
         }
-        setPhase("oak-intro");
+        // Auth failed — ask to re-register
+        setPhase("require-passkey");
         return;
       }
 
-      if (userId && !credentialId) {
-        // Known user but no passkey
+      if (userId && !credentialId && webAuthnOk) {
+        // Has userId but no passkey yet — require registration
+        setPhase("require-passkey");
+        return;
+      }
+
+      if (userId && !webAuthnOk) {
+        // No WebAuthn available — load existing save if any
         setCurrentUserId(userId);
         const save = await loadFromCloud(userId);
         if (save) {
@@ -127,12 +137,12 @@ const LoadScreen = () => {
       }
 
       if (webAuthnOk) {
-        // New device with WebAuthn support → ask to register
-        setPhase("prompt");
+        // Brand new user with WebAuthn — require passkey before anything
+        setPhase("require-passkey");
         return;
       }
 
-      // Fallback: create anonymous user, no passkey — go straight to new game
+      // Fallback: no WebAuthn, new user — create anonymous id
       const newId = await createUser();
       if (newId) setCurrentUserId(newId);
       setPhase("oak-intro");
@@ -180,18 +190,69 @@ const LoadScreen = () => {
   };
 
   const handleNewGame = () => {
+    setConfirmedName(null);
     setPhase("oak-intro");
   };
 
   return (
     <StyledLoadScreen>
       {/* Checking / done: pulsing WEDDINGBOY text */}
-      {(phase === "checking" || phase === "done") && (
+      {(phase === "checking" || phase === "registering" || phase === "done") && (
         <TextArea>
           <Frame>
             <StatusText $flashing>WEDDINGBOY...</StatusText>
           </Frame>
         </TextArea>
+      )}
+
+      {/* Require passkey: mandatory for wedding confirmation */}
+      {phase === "require-passkey" && (
+        <>
+          <TextArea>
+            <Frame>
+              <StatusText $flashing={false}>
+                Para confirmar asistencia necesitas guardar con huella / Face ID.
+              </StatusText>
+            </Frame>
+          </TextArea>
+          <Menu
+            disabled={titleOpen || gameboyOpen}
+            show={!loaded}
+            noExit
+            top="2px"
+            left="2px"
+            padding="7vw"
+            close={() => {}}
+            menuItems={[
+              {
+                label: "Activar guardado",
+                action: async () => {
+                  setPhase("registering");
+                  const userId = await webauthnRegister();
+                  if (userId) {
+                    setCurrentUserId(userId);
+                    const save = await loadFromCloud(userId);
+                    if (save) {
+                      cloudSave.current = save as GameState;
+                      setPhase("choose");
+                      return;
+                    }
+                    setPhase("oak-intro");
+                  } else {
+                    // Registration failed — stay on require-passkey
+                    setPhase("require-passkey");
+                  }
+                },
+              },
+              {
+                label: "Reintentar",
+                action: () => {
+                  window.location.reload();
+                },
+              },
+            ]}
+          />
+        </>
       )}
 
       {/* Choose: continue or new game */}
@@ -200,7 +261,7 @@ const LoadScreen = () => {
           <TextArea>
             <Frame>
               <StatusText $flashing={!loaded}>
-                ¿Continuar la partida guardada?
+                ¡Bienvenido de nuevo!
               </StatusText>
             </Frame>
           </TextArea>
@@ -215,56 +276,6 @@ const LoadScreen = () => {
             menuItems={[
               { label: "Continuar", action: handleContinue },
               { label: "Nueva partida", action: handleNewGame },
-            ]}
-          />
-        </>
-      )}
-
-      {/* Prompt: ask to register passkey */}
-      {phase === "prompt" && (
-        <>
-          <TextArea>
-            <Frame>
-              <StatusText $flashing={!loaded}>
-                ¿Guardar con Face ID / huella?
-              </StatusText>
-            </Frame>
-          </TextArea>
-          <Menu
-            disabled={titleOpen || gameboyOpen}
-            show={!loaded}
-            noExit
-            top="2px"
-            left="2px"
-            padding="7vw"
-            close={() => setLoaded(true)}
-            menuItems={[
-              {
-                label: "Sí, guardar",
-                action: async () => {
-                  setPhase("checking");
-                  const userId = await webauthnRegister();
-                  if (userId) {
-                    setCurrentUserId(userId);
-                    const save = await loadFromCloud(userId);
-                    if (save) {
-                      cloudSave.current = save as GameState;
-                      setPhase("choose");
-                      return;
-                    }
-                  }
-                  handleNewGame();
-                },
-              },
-              {
-                label: "Sin guardar",
-                action: async () => {
-                  setPhase("checking");
-                  const userId = await createUser();
-                  if (userId) setCurrentUserId(userId);
-                  handleNewGame();
-                },
-              },
             ]}
           />
         </>

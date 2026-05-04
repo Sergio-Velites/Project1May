@@ -113,9 +113,8 @@ const route2: MapType = {
   text: {
     11: {
       11: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "RUTA 2: El sendero de los valientes.",
+        "¡La boda espera al final del camino!",
       ],
     },
     65: {

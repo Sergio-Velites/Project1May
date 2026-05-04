@@ -23,9 +23,9 @@ const viridianCityPokemonCenter: MapType = {
   text: {
     4: {
       0: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "¡Bienvenidos, invitados de la boda!",
+        "¡Aquí curamos a todos los PKMN gratis!",
+        "¡Que disfruten la celebración!",
       ],
     },
   },

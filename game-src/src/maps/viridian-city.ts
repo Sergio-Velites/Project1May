@@ -67,44 +67,32 @@ const viridianCity: MapType = {
   text: {
     29: {
       21: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "¡Esta es CIUDAD AÑIL!",
       ],
     },
     25: {
       24: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "¡Ciudad sin principio ni fin!",
       ],
     },
     19: {
       30: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "Bienvenidos a la boda.",
       ],
     },
     17: {
       17: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "¡Felicidades a los novios!",
       ],
     },
     7: {
       27: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "El amor es el mejor PKMN.",
       ],
     },
     1: {
       19: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "¡Hoy es un día especial!",
       ],
     },
   },

@@ -25,6 +25,12 @@ const lab: MapType = {
     1: {
       0: ["ASH turned on the PC.", "It's not working..."],
     },
+    // Texto descriptivo de la mesa con pokéballs
+    2: {
+      2: ["BULBASAUR. Pulsa A para verlo."],
+      4: ["CHARMANDER. Pulsa A para verlo."],
+      5: ["SQUIRTLE. Pulsa A para verlo."],
+    },
   },
   maps: {},
   exits: {
@@ -45,25 +51,20 @@ const lab: MapType = {
       pos: { x: 5, y: 2 },
       intro: [
         "Hoy no hay tiempo de tonterías.",
-        "Ponte las pilas que es un día importante.",
+        "Pon las pilas que es un día importante.",
         "Te esperan en EL BOSQUECILLO.",
         "hip!",
         "Yo ya voy un tanto borraja.",
         "hip!",
         "Date prisa!",
+        "¡Elige uno de los tres POKEMON de la mesa!",
         "He oido que hay un tal Juanre",
         "que no perdona con la comida a los rezagados.",
       ],
       outtro: [
-        "Hoy no hay tiempo de tonterías.",
-        "Ponte las pilas que es un día importante.",
-        "Te esperan en EL BOSQUECILLO.",
+        "¡Buena elección!",
+        "¡Date prisa al BOSQUECILLO!",
         "hip!",
-        "Yo ya voy un tanto borraja.",
-        "hip!",
-        "Date prisa!",
-        "He oido que hay un tal Juanre",
-        "que no perdona con la comida a los rezagados.",
       ],
       money: 0,
     },

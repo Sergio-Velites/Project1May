@@ -137,19 +137,19 @@ const DetailArea = styled.div`
 `;
 
 const SpriteBox = styled.div`
-  border: 2px solid #181010;
-  width: 46%;
-  aspect-ratio: 1/1;
+  border-right: 2px solid #181010;
+  width: 42%;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg);
+  padding: 4px;
 `;
 
 const SpriteImg = styled(PixelImage)`
-  width: 86%;
-  height: 86%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 `;
 
@@ -159,16 +159,15 @@ const InfoCol = styled.div`
   flex-direction: column;
   padding: 2px 4px;
   gap: 2px;
-  border-left: 2px solid #181010;
+  overflow: hidden;
 `;
 
 const DescBox = styled.div`
-  flex: 1;
   padding: 3px 4px;
   font-size: 0.8em;
-  line-height: 1.6;
+  line-height: 1.5;
   border-top: 2px solid #181010;
-  overflow: hidden;
+  flex-shrink: 0;
 `;
 
 // ── Sub-components ───────────────────────────────────────────────────────────
@@ -193,7 +192,8 @@ const Detail = ({ id, onBack }: DetailProps) => {
       </HeaderBar>
 
       <DetailArea>
-        <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+        {/* Sprite + Info row, fixed height */}
+        <div style={{ display: "flex", flexShrink: 0, height: "48%" }}>
           <SpriteBox>
             <SpriteImg src={meta.images.front} alt={meta.name} />
           </SpriteBox>

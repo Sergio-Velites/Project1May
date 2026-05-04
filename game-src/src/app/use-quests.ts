@@ -6,6 +6,7 @@ import {
   moveLeft,
   selectCompletedQuests,
   selectPos,
+  selectPokemon,
   setPos,
   takeMoney,
 } from "../state/gameSlice";
@@ -30,8 +31,27 @@ const useQuests = () => {
   const badges = useBadges();
   const completedQuests = useSelector(selectCompletedQuests);
   const pos = useSelector(selectPos);
+  const pokemon = useSelector(selectPokemon);
 
   const quests: QuestType[] = [
+    // ── Pallet Town: bloqueo norte si no tienes pokémon ────────────────────
+    {
+      trigger: "walk",
+      map: MapId.PalletTown,
+      positions: {
+        0: [10, 11],
+        1: [10, 11],
+      },
+      active: () => pokemon.length === 0,
+      text: [
+        "¡Viva el vino!... hip!",
+        "¡Aquí no pasa nadie sin su POKEMON!",
+        "¡Ve al laboratorio primero!",
+      ],
+      action: () => {
+        dispatch(setPos({ x: pos.x, y: 2 }));
+      },
+    },
     // Pewter City
     {
       trigger: "walk",

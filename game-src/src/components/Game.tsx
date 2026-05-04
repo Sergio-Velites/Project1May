@@ -35,6 +35,7 @@ import ConfirmationMenu from "./ConfirmationMenu";
 import Evolution from "./Evolution";
 import IntroVideo from "./IntroVideo";
 import Pokedex from "./Pokedex";
+import LabPokeballs from "./LabPokeball";
 import { selectPokedexOpen, hidePokedex } from "../state/uiSlice";
 
 const Container = styled.div`
@@ -130,6 +131,7 @@ const Game = () => {
       <ActionOnPokemon />
       <Evolution />
       <ConfirmationMenu />
+      <LabPokeballs />
       {pokedexOpen && <Pokedex onClose={() => dispatch(hidePokedex())} />}
       <LoadScreen />
       <TitleScreen />

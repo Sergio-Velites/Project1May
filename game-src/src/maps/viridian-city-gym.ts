@@ -34,14 +34,14 @@ const viridianCityGym: MapType = {
   text: {
     15: {
       15: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "GIMNASIO AÑIL",
+        "Solo los campeones",
+        "pueden entrar aquí.",
       ],
       18: [
-        "Lorem ipsum dolor sit amet, consectetur",
-        "adipiscing elit, sed do eiusmod tempor",
-        "incididunt ut labore et dolore magna aliqua.",
+        "AVISO AL LUCHADOR:",
+        "El líder no está.",
+        "¡Vuelve cuando seas digno!",
       ],
     },
   },

@@ -1,5 +1,7 @@
 import palletTownImage from "../assets/map/pallet-town.png";
 import { MapId, MapType } from "./map-types";
+import { Direction } from "../state/state-types";
+import { youngster, lass } from "../app/npcs";
 
 import music from "../assets/music/maps/pallet-town.mp3";
 import getEncounterData from "./get-location-data";
@@ -36,25 +38,39 @@ const palletTown: MapType = {
   },
   text: {
     5: {
-      3: ["ASH's house"],
-      11: ["GARRY's house"],
-    },
-    8: {
-      4: [
-        "I'm raising POKEMON too!",
-        "When they get strong, they can protect me!",
-      ],
+      3: ["Tu casa. Volver a dormir no es una opción ahora."],
+      11: ["Casa del vecino. Hoy no hay nadie."],
     },
     9: {
-      7: ["PALLET TOWN Shades of your journey await!"],
+      7: ["PUEBLO PALETA. El comienzo de todo."],
     },
     13: {
-      13: ["OAK POKEMON RESEARCH LAB"],
+      13: ["LABORATORIO DEL PROF. OAK"],
     },
     15: {
       10: [
-        "Technology is incredible!",
-        "You can now store and recall items and POKEMON as data via PC!",
+        "¡Tecnología increíble!",
+        "Puedes guardar POKEMON en el PC.",
+      ],
+    },
+    // Los borrachos bloqueadores visuales (tiles que el jugador puede ver/leer)
+    1: {
+      10: ["¡Viva el vino!... hip!"],
+      11: ["¡Viva el vino!... hip!"],
+    },
+    // NPCs andantes — sus textos de diálogo
+    8: {
+      2: [
+        "No sé qué demonios pasa hoy pero,",
+        "me noto como un cancaneo por el cuerpo.",
+        "Presiento algo importante.",
+      ],
+    },
+    6: {
+      16: [
+        "Me voy a poner como el kiko en la preboda.",
+        "Dicen que hay que llegar hasta EL BOSQUECILLO,",
+        "pero merecerá la pena.",
       ],
     },
   },
@@ -76,6 +92,40 @@ const palletTown: MapType = {
   encounters: getEncounterData("pallet-town-area"),
   grass: {},
   recoverLocation: { x: 5, y: 6 },
+  // Borrachos bloqueadores: solo visibles, sus posiciones son "text" tiles
+  // NPCs del pueblo con los que se puede hablar (no combaten):
+  trainers: [
+    {
+      npc: youngster,
+      pokemon: [{ id: 19, level: 2 }],
+      facing: Direction.Right,
+      pos: { x: 3, y: 8 },
+      intro: [
+        "No sé qué demonios pasa hoy pero,",
+        "me noto como un cancaneo por el cuerpo.",
+        "Presiento algo importante.",
+      ],
+      outtro: [
+        "¡Se me ha ido el cancaneo con tanto vino!",
+      ],
+      money: 0,
+    },
+    {
+      npc: lass,
+      pokemon: [{ id: 35, level: 2 }],
+      facing: Direction.Left,
+      pos: { x: 15, y: 6 },
+      intro: [
+        "Me voy a poner como el kiko en la preboda.",
+        "Dicen que hay que llegar hasta EL BOSQUECILLO,",
+        "pero merecerá la pena.",
+      ],
+      outtro: [
+        "¡Qué viva la boda! ¡Al bosquecillo!",
+      ],
+      money: 0,
+    },
+  ],
 };
 
 export default palletTown;
