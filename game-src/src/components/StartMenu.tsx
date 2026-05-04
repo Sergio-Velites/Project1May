@@ -18,8 +18,10 @@ import {
   save,
   selectName,
   selectPokemon,
+  selectGameState,
   updateSpecificPokemon,
 } from "../state/gameSlice";
+import { saveToCloud, getCurrentUserId } from "../app/cloud-save";
 import PokemonList from "./PokemonList";
 import { DEBUG_MODE } from "../app/constants";
 import { getPokemonStats } from "../app/use-pokemon-stats";
@@ -29,6 +31,7 @@ const StartMenu = () => {
   const show = useSelector(selectStartMenu);
   const disabled = useSelector(selectStartMenuSubOpen);
   const name = useSelector(selectName);
+  const gameState = useSelector(selectGameState);
   const saving = !!useSelector(selectConfirmationMenu);
   const allPokemon = useSelector(selectPokemon);
 
@@ -77,6 +80,8 @@ const StartMenu = () => {
                   postMessage: `¡${name} guardó la partida!`,
                   confirm: () => {
                     dispatch(save());
+                    const userId = getCurrentUserId();
+                    if (userId) saveToCloud(userId, gameState);
                   },
                 })
               );
