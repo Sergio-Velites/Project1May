@@ -6,10 +6,12 @@ const SUPABASE_URL =
   "https://kplfjrjibjptigvfgdvy.supabase.co";
 
 // In-memory current user ID (also persisted in localStorage)
-let currentUserId: string | null = null;
+// Se inicializa con el valor de localStorage para que persista entre recargas.
+let currentUserId: string | null = localStorage.getItem("wedding_user_id");
 
 export const setCurrentUserId = (id: string) => {
   currentUserId = id;
+  localStorage.setItem("wedding_user_id", id);
 };
 
 export const getCurrentUserId = () => currentUserId;

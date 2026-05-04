@@ -427,4 +427,6 @@ export const selectCaughtPokemon = (state: RootState) => state.game.caughtPokemo
 export const selectActivePokemonIndex = (state: RootState) =>
   state.game.activePokemonIndex;
 
+export const selectGameState = (state: RootState) => state.game;
+
 export default gameSlice.reducer;
