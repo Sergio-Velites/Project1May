@@ -36,16 +36,18 @@ const useQuests = () => {
   const playerName = useSelector(selectName);
 
   const quests: QuestType[] = [
-    // ── House A 1F: madre bloquea la salida hasta que el jugador recibe la bronca ─
+    // ── House A 1F: madre bronca nada más bajar las escaleras ─────────────────
     {
       trigger: "walk",
       map: MapId.PalletTownHouseA1F,
       positions: {
-        7: [2, 3],
+        3: [2, 3, 4, 5],
+        4: [1, 2, 5, 6],
+        5: [1, 2, 5, 6],
       },
       active: () => !completedQuests.includes("madre-bronca-done"),
       text: [
-        `¡${playerName.toUpperCase()}! ¡Que coño haces!`,
+        `¡${playerName.toUpperCase()}! ¡Qué coño haces!`,
         "¿Te has quedado otra vez jugando?",
         "¡Ya te lo dije! ¡Es un día importante!",
         "¡El Profesor Oak te está esperando!",
@@ -54,7 +56,6 @@ const useQuests = () => {
         "¡Yo ya me voy a comprar mucho anís!",
       ],
       action: () => {
-        dispatch(setPos({ x: 3, y: 6 }));
         dispatch(completeQuest("madre-bronca-done"));
       },
     },
