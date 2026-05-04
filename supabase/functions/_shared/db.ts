@@ -5,9 +5,9 @@ export const db = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-export const RP_ID     = Deno.env.get("RP_ID")     ?? "localhost";
+export const RP_ID     = Deno.env.get("RP_ID")     ?? "game.bodasym26.es";
 export const RP_NAME   = Deno.env.get("RP_NAME")   ?? "La Boda";
-export const RP_ORIGIN = Deno.env.get("RP_ORIGIN") ?? "http://localhost:3000";
+export const RP_ORIGIN = Deno.env.get("RP_ORIGIN") ?? "https://game.bodasym26.es";
 
 export function encodeBase64Url(bytes: Uint8Array): string {
   let binary = "";
