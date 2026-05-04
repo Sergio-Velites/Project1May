@@ -79,6 +79,7 @@ const LoadScreen = () => {
   const [phase, setPhase] = useState<Phase>("checking");
   const [loaded, setLoaded] = useState(false);
   const [confirmedName, setConfirmedName] = useState<string | null>(null);
+  const [registrationFailed, setRegistrationFailed] = useState(false);
   const cloudSave = useRef<GameState | null>(null);
 
   const loadComplete = () => {
@@ -228,27 +229,41 @@ const LoadScreen = () => {
                 label: "Activar guardado",
                 action: async () => {
                   setPhase("registering");
-                  const userId = await webauthnRegister();
-                  if (userId) {
-                    setCurrentUserId(userId);
-                    const save = await loadFromCloud(userId);
-                    if (save) {
-                      cloudSave.current = save as GameState;
-                      setPhase("choose");
-                      return;
+                  try {
+                    const userId = await webauthnRegister();
+                    if (userId) {
+                      setCurrentUserId(userId);
+                      const save = await loadFromCloud(userId);
+                      if (save) {
+                        cloudSave.current = save as GameState;
+                        setPhase("choose");
+                        return;
+                      }
+                      setPhase("oak-intro");
+                    } else {
+                      // Falló el registro (Edge Function o usuario canceló)
+                      setRegistrationFailed(true);
+                      setPhase("require-passkey");
                     }
-                    setPhase("oak-intro");
-                  } else {
-                    // Registration failed — stay on require-passkey
+                  } catch {
+                    setRegistrationFailed(true);
                     setPhase("require-passkey");
                   }
                 },
               },
               {
-                label: "Reintentar",
-                action: () => {
-                  window.location.reload();
-                },
+                label: registrationFailed ? "Jugar sin guardar" : "Reintentar",
+                action: registrationFailed
+                  ? () => {
+                      // Fallback local: UUID sin Supabase → el juego funciona
+                      const localId = crypto.randomUUID();
+                      localStorage.setItem("wedding_user_id", localId);
+                      setCurrentUserId(localId);
+                      setPhase("oak-intro");
+                    }
+                  : () => {
+                      window.location.reload();
+                    },
               },
             ]}
           />
