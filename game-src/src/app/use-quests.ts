@@ -41,6 +41,7 @@ const useQuests = () => {
       trigger: "walk",
       map: MapId.PalletTownHouseA1F,
       positions: {
+        2: [6],
         3: [2, 3, 4, 5],
         4: [1, 2, 5, 6],
         5: [1, 2, 5, 6],
