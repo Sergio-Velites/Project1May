@@ -10,51 +10,50 @@ Motor base: [chase-manning/pokemon-js](https://github.com/chase-manning/pokemon-
 ## Características implementadas
 
 - Motor completo estilo Pokémon Rojo/Azul: combates, Pokédex, ítems, guardado, evoluciones
-- **Mecánicas Gen I fieles al original**: growth rates (4 grupos), fórmulas XP, stat stages, críticos 10%, captura con 4 sacudidas reales
-- **Narrativa de boda** integrada en cada zona: textos, NPCs y diálogos temáticos
+- **Mecánicas Gen I fieles al original**: growth rates (4 grupos), fórmulas XP, stat stages, críticos 10%, captura con 4 sacudidas reales, drain/recoil, flinch, leech-seed, counter, metronome, super-fang, dream-eater
+- **Narrativa de boda** integrada en todos los actos I–V: textos, NPCs y diálogos temáticos
 - 3 starters interactivos en el laboratorio con modal centrado (←/→ para Sí/No)
 - Passkey / Face ID para guardar partida; fallback local sin bucles si el registro falla
 - Video de introducción saltable · Intro del Prof. Oak con efecto typewriter
 - Layout Game Boy Color responsive (escritorio y móvil, aspect ratio 3:5 fijo)
 - NPCs con diálogo puro (sin combate) que se giran hacia el jugador al hablar
 - Team Rocket en salida norte desaparecen cuando el jugador tiene ≥1 pokémon
-- Pasajes de texto dependientes de estado (estado del juego → texto diferente)
-- `hideCondition` en TrainerType: ocultar NPCs según condición de juego
+- Entrenadores derrotados permanecen visibles en el mapa y saludan con su `outtro`
+- Evolución de pokémon aprende movimientos del nuevo formulario automáticamente
+- Recuperación tras KO siempre en el último Centro Pokémon donde se curó
+- **Batallas online** entre invitados: scientist NPC en los centros Pokémon carga el equipo de otro jugador desde Supabase y lanza la batalla en tiempo real
 
-## Narrativa completa (hoja de ruta)
+## Narrativa completa
 
 ### Acto I — Pueblo Paleta / DESTILERÍA DEL PROF. OAK ✅
 - Habitación del jugador → madre → laboratorio → 3 starters
 - Team Rocket bloquean la salida norte hasta tener pokémon
-- Prof. Oak da el discurso de bienvenida y anima a ir al bosquecillo
+- Prof. Oak da el discurso de bienvenida a la boda
 
-### Acto II — Ruta 1 🔲
-- **NPC "invitado cabreado"** (youngster): _"¡No te creas que llegarás tan fácil! ¡Yo quería el vino y tú me lo quitaste!"_ → combate opcional
-- **NPC "abuela del anís"** (beauty, no combate): _"¡No olvides que la preboda sin anís no es preboda!"_
-- Hierba con encuentros aleatorios ya funcional
+### Acto II — Ruta 1 · Camino al Soto ✅
+- NPC **invitado cabreado** (youngster, combate): _"¡Yo quería el vino y tú me lo quitaste!"_
+- NPC **abuela del anís** (beauty, decorativo): _"¡La preboda sin anís no es preboda!"_
+- Mensajero, pescador y marinero con diálogos temáticos de boda
 
-### Acto III — SOTO LEZKAIRU (ex Ciudad Añil / Viridian City) 🔲
-- Nombre del mapa renombrado a **"SOTO LEZKAIRU"**
-- **Grupo de "no invitados"** con anti-preboda de vino barato (trainers combatibles)
-- NPC que desafía: _"¡Si me ganas, te diré dónde está escondida la reserva especial!"_
-- **Maestro del Vino** (NPC izquierda): enseña a usar _"Vino Tinto"_ como ítem de curación
-- Team Rocket norte intentando robar un barril: _"¡Con este vino seremos los reyes de la fiesta!"_
-- PokéCenter y PokéMart con textos de boda
+### Acto III — SOTO LEZKAIRU ✅
+- Mapa renombrado de Viridian City
+- Grupo **anti-preboda** (cueBall + jrTrainerFemale, combatibles)
+- **Team Rocket** robando la reserva de vino (combate, 200 pokedólares)
+- **Maestro del Vino** (gentleman, decorativo + quest): da SodaPop como _"Vino Tinto"_ una sola vez
+- DJ preparando el equipo, carteles temáticos de Lezkairu
 
-### Acto IV — EL BOSQUECILLO (ex Bosque Viridian / Viridian Forest) 🔲
-- Nombre renombrado a **"EL BOSQUECILLO"**
-- NPCs apuran al jugador: _"¡Corre, que la barra libre se acaba!"_
-- Team Rocket intermedio: _"¡Queríamos los Pokémon de la boda, pero nos llevamos este anís de mientras!"_
-- Encuentros de pokémon salvajes ya funcionales
+### Acto IV — EL BOSQUECILLO ✅
+- Mapa renombrado de Viridian Forest
+- NPCs decorativos que apuran al jugador: _"¡Corre, que la barra libre se acaba!"_
+- Team Rocket bloqueando el paso (combate, 150 pokedólares)
+- Hierba densa con encuentros aleatorios funcionales
 
-### Acto V — VILLAMAYOR DE MONJARDÍN (ex Ciudad Plateada / Pewter City) 🔲
-- Nombre renombrado a **"VILLAMAYOR DE MONJARDÍN"**
-- NPCs brindan: _"¡Aquí se hace vino del bueno, pero primero tienes que ganar!"_
-- **Bodega CASTILLO DE MONJARDÍN** (ex Gimnasio): tipo **"Vino"** (ficticio, referenciado explícitamente)
-- **Líderes Sergio y Marta** esperan entre barricas:
-  - Intro: _"¡Te lo advertimos, aquí se sirve vino… solo si nos vences primero!"_
-  - Victoria: _"¡Nos vemos el 8 de agosto, y esta vez tú brindas con nosotros!"_
-- Obtener la **Insignia del Vino** al ganar
+### Acto V — VILLAMAYOR DE MONJARDÍN ✅
+- Mapa renombrado de Pewter City
+- **Bodega CASTILLO DE MONJARDÍN** (ex gimnasio): tipo VINO
+- Guardián de la bodega (sailor) antes de los líderes
+- **Líderes Sergio** (aceTrainerMale) y **Marta** (aceTrainerFemale) con intro y outtro de boda
+- **Insignia del Vino** (`BoulderBadge`) + TM34 al ganar
 
 ---
 
@@ -63,7 +62,7 @@ Motor base: [chase-manning/pokemon-js](https://github.com/chase-manning/pokemon-
 | Capa | Tecnología |
 |---|---|
 | Shell | Next.js 16 (App Router) + TypeScript |
-| Juego | React 18 + TypeScript + Redux + styled-components (CRA build) |
+| Juego | React 18 + TypeScript + Redux Toolkit + styled-components (CRA build) |
 | Despliegue | Vercel |
 | Guardado | Supabase + WebAuthn passkey |
 
@@ -82,7 +81,7 @@ npm run dev
 
 ### Editar el juego (fuente)
 
-El código fuente del juego está en `game-src/src/` (ya incluido en este repo).  
+El código fuente del juego está en `game-src/src/` (incluido en este repo).  
 **No hay que clonar nada extra.**
 
 ```bash
@@ -98,6 +97,25 @@ cd game-src && npm install --legacy-peer-deps
 
 # Copiar build y limpiar bundle anterior (sustituir OLDHASH):
 cp -r game-src/build/* public/game/
+rm -f public/game/static/js/main.OLDHASH.js \
+      public/game/static/js/main.OLDHASH.js.LICENSE.txt
+
+# Commit y push:
+git add public/game/ game-src/src/
+git commit -m "feat: descripción"
+git push origin local-src
+
+# Sincronizar master:
+git checkout master && git merge local-src --no-edit && git push origin master && git checkout local-src
+```
+
+---
+
+## Licencia
+
+Basado en [chase-manning/pokemon-js](https://github.com/chase-manning/pokemon-js), licencia MIT.  
+Sprites y assets originales del repo base. Sin ROMs ni assets de Nintendo.
+
 rm -f public/game/static/js/main.OLDHASH.js \
       public/game/static/js/main.OLDHASH.js.LICENSE.txt
 
