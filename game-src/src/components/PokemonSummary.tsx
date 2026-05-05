@@ -112,12 +112,14 @@ const TypeTag = styled.span`
 const SpriteBox = styled.div`
   border-right: 2px solid #181010;
   width: 44%;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg);
   padding: 4px;
+  overflow: hidden;
 `;
 
 const SpriteImg = styled(PixelImage)`
@@ -132,6 +134,7 @@ const InfoBlock = styled(Col)`
   gap: 2px;
   justify-content: space-between;
   overflow: hidden;
+  min-height: 0;
 `;
 
 interface BarProps { $pct: number; $color: string; }

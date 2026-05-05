@@ -1,4 +1,4 @@
-import { bugCatcher } from "../app/npcs";
+import { bugCatcher, beauty, lass, teamRocketGrunt } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/viridian-forrest.png";
 import { Direction } from "../state/state-types";
@@ -6,7 +6,7 @@ import getEncounterData from "./get-location-data";
 import { MapId, MapType } from "./map-types";
 
 const viridianForrest: MapType = {
-  name: "Viridian Forrest",
+  name: "EL BOSQUECILLO",
   image,
   height: 48,
   width: 34,
@@ -167,7 +167,7 @@ const viridianForrest: MapType = {
       ],
     },
     1: {
-      2: ["SALIENDO DEL BOSQUE AÑIL", "CIUDAD PLATEADA ADELANTE"],
+      2: ["SALIENDO DEL BOSQUECILLO", "VILLAMAYOR DE MONJARDÍN ADELANTE"],
     },
   },
   maps: {
@@ -248,6 +248,37 @@ const viridianForrest: MapType = {
         x: 30,
         y: 33,
       },
+    },
+    {
+      npc: beauty,
+      facing: Direction.Down,
+      pokemon: [{ id: 16, level: 4 }],
+      intro: [],
+      outtro: ["¡Corre, que la barra libre se acaba!"],
+      money: 0,
+      pos: { x: 8, y: 10 },
+    },
+    {
+      npc: lass,
+      facing: Direction.Right,
+      pokemon: [{ id: 35, level: 4 }],
+      intro: [],
+      outtro: ["¡El DJ ya está calentando! ¡Mueve las piernas!"],
+      money: 0,
+      pos: { x: 20, y: 38 },
+    },
+    {
+      npc: teamRocketGrunt,
+      facing: Direction.Down,
+      pokemon: [{ id: 52, level: 7 }, { id: 41, level: 6 }],
+      intro: [
+        "¡Teníamos un plan perfecto!",
+        "¡Queríamos los Pokémon de la boda!",
+        "...pero nos llevamos este anís de mientras.",
+      ],
+      outtro: ["¡Que disfrutes de la preboda, crío!"],
+      money: 150,
+      pos: { x: 16, y: 6 },
     },
   ],
   items: [

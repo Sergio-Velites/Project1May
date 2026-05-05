@@ -51,7 +51,7 @@ desde dentro de `game-src/`.
 
 ---
 
-## Estado actual del juego (commit 0a0e413)
+## Estado actual del juego (commit 21b4156)
 
 ### Flujo de inicio
 1. **GameboyMenu** → menú de encendido
@@ -62,44 +62,201 @@ desde dentro de `game-src/`.
    - Si el registro falla → opción "Jugar sin guardar" (UUID local, sin Supabase)
    - Si no hay partida guardada → solo "Nueva partida"
    - Si hay partida → "Continuar" + "Nueva partida"
+   - `choosingRef` guard atómico previene race condition doble-A → Oak intro falso
 5. **OakIntro** → intro del Profesor Oak con typewriter (solo en nueva partida)
+   - Pulsar A en panel "NUEVO NOMBRE" ya funciona (antes requería click táctil)
 6. **NameKeyboard** → elegir nombre del jugador (solo en nueva partida)
 7. Juego comienza en `PalletTownHouseA2F` (habitación del jugador), sin pokémon
-
-> ⚠️ **BUG CONOCIDO**: Al elegir "Continuar" con una partida guardada, a veces aparece
-> la intro del Profesor Oak. Ocurre porque `handleContinue` en LoadScreen llama `loadComplete()`
-> pero el estado de fase queda en `"choose"`. Pendiente: verificar que `phase` se resetee
-> correctamente tras `dispatch(loadFromState(...))`.
 
 ### Estado inicial del jugador
 - Sin pokémon en equipo ni en PC
 - Mapa: `PalletTownHouseA2F` pos (3,6)
 - Inventario: 2 Pokéballs
 - `defeatedTrainers: ["pallet-town-lab-5-1", "pallet-town-house-a-1f-6-3", "pallet-town-10-0", "pallet-town-11-0"]`
-  - `pallet-town-lab-5-1`: Oak pre-derrotado (evita combate)
-  - `pallet-town-house-a-1f-6-3`: madre pre-derrotada
-  - `pallet-town-10-0` y `pallet-town-11-0`: Team Rocket pre-derrotados (solo visibles si `outtro` lo permite; con `persistent:true` siguen apareciendo)
+  - `pallet-town-lab-5-1`: Oak pre-derrotado (evita combate automático)
+  - `pallet-town-house-a-1f-6-3`: madre pre-derrotada (`persistent:true` → muestra `outtro`)
+  - `pallet-town-10-0`, `pallet-town-11-0`: Team Rocket pre-derrotados
+    - `persistent:true` + `hideCondition:"has-pokemon"` → visibles solo sin pokémon
 
-> ⚠️ **PATRÓN NPCs SIEMPRE VISIBLES**: Para que un NPC persista visualmente tras ser
-> "derrotado" (sin que desaparezca del mapa), usar `persistent: true` en el `TrainerType`.
-> Sin `persistent`, el NPC desaparece del mapa cuando su ID está en `defeatedTrainers`.
-> Para ocultar un NPC cuando se cumple una condición, NO usar `persistent`.
+### Acto I — DESTILERÍA DEL PROF. OAK / Pueblo Paleta ✅
+1. Jugador despierta en habitación 2F → baja a cocina
+2. **Madre (beauty, x:6,y:3, persistent)** → quest walk bronca en `house-a-1f`
+3. Sale de casa → Pueblo Paleta
+4. **Team Rocket norte** (x:10-11, y:0): `persistent+hideCondition="has-pokemon"`
+   - Sin pokémon: visibles, bloquean con diálogo, quest walk devuelve al jugador a y:3
+   - Con ≥1 pokémon: desaparecen visualmente Y no responden al pulsar A
+5. **Laboratorio** (x:12, y:11) → **Oak NPC** (x:5,y:1, persistent) → discurso de boda
+6. **3 pokéballs** (x:6,7,8 y:3) → modal `LabPokeballModal` en screen space → starter
+7. Con pokémon: quest walk norte ya no activa → puede subir a Ruta 1
 
-### Narrativa del primer acto
-1. Jugador en su habitación → baja a cocina
-2. **Madre (beauty NPC)** en `house-a-1f` pos (x:6,y:3), `persistent:true`
-   - `intro:[]` → sin combate; texto `outtro` al hablar
-   - Ya en `defeatedTrainers` de inicio → muestra `outtro` directamente al hablar
-3. En **Pallet Town** norte (y:2 cols 10-11): quest walk bloquea si `pokemon.length===0`
-   - Team Rocket en `{x:10,y:0}` y `{x:11,y:0}`, `persistent:true`
-   - Desaparecen (no persistent) una vez que el jugador tiene pokémon → NO, siguen visibles
-   - Para ocultarlos cuando el jugador ya tiene pokémon: quitar `persistent:true`
-4. En el **Laboratorio** (pallet-town-lab): 3 pokéballs en mesa `{x:6,y:3}` `{x:7,y:3}` `{x:8,y:3}`
-   - Componente `LabPokeball.tsx` (sprite world) + `LabPokeballModal.tsx` (modal pantalla)
-   - El modal se renderiza **fuera** del `BackgroundContainer` → centrado en pantalla siempre
-   - `pokeballCardId` en `uiSlice` → incluido en `selectMenuOpen` → freeze automático
-   - ← / → para cambiar Sí/No en el modal
-5. Con ≥1 pokémon: quest walk de Ruta 1 ya no está `active` → puede pasar
+---
+
+## Narrativa completa — Hoja de ruta de implementación
+
+### Acto II — RUTA 1 🔲 (maps/route-1.ts)
+**Renombrar**: el campo `name` ya dice "Route 1" — cambiar a `"Ruta 1 · Camino al Soto"`
+
+**NPCs a añadir** (en `route-1.ts`, array `trainers`):
+
+```typescript
+// NPC combatible: "invitado cabreado" — youngster en posición media de la ruta
+{
+  npc: youngster,
+  pokemon: [{ id: 21, level: 3 }],  // Spearow
+  facing: Direction.Left,
+  pos: { x: 12, y: 18 },
+  intro: [
+    "¡Para ahí, tú!",
+    "¡No te creas que llegarás tan fácil!",
+    "¡Yo quería el vino y tú me lo quitaste!",
+  ],
+  outtro: ["Bueno... puede que yo tampoco llegue a tiempo."],
+  money: 50,
+}
+
+// NPC decorativo: "abuela del anís" — beauty, sin combate
+{
+  npc: beauty,
+  pokemon: [{ id: 35, level: 3 }],
+  facing: Direction.Right,
+  pos: { x: 7, y: 28 },
+  intro: [],
+  outtro: ["¡No olvides que la preboda sin anís no es preboda!"],
+  money: 0,
+}
+```
+
+### Acto III — SOTO LEZKAIRU (ex Viridian City) 🔲 (maps/viridian-city.ts)
+**Renombrar**: `name: "SOTO LEZKAIRU"` · Textos del mapa actualizados
+
+**Cambios en `viridian-city.ts`**:
+- `text`: actualizar todos los carteles con temática de boda y Lezkairu
+- `trainers`: añadir grupo de "no invitados" (combatibles) + Maestro del Vino (NPC decorativo)
+
+```typescript
+// Anti-preboda — grupo combatible de 2-3 trainers
+{
+  npc: cueBall,
+  pokemon: [{ id: 19, level: 4 }],
+  facing: Direction.Down,
+  pos: { x: 15, y: 8 },
+  intro: [
+    "¡Hemos montado nuestra propia preboda!",
+    "¡Con vino barato y sin protocolo!",
+    "¡Demuestra que mereces el bueno!",
+  ],
+  outtro: ["...igual el vino caro tampoco está tan mal."],
+  money: 80,
+}
+
+// Maestro del Vino — NPC decorativo que enseña el ítem "Vino Tinto"
+// Usa showTextThenAction + addItem (ItemType.SodaPop como proxy de "Vino Tinto")
+{
+  npc: gentleman,
+  pokemon: [{ id: 1, level: 1 }],
+  facing: Direction.Down,
+  pos: { x: 6, y: 14 },
+  intro: [],
+  outtro: [
+    "Joven, el vino tinto cura... y anima.",
+    "Toma una botella para el camino.",
+  ],
+  money: 0,
+}
+// → quest "talk" en use-quests.ts da SodaPop como "Vino Tinto" 1 vez
+
+// Team Rocket norte — intentando robar barril
+{
+  npc: teamRocketGrunt,
+  pokemon: [{ id: 33, level: 5 }, { id: 52, level: 4 }],
+  facing: Direction.Down,
+  pos: { x: 19, y: 3 },
+  intro: [
+    "¡Con este vino seremos los reyes de la fiesta!",
+    "¡No te metas en nuestros asuntos!",
+  ],
+  outtro: ["¡Maldición! ¡Nos retiramos... pero volveremos por el anís!"],
+  money: 200,
+}
+```
+
+### Acto IV — EL BOSQUECILLO (ex Viridian Forest) 🔲 (maps/viridian-forrest.ts)
+**Renombrar**: `name: "EL BOSQUECILLO"`
+
+**NPCs a añadir**:
+```typescript
+// NPCs que apuran — decorativos dispersos por el bosque
+{ intro: [], outtro: ["¡Corre, que la barra libre se acaba!"], ... }
+{ intro: [], outtro: ["¡El DJ ya está calentando! ¡Mueve las piernas!"], ... }
+
+// Team Rocket bloqueando el paso
+{
+  intro: [
+    "¡Teníamos un plan perfecto!",
+    "¡Queríamos los Pokémon de la boda!",
+    "...pero nos llevamos este anís de mientras.",
+  ],
+  outtro: ["¡Que disfrutes de la preboda, crío!"],
+  money: 150,
+}
+```
+
+### Acto V — VILLAMAYOR DE MONJARDÍN (ex Pewter City) 🔲 (maps/pewter-city.ts)
+**Renombrar**: `name: "VILLAMAYOR DE MONJARDÍN"`
+
+**Cambios**:
+- Textos de NPCs y carteles: temática de vino de Monjardín
+- **Bodega CASTILLO DE MONJARDÍN** (ex pewter-city-gym.ts):
+  - `name: "Bodega CASTILLO DE MONJARDÍN"`
+  - `text` de la puerta: _"Gimnasio de tipo VINO"_ (aunque Vino no sea tipo oficial Pokémon, se referencia explícitamente)
+  - Trainer previo (ex jrTrainerMale): invitado que guarda la entrada
+  - Líderes **Sergio y Marta** (usar `aceTrainerMale` + `aceTrainerFemale` o `gentleman` + `beauty`):
+
+```typescript
+// Sergio — primer líder
+{
+  npc: aceTrainerMale,
+  pokemon: [{ id: 58, level: 14 }, { id: 77, level: 12 }],
+  facing: Direction.Down,
+  pos: { x: 4, y: 3 },
+  intro: [
+    "¡Te lo advertimos!",
+    "Aquí entre barricas solo se habla de vino.",
+    "...y de Pokémon.",
+    "¡Demuestra que mereces brindar con nosotros!",
+  ],
+  outtro: [
+    "¡Bien hecho!",
+    "Nos vemos el 8 de agosto.",
+    "Y esta vez tú brindas con nosotros.",
+  ],
+  money: 1400,
+}
+// Marta — segundo líder (pos adyacente)
+{
+  npc: aceTrainerFemale,
+  pokemon: [{ id: 12, level: 16 }, { id: 36, level: 14 }],
+  ...
+}
+```
+- Al ganar → añadir `ItemType.BoulderBadge` renombrado a **"Insignia del Vino"** en el texto de victoria
+  (el ítem BoulderBadge ya existe en el sistema de badges)
+
+---
+
+## `hideCondition` — Sistema de visibilidad condicional de NPCs
+
+Campo en `TrainerType`:
+```typescript
+hideCondition?: "has-pokemon";
+```
+
+Evaluado en **dos capas**:
+1. **`Game.tsx`** → filtro de render: NPC no se dibuja si la condición se cumple
+2. **`TrainerEncounter.tsx`** → handler de A: interacción ignorada aunque el jugador esté encima
+
+Para añadir nuevas condiciones: extender el tipo union y añadir el check en ambos sitios.
+Ejemplo futuro: `hideCondition?: "has-pokemon" | "has-badge-1" | "quest-done:X"`
 
 ---
 

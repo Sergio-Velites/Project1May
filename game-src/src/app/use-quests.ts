@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MapId } from "../maps/map-types";
 import useBadges from "./use-badges";
 import {
+  addInventory,
   completeQuest,
   moveLeft,
   selectCompletedQuests,
@@ -11,6 +12,7 @@ import {
   setPos,
   takeMoney,
 } from "../state/gameSlice";
+import { ItemType } from "./use-item-data";
 import { setBlackScreen, showConfirmationMenu } from "../state/uiSlice";
 
 export interface QuestType {
@@ -68,8 +70,11 @@ const useQuests = () => {
       },
       active: () => pokemon.length === 0,
       text: [
-        "¡Aquí no pasa nadie sin un POKEMON!",
-        "¡Ve al laboratorio primero!",
+        "Viva el vino!",
+        "Hip! ¡Aquí no pasa nadie sin un POKEMON!",
+        "Hip! Habla con el borracho Oak y ",
+        "que te de uno, hip!",
+        "antes de que se los beba todos, hip!",
       ],
       action: () => {
         dispatch(setPos({ x: pos.x, y: 3 }));
@@ -86,9 +91,9 @@ const useQuests = () => {
       },
       active: () => badges.length === 0,
       text: [
-        "You're a Trainer, right?",
-        "Brock's looking for new challengers.",
-        "Follow me!",
+        "¡Ey, tú!",
+        "¿Buscas la Bodega de MONJARDÍN?",
+        "¡Sígueme, que te la enseño!",
       ],
       action: () => {
         dispatch(moveLeft());
@@ -108,12 +113,12 @@ const useQuests = () => {
         4: [9, 10],
       },
       active: () => !completedQuests.includes("pewter-museum-1f-paid"),
-      text: ["It's $50 for a child's ticket."],
+      text: ["El acceso a la Bodega tiene un precio...", "¡50 pokedólares!"],
       action: () => {
         dispatch(
           showConfirmationMenu({
-            preMessage: "Would you like to come in?",
-            postMessage: "Right $50! Thank you!",
+            preMessage: "¿Deseas ver la colección de vinos?",
+            postMessage: "¡Gracias! ¡Buen provecho!",
             confirm: () => {
               dispatch(completeQuest("pewter-museum-1f-paid"));
               dispatch(takeMoney(50));
@@ -123,6 +128,23 @@ const useQuests = () => {
             },
           })
         );
+      },
+    },
+    // Soto Lezkairu — Maestro del Vino da SodaPop ("Vino Tinto") una sola vez
+    {
+      trigger: "walk",
+      map: MapId.ViridianCity,
+      positions: {
+        23: [8],
+      },
+      active: () => !completedQuests.includes("vino-tinto-dado"),
+      text: [
+        "El MAESTRO DEL VINO te da una botella de VINO TINTO.",
+        "¡Úsala cuando más lo necesites!",
+      ],
+      action: () => {
+        dispatch(addInventory({ item: ItemType.SodaPop, amount: 1 }));
+        dispatch(completeQuest("vino-tinto-dado"));
       },
     },
   ];
