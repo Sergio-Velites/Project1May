@@ -51,7 +51,7 @@ desde dentro de `game-src/`.
 
 ---
 
-## Estado actual del juego (commit 21b4156)
+## Estado actual del juego (commit b2c12f3)
 
 ### Flujo de inicio
 1. **GameboyMenu** → menú de encendido
@@ -385,6 +385,9 @@ No usar trainers para esto (siempre fuerzan combate).
 | `game-src/src/maps/house-a-2f.ts` | Habitación del jugador (start) |
 | `game-src/src/app/move-metadata.ts` | ~24k líneas. Nombres oficiales ES de movimientos |
 | `game-src/src/app/npcs.ts` | 40+ tipos de NPC con sprites |
+| `game-src/src/app/level-helper.ts` | 4 fórmulas growth rate Gen I exactas (Fast/Med-Fast/Med-Slow/Slow) |
+| `game-src/src/app/xp-helper.ts` | Fórmula XP Gen I: `floor(base*level/7)`, ×1.5 entrenador |
+| `game-src/src/app/pokemon-metadata.ts` | Metadatos 151 Pokémon incluyendo campo `growthRate` |
 
 ---
 
