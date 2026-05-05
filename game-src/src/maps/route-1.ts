@@ -95,7 +95,7 @@ const route1: MapType = {
       npc: beauty,
       pokemon: [{ id: 35, level: 2 }],
       facing: Direction.Right,
-      pos: { x: 5, y: 28 },
+      pos: { x: 7, y: 20 },
       intro: [],
       outtro: ["¡No olvides que la preboda sin anís no es preboda!"],
       money: 0,

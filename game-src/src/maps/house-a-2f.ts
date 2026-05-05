@@ -20,7 +20,7 @@ const houseA2f: MapType = {
   },
   text: {
     5: {
-      3: ["¡Estás jugando a la SNES!", "... ¡Vamos! ¡Es hora de salir!"],
+      3: ["¡Estás jugando al Super Smash Brosh en la Nintendo 64!", "... ¡Vamos! ¡Es hora de salir!"],
     },
     1: {
       0: ["Enciendes el PC.", "No funciona..."],

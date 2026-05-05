@@ -43,44 +43,56 @@ const Overlay = styled.div`
   background: rgba(0, 0, 0, 0.55);
 `;
 
+/* Layout horizontal: sprite izquierda + texto/botones derecha */
 const Card = styled.div`
   background: var(--bg);
   border: 3px solid #181010;
   font-family: "PokemonGB", monospace;
-  font-size: 7cqw;
-  @media (min-width: 600px) {
-    font-size: 1.8vh;
-  }
+  font-size: 5cqw;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  padding: 6px;
-  gap: 4px;
-  width: 80%;
-  max-width: 240px;
-  max-height: 92%;
-  overflow-y: auto;
+  padding: 5px;
+  gap: 6px;
+  width: 86%;
+  max-width: 260px;
   box-sizing: border-box;
 `;
 
 const PokemonSprite = styled(PixelImage)`
-  width: 32%;
-  max-height: 28cqw;
-  object-fit: contain;
+  height: 14cqw;
+  width: auto;
+  max-width: 14cqw;
   image-rendering: pixelated;
   flex-shrink: 0;
 `;
 
+const RightCol = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+`;
+
+const PokeName = styled.p`
+  font-size: 1em;
+  font-weight: bold;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
 const CardText = styled.p`
   font-size: 0.85em;
-  text-align: center;
-  line-height: 1.6;
+  line-height: 1.5;
   margin: 0;
 `;
 
 const BtnRow = styled.div`
   display: flex;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 `;
 
@@ -88,7 +100,7 @@ const Btn = styled.button<{ $active: boolean }>`
   flex: 1;
   font-family: "PokemonGB", monospace;
   font-size: 0.9em;
-  padding: 4px 0;
+  padding: 3px 0;
   border: 2px solid #181010;
   background: ${(p) => (p.$active ? "#181010" : "var(--bg)")};
   color: ${(p) => (p.$active ? "var(--bg)" : "#181010")};
@@ -177,18 +189,18 @@ const StarterCard = ({ pokemonId }: { pokemonId: number }) => {
     <Overlay>
       <Card>
         <PokemonSprite src={meta.images.front} alt={meta.name} />
-        <CardText>
-          ¿Quieres a {meta.name.toUpperCase()}
-          {"\n"}como tu compañero?
-        </CardText>
-        <BtnRow>
-          <Btn $active={btnIndex === 0} onClick={() => setBtnIndex(0)}>
-            SÍ
-          </Btn>
-          <Btn $active={btnIndex === 1} onClick={() => setBtnIndex(1)}>
-            NO
-          </Btn>
-        </BtnRow>
+        <RightCol>
+          <PokeName>{meta.name.toUpperCase()}</PokeName>
+          <CardText>¿Lo quieres como compañero?</CardText>
+          <BtnRow>
+            <Btn $active={btnIndex === 0} onClick={() => setBtnIndex(0)}>
+              SÍ
+            </Btn>
+            <Btn $active={btnIndex === 1} onClick={() => setBtnIndex(1)}>
+              NO
+            </Btn>
+          </BtnRow>
+        </RightCol>
       </Card>
     </Overlay>
   );

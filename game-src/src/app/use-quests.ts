@@ -135,7 +135,7 @@ const useQuests = () => {
       trigger: "walk",
       map: MapId.ViridianCity,
       positions: {
-        23: [8],
+        23: [27],
       },
       active: () => !completedQuests.includes("vino-tinto-dado"),
       text: [

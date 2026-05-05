@@ -150,7 +150,7 @@ const viridianCity: MapType = {
       npc: cueBall,
       pokemon: [{ id: 19, level: 4 }],
       facing: Direction.Down,
-      pos: { x: 15, y: 10 },
+      pos: { x: 12, y: 20 },
       intro: [
         "¡Hemos montado nuestra propia preboda!",
         "¡Con vino barato y sin protocolo!",
@@ -163,7 +163,7 @@ const viridianCity: MapType = {
       npc: jrTrainerFemale,
       pokemon: [{ id: 41, level: 5 }],
       facing: Direction.Left,
-      pos: { x: 22, y: 15 },
+      pos: { x: 26, y: 24 },
       intro: [
         "¡Nosotros también queremos brindar!",
         "¡Pero solo si nos ganas!",
@@ -175,7 +175,7 @@ const viridianCity: MapType = {
       npc: teamRocketGrunt,
       pokemon: [{ id: 33, level: 5 }, { id: 52, level: 4 }],
       facing: Direction.Down,
-      pos: { x: 10, y: 3 },
+      pos: { x: 11, y: 11 },
       intro: [
         "¡Con este vino seremos los reyes de la fiesta!",
         "¡No te metas en nuestros asuntos!",
@@ -187,7 +187,7 @@ const viridianCity: MapType = {
       npc: gentleman,
       pokemon: [{ id: 1, level: 1 }],
       facing: Direction.Down,
-      pos: { x: 8, y: 22 },
+      pos: { x: 27, y: 22 },
       persistent: true,
       intro: [],
       outtro: [

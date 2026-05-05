@@ -73,7 +73,7 @@ const pewterCityGym: MapType = {
         "Y esta vez tú brindas con nosotros.",
       ],
       facing: Direction.Down,
-      pos: { x: 3, y: 2 },
+      pos: { x: 4, y: 1 },
       postGame: {
         message: [
           "¡Toma la INSIGNIA DEL VINO!",
@@ -97,7 +97,7 @@ const pewterCityGym: MapType = {
         "El 8 de agosto... trae buen vino.",
       ],
       facing: Direction.Down,
-      pos: { x: 6, y: 2 },
+      pos: { x: 5, y: 1 },
     },
   ],
 };
