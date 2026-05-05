@@ -244,6 +244,17 @@ export const gameSlice = createSlice({
             getMoveMetadata(state.pokemon[i].moves[j].id).pp || 0;
         }
       }
+      // Registrar el último centro donde se curó (para recuperación tras derrota)
+      // Resolvemos la ubicación exterior del centro subiendo por exitReturnMap
+      const resolveHealLocation = (mapId: MapId): { map: MapId; pos: PosType } => {
+        const m = mapData[mapId];
+        if (m.recoverLocation) return { map: mapId, pos: m.recoverLocation };
+        if (m.exitReturnMap && m.exitReturnPos)
+          return { map: m.exitReturnMap, pos: m.exitReturnPos };
+        // Fallback: posición actual
+        return { map: state.map, pos: state.pos };
+      };
+      state.lastHealLocation = resolveHealLocation(state.map);
     },
     recoverFromFainting: (state) => {
       // Heal
@@ -258,7 +269,13 @@ export const gameSlice = createSlice({
         }
       }
 
-      // Move
+      // Teleportar al último centro donde curó (si lo hay) o al recoverLocation del mapa
+      if (state.lastHealLocation) {
+        state.map = state.lastHealLocation.map;
+        state.pos = state.lastHealLocation.pos;
+        state.npcFacings = {} as Record<string, Direction>;
+        return;
+      }
       const getRecoverLocation = (map: MapId): { map: MapId; pos: PosType } => {
         const mapData_ = mapData[map];
         if (mapData_.recoverLocation) {
@@ -270,6 +287,7 @@ export const gameSlice = createSlice({
       const { map, pos } = getRecoverLocation(state.map);
       state.map = map;
       state.pos = pos;
+      state.npcFacings = {} as Record<string, Direction>;
     },
     resetActivePokemon: (state) => {
       let fistIndexWithHp = 0;
@@ -311,6 +329,11 @@ export const gameSlice = createSlice({
     },
     defeatTrainer: (state) => {
       if (!state.trainerEncounter) throw new Error("No trainer encounter");
+      // Las batallas online no se guardan en defeatedTrainers (son repetibles)
+      if (state.trainerEncounter.isOnline) {
+        state.trainerEncounter = undefined;
+        return;
+      }
       const id = `${state.map}-${state.trainerEncounter.pos.x}-${state.trainerEncounter.pos.y}`;
       state.defeatedTrainers.push(id);
       state.trainerEncounter = undefined;

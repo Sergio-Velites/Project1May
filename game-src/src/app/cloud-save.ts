@@ -76,6 +76,26 @@ export const loadFromCloud = async (userId: string): Promise<unknown | null> => 
   }
 };
 
+// ---- Lista de jugadores (para batallas online) ----
+
+export interface PlayerEntry {
+  playerId: string;
+  name: string;
+  pokemonCount: number;
+}
+
+export const listPlayers = async (): Promise<PlayerEntry[]> => {
+  if (!SUPABASE_URL) return [];
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/list-players`);
+    if (!res.ok) return [];
+    const { players } = await res.json();
+    return (players ?? []) as PlayerEntry[];
+  } catch {
+    return [];
+  }
+};
+
 // ---- User creation (guest UUID) ----
 
 export const createUser = async (): Promise<string | null> => {

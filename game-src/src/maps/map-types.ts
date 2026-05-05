@@ -87,6 +87,7 @@ export interface TrainerType {
   pos: PosType;
   persistent?: boolean;
   hideCondition?: "has-pokemon";
+  isOnline?: boolean;
   postGame?: {
     message: string[];
     items?: ItemType[];
@@ -131,4 +132,6 @@ export interface MapType {
   stoppers?: Record<number, number[]>;
   trainers?: TrainerType[];
   items?: MapItemType[];
+  /** Posición del NPC de batallas online en este mapa (centros Pokémon) */
+  onlineBattleNpc?: PosType;
 }
