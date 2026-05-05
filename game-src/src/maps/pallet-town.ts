@@ -39,7 +39,7 @@ const palletTown: MapType = {
   text: {
     5: {
       3: ["Tu casa. Volver a dormir no es una opción ahora."],
-      11: ["Casa del vecino. Hoy no hay nadie."],
+      11: ["Casa de Chun Su. Hoy no hay nadie."],
     },
     9: {
       7: ["PUEBLO PALETA. El comienzo de todo."],

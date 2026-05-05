@@ -11,7 +11,7 @@ import useEvent from "../app/use-event";
 import emitter, { Event } from "../app/emitter";
 import {
   hideText,
-  selectStartMenu,
+  selectMenuOpen,
   selectText,
   showText,
 } from "../state/uiSlice";
@@ -102,7 +102,7 @@ const Text = () => {
   const pos = useSelector(selectPos);
   const direction = useSelector(selectDirection);
   const map = useSelector(selectMap);
-  const startMenuOpen = useSelector(selectStartMenu);
+  const menuOpen = useSelector(selectMenuOpen);
   const text = useSelector(selectText);
   const mapId = useSelector(selectMapId);
   const quests = useActiveMapQuests(mapId);
@@ -130,7 +130,7 @@ const Text = () => {
       return;
     }
 
-    if (startMenuOpen) return;
+    if (menuOpen) return;
 
     // Getting coords in front of character
     let { x, y } = pos;
