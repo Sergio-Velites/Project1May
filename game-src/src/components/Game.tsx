@@ -114,11 +114,11 @@ const Game = () => {
           {map.trainers &&
             map.trainers
               .filter((trainer: TrainerType) => {
-                // Ocultar trainers con condición cuando se cumple
+                // Ocultar trainers con hideCondition cuando se cumple
                 if (trainer.hideCondition === "has-pokemon" && playerPokemon.length > 0) return false;
-                if (trainer.persistent) return true;
-                const id = `${mapId}-${trainer.pos.x}-${trainer.pos.y}`;
-                return !defeatedTrainers.includes(id);
+                // Los entrenadores derrotados permanecen visibles en el mapa
+                // (TrainerEncounter.tsx muestra outtro al interactuar con ellos)
+                return true;
               })
               .map((trainer: TrainerType, index: number) => (
                 <Trainer key={index} trainer={trainer} />
