@@ -49,6 +49,7 @@ interface UiState {
   confirmationMenu: ConfimationMenuType | null;
   evolution: EvolutionType | null;
   pokeballCardId: number | null;
+  academyPokeballOpen: boolean;
 }
 
 const initialState: UiState = {
@@ -73,6 +74,7 @@ const initialState: UiState = {
   confirmationMenu: null,
   evolution: null,
   pokeballCardId: null,
+  academyPokeballOpen: false,
 };
 
 export const uiSlice = createSlice({
@@ -200,6 +202,12 @@ export const uiSlice = createSlice({
     closePokeballCard: (state) => {
       state.pokeballCardId = null;
     },
+    openAcademyPokeball: (state) => {
+      state.academyPokeballOpen = true;
+    },
+    closeAcademyPokeball: (state) => {
+      state.academyPokeballOpen = false;
+    },
   },
 });
 
@@ -241,6 +249,8 @@ export const {
   hideEvolution,
   openPokeballCard,
   closePokeballCard,
+  openAcademyPokeball,
+  closeAcademyPokeball,
 } = uiSlice.actions;
 
 export const selectText = (state: RootState) => state.ui.text;
@@ -289,7 +299,8 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.learningMove !== null ||
   state.ui.confirmationMenu !== null ||
   state.ui.evolution !== null ||
-  state.ui.pokeballCardId !== null;
+  state.ui.pokeballCardId !== null ||
+  state.ui.academyPokeballOpen;
 
 export const selectStartMenuSubOpen = (state: RootState) =>
   state.ui.itemsMenu || state.ui.playerMenu;
@@ -316,5 +327,8 @@ export const selectEvolution = (state: RootState) => state.ui.evolution;
 
 export const selectPokeballCardId = (state: RootState) =>
   state.ui.pokeballCardId;
+
+export const selectAcademyPokeballOpen = (state: RootState) =>
+  state.ui.academyPokeballOpen;
 
 export default uiSlice.reducer;

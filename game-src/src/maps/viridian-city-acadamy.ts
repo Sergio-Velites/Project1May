@@ -28,9 +28,10 @@ const viridianCityAcadamy: MapType = {
     },
     4: {
       3: [
-        "TITULO: GUIA PARA NOVIOS.",
-        "Cap. 1: Como compartir un equipo.",
-        "Cap. 2: Entrenando juntos.",
+        "Encontrado este curioso pokemon.",
+        "No sabemos su procedencia",
+        "Juraría que le he escuchado decir un nombre....",
+        "'Soy Jonny, Soy Jonny...'",
       ],
     },
   },

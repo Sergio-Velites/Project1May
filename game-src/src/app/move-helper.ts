@@ -129,6 +129,7 @@ export interface MoveResult {
   critical: boolean;
   isBuff: boolean;
   isDebuff: boolean;
+  isTransform?: boolean;
   statChange?: StatChange; // present for status moves with a known effect
 }
 
@@ -176,6 +177,11 @@ const processMove = (
   // ── Accuracy check ────────────────────────────────────────────────────────
   if (moveMetadata.accuracy && moveMetadata.accuracy < Math.random() * 100) {
     return { ...defaultReturn, missed: true };
+  }
+
+  // ── Transformación (copia stats/tipos/movimientos del rival) ─────────────
+  if (move === "transform") {
+    return { ...defaultReturn, isTransform: true };
   }
 
   // ── Sin efecto (Splash, Teleport, Bide) ──────────────────────────────────

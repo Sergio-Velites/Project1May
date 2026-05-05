@@ -37,6 +37,8 @@ import IntroVideo from "./IntroVideo";
 import Pokedex from "./Pokedex";
 import LabPokeballs from "./LabPokeball";
 import LabPokeballModal from "./LabPokeballModal";
+import AcademyPokeball from "./AcademyPokeball";
+import AcademyPokeballModal from "./AcademyPokeballModal";
 import { selectPokedexOpen, hidePokedex } from "../state/uiSlice";
 
 const Container = styled.div`
@@ -124,6 +126,7 @@ const Game = () => {
               <Item key={index} item={item} />
             ))}
           <LabPokeballs />
+          <AcademyPokeball />
           <DebugOverlay />
         </BackgroundContainer>
         <Character />
@@ -145,6 +148,7 @@ const Game = () => {
       <Evolution />
       <ConfirmationMenu />
       <LabPokeballModal />
+      <AcademyPokeballModal />
       {pokedexOpen && <Pokedex onClose={() => dispatch(hidePokedex())} />}
       <LoadScreen />
       <TitleScreen />

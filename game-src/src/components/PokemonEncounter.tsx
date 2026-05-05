@@ -23,7 +23,7 @@ import {
   seePokemon,
   catchPokemonPokedex,
 } from "../state/gameSlice";
-import usePokemonMetadata from "../app/use-pokemon-metadata";
+import usePokemonMetadata, { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import Frame from "./Frame";
 import HealthBar from "./HealthBar";
 import usePokemonStats from "../app/use-pokemon-stats";
@@ -624,6 +624,10 @@ const PokemonEncounter = () => {
   const [playerStages, setPlayerStages] = useState<StatStages>(DEFAULT_STAGES);
   const [enemyStages, setEnemyStages] = useState<StatStages>(DEFAULT_STAGES);
 
+  // Transformación — se resetea al inicio/fin de cada combate
+  const [transformedId, setTransformedId] = useState<number | null>(null);
+  const [transformedMoves, setTransformedMoves] = useState<{ id: string; pp: number }[]>([]);
+
   const isInBattle = !!enemy && !!active && !!enemyMetadata && !!activeMetadata;
 
   const isTrainer = !!trainer;
@@ -744,6 +748,8 @@ const PokemonEncounter = () => {
       dispatch(resetActivePokemon());
       setPlayerStages(DEFAULT_STAGES);
       setEnemyStages(DEFAULT_STAGES);
+      setTransformedId(null);
+      setTransformedMoves([]);
       setStage(0);
       // Register enemy as SEEN in Pokédex
       dispatch(seePokemon(enemy.id));
@@ -1209,6 +1215,7 @@ const PokemonEncounter = () => {
       critical,
       notVeryEffective,
       statChange,
+      isTransform,
     } = result;
     if (isAttacking) {
       setAlertText(
@@ -1221,6 +1228,13 @@ const PokemonEncounter = () => {
 
         if (missed) {
           setAlertText(`¡${activeMetadata.name.toUpperCase()} falló!`);
+        } else if (isTransform) {
+          // Copiar ID, movimientos (PP:5) y stat stages del rival
+          setTransformedId(them.id);
+          setTransformedMoves(them.moves.map((m) => ({ id: m, pp: 5 })));
+          setPlayerStages({ ...enemyStages });
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} se transformó!`);
+          setStage(17);
         } else if (statChange) {
           applyStatChange(statChange, isAttacking);
           setStage(17);
@@ -1251,6 +1265,13 @@ const PokemonEncounter = () => {
 
         if (missed) {
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival falló!`);
+        } else if (isTransform) {
+          // El enemigo se transforma en el pokémon activo del jugador
+          const playerMoveIds = active.moves.map((m) => m.id);
+          dispatch(updatePokemonEncounter({ ...them, id: active.id, moves: playerMoveIds }));
+          setEnemyStages({ ...playerStages });
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival se transformó!`);
+          setStage(19);
         } else if (statChange) {
           applyStatChange(statChange, isAttacking);
           setStage(19);
@@ -1284,11 +1305,17 @@ const PokemonEncounter = () => {
 
     const stagesSnapshot = { us: playerStages, them: enemyStages };
 
+    // Si el jugador está transformado, usar el ID/moves del transformado para los cálculos
+    const effectivePlayer =
+      transformedId !== null
+        ? { ...active, id: transformedId, moves: transformedMoves }
+        : active;
+
     // We are moving first
     if (activeMovesFirst) {
       // We are attacking
       const { us, them } = processMoveResult(
-        processMove(active, enemy, attackId, true, stagesSnapshot),
+        processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot),
         true
       );
 
@@ -1329,7 +1356,7 @@ const PokemonEncounter = () => {
     else {
       // Enemy attacking
       const { us, them } = processMoveResult(
-        processMove(active, enemy, enemyMove.id, false, stagesSnapshot),
+        processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot),
         false
       );
 
@@ -1383,7 +1410,12 @@ const PokemonEncounter = () => {
     if (stage === 7) return ball3;
     if (stage === 8) return ball4;
     if (stage === 9) return ball5;
-    if (stage >= 10) return activeMetadata.images.back;
+    if (stage >= 10) {
+      if (transformedId !== null) {
+        return getPokemonMetadata(transformedId)?.images.back ?? activeMetadata.images.back;
+      }
+      return activeMetadata.images.back;
+    }
   };
 
   const rightImage = () => {
