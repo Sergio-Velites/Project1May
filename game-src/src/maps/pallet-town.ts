@@ -83,7 +83,7 @@ const palletTown: MapType = {
     {
       npc: youngster,
       pokemon: [{ id: 19, level: 2 }],
-      facing: Direction.Right,
+      facing: Direction.Up,
       pos: { x: 3, y: 7 },
       intro: [],
       outtro: [
@@ -111,6 +111,7 @@ const palletTown: MapType = {
       facing: Direction.Right,
       pos: { x: 10, y: 0 },
       persistent: true,
+      hideCondition: "has-pokemon",
       intro: [],
       outtro: [
         "Viva el vino!",
@@ -128,6 +129,7 @@ const palletTown: MapType = {
       facing: Direction.Left,
       pos: { x: 11, y: 0 },
       persistent: true,
+      hideCondition: "has-pokemon",
       intro: [],
       outtro: [
         "Viva el vino!",

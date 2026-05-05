@@ -8,6 +8,7 @@ import {
   selectMap,
   selectMapId,
   selectName,
+  selectPokemon,
   selectPokemonEncounter,
   selectPos,
   selectTrainerEncounter,
@@ -59,6 +60,7 @@ const TrainerEncounter = () => {
   const [introIndex, setIntroIndex] = useState(-1);
   const playerName = useSelector(selectName);
   const menuOpen = useSelector(selectMenuOpen);
+  const teamPokemon = useSelector(selectPokemon);
 
   const { trainers, walls, fences } = map;
 
@@ -100,6 +102,8 @@ const TrainerEncounter = () => {
           trainer.pos.y === pos.y + facingPos.y
       );
       if (!trainer) throw new Error("Trainer not found");
+      // Si el trainer está oculto por condición, ignorar completamente la interacción
+      if (trainer.hideCondition === "has-pokemon" && teamPokemon.length > 0) return;
       const trainerId = `${mapId}-${trainer.pos.x}-${trainer.pos.y}`;
       // Girar NPC hacia el jugador
       dispatch(setNpcFacing({ id: trainerId, direction: oppositeDirection(direction) }));
