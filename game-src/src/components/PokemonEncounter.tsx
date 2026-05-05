@@ -943,7 +943,8 @@ const PokemonEncounter = () => {
       const xpToUse = pendingXpRef.current ?? processingPokemon.xp;
       const { level, leveledUp, remainingXp } = getLevelData(
         processingPokemon.level,
-        xpToUse
+        xpToUse,
+        processingMetadata?.growthRate ?? "medium-fast"
       );
       if (leveledUp) {
         // Gen I: current HP increases by the same amount as max HP
@@ -1102,7 +1103,7 @@ const PokemonEncounter = () => {
     if (stage === 22) {
       if (!processingMetadata) throw new Error("No processing metadata found");
       return `¡${processingMetadata.name.toUpperCase()} subió al nivel ${
-        getLevelData(processingPokemon.level, processingPokemon.xp).level
+        getLevelData(processingPokemon.level, processingPokemon.xp, processingMetadata?.growthRate ?? "medium-fast").level
       }!`;
     }
     if (stage === 24) return `¡${activeMetadata.name.toUpperCase()} se debilitó!`;
