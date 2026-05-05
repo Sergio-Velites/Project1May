@@ -537,6 +537,7 @@ cd game-src && npx tsc --noEmit
 
 ## Roadmap
 
+### Motor y sistema ✅
 - [x] Base jugable en navegador (chase-manning/pokemon-js)
 - [x] Integración en Next.js / Vercel
 - [x] Traducciones al español (batallas, menús, diálogos, nombres de movimientos oficiales ES)
@@ -545,15 +546,50 @@ cd game-src && npx tsc --noEmit
 - [x] Intro Oak con typewriter + sprites por línea
 - [x] Teclado de nombre (4 filas + FIN siempre visible junto a ⌨ TECLADO)
 - [x] Layout Game Boy Color responsive (cqw, aspect ratio 3:5)
-- [x] Flujo narrativo primer acto: habitación → madre → laboratorio → Route 1
-- [x] Starters interactivos en el laboratorio (Bulbasaur, Charmander, Squirtle)
+- [x] Starters interactivos en el laboratorio — modal fuera de BackgroundContainer, centrado
 - [x] Passkey/Face ID obligatorio para guardar (necesario para confirmación boda)
 - [x] Pokédex y ficha Pokémon sin solapamientos de UI
 - [x] Menú batalla navegación lineal (Up/Down recorre las 4 opciones)
 - [x] Todos los textos en español sin Lorem ipsum
 - [x] `game-src/` añadido al repo GitHub
-- [ ] Personalizar pantalla de título (logos de la pareja y fecha)
-- [ ] Personalizar video de intro con clip real de la boda
+- [x] NPCs se giran hacia el jugador al hablar (`npcFacings` en Redux)
+- [x] `hideCondition: "has-pokemon"` — Team Rocket desaparecen al tener pokémon
+- [x] Guard `menuOpen` en handlers de A (evita re-disparos de diálogo al cerrar texto)
+- [x] `choosingRef` en LoadScreen (evita race condition "Continuar → Oak intro")
+
+### Narrativa — Acto I: Pueblo Paleta / DESTILERÍA DEL PROF. OAK ✅
+- [x] Habitación del jugador → madre → laboratorio → 3 starters
+- [x] Team Rocket bloquean salida norte hasta tener pokémon
+- [x] Prof. Oak discurso de bienvenida a la boda
+- [x] Diálogos temáticos de boda en carteles y NPCs del pueblo
+
+### Narrativa — Acto II: Ruta 1 🔲
+- [ ] Renombrar mapa: `"Ruta 1 · Camino al Soto"`
+- [ ] NPC "invitado cabreado" (youngster, combate): _"¡No te creas que llegarás tan fácil! ¡Yo quería el vino y tú me lo quitaste!"_
+- [ ] NPC "abuela del anís" (beauty, solo diálogo): _"¡No olvides que la preboda sin anís no es preboda!"_
+
+### Narrativa — Acto III: SOTO LEZKAIRU (ex Ciudad Añil) 🔲
+- [ ] Renombrar mapa: `"SOTO LEZKAIRU"` + actualizar carteles
+- [ ] Grupo de "no invitados" con anti-preboda de vino barato (2-3 trainers combatibles)
+- [ ] Maestro del Vino (solo diálogo): da `SodaPop` como _"Vino Tinto"_ 1 vez (quest `"talk"`)
+- [ ] Team Rocket norte robando barril: _"¡Con este vino seremos los reyes de la fiesta!"_
+
+### Narrativa — Acto IV: EL BOSQUECILLO (ex Viridian Forest) 🔲
+- [ ] Renombrar mapa: `"EL BOSQUECILLO"`
+- [ ] NPCs apuran al jugador (solo diálogo): _"¡Corre, que la barra libre se acaba!"_
+- [ ] Team Rocket bloqueando paso: _"¡Queríamos los Pokémon de la boda, pero nos llevamos este anís de mientras!"_
+
+### Narrativa — Acto V: VILLAMAYOR DE MONJARDÍN (ex Ciudad Plateada) 🔲
+- [ ] Renombrar mapa: `"VILLAMAYOR DE MONJARDÍN"` + actualizar carteles con temática de vino
+- [ ] Renombrar gimnasio: `"Bodega CASTILLO DE MONJARDÍN"` (tipo: VINO, referenciado explícitamente)
+- [ ] Trainer guardián de la bodega antes de los líderes
+- [ ] Líderes **Sergio** (`aceTrainerMale`) y **Marta** (`aceTrainerFemale`) con intro y outtro de boda
+- [ ] Texto de victoria: _"¡Nos vemos el 8 de agosto, y esta vez tú brindas con nosotros!"_
+- [ ] Dar **Insignia del Vino** (`BoulderBadge`) al ganar
+
+### Personalización visual pendiente 🔲
+- [ ] Pantalla de título: logos de la pareja y fecha de la boda
+- [ ] Video de intro: clip real de la boda
 - [ ] Compartir enlace con invitados
 
 ---
@@ -985,7 +1021,7 @@ Estos archivos han sido creados/modificados para la boda y están en `game-src/s
 | `components/TrainerEncounter.tsx` | Maneja encuentros; dispatcha `setNpcFacing` al pulsar A frente a NPC |
 | `state/gameSlice.ts` | `loadFromState()` para cloud save; `npcFacings` + `setNpcFacing`; estado inicial sin pokémon |
 | `maps/lab.ts` | Oak como NPC (pos 5,1); mesa con 3 pokéballs en y:3 x:6,7,8 |
-| `maps/pallet-town.ts` | youngster (x:3,y:7), lass (x:15,y:6), Team Rocket (x:10-11,y:0 persistent) |
+| `maps/pallet-town.ts` | lass (x:15,y:6), Team Rocket (x:10-11,y:0, persistent+hideCondition) |
 | `maps/house-a-1f.ts` | Madre (beauty, pos 6,3, persistent) con Ratata lvl 1 |
 
 ### Guía rápida de modificaciones
@@ -1052,6 +1088,7 @@ cd game-src && npx tsc --noEmit
 
 ## Roadmap
 
+### Motor y sistema ✅
 - [x] Base jugable en navegador (chase-manning/pokemon-js)
 - [x] Integración en Next.js / Vercel
 - [x] Traducciones al español (batallas, menús, diálogos)
@@ -1063,9 +1100,38 @@ cd game-src && npx tsc --noEmit
 - [x] Oak NPC en el laboratorio con diálogo de boda
 - [x] `game-src/` añadido al repo GitHub (commit `3e9990a`)
 - [x] `tsconfig.json` raíz excluye `game-src/` (fix Vercel build)
-- [ ] Guardado en Supabase (WebAuthn passkey — estructura lista, pendiente activar)
-- [ ] Personalizar pantalla de título (logos de la pareja y fecha)
-- [ ] Personalizar video de intro
+- [x] Guardado en Supabase con WebAuthn passkey (passkey obligatoria)
+- [x] NPCs se giran hacia el jugador al hablar (`npcFacings` en Redux)
+- [x] `hideCondition: "has-pokemon"` — Team Rocket desaparecen al tener pokémon
+- [x] Guard `menuOpen` en handlers de A (evita re-disparos de diálogo al cerrar texto)
+- [x] `choosingRef` en LoadScreen (evita race condition "Continuar → Oak intro")
+
+### Narrativa — Acto I: Pueblo Paleta ✅
+- [x] Habitación → madre → laboratorio → 3 starters
+- [x] Team Rocket bloquean salida norte hasta tener pokémon
+- [x] Prof. Oak discurso de bienvenida a la boda
+
+### Narrativa — Acto II: Ruta 1 🔲
+- [ ] Renombrar: `"Ruta 1 · Camino al Soto"`
+- [ ] NPC combatible "invitado cabreado" (youngster)
+- [ ] NPC decorativo "abuela del anís" (beauty, sin combate)
+
+### Narrativa — Acto III: SOTO LEZKAIRU 🔲
+- [ ] Renombrar viridian-city: `"SOTO LEZKAIRU"`
+- [ ] Grupo anti-preboda (combatibles) + Maestro del Vino (da SodaPop) + Team Rocket barril
+
+### Narrativa — Acto IV: EL BOSQUECILLO 🔲
+- [ ] Renombrar viridian-forrest: `"EL BOSQUECILLO"`
+- [ ] NPCs apurando al jugador + Team Rocket con anís
+
+### Narrativa — Acto V: VILLAMAYOR DE MONJARDÍN 🔲
+- [ ] Renombrar pewter-city: `"VILLAMAYOR DE MONJARDÍN"`
+- [ ] Bodega CASTILLO DE MONJARDÍN (tipo Vino) con jefes Sergio y Marta
+- [ ] Insignia del Vino al ganar
+
+### Personalización visual pendiente 🔲
+- [ ] Pantalla de título: logos de la pareja y fecha
+- [ ] Video de intro: clip real de la boda
 - [ ] Compartir enlace con invitados
 
 ---

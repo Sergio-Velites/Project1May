@@ -7,17 +7,53 @@ Motor base: [chase-manning/pokemon-js](https://github.com/chase-manning/pokemon-
 
 ---
 
-## Características
+## Características implementadas
 
-- Juego completo estilo Pokémon Rojo/Azul en el navegador
-- Flujo narrativo: habitación del jugador → madre → laboratorio → Route 1
-- 3 starters interactivos en el laboratorio (Bulbasaur, Charmander, Squirtle) — modal centrado en pantalla con ←/→ para Sí/No
-- Passkey / Face ID para guardar partida; fallback local si el registro falla (sin bucles)
-- Todos los textos en español, con diálogos temáticos de boda
-- Video de introducción saltable · Intro del Profesor Oak con efecto typewriter
-- Layout Game Boy Color responsive (escritorio y móvil)
-- NPCs con diálogo puro (sin combate): se giran hacia el jugador al hablar
-- Team Rocket en salida norte solo visibles hasta que el jugador recoge un pokémon
+- Motor completo estilo Pokémon Rojo/Azul: combates, Pokédex, ítems, guardado, evoluciones
+- **Narrativa de boda** integrada en cada zona: textos, NPCs y diálogos temáticos
+- 3 starters interactivos en el laboratorio con modal centrado (←/→ para Sí/No)
+- Passkey / Face ID para guardar partida; fallback local sin bucles si el registro falla
+- Video de introducción saltable · Intro del Prof. Oak con efecto typewriter
+- Layout Game Boy Color responsive (escritorio y móvil, aspect ratio 3:5 fijo)
+- NPCs con diálogo puro (sin combate) que se giran hacia el jugador al hablar
+- Team Rocket en salida norte desaparecen cuando el jugador tiene ≥1 pokémon
+- Pasajes de texto dependientes de estado (estado del juego → texto diferente)
+- `hideCondition` en TrainerType: ocultar NPCs según condición de juego
+
+## Narrativa completa (hoja de ruta)
+
+### Acto I — Pueblo Paleta / DESTILERÍA DEL PROF. OAK ✅
+- Habitación del jugador → madre → laboratorio → 3 starters
+- Team Rocket bloquean la salida norte hasta tener pokémon
+- Prof. Oak da el discurso de bienvenida y anima a ir al bosquecillo
+
+### Acto II — Ruta 1 🔲
+- **NPC "invitado cabreado"** (youngster): _"¡No te creas que llegarás tan fácil! ¡Yo quería el vino y tú me lo quitaste!"_ → combate opcional
+- **NPC "abuela del anís"** (beauty, no combate): _"¡No olvides que la preboda sin anís no es preboda!"_
+- Hierba con encuentros aleatorios ya funcional
+
+### Acto III — SOTO LEZKAIRU (ex Ciudad Añil / Viridian City) 🔲
+- Nombre del mapa renombrado a **"SOTO LEZKAIRU"**
+- **Grupo de "no invitados"** con anti-preboda de vino barato (trainers combatibles)
+- NPC que desafía: _"¡Si me ganas, te diré dónde está escondida la reserva especial!"_
+- **Maestro del Vino** (NPC izquierda): enseña a usar _"Vino Tinto"_ como ítem de curación
+- Team Rocket norte intentando robar un barril: _"¡Con este vino seremos los reyes de la fiesta!"_
+- PokéCenter y PokéMart con textos de boda
+
+### Acto IV — EL BOSQUECILLO (ex Bosque Viridian / Viridian Forest) 🔲
+- Nombre renombrado a **"EL BOSQUECILLO"**
+- NPCs apuran al jugador: _"¡Corre, que la barra libre se acaba!"_
+- Team Rocket intermedio: _"¡Queríamos los Pokémon de la boda, pero nos llevamos este anís de mientras!"_
+- Encuentros de pokémon salvajes ya funcionales
+
+### Acto V — VILLAMAYOR DE MONJARDÍN (ex Ciudad Plateada / Pewter City) 🔲
+- Nombre renombrado a **"VILLAMAYOR DE MONJARDÍN"**
+- NPCs brindan: _"¡Aquí se hace vino del bueno, pero primero tienes que ganar!"_
+- **Bodega CASTILLO DE MONJARDÍN** (ex Gimnasio): tipo **"Vino"** (ficticio, referenciado explícitamente)
+- **Líderes Sergio y Marta** esperan entre barricas:
+  - Intro: _"¡Te lo advertimos, aquí se sirve vino… solo si nos vences primero!"_
+  - Victoria: _"¡Nos vemos el 8 de agosto, y esta vez tú brindas con nosotros!"_
+- Obtener la **Insignia del Vino** al ganar
 
 ---
 
