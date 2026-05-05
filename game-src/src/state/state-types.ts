@@ -58,4 +58,6 @@ export interface GameState {
   seenPokemon: number[];    // IDs vistos en la Pokédex
   caughtPokemon: number[]; // IDs capturados
   npcFacings: Record<string, Direction>;
+  /** Mapa y posición donde el jugador curó por última vez (recuperación tras derrota) */
+  lastHealLocation?: { map: MapId; pos: PosType };
 }

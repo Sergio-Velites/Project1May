@@ -39,6 +39,8 @@ import LabPokeballs from "./LabPokeball";
 import LabPokeballModal from "./LabPokeballModal";
 import AcademyPokeball from "./AcademyPokeball";
 import AcademyPokeballModal from "./AcademyPokeballModal";
+import OnlineBattleNpc from "./OnlineBattleNpc";
+import OnlineBattleMenu from "./OnlineBattleMenu";
 import { selectPokedexOpen, hidePokedex } from "../state/uiSlice";
 
 const Container = styled.div`
@@ -139,6 +141,8 @@ const Game = () => {
       <PokemonCenter />
       <Pc />
       <PokeMart />
+      <OnlineBattleNpc />
+      <OnlineBattleMenu />
       <TextThenAction />
       <StartMenu />
       <ItemsMenu />

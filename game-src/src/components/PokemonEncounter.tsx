@@ -1044,11 +1044,11 @@ const PokemonEncounter = () => {
     if (stage === 27) {
       setStage(28);
       setTimeout(() => {
-        dispatch(recoverFromFainting());
+        endEncounter_(true);          // cerrar la batalla PRIMERO
       }, 1000);
       setTimeout(() => {
-        endEncounter_(true);
-      }, 1000 + 500);
+        dispatch(recoverFromFainting());  // curar y teleportar DESPUES
+      }, 1500);
     }
 
     if (stage === 29) {

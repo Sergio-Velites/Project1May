@@ -50,6 +50,7 @@ interface UiState {
   evolution: EvolutionType | null;
   pokeballCardId: number | null;
   academyPokeballOpen: boolean;
+  onlineBattleMenu: boolean;
 }
 
 const initialState: UiState = {
@@ -75,6 +76,7 @@ const initialState: UiState = {
   evolution: null,
   pokeballCardId: null,
   academyPokeballOpen: false,
+  onlineBattleMenu: false,
 };
 
 export const uiSlice = createSlice({
@@ -208,6 +210,12 @@ export const uiSlice = createSlice({
     closeAcademyPokeball: (state) => {
       state.academyPokeballOpen = false;
     },
+    showOnlineBattleMenu: (state) => {
+      state.onlineBattleMenu = true;
+    },
+    hideOnlineBattleMenu: (state) => {
+      state.onlineBattleMenu = false;
+    },
   },
 });
 
@@ -251,6 +259,8 @@ export const {
   closePokeballCard,
   openAcademyPokeball,
   closeAcademyPokeball,
+  showOnlineBattleMenu,
+  hideOnlineBattleMenu,
 } = uiSlice.actions;
 
 export const selectText = (state: RootState) => state.ui.text;
@@ -330,5 +340,8 @@ export const selectPokeballCardId = (state: RootState) =>
 
 export const selectAcademyPokeballOpen = (state: RootState) =>
   state.ui.academyPokeballOpen;
+
+export const selectOnlineBattleMenu = (state: RootState) =>
+  state.ui.onlineBattleMenu;
 
 export default uiSlice.reducer;

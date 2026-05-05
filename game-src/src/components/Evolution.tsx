@@ -6,8 +6,10 @@ import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import PixelImage from "../styles/PixelImage";
 import { useDispatch, useSelector } from "react-redux";
-import { hideEvolution, selectEvolution } from "../state/uiSlice";
+import { hideEvolution, selectEvolution, showText } from "../state/uiSlice";
 import { selectPokemon, updateSpecificPokemon } from "../state/gameSlice";
+import { getLearnedMove } from "../app/level-helper";
+import { getMoveMetadata } from "../app/use-move-metadata";
 
 const StyledEvolution = styled.div`
   position: absolute;
@@ -261,15 +263,42 @@ const Evolution = () => {
     if (!metadata) throw new Error("No metadata for evolution");
 
     setEvolved(false);
+
+    const evolvedPokemon = { ...evolvingPokemon, id: evolution!.evolveToId };
+
+    // Comprobar si el nuevo formulario aprende algún movimiento a este nivel
+    const newMove = getLearnedMove(evolvedPokemon);
+    let pokemonWithMove = evolvedPokemon;
+    const moveMessages: string[] = [];
+
+    if (newMove && evolvedPokemon.moves.length < 4) {
+      // Hueco libre — aprender automáticamente
+      pokemonWithMove = { ...evolvedPokemon, moves: [...evolvedPokemon.moves, newMove] };
+      const moveMeta = getMoveMetadata(newMove.id);
+      moveMessages.push(
+        `¡${evolvesMetadata!.name.toUpperCase()} aprendió ${moveMeta.name.toUpperCase()}!`
+      );
+    } else if (newMove) {
+      // 4 movimientos: informar que quiere aprender (sin flujo de olvidar por ahora)
+      const moveMeta = getMoveMetadata(newMove.id);
+      moveMessages.push(
+        `¡${evolvesMetadata!.name.toUpperCase()} quiere aprender ${moveMeta.name.toUpperCase()}!`,
+        "Pero ya conoce 4 movimientos.",
+        "El movimiento no se aprendió."
+      );
+    }
+
     dispatch(
       updateSpecificPokemon({
-        index: evolution.index,
-        pokemon: {
-          ...evolvingPokemon,
-          id: evolution.evolveToId,
-        },
+        index: evolution!.index,
+        pokemon: pokemonWithMove,
       })
     );
+
+    if (moveMessages.length > 0) {
+      dispatch(showText(moveMessages));
+    }
+
     dispatch(hideEvolution());
   });
 

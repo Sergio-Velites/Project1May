@@ -1,5 +1,7 @@
 import image from "../assets/map/viridian-city-pokemon-center.png";
 import { MapId, MapType } from "./map-types";
+import { Direction } from "../state/state-types";
+import { scientist } from "../app/npcs";
 
 import music from "../assets/music/maps/pokemon-center.mp3";
 
@@ -44,6 +46,22 @@ const route3PokemonCenter: MapType = {
     x: 13,
     y: 3,
   },
+  onlineBattleNpc: {
+    x: 10,
+    y: 2,
+  },
+  trainers: [
+    {
+      npc: scientist,
+      pokemon: [{ id: 1, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 10, y: 2 },
+      intro: [],
+      outtro: [],
+      money: 0,
+      isOnline: true,
+    },
+  ],
 };
 
 export default route3PokemonCenter;
