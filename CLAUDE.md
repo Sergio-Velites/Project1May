@@ -396,10 +396,10 @@ Estos archivos han sido creados/modificados para la boda y están en `game-src/s
 | Archivo | Qué hace |
 |---|---|
 | `app/cloud-save.ts` | Supabase Edge Functions + WebAuthn passkey (save/load remoto) |
-| `app/level-helper.ts` | Fórmula XP Gen I corregida (Medium-Fast: `nextLevel³ − currentLevel³`) |
+| `app/level-helper.ts` | 4 fórmulas growth rate Gen I: Fast `⌊4n³/5⌋`, Medium-Fast `n³`, Medium-Slow `⌊6n³/5⌋−15n²+100n−140`, Slow `⌊5n³/4⌋` |
 | `app/move-helper.ts` | Daño Gen I completo: stat stages (20 movimientos), críticos 10%, efectividad |
 | `app/move-metadata.ts` | ~24k líneas, nombres oficiales ES de movimientos (Wikidex) |
-| `app/xp-helper.ts` | XP de entrenadores × 1.5 (bonus Gen I) |
+| `app/xp-helper.ts` | XP de entrenadores × 1.5 (bonus Gen I); `Math.floor` fiel a Gen I |
 | `app/pokeball-helper.ts` | Fórmula de captura Gen I con 4 sacudidas reales |
 | `app/use-quests.ts` | Sistema de quests + **quest norte Pallet Town** (bloquea sin pokémon) |
 | `components/IntroVideo.tsx` | Video intro antes del TitleScreen; se reproduce siempre (saltable A/B) |
@@ -542,6 +542,7 @@ cd game-src && npx tsc --noEmit
 - [x] Integración en Next.js / Vercel
 - [x] Traducciones al español (batallas, menús, diálogos, nombres de movimientos oficiales ES)
 - [x] Mecánicas Gen I corregidas (XP, stat stages, captura, HP nivel)
+- [x] **Growth rate Gen I completo** — 4 grupos (Fast/Med-Fast/Med-Slow/Slow) con fórmulas exactas y `growthRate` en los 151 Pokémon
 - [x] Video de intro por sesión (saltable con A/B)
 - [x] Intro Oak con typewriter + sprites por línea
 - [x] Teclado de nombre (4 filas + FIN siempre visible junto a ⌨ TECLADO)
@@ -1007,9 +1008,9 @@ Estos archivos han sido creados/modificados para la boda y están en `game-src/s
 | Archivo | Qué hace |
 |---|---|
 | `app/cloud-save.ts` | Supabase Edge Functions + WebAuthn passkey (save/load remoto) |
-| `app/level-helper.ts` | Fórmula XP Gen I corregida (Medium-Fast: `nextLevel³ − currentLevel³`) |
+| `app/level-helper.ts` | 4 fórmulas growth rate Gen I: Fast `⌊4n³/5⌋`, Medium-Fast `n³`, Medium-Slow `⌊6n³/5⌋−15n²+100n−140`, Slow `⌊5n³/4⌋` |
 | `app/move-helper.ts` | Daño Gen I completo: stat stages (20 movimientos), críticos 10%, efectividad |
-| `app/xp-helper.ts` | XP de entrenadores × 1.5 (bonus Gen I) |
+| `app/xp-helper.ts` | XP de entrenadores × 1.5 (bonus Gen I); `Math.floor` fiel a Gen I |
 | `app/pokeball-helper.ts` | Fórmula de captura Gen I con 4 sacudidas reales |
 | `components/IntroVideo.tsx` | Video intro antes del TitleScreen; se reproduce siempre (saltable A/B) |
 | `components/LoadScreen.tsx` | Passkey **obligatorio** → save/load → oak-intro → name-picker → done |
@@ -1093,6 +1094,7 @@ cd game-src && npx tsc --noEmit
 - [x] Integración en Next.js / Vercel
 - [x] Traducciones al español (batallas, menús, diálogos)
 - [x] Mecánicas Gen I corregidas (XP, stat stages, captura, HP nivel)
+- [x] **Growth rate Gen I completo** — 4 grupos (Fast/Med-Fast/Med-Slow/Slow) con fórmulas exactas y `growthRate` en los 151 Pokémon
 - [x] Video de intro por sesión (saltable con A/B)
 - [x] Intro Oak con typewriter + sprites por línea
 - [x] Teclado de nombre (4 filas + FIN siempre visible)

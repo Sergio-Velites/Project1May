@@ -10,6 +10,7 @@ Motor base: [chase-manning/pokemon-js](https://github.com/chase-manning/pokemon-
 ## Características implementadas
 
 - Motor completo estilo Pokémon Rojo/Azul: combates, Pokédex, ítems, guardado, evoluciones
+- **Mecánicas Gen I fieles al original**: growth rates (4 grupos), fórmulas XP, stat stages, críticos 10%, captura con 4 sacudidas reales
 - **Narrativa de boda** integrada en cada zona: textos, NPCs y diálogos temáticos
 - 3 starters interactivos en el laboratorio con modal centrado (←/→ para Sí/No)
 - Passkey / Face ID para guardar partida; fallback local sin bucles si el registro falla
