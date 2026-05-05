@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 import { useDispatch, useSelector } from "react-redux";
-import { selectPos, selectMap, selectDefeatedTrainers, selectMapId } from "../state/gameSlice";
+import { selectPos, selectMap, selectDefeatedTrainers, selectMapId, selectPokemon } from "../state/gameSlice";
 import Character from "./Character";
 import Text from "./Text";
 import MapChangeHandler from "./MapChangeHandler";
@@ -94,6 +94,7 @@ const Game = () => {
   const map = useSelector(selectMap);
   const mapId = useSelector(selectMapId);
   const defeatedTrainers = useSelector(selectDefeatedTrainers);
+  const playerPokemon = useSelector(selectPokemon);
   const dispatch = useDispatch();
   const pokedexOpen = useSelector(selectPokedexOpen);
 
@@ -109,6 +110,8 @@ const Game = () => {
           {map.trainers &&
             map.trainers
               .filter((trainer: TrainerType) => {
+                // Ocultar trainers con condición cuando se cumple
+                if (trainer.hideCondition === "has-pokemon" && playerPokemon.length > 0) return false;
                 if (trainer.persistent) return true;
                 const id = `${mapId}-${trainer.pos.x}-${trainer.pos.y}`;
                 return !defeatedTrainers.includes(id);
