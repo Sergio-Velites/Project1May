@@ -1,7 +1,7 @@
 import palletTownImage from "../assets/map/pallet-town.png";
 import { MapId, MapType } from "./map-types";
 import { Direction } from "../state/state-types";
-import { lass, youngster, teamRocketGrunt } from "../app/npcs";
+import { lass, teamRocketGrunt } from "../app/npcs";
 
 import music from "../assets/music/maps/pallet-town.mp3";
 import getEncounterData from "./get-location-data";
@@ -45,12 +45,13 @@ const palletTown: MapType = {
       7: ["PUEBLO PALETA. El comienzo de todo."],
     },
     13: {
-      13: ["LABORATORIO DEL PROF. OAK"],
+      13: ["DESTILERÍA DEL PROF. OAK"],
     },
     15: {
       10: [
-        "¡Tecnología increíble!",
-        "Puedes guardar POKEMON en el PC.",
+        "Dicen que hay un tal JUANRE que no perdona a los rezajados",
+        "Habrá que que ponerse en marcha...",
+        "Dicen que la preboda es en EL BOSQUECILLO",
       ],
     },
   },
@@ -75,18 +76,6 @@ const palletTown: MapType = {
   // NPCs del pueblo con los que se puede hablar (no combaten):
   trainers: [
     {
-      npc: youngster,
-      pokemon: [{ id: 19, level: 2 }],
-      facing: Direction.Right,
-      pos: { x: 3, y: 7 },
-      intro: [],
-      outtro: [
-        "Hoy noto como un cancaneo por mi cuerpo.",
-        "Parece que algo gordo se avecina!",
-      ],
-      money: 0,
-    },
-    {
       npc: lass,
       pokemon: [{ id: 35, level: 3 }],
       facing: Direction.Down,
@@ -107,9 +96,13 @@ const palletTown: MapType = {
       persistent: true,
       intro: [],
       outtro: [
-        "¡Aquí no pasa nadie sin un POKEMON!",
-        "Ve al laboratorio y busca uno.",
+        "Viva el vino!",
+        "Hip! ¡Aquí no pasa nadie sin un POKEMON!",
+        "Hip! Habla con el borracho Oak y ",
+        "que te de uno, hip!",
+        "antes de que se los beba todos, hip!",
       ],
+      
       money: 0,
     },
     {
@@ -120,8 +113,11 @@ const palletTown: MapType = {
       persistent: true,
       intro: [],
       outtro: [
-        "¡Sin POKEMON no sales de Pueblo Paleta!",
-        "Jefe’s orders.",
+        "Viva el vino!",
+        "Hip! ¡Aquí no pasa nadie sin un POKEMON!",
+        "Hip! Habla con el borracho Oak y ",
+        "que te de uno, hip!",
+        "antes de que se los beba todos, hip!",
       ],
       money: 0,
     },

@@ -15,7 +15,7 @@ import {
   selectPokemon,
   selectPos,
 } from "../state/gameSlice";
-import { openPokeballCard, showTextThenAction } from "../state/uiSlice";
+import { openPokeballCard, selectMenuOpen, showTextThenAction } from "../state/uiSlice";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import { MapId } from "../maps/map-types";
@@ -63,6 +63,7 @@ const SingleBall = ({
   const facing = useSelector(selectDirection);
   const mapId = useSelector(selectMapId);
   const teamPokemon = useSelector(selectPokemon);
+  const menuOpen = useSelector(selectMenuOpen);
 
   const questId = starterQuestId(starter.id);
   const isCollected = completedQuests.includes(questId);
@@ -77,6 +78,7 @@ const SingleBall = ({
   }, [pos, facing, mapId, starter.pos]);
 
   useEvent(Event.A, useCallback(() => {
+    if (menuOpen) return; // No reaccionar mientras haya texto/modal abierto
     if (isCollected) return;
     if (mapId !== MapId.PalletTownLab) return;
     if (!isInFront()) return;
@@ -95,7 +97,7 @@ const SingleBall = ({
     }
 
     dispatch(openPokeballCard(starter.id));
-  }, [isCollected, mapId, teamPokemon, isInFront, dispatch, starter.id]));
+  }, [menuOpen, isCollected, mapId, teamPokemon, isInFront, dispatch, starter.id]));
 
   if (isCollected) return null;
 
