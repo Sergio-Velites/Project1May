@@ -86,7 +86,7 @@ export interface TrainerType {
   money: number;
   pos: PosType;
   persistent?: boolean;
-  hideCondition?: "has-pokemon"; // ocultar cuando el jugador tenga al menos 1 pokémon
+  hideCondition?: "has-pokemon";
   postGame?: {
     message: string[];
     items?: ItemType[];
