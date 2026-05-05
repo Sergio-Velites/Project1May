@@ -619,14 +619,21 @@ const PokemonEncounter = () => {
   const [clickableNotice, setClickableNotice] = useState<string | null>(null);
   // Ref to pass computed XP from stage 20 to stage 21 without stale closure
   const pendingXpRef = useRef<number | null>(null);
+  // Ref to pass new level from stage 21 to stages 22/29/33 without stale closure
+  const pendingLevelRef = useRef<number | null>(null);
 
   // Stat stages — reset al inicio de cada combate
   const [playerStages, setPlayerStages] = useState<StatStages>(DEFAULT_STAGES);
   const [enemyStages, setEnemyStages] = useState<StatStages>(DEFAULT_STAGES);
 
-  // Transformación — se resetea al inicio/fin de cada combate
-  const [transformedId, setTransformedId] = useState<number | null>(null);
-  const [transformedMoves, setTransformedMoves] = useState<{ id: string; pp: number }[]>([]);
+  // Transformación — keyed por activePokemonIndex para que sea por pokémon individual
+  // Persiste durante todo el combate: si cambias a otro pokémon y vuelves a sacar
+  // a Ditto, sigue transformado.
+  const [transformedData, setTransformedData] = useState<Record<number, { id: number; moves: { id: string; pp: number }[] }>>({});
+  // Accesores convenientes para el pokémon activo
+  const currentTransform = transformedData[activePokemonIndex] ?? null;
+  const transformedId    = currentTransform?.id    ?? null;
+  const transformedMoves = currentTransform?.moves  ?? [];
 
   // Condiciones de estado en combate (no se persisten en Redux)
   type BattleStatus = { type: "poison" | "badly-poisoned" | "burn" | "paralysis" | "sleep" | "freeze"; turns: number };
@@ -637,6 +644,21 @@ const PokemonEncounter = () => {
   const enemyStatusRef = useRef<BattleStatus | null>(null);
   useEffect(() => { playerStatusRef.current = playerStatus; }, [playerStatus]);
   useEffect(() => { enemyStatusRef.current = enemyStatus; }, [enemyStatus]);
+
+  // Leech Seed (puede coexistir con otros estados — se guarda por separado)
+  const [playerLeechSeeded, setPlayerLeechSeeded] = useState(false);
+  const [enemyLeechSeeded, setEnemyLeechSeeded] = useState(false);
+  const playerLeechSeededRef = useRef(false);
+  const enemyLeechSeededRef  = useRef(false);
+  useEffect(() => { playerLeechSeededRef.current = playerLeechSeeded; }, [playerLeechSeeded]);
+  useEffect(() => { enemyLeechSeededRef.current  = enemyLeechSeeded;  }, [enemyLeechSeeded]);
+
+  // Último daño físico recibido por el jugador (para Counter)
+  const lastPhysicalDamageRef = useRef(0);
+
+  // Flinch refs — el objetivo de un golpe con flinch no puede actuar ese turno
+  const enemyFlinchRef  = useRef(false);
+  const playerFlinchRef = useRef(false);
 
   const isInBattle = !!enemy && !!active && !!enemyMetadata && !!activeMetadata;
 
@@ -758,12 +780,18 @@ const PokemonEncounter = () => {
       dispatch(resetActivePokemon());
       setPlayerStages(DEFAULT_STAGES);
       setEnemyStages(DEFAULT_STAGES);
-      setTransformedId(null);
-      setTransformedMoves([]);
+      setTransformedData({});
       setPlayerStatus(null);
       setEnemyStatus(null);
       playerStatusRef.current = null;
       enemyStatusRef.current = null;
+      setPlayerLeechSeeded(false);
+      setEnemyLeechSeeded(false);
+      playerLeechSeededRef.current = false;
+      enemyLeechSeededRef.current  = false;
+      lastPhysicalDamageRef.current = 0;
+      enemyFlinchRef.current  = false;
+      playerFlinchRef.current = false;
       setStage(0);
       // Register enemy as SEEN in Pokédex
       dispatch(seePokemon(enemy.id));
@@ -975,6 +1003,7 @@ const PokemonEncounter = () => {
           })
         );
         pendingXpRef.current = null;
+        pendingLevelRef.current = level;
         setStage(22);
       } else {
         pendingXpRef.current = null;
@@ -983,7 +1012,12 @@ const PokemonEncounter = () => {
     }
 
     if (stage === 22) {
-      const move = getLearnedMove(processingPokemon);
+      // Use pendingLevelRef to avoid stale closure: Redux already dispatched new level
+      // but processingPokemon from selector may still show old level in this render.
+      const pokemonForLearn = pendingLevelRef.current !== null
+        ? { ...processingPokemon, level: pendingLevelRef.current }
+        : processingPokemon;
+      const move = getLearnedMove(pokemonForLearn);
       const hasFourMoves = processingPokemon.moves.length === 4;
       if (move && !hasFourMoves) {
         setStage(29);
@@ -1018,7 +1052,10 @@ const PokemonEncounter = () => {
     }
 
     if (stage === 29) {
-      const move = getLearnedMove(processingPokemon);
+      const pokemonForLearn = pendingLevelRef.current !== null
+        ? { ...processingPokemon, level: pendingLevelRef.current }
+        : processingPokemon;
+      const move = getLearnedMove(pokemonForLearn);
       if (!move) throw new Error("No move found");
       dispatch(
         updateSpecificPokemon({
@@ -1029,7 +1066,7 @@ const PokemonEncounter = () => {
           },
         })
       );
-
+      pendingLevelRef.current = null;
       endEncounter_();
     }
 
@@ -1177,10 +1214,12 @@ const PokemonEncounter = () => {
   };
 
   const STAT_NAMES_ES: Record<string, string> = {
-    attack: "ATAQUE",
-    defense: "DEFENSA",
-    speed: "VELOCIDAD",
-    special: "ESPECIAL",
+    attack:   "ATAQUE",
+    defense:  "DEFENSA",
+    speed:    "VELOCIDAD",
+    special:  "ESPECIAL",
+    accuracy: "PRECISIÓN",
+    evasion:  "EVASION",
   };
 
   const applyStatChange = (
@@ -1243,11 +1282,31 @@ const PokemonEncounter = () => {
       "paralysis":      "quedó paralizado",
       "sleep":          "se quedó dormido",
       "freeze":         "se congeló",
+      "leech-seed":     "fue sembrado con Drenadoras",
     };
     // "defender" = el objetivo del movimiento; "attacker" = quien lo usa
     const affectsPlayer =
       (isAttacking  && statusApply.target === "attacker") ||
       (!isAttacking && statusApply.target === "defender");
+
+    const targetName = affectsPlayer
+      ? activeMetadata.name.toUpperCase()
+      : enemyMetadata.name.toUpperCase();
+
+    // Leech Seed se gestiona aparte (puede coexistir con otro estado)
+    if (statusApply.status === "leech-seed") {
+      if (affectsPlayer) {
+        if (playerLeechSeededRef.current) return false;
+        setPlayerLeechSeeded(true);
+        playerLeechSeededRef.current = true;
+      } else {
+        if (enemyLeechSeededRef.current) return false;
+        setEnemyLeechSeeded(true);
+        enemyLeechSeededRef.current = true;
+      }
+      setAlertText(`¡${targetName} ${STATUS_MSG["leech-seed"]}!`);
+      return true;
+    }
 
     const currentStatus = affectsPlayer ? playerStatusRef.current : enemyStatusRef.current;
     if (currentStatus) return false; // ya tiene un estado: no se puede aplicar otro
@@ -1266,9 +1325,6 @@ const PokemonEncounter = () => {
       setEnemyStatus(newStatus);
       enemyStatusRef.current = newStatus;
     }
-    const targetName = affectsPlayer
-      ? activeMetadata.name.toUpperCase()
-      : enemyMetadata.name.toUpperCase();
     setAlertText(`¡${targetName} ${STATUS_MSG[statusApply.status] ?? statusApply.status}!`);
     return true;
   };
@@ -1302,8 +1358,20 @@ const PokemonEncounter = () => {
         dispatch(updatePokemon(usForDispatch));
         // FIX: cuando transformado, sincronizar PP de los movimientos copiados
         if (transformedId !== null) {
-          setTransformedMoves(us.moves);
+          setTransformedData((prev) => ({
+            ...prev,
+            [activePokemonIndex]: { id: transformedId, moves: us.moves },
+          }));
         }
+
+        // Actualizar lastPhysicalDamageRef si el rival nos ha pegado (para Counter)
+        // En este bloque el JUGADOR ataca — no aplica para lastPhysicalDamage del jugador
+
+        // Si el movimiento hace drain/recoil al jugador, propagar el HP ya calculado
+        // (processMoveResult ya despacha 'us' con el HP correcto)
+
+        // Registrar flinch si el resultado indica que el enemigo flinched
+        if (result.flinch) enemyFlinchRef.current = true;
 
         // Aplicar condición de estado ANTES de elegir el mensaje
         const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
@@ -1312,8 +1380,13 @@ const PokemonEncounter = () => {
           setAlertText(`¡${activeMetadata.name.toUpperCase()} falló!`);
         } else if (isTransform) {
           // Copiar ID, movimientos (PP:5) y stat stages del rival
-          setTransformedId(them.id);
-          setTransformedMoves(them.moves.map((m) => ({ id: m, pp: 5 })));
+          setTransformedData((prev) => ({
+            ...prev,
+            [activePokemonIndex]: {
+              id: them.id,
+              moves: them.moves.map((m) => ({ id: m, pp: 5 })),
+            },
+          }));
           setPlayerStages({ ...enemyStages });
           setAlertText(`¡${activeMetadata.name.toUpperCase()} se transformó!`);
           setStage(17);
@@ -1349,6 +1422,24 @@ const PokemonEncounter = () => {
         // Cuando transformado: conservar id y moves originales, solo propagar HP.
         const usForDispatch = transformedId !== null ? { ...active, hp: us.hp } : us;
         dispatch(updatePokemon(usForDispatch));
+
+        // Registrar daño físico recibido por el jugador (para Counter en siguiente turno)
+        const movedUsed = getMoveMetadata(result.moveName) ?? getMoveMetadata("pound");
+        if (movedUsed && movedUsed.damageClass === "physical" && us.hp < active.hp) {
+          lastPhysicalDamageRef.current = active.hp - us.hp;
+        }
+
+        // Leech Seed del jugador: el rival drena al jugador si tiene seed
+        if (playerLeechSeededRef.current && us.hp > 0) {
+          const seedDmg = Math.max(1, Math.floor(getPokemonStats(us.id, us.level).hp / 16));
+          const newPlayerHp = Math.max(0, us.hp - seedDmg);
+          const newEnemyHp  = Math.min(getPokemonStats(them.id, them.level).hp, them.hp + seedDmg);
+          dispatch(updatePokemon({ ...(transformedId !== null ? { ...active, hp: us.hp } : us), hp: newPlayerHp }));
+          dispatch(updatePokemonEncounter({ ...them, hp: newEnemyHp }));
+        }
+
+        // Registrar flinch del jugador si el rival le golpea con flinch
+        if (result.flinch) playerFlinchRef.current = true;
 
         // Aplicar condición de estado ANTES de elegir el mensaje
         const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
@@ -1433,6 +1524,32 @@ const PokemonEncounter = () => {
       hasMsg = true;
     }
 
+    // Drenadoras en el enemigo: le quita PS y cura al jugador
+    if (enemyLeechSeededRef.current && newThemHp > 0) {
+      const seedDmg = Math.max(1, Math.floor(getPokemonStats(currentThem.id, currentThem.level).hp / 16));
+      newThemHp     = Math.max(0, newThemHp - seedDmg);
+      newUsHp       = Math.min(getPokemonStats(currentUs.id, currentUs.level).hp, newUsHp + seedDmg);
+      dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
+      dispatch(updatePokemon({ ...currentUs, hp: newUsHp }));
+      setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival pierde PS por Drenadoras!`);
+      hasMsg = true;
+    }
+
+    // Drenadoras en el jugador: le quita PS y cura al enemigo
+    if (playerLeechSeededRef.current && newUsHp > 0) {
+      const seedDmg = Math.max(1, Math.floor(getPokemonStats(currentUs.id, currentUs.level).hp / 16));
+      newUsHp       = Math.max(0, newUsHp - seedDmg);
+      newThemHp     = Math.min(getPokemonStats(currentThem.id, currentThem.level).hp, newThemHp + seedDmg);
+      dispatch(updatePokemon({ ...currentUs, hp: newUsHp }));
+      dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
+      setAlertText(`¡${activeMetadata.name.toUpperCase()} pierde PS por Drenadoras!`);
+      hasMsg = true;
+    }
+
+    // Limpiar flinch al inicio del próximo turno
+    enemyFlinchRef.current  = false;
+    playerFlinchRef.current = false;
+
     setTimeout(() => {
       setAlertText(null);
       if (newUsHp <= 0)   setStage(24);
@@ -1456,6 +1573,17 @@ const PokemonEncounter = () => {
 
     // ── Helper: comprobar si un pokémon debe saltar su turno ─────────────
     const checkSkipTurn = (isPlayer: boolean): boolean => {
+      // Flinch tiene prioridad sobre estados (se consume al comprobar)
+      if (isPlayer && playerFlinchRef.current) {
+        playerFlinchRef.current = false;
+        setAlertText(`¡${activeMetadata.name.toUpperCase()} no puede moverse!`);
+        return true;
+      }
+      if (!isPlayer && enemyFlinchRef.current) {
+        enemyFlinchRef.current = false;
+        return true; // rival flincheó — sin mensaje visible
+      }
+
       const status    = isPlayer ? playerStatusRef.current : enemyStatusRef.current;
       if (!status) return false;
 
@@ -1511,7 +1639,10 @@ const PokemonEncounter = () => {
             }, ATTACK_ANIMATION);
           } else {
             const { us: usNew } = processMoveResult(
-              processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot),
+              processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot, {
+                lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+                isTargetSleeping: playerStatusRef.current?.type === "sleep",
+              }),
               false
             );
             setTimeout(() => {
@@ -1523,7 +1654,10 @@ const PokemonEncounter = () => {
       } else {
         // Jugador ataca normalmente
         const { us, them } = processMoveResult(
-          processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot),
+          processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
+            lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+            isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+          }),
           true
         );
         setTimeout(() => {
@@ -1570,7 +1704,10 @@ const PokemonEncounter = () => {
             }, ATTACK_ANIMATION);
           } else {
             const { us: playerAft, them: enemyAft } = processMoveResult(
-              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot),
+              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
+                lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+                isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+              }),
               true
             );
             setTimeout(() => {
@@ -1583,7 +1720,10 @@ const PokemonEncounter = () => {
       } else {
         // Rival ataca normalmente
         const { us, them } = processMoveResult(
-          processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot),
+          processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot, {
+            lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+            isTargetSleeping: playerStatusRef.current?.type === "sleep",
+          }),
           false
         );
         setTimeout(() => {
@@ -1604,7 +1744,10 @@ const PokemonEncounter = () => {
               }, ATTACK_ANIMATION);
             } else {
               const { us: playerAfterAttack, them: themAfterAttack } = processMoveResult(
-                processMove(us, them, attackId, true, stagesSnapshot),
+                processMove(us, them, attackId, true, stagesSnapshot, {
+                  lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+                  isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+                }),
                 true
               );
               setTimeout(() => {
@@ -1816,7 +1959,10 @@ const PokemonEncounter = () => {
             show={stage === 33}
             menuItems={[
               ...processingPokemon.moves.map((m) => {
-                const newMove = getLearnedMove(processingPokemon);
+                const pokemonForLearn33 = pendingLevelRef.current !== null
+                  ? { ...processingPokemon, level: pendingLevelRef.current }
+                  : processingPokemon;
+                const newMove = getLearnedMove(pokemonForLearn33);
                 if (!newMove)
                   return {
                     label: "Error",
