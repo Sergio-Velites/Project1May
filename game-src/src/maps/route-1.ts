@@ -1,11 +1,12 @@
 import route1Image from "../assets/map/route-1.png";
 import { MapId, MapType } from "./map-types";
-
+import { beauty, youngster } from "../app/npcs";
+import { Direction } from "../state/state-types";
 import music from "../assets/music/maps/route-1.mp3";
 import getEncounterData from "./get-location-data";
 
 const route1: MapType = {
-  name: "Route 1",
+  name: "Ruta 1 · Camino al Soto",
   image: route1Image,
   height: 36,
   width: 20,
@@ -54,8 +55,9 @@ const route1: MapType = {
   text: {
     27: {
       9: [
-        "RUTA 1: Camino al pueblo de la boda.",
+        "RUTA 1 · Camino al Soto",
         "¡Sigue el sendero del amor!",
+        "La preboda te espera al final del camino.",
       ],
     },
   },
@@ -75,6 +77,30 @@ const route1: MapType = {
   exitReturnMap: MapId.PalletTown,
   music,
   encounters: getEncounterData("kanto-route-1-area"),
+  trainers: [
+    {
+      npc: youngster,
+      pokemon: [{ id: 21, level: 3 }],
+      facing: Direction.Left,
+      pos: { x: 14, y: 18 },
+      intro: [
+        "¡Para ahí, tú!",
+        "¡No te creas que llegarás tan fácil!",
+        "¡Yo quería el vino y tú me lo quitaste!",
+      ],
+      outtro: ["Bueno... puede que yo tampoco llegue a tiempo."],
+      money: 50,
+    },
+    {
+      npc: beauty,
+      pokemon: [{ id: 35, level: 2 }],
+      facing: Direction.Right,
+      pos: { x: 5, y: 28 },
+      intro: [],
+      outtro: ["¡No olvides que la preboda sin anís no es preboda!"],
+      money: 0,
+    },
+  ],
   grass: {
     6: [10, 11, 12, 13, 14, 15, 16, 17],
     7: [10, 11, 12, 13, 14, 15, 16, 17],

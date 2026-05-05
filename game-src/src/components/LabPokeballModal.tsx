@@ -54,15 +54,21 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px;
-  gap: 6px;
+  padding: 6px;
+  gap: 4px;
   width: 80%;
   max-width: 240px;
+  max-height: 92%;
+  overflow-y: auto;
+  box-sizing: border-box;
 `;
 
 const PokemonSprite = styled(PixelImage)`
-  width: 50%;
+  width: 32%;
+  max-height: 28cqw;
+  object-fit: contain;
   image-rendering: pixelated;
+  flex-shrink: 0;
 `;
 
 const CardText = styled.p`

@@ -3,7 +3,7 @@ import { MapId, MapType } from "./map-types";
 import music from "../assets/music/maps/pewter-city.mp3";
 
 const pewterCity: MapType = {
-  name: "Pewter City",
+  name: "VILLAMAYOR DE MONJARDÍN",
   music,
   image,
   height: 36,
@@ -64,29 +64,29 @@ const pewterCity: MapType = {
   grass: {},
   text: {
     9: {
-      15: ["MUSEO DE CIENCIAS DE PLATEADA"],
+      15: ["BODEGA CASTILLO DE MONJARDÍN", "Tipo VINO · ¡Ven a brindar!"],
     },
     17: {
       11: [
-        "LÍDER DEL GIMNASIO DE CIUDAD PLATEADA: BROCK",
-        "El entrenador sólido como la roca!",
+        "SERGIO Y MARTA, guardianes de la BODEGA.",
+        "¡Solo los que merezcan brindar podrán pasar!",
       ],
     },
     19: {
       33: [
         "¡AVISO!",
-        "¡Ladrones roban fósiles PKMN en el MONTE LUNA!",
-        "¡Llama a la POLICÍA DE PLATEADA si tienes info!",
+        "El Team Rocket intenta robar la reserva especial.",
+        "¡Repórtalo al organizador de la boda!",
       ],
     },
     23: {
-      25: ["CIUDAD PLATEADA", "Una ciudad gris como las rocas"],
+      25: ["VILLAMAYOR DE MONJARDÍN", "Tierra del mejor vino de la comarca."],
     },
     29: {
       19: [
-        "CONSEJOS DE ENTRENADOR",
-        "Todo PKMN que participe en combate,",
-        "¡aunque sea poco, gana experiencia!",
+        "CONSEJO DE BODA",
+        "El que llega tarde a la preboda,",
+        "¡pierde turno en la barra libre!",
       ],
     },
   },

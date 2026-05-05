@@ -139,12 +139,14 @@ const DetailArea = styled.div`
 const SpriteBox = styled.div`
   border-right: 2px solid #181010;
   width: 42%;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg);
   padding: 4px;
+  overflow: hidden;
 `;
 
 const SpriteImg = styled(PixelImage)`

@@ -1,4 +1,4 @@
-import { brock, jrTrainerMale } from "../app/npcs";
+import { aceTrainerFemale, aceTrainerMale, sailor } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/pewter-city-gym.png";
 import music from "../assets/music/maps/pokemon-gym.mp3";
@@ -6,7 +6,7 @@ import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 
 const pewterCityGym: MapType = {
-  name: "Pewter City Gym",
+  name: "Bodega CASTILLO DE MONJARDÍN",
   image,
   music,
   height: 14,
@@ -42,73 +42,62 @@ const pewterCityGym: MapType = {
   exitReturnMap: MapId.PewterCity,
   trainers: [
     {
-      npc: jrTrainerMale,
-      pokemon: [
-        {
-          id: 50,
-          level: 11,
-        },
-        {
-          id: 27,
-          level: 11,
-        },
-      ],
-      money: 220,
+      npc: sailor,
+      pokemon: [{ id: 72, level: 10 }, { id: 54, level: 10 }],
+      money: 300,
       intro: [
-        "¡Párate ahí, crío!",
-        "¡Te faltan años luz para enfrentarte a BROCK!",
-      ],
-      outtro: ["¡Rediez!", "¡Un año luz no es tiempo, es distancia!"],
-      facing: Direction.Right,
-      pos: {
-        x: 3,
-        y: 6,
-      },
-    },
-    {
-      npc: brock,
-      pokemon: [
-        {
-          id: 74,
-          level: 12,
-        },
-        {
-          id: 95,
-          level: 14,
-        },
-      ],
-      money: 1386,
-      intro: [
-        "¡Soy BROCK, LÍDER del GIMNASIO DE CIUDAD PLATEADA!",
-        "¡Creo en la defensa sólida como la roca y en la determinación!",
-        "¡Por eso todos mis PKMN son de tipo roca!",
-        "¿Sigues queriendo desafiarme?",
-        "¡Muy bien! ¡Muéstrame lo mejor que tienes!",
+        "¡Eh, espera!",
+        "¡Esta bodega es solo para los que demuestren su valor!",
+        "¡Derrótame primero!",
       ],
       outtro: [
-        "¡Me has subestimado!",
-        "¡Como prueba de tu victoria, toma la MEDALLA ROCA!",
-        "¡Es una medalla oficial de la LIGA PKMN!",
-        "¡Los PKMN de su portador se vuelven más poderosos!",
-        "¡Ahora puedes usar FLASH fuera de combate!",
+        "Bien... pero dentro te esperan Sergio y Marta.",
+        "¡No podrás con ellos!",
+      ],
+      facing: Direction.Right,
+      pos: { x: 3, y: 6 },
+    },
+    {
+      npc: aceTrainerMale,
+      pokemon: [{ id: 58, level: 14 }, { id: 77, level: 12 }],
+      money: 1400,
+      intro: [
+        "¡Te lo advertimos!",
+        "Aquí entre barricas solo se habla de vino.",
+        "...y de Pokémon.",
+        "¡Demuestra que mereces brindar con nosotros!",
+      ],
+      outtro: [
+        "¡Bien hecho!",
+        "Nos vemos el 8 de agosto.",
+        "Y esta vez tú brindas con nosotros.",
       ],
       facing: Direction.Down,
-      pos: {
-        x: 4,
-        y: 1,
-      },
+      pos: { x: 3, y: 2 },
       postGame: {
         message: [
-          "¡Espera, lleva esto contigo!",
-          "¡Una MT tiene una técnica que se puede enseñar a un PKMN!",
-          "¡Una MT solo se puede usar una vez!",
-          "¡Así que elige bien el PKMN al que se la enseñas!",
-          "¡La MT34 contiene AGUANTAR!",
-          "¡Tu PKMN absorberá el daño recibido",
-          "y luego lo devolverá al doble!",
+          "¡Toma la INSIGNIA DEL VINO!",
+          "Es el símbolo de que mereces brindar.",
+          "¡Úsala bien, y que el vino fluya!",
         ],
         items: [ItemType.BoulderBadge, ItemType.Tm34],
       },
+    },
+    {
+      npc: aceTrainerFemale,
+      pokemon: [{ id: 12, level: 16 }, { id: 36, level: 14 }],
+      money: 1600,
+      intro: [
+        "¡Yo soy Marta!",
+        "¡Y no te lo voy a poner fácil!",
+        "¡No todo en la boda es vino y flores!",
+      ],
+      outtro: [
+        "¡Increíble! ¡Enhorabuena!",
+        "El 8 de agosto... trae buen vino.",
+      ],
+      facing: Direction.Down,
+      pos: { x: 6, y: 2 },
     },
   ],
 };

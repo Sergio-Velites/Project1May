@@ -1,11 +1,12 @@
 import viridianCityImage from "../assets/map/viridian-city.png";
 import { MapId, MapType } from "./map-types";
-
+import { cueBall, gentleman, jrTrainerFemale, teamRocketGrunt } from "../app/npcs";
+import { Direction } from "../state/state-types";
 import music from "../assets/music/maps/pewter-city.mp3";
 import getEncounterData from "./get-location-data";
 
 const viridianCity: MapType = {
-  name: "Viridian City",
+  name: "SOTO LEZKAIRU",
   image: viridianCityImage,
   height: 36,
   width: 40,
@@ -67,32 +68,36 @@ const viridianCity: MapType = {
   text: {
     29: {
       21: [
-        "¡Esta es CIUDAD AÑIL!",
+        "¡Bienvenido al SOTO LEZKAIRU!",
+        "Lugar de preboda y celebración.",
       ],
     },
     25: {
       24: [
-        "¡Ciudad sin principio ni fin!",
+        "En el Soto, el vino corre más que el agua.",
       ],
     },
     19: {
       30: [
-        "Bienvenidos a la boda.",
+        "¡Que vivan los novios!",
+        "¡Y que el anís no falte!",
       ],
     },
     17: {
       17: [
-        "¡Felicidades a los novios!",
+        "AVISO: Reserva de vino protegida.",
+        "Manos fuera, Team Rocket.",
       ],
     },
     7: {
       27: [
-        "El amor es el mejor PKMN.",
+        "Bodega CASTILLO DE MONJARDÍN →",
+        "¡Demuestra que mereces brindar!",
       ],
     },
     1: {
       19: [
-        "¡Hoy es un día especial!",
+        "RUTA 2 · Hacia VILLAMAYOR →",
       ],
     },
   },
@@ -140,7 +145,59 @@ const viridianCity: MapType = {
     x: 11,
     y: 1,
   },
-  trainers: [],
+  trainers: [
+    {
+      npc: cueBall,
+      pokemon: [{ id: 19, level: 4 }],
+      facing: Direction.Down,
+      pos: { x: 15, y: 10 },
+      intro: [
+        "¡Hemos montado nuestra propia preboda!",
+        "¡Con vino barato y sin protocolo!",
+        "¡Demuestra que mereces el bueno!",
+      ],
+      outtro: ["...igual el vino caro tampoco está tan mal."],
+      money: 80,
+    },
+    {
+      npc: jrTrainerFemale,
+      pokemon: [{ id: 41, level: 5 }],
+      facing: Direction.Left,
+      pos: { x: 22, y: 15 },
+      intro: [
+        "¡Nosotros también queremos brindar!",
+        "¡Pero solo si nos ganas!",
+      ],
+      outtro: ["¡Felicidades! ¡Brindamos juntos el 8 de agosto!"],
+      money: 100,
+    },
+    {
+      npc: teamRocketGrunt,
+      pokemon: [{ id: 33, level: 5 }, { id: 52, level: 4 }],
+      facing: Direction.Down,
+      pos: { x: 10, y: 3 },
+      intro: [
+        "¡Con este vino seremos los reyes de la fiesta!",
+        "¡No te metas en nuestros asuntos!",
+      ],
+      outtro: ["¡Maldición! Nos retiramos... pero volveremos por el anís."],
+      money: 200,
+    },
+    {
+      npc: gentleman,
+      pokemon: [{ id: 1, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 8, y: 22 },
+      persistent: true,
+      intro: [],
+      outtro: [
+        "Joven, el vino tinto cura... y anima.",
+        "Toma una botella para el camino.",
+        "¡Salud!",
+      ],
+      money: 0,
+    },
+  ],
 };
 
 export default viridianCity;
