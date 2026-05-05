@@ -52,19 +52,9 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
 
   // Lower enemy speed
   "string-shot":   { stat: "speed",   target: "defender", delta: -2 },
-  // Status → speed penalty (sleep/paralysis approximation)
-  "sing":          { stat: "speed",   target: "defender", delta: -2 },
-  "hypnosis":      { stat: "speed",   target: "defender", delta: -2 },
-  "sleep-powder":  { stat: "speed",   target: "defender", delta: -2 },
-  "spore":         { stat: "speed",   target: "defender", delta: -2 },
-  "lovely-kiss":   { stat: "speed",   target: "defender", delta: -2 },
-  "stun-spore":    { stat: "speed",   target: "defender", delta: -2 },
-  "thunder-wave":  { stat: "speed",   target: "defender", delta: -2 },
-  // Status → special penalty
+  // Confusión → penalización especial (simplificado, sin estado real)
   "confuse-ray":   { stat: "special", target: "defender", delta: -1 },
   "supersonic":    { stat: "special", target: "defender", delta: -1 },
-  "poison-powder": { stat: "special", target: "defender", delta: -1 },
-  "toxic":         { stat: "special", target: "defender", delta: -2 },
   "leech-seed":    { stat: "defense", target: "defender", delta: -1 },
   "disable":       { stat: "attack",  target: "defender", delta: -1 },
 
@@ -89,6 +79,72 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
   // Raise own special
   "amnesia":       { stat: "special", target: "attacker", delta: +2 },
   "growth":        { stat: "special", target: "attacker", delta: +1 },
+};
+
+// ── Condiciones de estado ────────────────────────────────────────────────────
+
+export type StatusType =
+  | "poison"
+  | "badly-poisoned"
+  | "burn"
+  | "paralysis"
+  | "sleep"
+  | "freeze";
+
+export interface StatusApply {
+  status: StatusType;
+  target: "attacker" | "defender";
+}
+
+/** Movimientos que aplican una condición de estado como efecto principal o secundario */
+const STATUS_APPLY_TABLE: Record<string, StatusApply> = {
+  // ── Estado puro (probabilidad gestionada por accuracy del movimiento) ──
+  "poison-powder": { status: "poison",         target: "defender" },
+  "toxic":         { status: "badly-poisoned",  target: "defender" },
+  "stun-spore":    { status: "paralysis",       target: "defender" },
+  "thunder-wave":  { status: "paralysis",       target: "defender" },
+  "sleep-powder":  { status: "sleep",           target: "defender" },
+  "spore":         { status: "sleep",           target: "defender" },
+  "sing":          { status: "sleep",           target: "defender" },
+  "hypnosis":      { status: "sleep",           target: "defender" },
+  "lovely-kiss":   { status: "sleep",           target: "defender" },
+  // ── Efectos secundarios de movimientos de daño (chance separada abajo) ──
+  "poison-sting":  { status: "poison",    target: "defender" },
+  "sludge":        { status: "poison",    target: "defender" },
+  "smog":          { status: "poison",    target: "defender" },
+  "twineedle":     { status: "poison",    target: "defender" },
+  "ember":         { status: "burn",      target: "defender" },
+  "flamethrower":  { status: "burn",      target: "defender" },
+  "fire-blast":    { status: "burn",      target: "defender" },
+  "fire-punch":    { status: "burn",      target: "defender" },
+  "body-slam":     { status: "paralysis", target: "defender" },
+  "lick":          { status: "paralysis", target: "defender" },
+  "thunder":       { status: "paralysis", target: "defender" },
+  "thunderbolt":   { status: "paralysis", target: "defender" },
+  "thunder-punch": { status: "paralysis", target: "defender" },
+  "blizzard":      { status: "freeze",    target: "defender" },
+  "ice-beam":      { status: "freeze",    target: "defender" },
+  "ice-punch":     { status: "freeze",    target: "defender" },
+};
+
+/** Probabilidad del efecto secundario de estado para movimientos de daño */
+const SECONDARY_STATUS_CHANCE: Record<string, number> = {
+  "poison-sting":  0.30,
+  "sludge":        0.30,
+  "smog":          0.40,
+  "twineedle":     0.20,
+  "ember":         0.10,
+  "flamethrower":  0.10,
+  "fire-blast":    0.30,
+  "fire-punch":    0.10,
+  "body-slam":     0.30,
+  "lick":          0.30,
+  "thunder":       0.10,
+  "thunderbolt":   0.10,
+  "thunder-punch": 0.10,
+  "blizzard":      0.10,
+  "ice-beam":      0.10,
+  "ice-punch":     0.10,
 };
 
 // ── Movimientos de efecto especial ──────────────────────────────────────────
@@ -131,6 +187,7 @@ export interface MoveResult {
   isDebuff: boolean;
   isTransform?: boolean;
   statChange?: StatChange; // present for status moves with a known effect
+  statusApply?: StatusApply; // present when a status condition is applied
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -226,6 +283,17 @@ const processMove = (
 
   // ── Movimientos de estado (sin daño) ─────────────────────────────────────
   if (!moveMetadata.power) {
+    // Condición de estado real (sueño, parálisis, veneno…)
+    const statusEntry = STATUS_APPLY_TABLE[move];
+    if (statusEntry) {
+      return {
+        ...defaultReturn,
+        isDebuff: statusEntry.target === "defender",
+        isBuff:   statusEntry.target === "attacker",
+        statusApply: statusEntry,
+      };
+    }
+    // Cambio de estadística (growl, leer, swords-dance…)
     const effect = STATUS_MOVE_EFFECTS[move];
     if (effect) {
       return {
@@ -283,6 +351,12 @@ const processMove = (
     // Autodestrucción / Explosión: el atacante también se debilita
     const selfDestructs = move === "self-destruct" || move === "explosion";
 
+    // Efecto secundario de estado (body-slam, thunderbolt, flamethrower…)
+    const secEntry = STATUS_APPLY_TABLE[move];
+    const secChance = SECONDARY_STATUS_CHANCE[move];
+    const secondaryStatus =
+      secEntry && secChance && Math.random() < secChance ? secEntry : undefined;
+
     return {
       ...defaultReturn,
       them: { ...them, hp: Math.max(0, them.hp - totalDamage) },
@@ -290,6 +364,7 @@ const processMove = (
       superEffective,
       notVeryEffective,
       critical: isCrit,
+      statusApply: secondaryStatus,
     };
   }
 
@@ -323,6 +398,12 @@ const processMove = (
   // Autodestrucción / Explosión: el atacante (enemigo) también se debilita
   const enemyExplodes = move === "self-destruct" || move === "explosion";
 
+  // Efecto secundario de estado cuando el enemigo ataca
+  const eSecEntry = STATUS_APPLY_TABLE[move];
+  const eSecChance = SECONDARY_STATUS_CHANCE[move];
+  const eSecondaryStatus =
+    eSecEntry && eSecChance && Math.random() < eSecChance ? eSecEntry : undefined;
+
   return {
     ...defaultReturn,
     us: { ...usAfterPP, hp: Math.max(0, us.hp - eTotalDmg) },
@@ -330,6 +411,7 @@ const processMove = (
     superEffective,
     notVeryEffective,
     critical: isCrit,
+    statusApply: eSecondaryStatus,
   };
 };
 

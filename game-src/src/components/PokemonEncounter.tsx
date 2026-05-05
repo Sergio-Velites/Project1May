@@ -26,7 +26,7 @@ import {
 import usePokemonMetadata, { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import Frame from "./Frame";
 import HealthBar from "./HealthBar";
-import usePokemonStats from "../app/use-pokemon-stats";
+import usePokemonStats, { getPokemonStats } from "../app/use-pokemon-stats";
 
 import corner from "../assets/ui/corner.png";
 import { useEffect, useState, useRef } from "react";
@@ -628,6 +628,16 @@ const PokemonEncounter = () => {
   const [transformedId, setTransformedId] = useState<number | null>(null);
   const [transformedMoves, setTransformedMoves] = useState<{ id: string; pp: number }[]>([]);
 
+  // Condiciones de estado en combate (no se persisten en Redux)
+  type BattleStatus = { type: "poison" | "badly-poisoned" | "burn" | "paralysis" | "sleep" | "freeze"; turns: number };
+  const [playerStatus, setPlayerStatus] = useState<BattleStatus | null>(null);
+  const [enemyStatus, setEnemyStatus] = useState<BattleStatus | null>(null);
+  // Refs para evitar stale-closures en los timeouts de processBattle
+  const playerStatusRef = useRef<BattleStatus | null>(null);
+  const enemyStatusRef = useRef<BattleStatus | null>(null);
+  useEffect(() => { playerStatusRef.current = playerStatus; }, [playerStatus]);
+  useEffect(() => { enemyStatusRef.current = enemyStatus; }, [enemyStatus]);
+
   const isInBattle = !!enemy && !!active && !!enemyMetadata && !!activeMetadata;
 
   const isTrainer = !!trainer;
@@ -750,6 +760,10 @@ const PokemonEncounter = () => {
       setEnemyStages(DEFAULT_STAGES);
       setTransformedId(null);
       setTransformedMoves([]);
+      setPlayerStatus(null);
+      setEnemyStatus(null);
+      playerStatusRef.current = null;
+      enemyStatusRef.current = null;
       setStage(0);
       // Register enemy as SEEN in Pokédex
       dispatch(seePokemon(enemy.id));
@@ -1184,6 +1198,20 @@ const PokemonEncounter = () => {
       ? activeMetadata.name.toUpperCase()
       : enemyMetadata.name.toUpperCase();
     const statNameES = STAT_NAMES_ES[stat] ?? stat.toUpperCase();
+
+    // Verificar límite ±6
+    const currentStage = affectsPlayer
+      ? playerStages[stat as keyof StatStages]
+      : enemyStages[stat as keyof StatStages];
+    if (delta > 0 && currentStage >= 6) {
+      setAlertText(`¡El ${statNameES} de ${targetName} no subirá más!`);
+      return;
+    }
+    if (delta < 0 && currentStage <= -6) {
+      setAlertText(`¡El ${statNameES} de ${targetName} no bajará más!`);
+      return;
+    }
+
     const dir = delta > 0 ? "subió" : "bajó";
     const magnitude = Math.abs(delta) >= 2 ? " mucho" : "";
 
@@ -1203,6 +1231,48 @@ const PokemonEncounter = () => {
     }
   };
 
+  // ── Helper: aplica una condición de estado y muestra el mensaje ───────────
+  const applyStatus = (
+    statusApply: { status: string; target: "attacker" | "defender" },
+    isAttacking: boolean
+  ): boolean => {
+    const STATUS_MSG: Record<string, string> = {
+      "poison":         "quedó envenenado",
+      "badly-poisoned": "quedó gravemente envenenado",
+      "burn":           "sufrió una quemadura",
+      "paralysis":      "quedó paralizado",
+      "sleep":          "se quedó dormido",
+      "freeze":         "se congeló",
+    };
+    // "defender" = el objetivo del movimiento; "attacker" = quien lo usa
+    const affectsPlayer =
+      (isAttacking  && statusApply.target === "attacker") ||
+      (!isAttacking && statusApply.target === "defender");
+
+    const currentStatus = affectsPlayer ? playerStatusRef.current : enemyStatusRef.current;
+    if (currentStatus) return false; // ya tiene un estado: no se puede aplicar otro
+
+    type BT = { type: "poison"|"badly-poisoned"|"burn"|"paralysis"|"sleep"|"freeze"; turns: number };
+    const newStatus: BT = {
+      type: statusApply.status as BT["type"],
+      turns: statusApply.status === "sleep"          ? 1 + Math.floor(Math.random() * 5)
+           : statusApply.status === "badly-poisoned" ? 1
+           : 0,
+    };
+    if (affectsPlayer) {
+      setPlayerStatus(newStatus);
+      playerStatusRef.current = newStatus;
+    } else {
+      setEnemyStatus(newStatus);
+      enemyStatusRef.current = newStatus;
+    }
+    const targetName = affectsPlayer
+      ? activeMetadata.name.toUpperCase()
+      : enemyMetadata.name.toUpperCase();
+    setAlertText(`¡${targetName} ${STATUS_MSG[statusApply.status] ?? statusApply.status}!`);
+    return true;
+  };
+
   const processMoveResult = (
     result: MoveResult,
     isAttacking: boolean
@@ -1217,6 +1287,7 @@ const PokemonEncounter = () => {
       notVeryEffective,
       statChange,
       isTransform,
+      statusApply,
     } = result;
     if (isAttacking) {
       setAlertText(
@@ -1229,6 +1300,13 @@ const PokemonEncounter = () => {
         // solo propagar cambio de HP. Evita corromper el save con id del rival.
         const usForDispatch = transformedId !== null ? { ...active, hp: us.hp } : us;
         dispatch(updatePokemon(usForDispatch));
+        // FIX: cuando transformado, sincronizar PP de los movimientos copiados
+        if (transformedId !== null) {
+          setTransformedMoves(us.moves);
+        }
+
+        // Aplicar condición de estado ANTES de elegir el mensaje
+        const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
 
         if (missed) {
           setAlertText(`¡${activeMetadata.name.toUpperCase()} falló!`);
@@ -1251,6 +1329,9 @@ const PokemonEncounter = () => {
         } else if (notVeryEffective) {
           setAlertText(`No es muy efectivo...`);
           setStage(17);
+        } else if (statusApplied) {
+          // Mensaje ya fijado por applyStatus
+          setStage(17);
         } else {
           setStage(17);
         }
@@ -1268,6 +1349,9 @@ const PokemonEncounter = () => {
         // Cuando transformado: conservar id y moves originales, solo propagar HP.
         const usForDispatch = transformedId !== null ? { ...active, hp: us.hp } : us;
         dispatch(updatePokemon(usForDispatch));
+
+        // Aplicar condición de estado ANTES de elegir el mensaje
+        const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
 
         if (missed) {
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival falló!`);
@@ -1290,6 +1374,9 @@ const PokemonEncounter = () => {
         } else if (notVeryEffective) {
           setAlertText(`No es muy efectivo...`);
           setStage(19);
+        } else if (statusApplied) {
+          // Mensaje ya fijado por applyStatus
+          setStage(19);
         } else {
           setStage(19);
         }
@@ -1303,13 +1390,63 @@ const PokemonEncounter = () => {
     return { us, them };
   };
 
+  // ── Helper: daño por veneno/quemadura al final del turno ─────────────────
+  const applyEndOfTurnStatus = (
+    currentUs: PokemonInstance,
+    currentThem: PokemonEncounterType
+  ) => {
+    const pStatus = playerStatusRef.current;
+    const eStatus = enemyStatusRef.current;
+    let newUsHp   = currentUs.hp;
+    let newThemHp = currentThem.hp;
+    let hasMsg    = false;
+
+    if (pStatus && (pStatus.type === "poison" || pStatus.type === "badly-poisoned" || pStatus.type === "burn")) {
+      const maxHp  = getPokemonStats(currentUs.id, currentUs.level).hp;
+      const counter = pStatus.type === "badly-poisoned" ? pStatus.turns : 1;
+      const dmg    = Math.max(1, Math.floor(maxHp * counter / 16));
+      newUsHp      = Math.max(0, newUsHp - dmg);
+      dispatch(updatePokemon({ ...currentUs, hp: newUsHp }));
+      if (pStatus.type === "badly-poisoned") {
+        const upd = { ...pStatus, turns: pStatus.turns + 1 };
+        setPlayerStatus(upd);
+        playerStatusRef.current = upd;
+      }
+      const what = pStatus.type === "burn" ? "la quemadura" : "el veneno";
+      setAlertText(`¡${activeMetadata.name.toUpperCase()} sufre por ${what}!`);
+      hasMsg = true;
+    }
+
+    if (eStatus && (eStatus.type === "poison" || eStatus.type === "badly-poisoned" || eStatus.type === "burn")) {
+      const maxHp  = getPokemonStats(currentThem.id, currentThem.level).hp;
+      const counter = eStatus.type === "badly-poisoned" ? eStatus.turns : 1;
+      const dmg    = Math.max(1, Math.floor(maxHp * counter / 16));
+      newThemHp    = Math.max(0, newThemHp - dmg);
+      dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
+      if (eStatus.type === "badly-poisoned") {
+        const upd = { ...eStatus, turns: eStatus.turns + 1 };
+        setEnemyStatus(upd);
+        enemyStatusRef.current = upd;
+      }
+      const what = eStatus.type === "burn" ? "la quemadura" : "el veneno";
+      setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival sufre por ${what}!`);
+      hasMsg = true;
+    }
+
+    setTimeout(() => {
+      setAlertText(null);
+      if (newUsHp <= 0)   setStage(24);
+      else if (newThemHp <= 0) setStage(20);
+      else setStage(11);
+    }, hasMsg ? 1000 : 0);
+  };
+
   const processBattle = (attackId: string) => {
     const activeMove = getMoveMetadata(attackId);
-    const enemyMove = getMoveMetadata(getRandomEnemyMove());
+    const enemyMove  = getMoveMetadata(getRandomEnemyMove());
 
     const activeMovesFirst = getActiveMovesFirst(activeMove, enemyMove);
-
-    const stagesSnapshot = { us: playerStages, them: enemyStages };
+    const stagesSnapshot   = { us: playerStages, them: enemyStages };
 
     // Si el jugador está transformado, usar el ID/moves del transformado para los cálculos
     const effectivePlayer =
@@ -1317,92 +1454,168 @@ const PokemonEncounter = () => {
         ? { ...active, id: transformedId, moves: transformedMoves }
         : active;
 
-    // We are moving first
+    // ── Helper: comprobar si un pokémon debe saltar su turno ─────────────
+    const checkSkipTurn = (isPlayer: boolean): boolean => {
+      const status    = isPlayer ? playerStatusRef.current : enemyStatusRef.current;
+      if (!status) return false;
+
+      type BT = { type: string; turns: number };
+      const setStatus = isPlayer
+        ? (s: BT | null) => { setPlayerStatus(s as typeof playerStatus); playerStatusRef.current = s as typeof playerStatus; }
+        : (s: BT | null) => { setEnemyStatus(s as typeof enemyStatus);   enemyStatusRef.current  = s as typeof enemyStatus; };
+
+      const name = isPlayer
+        ? activeMetadata.name.toUpperCase()
+        : enemyMetadata.name.toUpperCase() + " rival";
+
+      if (status.type === "sleep") {
+        const newTurns = status.turns - 1;
+        if (newTurns <= 0) {
+          setStatus(null);
+          setAlertText(`¡${name} se despertó!`);
+          return false; // se despertó, puede moverse este turno
+        }
+        setStatus({ ...status, turns: newTurns });
+        setAlertText(`¡${name} está dormido...!`);
+        return true;
+      }
+      if (status.type === "freeze") {
+        if (Math.random() < 0.20) {
+          setStatus(null);
+          setAlertText(`¡${name} se descongeló!`);
+          return false;
+        }
+        setAlertText(`¡${name} está congelado!`);
+        return true;
+      }
+      if (status.type === "paralysis" && Math.random() < 0.25) {
+        setAlertText(`¡${name} está paralizado! ¡No puede moverse!`);
+        return true;
+      }
+      return false;
+    };
+
+    // ── Jugador mueve primero ─────────────────────────────────────────────
     if (activeMovesFirst) {
-      // We are attacking
-      const { us, them } = processMoveResult(
-        processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot),
-        true
-      );
-
-      setTimeout(() => {
-        // If enemy fainted
-        if (them.hp <= 0) {
-          setStage(20);
-        }
-
-        // Player self-destructed (Explosion / Self-Destruct) — no counter-attack
-        else if (us.hp <= 0) {
-          setStage(24);
-        }
-
-        // Enemy attacking
-        else {
-          const { us: usNew } = processMoveResult(
-            processMove(us, them, enemyMove.id, false, stagesSnapshot),
-            false
-          );
-
-          setTimeout(() => {
-            // We fainted
-            if (usNew.hp <= 0) {
-              setStage(24);
+      if (checkSkipTurn(true)) {
+        // Jugador salta turno — mostrar mensaje, luego ataca el rival
+        setStage(15);
+        setTimeout(() => {
+          setAlertText(null);
+          if (checkSkipTurn(false)) {
+            // Ambos saltan
+            setStage(18);
+            setTimeout(() => {
+              setAlertText(null);
+              applyEndOfTurnStatus(effectivePlayer, enemy);
+            }, ATTACK_ANIMATION);
+          } else {
+            const { us: usNew } = processMoveResult(
+              processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot),
+              false
+            );
+            setTimeout(() => {
+              if (usNew.hp <= 0) setStage(24);
+              else applyEndOfTurnStatus(usNew, enemy);
+            }, ATTACK_ANIMATION + 1000);
+          }
+        }, ATTACK_ANIMATION);
+      } else {
+        // Jugador ataca normalmente
+        const { us, them } = processMoveResult(
+          processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot),
+          true
+        );
+        setTimeout(() => {
+          if (them.hp <= 0) {
+            setStage(20);
+          } else if (us.hp <= 0) {
+            setStage(24);
+          } else {
+            if (checkSkipTurn(false)) {
+              // Rival salta turno
+              setStage(18);
+              setTimeout(() => {
+                setAlertText(null);
+                applyEndOfTurnStatus(us, them);
+              }, ATTACK_ANIMATION);
+            } else {
+              const { us: usNew } = processMoveResult(
+                processMove(us, them, enemyMove.id, false, stagesSnapshot),
+                false
+              );
+              setTimeout(() => {
+                if (usNew.hp <= 0) setStage(24);
+                else applyEndOfTurnStatus(usNew, them);
+              }, ATTACK_ANIMATION + 1000);
             }
-
-            // Ending battle
-            else {
-              setStage(11);
-            }
-          }, ATTACK_ANIMATION + 1000);
-        }
-      }, ATTACK_ANIMATION + 1000);
+          }
+        }, ATTACK_ANIMATION + 1000);
+      }
     }
 
-    // Enemy moving first
+    // ── Rival mueve primero ──────────────────────────────────────────────
     else {
-      // Enemy attacking
-      const { us, them } = processMoveResult(
-        processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot),
-        false
-      );
-
-      setTimeout(() => {
-        // BUG FIX: if the enemy self-destructed, it has 0 HP — player wins
-        if (them.hp <= 0) {
-          setStage(20);
-          return;
-        }
-
-        // We fainted
-        if (us.hp <= 0) {
-          setStage(24);
-        }
-
-        // We are attacking
-        else {
-          const { us: playerAfterAttack, them: themAfterAttack } = processMoveResult(
-            processMove(us, them, attackId, true, stagesSnapshot),
-            true
-          );
-
-          setTimeout(() => {
-            // If enemy fainted
-            if (themAfterAttack.hp <= 0) {
-              setStage(20);
+      if (checkSkipTurn(false)) {
+        // Rival salta turno — mostrar mensaje, luego ataca el jugador
+        setStage(18);
+        setTimeout(() => {
+          setAlertText(null);
+          if (checkSkipTurn(true)) {
+            // Ambos saltan
+            setStage(15);
+            setTimeout(() => {
+              setAlertText(null);
+              applyEndOfTurnStatus(effectivePlayer, enemy);
+            }, ATTACK_ANIMATION);
+          } else {
+            const { us: playerAft, them: enemyAft } = processMoveResult(
+              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot),
+              true
+            );
+            setTimeout(() => {
+              if (enemyAft.hp <= 0) setStage(20);
+              else if (playerAft.hp <= 0) setStage(24);
+              else applyEndOfTurnStatus(playerAft, enemyAft);
+            }, ATTACK_ANIMATION + 1000);
+          }
+        }, ATTACK_ANIMATION);
+      } else {
+        // Rival ataca normalmente
+        const { us, them } = processMoveResult(
+          processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot),
+          false
+        );
+        setTimeout(() => {
+          // BUG FIX: if the enemy self-destructed, it has 0 HP — player wins
+          if (them.hp <= 0) {
+            setStage(20);
+            return;
+          }
+          if (us.hp <= 0) {
+            setStage(24);
+          } else {
+            if (checkSkipTurn(true)) {
+              // Jugador salta turno
+              setStage(15);
+              setTimeout(() => {
+                setAlertText(null);
+                applyEndOfTurnStatus(us, them);
+              }, ATTACK_ANIMATION);
+            } else {
+              const { us: playerAfterAttack, them: themAfterAttack } = processMoveResult(
+                processMove(us, them, attackId, true, stagesSnapshot),
+                true
+              );
+              setTimeout(() => {
+                if (themAfterAttack.hp <= 0) setStage(20);
+                else if (playerAfterAttack.hp <= 0) setStage(24);
+                else applyEndOfTurnStatus(playerAfterAttack, themAfterAttack);
+              }, ATTACK_ANIMATION + 1000);
             }
-
-            // Player self-destructed (Explosion / Self-Destruct)
-            else if (playerAfterAttack.hp <= 0) {
-              setStage(24);
-            }
-
-            // Ending battle
-            else {
-              setStage(11);
-            }
-          }, ATTACK_ANIMATION + 1000);
-        }
-      }, ATTACK_ANIMATION + 1000);
+          }
+        }, ATTACK_ANIMATION + 1000);
+      }
     }
   };
 
