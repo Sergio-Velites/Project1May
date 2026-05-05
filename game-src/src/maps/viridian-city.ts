@@ -1,6 +1,6 @@
 import viridianCityImage from "../assets/map/viridian-city.png";
 import { MapId, MapType } from "./map-types";
-import { cueBall, gentleman, jrTrainerFemale, teamRocketGrunt } from "../app/npcs";
+import { cueBall, fisher, gentleman, jrTrainerFemale, lass, rocker, sailor, teamRocketGrunt } from "../app/npcs";
 import { Direction } from "../state/state-types";
 import music from "../assets/music/maps/pewter-city.mp3";
 import getEncounterData from "./get-location-data";
@@ -196,6 +196,61 @@ const viridianCity: MapType = {
         "¡Salud!",
       ],
       money: 0,
+    },
+    // DJ preparando el equipo — decorativo
+    {
+      npc: rocker,
+      pokemon: [{ id: 25, level: 1 }],
+      facing: Direction.Right,
+      pos: { x: 18, y: 8 },
+      persistent: true,
+      intro: [],
+      outtro: [
+        "¡El equipo de sonido ya está enchufado!",
+        "¡En cuanto lleguen los novios, esto se lía!",
+      ],
+      money: 0,
+    },
+    // Invitada madrugadora — ya está sentada reservando sitio
+    {
+      npc: lass,
+      pokemon: [{ id: 35, level: 3 }],
+      facing: Direction.Down,
+      pos: { x: 9, y: 4 },
+      persistent: true,
+      intro: [],
+      outtro: [
+        "Llegué la primera. Esta silla ya tiene dueña.",
+        "¡A ver si venís más tarde!",
+      ],
+      money: 0,
+    },
+    // Fotógrafo — moviéndose por el soto buscando el ángulo perfecto
+    {
+      npc: sailor,
+      pokemon: [{ id: 54, level: 5 }],
+      facing: Direction.Left,
+      pos: { x: 14, y: 20 },
+      persistent: true,
+      intro: [],
+      outtro: [
+        "¡Quieto! ¡Esto es para las fotos del álbum!",
+        "¡La luz aquí es perfecta!",
+      ],
+      money: 0,
+    },
+    // Invitado perdido — combatible
+    {
+      npc: fisher,
+      pokemon: [{ id: 118, level: 5 }, { id: 129, level: 4 }],
+      facing: Direction.Down,
+      pos: { x: 15, y: 30 },
+      intro: [
+        "¡No sé dónde es la preboda!",
+        "¡Y encima tú te has metido en mi camino!",
+      ],
+      outtro: ["Gracias... Creo que es por aquí."],
+      money: 60,
     },
   ],
 };
