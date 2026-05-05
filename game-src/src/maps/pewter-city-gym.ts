@@ -1,4 +1,4 @@
-import { aceTrainerFemale, aceTrainerMale, sailor } from "../app/npcs";
+import { martaNpc, sailor, sergioNpc } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/pewter-city-gym.png";
 import music from "../assets/music/maps/pokemon-gym.mp3";
@@ -58,7 +58,7 @@ const pewterCityGym: MapType = {
       pos: { x: 3, y: 6 },
     },
     {
-      npc: aceTrainerMale,
+      npc: sergioNpc,
       pokemon: [{ id: 58, level: 14 }, { id: 77, level: 12 }],
       money: 1400,
       intro: [
@@ -84,7 +84,7 @@ const pewterCityGym: MapType = {
       },
     },
     {
-      npc: aceTrainerFemale,
+      npc: martaNpc,
       pokemon: [{ id: 12, level: 16 }, { id: 36, level: 14 }],
       money: 1600,
       intro: [

@@ -117,6 +117,8 @@ import channelerRightWalk1 from "../assets/walk-sprites/al-right-1.png";
 
 // Ace Trainer Male
 import aceTrainerMalePortrait from "../assets/portraits/ace-trainer-male.png";
+import sergioPortrait from "../assets/portraits/sergio.png";
+import martaPortrait from "../assets/portraits/marta.png";
 import aceTrainerMaleDown from "../assets/walk-sprites/g-down.png";
 import aceTrainerMaleDownWalk1 from "../assets/walk-sprites/g-down-1.png";
 import aceTrainerMaleDownWalk2 from "../assets/walk-sprites/g-down-2.png";
@@ -1296,5 +1298,45 @@ export const giovanni = {
     leftWalk1: giovanniLeftWalk1,
     right: giovanniRight,
     rightWalk1: giovanniRightWalk1,
+  },
+};
+
+// ── Novios — sprites walk de aceTrainer, portrait personalizado ───────────────
+
+export const sergioNpc = {
+  canBattle: true,
+  canWalk: true,
+  name: "Sergio",
+  portrait: sergioPortrait,
+  sprites: {
+    down: aceTrainerMaleDown,
+    downWalk1: aceTrainerMaleDownWalk1,
+    downWalk2: aceTrainerMaleDownWalk2,
+    up: aceTrainerMaleUp,
+    upWalk1: aceTrainerMaleUpWalk1,
+    upWalk2: aceTrainerMaleUpWalk2,
+    left: aceTrainerMaleLeft,
+    leftWalk1: aceTrainerMaleLeftWalk1,
+    right: aceTrainerMaleRight,
+    rightWalk1: aceTrainerMaleRightWalk1,
+  },
+};
+
+export const martaNpc = {
+  canBattle: true,
+  canWalk: true,
+  name: "Marta",
+  portrait: martaPortrait,
+  sprites: {
+    down: aceTrainerFemaleDown,
+    downWalk1: aceTrainerFemaleDownWalk1,
+    downWalk2: aceTrainerFemaleDownWalk2,
+    up: aceTrainerFemaleUp,
+    upWalk1: aceTrainerFemaleUpWalk1,
+    upWalk2: aceTrainerFemaleUpWalk2,
+    left: aceTrainerFemaleLeft,
+    leftWalk1: aceTrainerFemaleLeftWalk1,
+    right: aceTrainerFemaleRight,
+    rightWalk1: aceTrainerFemaleRightWalk1,
   },
 };
