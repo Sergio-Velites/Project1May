@@ -1224,7 +1224,10 @@ const PokemonEncounter = () => {
       setStage(15);
       setTimeout(() => {
         dispatch(updatePokemonEncounter(them));
-        dispatch(updatePokemon(us));
+        // Cuando transformado: conservar id y moves originales en Redux,
+        // solo propagar cambio de HP. Evita corromper el save con id del rival.
+        const usForDispatch = transformedId !== null ? { ...active, hp: us.hp } : us;
+        dispatch(updatePokemon(usForDispatch));
 
         if (missed) {
           setAlertText(`¡${activeMetadata.name.toUpperCase()} falló!`);
@@ -1261,7 +1264,9 @@ const PokemonEncounter = () => {
       setStage(18);
       setTimeout(() => {
         dispatch(updatePokemonEncounter(them));
-        dispatch(updatePokemon(us));
+        // Cuando transformado: conservar id y moves originales, solo propagar HP.
+        const usForDispatch = transformedId !== null ? { ...active, hp: us.hp } : us;
+        dispatch(updatePokemon(usForDispatch));
 
         if (missed) {
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival falló!`);
@@ -1576,6 +1581,7 @@ const PokemonEncounter = () => {
             show={stage === 14}
             select={(move: string) => processBattle(move)}
             close={() => setStage(11)}
+            overrideMoves={transformedId !== null ? transformedMoves : undefined}
           />
           {stage === 25 && (
             <PokemonList
