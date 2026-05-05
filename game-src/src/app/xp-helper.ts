@@ -6,8 +6,8 @@ import { getPokemonMetadata } from "./use-pokemon-metadata";
 // Divided by number of participants (shared XP handled at call site)
 const getXp = (enemyId: number, enemyLevel: number, isTrainerBattle = false): number => {
   const metadata = getPokemonMetadata(enemyId);
-  const base = Math.round((metadata.baseExperience * enemyLevel) / 7);
-  return isTrainerBattle ? Math.round(base * 1.5) : base;
+  const base = Math.floor((metadata.baseExperience * enemyLevel) / 7);
+  return isTrainerBattle ? Math.floor(base * 1.5) : base;
 };
 
 export default getXp;
