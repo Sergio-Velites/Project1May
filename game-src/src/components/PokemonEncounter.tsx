@@ -63,6 +63,8 @@ import getXp from "../app/xp-helper";
 import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp } from "../app/level-helper";
 import MoveSelect from "./MoveSelect";
 import catchesPokemon from "../app/pokeball-helper";
+import { getMoveAnimGroup, AnimGroup } from "../app/move-animations";
+import { MoveAnimation } from "./MoveAnimation";
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
 import PixelImage from "../styles/PixelImage";
@@ -204,6 +206,8 @@ const ImageContainer = styled.div<ImageContainerProps>`
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
 
   ${(props: ImageContainerProps) =>
     props.$flashing &&
@@ -617,6 +621,11 @@ const PokemonEncounter = () => {
 
   const [alertText, setAlertText] = useState<string | null>(null);
   const [clickableNotice, setClickableNotice] = useState<string | null>(null);
+  const [moveAnim, setMoveAnim] = useState<{
+    group: AnimGroup;
+    target: "enemy" | "player";
+    damageClass: string;
+  } | null>(null);
   // Ref to pass computed XP from stage 20 to stage 21 without stale closure
   const pendingXpRef = useRef<number | null>(null);
   // Ref to pass new level from stage 21 to stages 22/29/33 without stale closure
@@ -792,6 +801,7 @@ const PokemonEncounter = () => {
       lastPhysicalDamageRef.current = 0;
       enemyFlinchRef.current  = false;
       playerFlinchRef.current = false;
+      setMoveAnim(null);
       setStage(0);
       // Register enemy as SEEN in Pokédex
       dispatch(seePokemon(enemy.id));
@@ -1346,6 +1356,14 @@ const PokemonEncounter = () => {
       statusApply,
     } = result;
     if (isAttacking) {
+      const moveDataAnim = getMoveMetadata(moveName);
+      if (moveDataAnim) {
+        setMoveAnim({
+          group: getMoveAnimGroup(moveDataAnim.type, moveDataAnim.damageClass),
+          target: "enemy",
+          damageClass: moveDataAnim.damageClass,
+        });
+      }
       setAlertText(
         `¡${activeMetadata.name.toUpperCase()} usó ${moveName.toUpperCase()}!`
       );
@@ -1412,6 +1430,14 @@ const PokemonEncounter = () => {
     }
 
     if (!isAttacking) {
+      const moveDataAnim = getMoveMetadata(moveName);
+      if (moveDataAnim) {
+        setMoveAnim({
+          group: getMoveAnimGroup(moveDataAnim.type, moveDataAnim.damageClass),
+          target: "player",
+          damageClass: moveDataAnim.damageClass,
+        });
+      }
       setAlertText(
         `¡${enemyMetadata.name.toUpperCase()} rival usó ${moveName.toUpperCase()}!`
       );
@@ -1476,6 +1502,7 @@ const PokemonEncounter = () => {
 
     setTimeout(() => {
       setAlertText(null);
+      setMoveAnim(null);
     }, ATTACK_ANIMATION + 1000);
 
     return { us, them };
@@ -1832,23 +1859,31 @@ const PokemonEncounter = () => {
                 </HealthBarContainer>
                 <Corner src={corner} />
               </LeftInfoSection>
-              <ImageContainer $flashing={stage === 17}>
-                <AttackRight $attacking={stage === 18}>
+              <ImageContainer $flashing={stage === 17 && moveAnim?.damageClass !== "status"}>
+                <AttackRight $attacking={stage === 18 && moveAnim?.damageClass === "physical"}>
                   <ChangeEnemyPokemon $changing={[46].includes(stage)}>
                     <RightImage src={rightImage()} />
                   </ChangeEnemyPokemon>
                 </AttackRight>
+                <MoveAnimation
+                  group={moveAnim?.group ?? null}
+                  active={stage === 15 && moveAnim?.target === "enemy"}
+                />
               </ImageContainer>
             </Row>
             <Row
               style={{ opacity: [24, 26, 27, 28].includes(stage) ? "0" : "1" }}
             >
-              <ImageContainer $flashing={stage === 19}>
-                <AttackLeft $attacking={stage === 15}>
+              <ImageContainer $flashing={stage === 19 && moveAnim?.damageClass !== "status"}>
+                <AttackLeft $attacking={stage === 15 && moveAnim?.damageClass === "physical"}>
                   <ChangePokemon $changing={[3, 25].includes(stage)}>
                     <LeftImage src={leftImage()} />
                   </ChangePokemon>
                 </AttackLeft>
+                <MoveAnimation
+                  group={moveAnim?.group ?? null}
+                  active={stage === 18 && moveAnim?.target === "player"}
+                />
               </ImageContainer>
               <RightInfoSection
                 style={{
