@@ -1,4 +1,4 @@
-import { bugCatcher, beauty, lass, teamRocketGrunt } from "../app/npcs";
+import { bugCatcher, beauty, hiker, lass, pokeManiac, teamRocketGrunt } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/viridian-forrest.png";
 import { Direction } from "../state/state-types";
@@ -279,6 +279,50 @@ const viridianForrest: MapType = {
       outtro: ["¡Que disfrutes de la preboda, crío!"],
       money: 150,
       pos: { x: 16, y: 6 },
+    },
+    // Senderista con mapa — decorativo, da orientación
+    {
+      npc: hiker,
+      pokemon: [{ id: 74, level: 7 }],
+      facing: Direction.Right,
+      pos: { x: 7, y: 3 },
+      persistent: true,
+      intro: [],
+      outtro: [
+        "¡Este bosque lleva directo a VILLAMAYOR!",
+        "Sigue hacia el norte y no te metas en la hierba alta.",
+        "¡Los bichos aquí pican fuerte!",
+      ],
+      money: 0,
+    },
+    // Fan de la boda — combatible, quiere demostrar que merece el banquete
+    {
+      npc: pokeManiac,
+      pokemon: [{ id: 46, level: 8 }, { id: 48, level: 7 }],
+      facing: Direction.Down,
+      pos: { x: 21, y: 11 },
+      intro: [
+        "¡Llevo tres días leyendo el menú del banquete!",
+        "¡Nadie merece ese chuletón más que yo!",
+        "¡Demuestra que tú sí lo mereces!",
+      ],
+      outtro: ["Vale, vale... tú te lo ganas más que yo."],
+      money: 120,
+    },
+    // Niño perdido — decorativo, lleva buscando a sus padres desde la entrada
+    {
+      npc: lass,
+      pokemon: [{ id: 10, level: 5 }],
+      facing: Direction.Left,
+      pos: { x: 5, y: 22 },
+      persistent: true,
+      intro: [],
+      outtro: [
+        "¿Has visto a mis padres?",
+        "Se llaman Juan y María...",
+        "¡Llevan corbata de lunares los dos!",
+      ],
+      money: 0,
     },
   ],
   items: [

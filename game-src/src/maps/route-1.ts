@@ -1,6 +1,6 @@
 import route1Image from "../assets/map/route-1.png";
 import { MapId, MapType } from "./map-types";
-import { beauty, youngster } from "../app/npcs";
+import { beauty, fisher, lass, sailor, youngster } from "../app/npcs";
 import { Direction } from "../state/state-types";
 import music from "../assets/music/maps/route-1.mp3";
 import getEncounterData from "./get-location-data";
@@ -99,6 +99,45 @@ const route1: MapType = {
       intro: [],
       outtro: ["¡No olvides que la preboda sin anís no es preboda!"],
       money: 0,
+    },
+    // Mensajero — corre a avisar que ya llega el coche de los novios
+    {
+      npc: lass,
+      pokemon: [{ id: 19, level: 4 }],
+      facing: Direction.Down,
+      pos: { x: 13, y: 10 },
+      intro: [],
+      outtro: [
+        "¡El coche de los novios ya ha salido de Pamplona!",
+        "¡Muévete o te quedas sin sitio!",
+      ],
+      money: 0,
+    },
+    // Pescador — invitado de la cuñada, despistado
+    {
+      npc: fisher,
+      pokemon: [{ id: 129, level: 5 }, { id: 118, level: 4 }],
+      facing: Direction.Left,
+      pos: { x: 13, y: 26 },
+      intro: [
+        "¡Yo pensaba que la preboda era en el río!",
+        "¡Pues aun así, a ver si me ganas!",
+      ],
+      outtro: ["Bueno... en fin. Al menos el vino no estará en el río."],
+      money: 70,
+    },
+    // Marinero — llega en nombre del padrino
+    {
+      npc: sailor,
+      pokemon: [{ id: 72, level: 6 }, { id: 54, level: 5 }],
+      facing: Direction.Down,
+      pos: { x: 6, y: 16 },
+      intro: [
+        "¡El padrino me manda a probarte!",
+        "¡Si llegas tarde, él no responde!",
+      ],
+      outtro: ["Pasa, pasa. El padrino estará orgulloso."],
+      money: 90,
     },
   ],
   grass: {
