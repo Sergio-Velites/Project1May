@@ -134,11 +134,18 @@ export const saveRsvp = async (
   userId: string,
   rsvp: RSVPPayload
 ): Promise<void> => {
-  if (!SUPABASE_URL || !userId) return;
+  if (!SUPABASE_URL || !userId) {
+    console.error("[saveRsvp] Skipped: no SUPABASE_URL or userId");
+    return;
+  }
   try {
-    await callEdge("save-rsvp", { userId, rsvp });
-  } catch {
-    // Silent fail — no bloquea el inicio del juego
+    const res = await callEdge("save-rsvp", { userId, rsvp });
+    if (!res.ok) {
+      const body = await res.text();
+      console.error(`[saveRsvp] HTTP ${res.status}:`, body);
+    }
+  } catch (e) {
+    console.error("[saveRsvp] Network error:", e);
   }
 };
 

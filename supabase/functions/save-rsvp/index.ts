@@ -25,9 +25,12 @@ Deno.serve(async (req) => {
       return json({ error: "Faltan campos obligatorios" }, 400, corsHeaders);
     }
 
-    // Ensure user exists in wedding_users.
-    // Users who played "sin guardar" have a local UUID not in the DB.
-    await db.from("wedding_users").upsert({ id: userId }, { ignoreDuplicates: true });
+    // Ensure the user exists in wedding_users.
+    // "Jugar sin guardar" players have a locally-generated UUID not yet in the DB.
+    // INSERT ... ON CONFLICT DO NOTHING is the safest atomic approach.
+    const { error: userErr } = await db.from("wedding_users").insert({ id: userId });
+    // 23505 = unique_violation → user already exists, that's fine
+    if (userErr && userErr.code !== "23505") throw userErr;
 
     const { error } = await db.rpc("upsert_rsvp", {
       p_user_id:      userId,
