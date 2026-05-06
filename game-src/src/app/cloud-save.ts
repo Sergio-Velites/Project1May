@@ -118,6 +118,30 @@ export const listPlayers = async (): Promise<PlayerEntry[]> => {
   }
 };
 
+// ---- Guardar RSVP ----
+
+export interface RSVPPayload {
+  playerName: string;
+  companion: string | null;
+  children: number;
+  allergies: string | null;
+  busOutbound: boolean;
+  busReturn: "none" | "23:00" | "1:45";
+  preboda: boolean;
+}
+
+export const saveRsvp = async (
+  userId: string,
+  rsvp: RSVPPayload
+): Promise<void> => {
+  if (!SUPABASE_URL || !userId) return;
+  try {
+    await callEdge("save-rsvp", { userId, rsvp });
+  } catch {
+    // Silent fail — no bloquea el inicio del juego
+  }
+};
+
 // ---- User creation (guest UUID) ----
 
 export const createUser = async (): Promise<string | null> => {

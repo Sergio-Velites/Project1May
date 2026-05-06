@@ -1,43 +1,121 @@
+/**
+ * OakIntro — RSVP boda estilo Game Boy.
+ * Autónomo: gestiona nombre, acompañante, niños, alergias, bus y preboda.
+ */
 import { useState, useEffect, useRef, useCallback } from "react";
 import styled, { keyframes, css } from "styled-components";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import PixelImage from "../styles/PixelImage";
-import oakPortrait from "../assets/portraits/oak.png";
-import playerPortrait from "../assets/portraits/ash.png";
-import ashDownSprite from "../assets/walk-sprites/ash-down.png";
+import { useDispatch } from "react-redux";
+import { setName, setRsvp } from "../state/gameSlice";
+import { RSVPData } from "../state/state-types";
+import { saveRsvp, getCurrentUserId } from "../app/cloud-save";
 import usePokemon from "../app/use-pokemon-metadata";
+import NameKeyboard from "./NameKeyboard";
+import oakPortrait from "../assets/portraits/oak.png";
+import ashPortrait from "../assets/portraits/ash.png";
+import sergioPortrait from "../assets/portraits/sergio.png";
+import martaPortrait from "../assets/portraits/marta.png";
+import youngsterPortrait from "../assets/portraits/youngster.png";
+import bikerPortrait from "../assets/portraits/biker.png";
+import hikerPortrait from "../assets/portraits/hiker.png";
+import ashDownSprite from "../assets/walk-sprites/ash-down.png";
 
-// ── Dialogue data ────────────────────────────────────────────────────────────
+type SpriteId =
+  | "oak" | "player" | "duo"
+  | "youngster" | "biker" | "hiker"
+  | "pokemon113" | "pokemon132";
+
+type Stage =
+  | "dialogue"
+  | "name-picker"
+  | "companion-choice"
+  | "companion-picker"
+  | "children-select"
+  | "allergy-choice"
+  | "allergy-input"
+  | "bus-outbound"
+  | "bus-return"
+  | "preboda-choice"
+  | "saving"
+  | "done";
 
 interface DialogueLine {
-  sprite: "oak" | "pokemon" | "player" | "silhouette";
+  sprite: SpriteId;
   text: string;
-  pauseAfter?: "name-picker" | "start-game";
+  next?: Stage;
 }
 
-const BASE_DIALOGUE: DialogueLine[] = [
-  { sprite: "oak",     text: "¡Hola!" },
-  { sprite: "oak",     text: "¡Bienvenido al mundo\nde los POKÉMON!" },
-  { sprite: "oak",     text: "¡Me llamo OAK!\n¡Todo el mundo me conoce\ncomo el PROF. POKÉMON!" },
-  { sprite: "pokemon", text: "¡Este mundo está habitado\npor criaturas llamadas\nPOKÉMON!" },
-  { sprite: "pokemon", text: "Para algunos, los POKÉMON\nson mascotas. Otros los\nusan para pelear." },
-  { sprite: "player",  text: "Yo mismo los estudio\ncomo profesión." },
-  { sprite: "player",  text: "¿Y tú?\n¿Cómo te llamas?", pauseAfter: "name-picker" },
+// ── Static dialogue lines ─────────────────────────────────────────────────────
+
+const INTRO_LINES: DialogueLine[] = [
+  { sprite: "oak",        text: "¡Hola!" },
+  { sprite: "oak",        text: "¡Bienvenido al mundo\nde los POKÉMON!" },
+  { sprite: "oak",        text: "¡Me llamo OAK!\nAunque hoy..." },
+  { sprite: "oak",        text: "...puedes llamarme\nMAESTRO DE CEREMONIAS." },
+  { sprite: "oak",        text: "Este mundo está lleno de\namistades, aventuras..." },
+  { sprite: "pokemon132", text: "¡Y grandes celebraciones!" },
+  { sprite: "pokemon132", text: "Durante años, entrenadores\nde todas partes han viajado\njuntos, compartido combates..." },
+  { sprite: "pokemon132", text: "...y encontrado compañeros\npara toda la vida." },
+  { sprite: "oak",        text: "Precisamente por eso\nestamos hoy aquí." },
+  { sprite: "oak",        text: "Porque dos entrenadores\nlegendarios..." },
+  { sprite: "duo",        text: "¡MARTA y SERGIO..." },
+  { sprite: "duo",        text: "...van a unir sus caminos\nel 28 de agosto de 2026!" },
+  { sprite: "oak",        text: "Pero antes de comenzar\nesta gran aventura..." },
+  { sprite: "oak",        text: "¡Necesitamos registrar\ntu ficha de\nENTRENADOR INVITADO!" },
+  { sprite: "player",     text: "Primero de todo..." },
+  { sprite: "player",     text: "¿Cómo te llamas?", next: "name-picker" },
 ];
 
-const POST_NAME_DIALOGUE = (name: string): DialogueLine[] => [
-  { sprite: "player",     text: `¡Correcto!\n¡Tu nombre es ${name}!` },
-  { sprite: "player",     text: "¡Tu propia leyenda POKÉMON\nestá a punto de comenzar!" },
-  { sprite: "player",     text: "¡Te espera un mundo de\nsueños y aventuras\ncon POKÉMON! ¡Vamos!", pauseAfter: "start-game" },
+// ── Dynamic line builders ─────────────────────────────────────────────────────
+
+const buildPostNameLines = (name: string): DialogueLine[] => [
+  { sprite: "player",  text: `¡Ah, claro!\n¡Tu nombre es ${name}!` },
+  { sprite: "oak",     text: "Excelente.\nDime una cosa..." },
+  { sprite: "oak",     text: "¿Viajarás acompañado\nen esta aventura?", next: "companion-choice" },
 ];
 
-// ── Animations ───────────────────────────────────────────────────────────────
+const buildChildrenIntro = (): DialogueLine[] => [
+  { sprite: "youngster", text: "¿Cuántos niños vendrán\ncontigo?", next: "children-select" },
+];
+
+const buildAllergyIntro = (): DialogueLine[] => [
+  { sprite: "pokemon113", text: "¿Tienes/Tenéis alguna intolerancia\no alergia alimentaria?", next: "allergy-choice" },
+];
+
+const buildBusLines = (): DialogueLine[] => [
+  { sprite: "biker", text: "Para facilitar el viaje\nhasta VILLAMAYOR..." },
+  { sprite: "biker", text: "Habrá un BUS especial\npara entrenadores invitados." },
+  { sprite: "biker", text: "Las paradas serán:" },
+  { sprite: "biker", text: "11:00 CLUB DE TENIS\n11:20 HOTEL TRES REYES" },
+  { sprite: "biker", text: "¿Utilizarás el bus de ida?", next: "bus-outbound" },
+];
+
+const buildPrebodaLines = (): DialogueLine[] => [
+  { sprite: "oak",   text: "Una última cosa." },
+  { sprite: "oak",   text: "Antes del gran día..." },
+  { sprite: "hiker", text: "Se celebrará una PREBODA\nel día 6 en EL BOSQUECILLO" },
+  { sprite: "hiker", text: "(Junto al Hotel Tres Reyes\nde Pamplona)" },
+  { sprite: "hiker", text: "¿Te unirás al encuentro\nde entrenadores?", next: "preboda-choice" },
+];
+
+const buildFinaleLines = (): DialogueLine[] => [
+  { sprite: "oak",        text: "¡Fantástico!" },
+  { sprite: "oak",        text: "Tu registro para la\nWEDDING VERSION ya\nestá completo." },
+  { sprite: "oak",        text: "MARTA y SERGIO te esperan\npara una aventura\ninolvidable." },
+  { sprite: "oak",        text: "Risas, baile, amigos,\nvino y combates en pista..." },
+  { sprite: "pokemon132", text: "...y probablemente algún\nderretido después de las copas." },
+  { sprite: "oak",        text: "Si cambias de opinión,\ncomienza una nueva partida\ny actualizarás tu registro." },
+  { sprite: "oak",        text: "¡Prepárate!" },
+  { sprite: "player",     text: "¡Tu aventura hacia la\ngran boda está a punto\nde comenzar!", next: "done" },
+];
+
+// ── Animations ────────────────────────────────────────────────────────────────
 
 const fadeIn = keyframes`
-  0%   { opacity: 0; }
-  50%  { opacity: 0.5; }
-  100% { opacity: 1; }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 `;
 
 const blink = keyframes`
@@ -45,15 +123,10 @@ const blink = keyframes`
   50%, 100% { opacity: 0; }
 `;
 
-const shrink = keyframes`
+const shrinkAnim = keyframes`
   0%   { transform: scale(1);    opacity: 1; }
   70%  { transform: scale(0.08); opacity: 1; }
   100% { transform: scale(0.08); opacity: 0; }
-`;
-
-const appear = keyframes`
-  0%   { opacity: 0; }
-  100% { opacity: 1; }
 `;
 
 const popIn = keyframes`
@@ -62,153 +135,69 @@ const popIn = keyframes`
   100% { transform: scale(1);   opacity: 1; }
 `;
 
-// ── Styled components ────────────────────────────────────────────────────────
+// ── Styled components ───────────────────────────────────────────────────────────
 
 const Overlay = styled.div`
-  position: absolute;
-  inset: 0;
-  z-index: 2000;
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  position: absolute; inset: 0; z-index: 2000;
+  background: var(--bg); display: flex;
+  flex-direction: column; justify-content: flex-end;
 `;
 
 const SpriteArea = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 1; display: flex;
+  align-items: center; justify-content: center;
   position: relative;
 `;
 
-interface OakImageProps {
-  $silhouette?: boolean;
-  $shrink?: boolean;
-}
+interface ImgProps { $shrink?: boolean; }
 
-const OakImage = styled(PixelImage)<OakImageProps>`
-  height: 55%;
-  max-height: 200px;
-  animation: ${appear} 0.1s ease-in-out forwards;
-  filter: ${(p) => p.$silhouette ? "brightness(0)" : "none"};
-  ${(p) =>
-    p.$shrink &&
-    css`
-      animation: ${shrink} 2.5s ease-in-out forwards;
-    `}
-
-  @media (max-width: 1000px) {
-    height: 40%;
-    max-height: 120px;
-  }
+const Portrait = styled(PixelImage)<ImgProps>`
+  height: 55%; max-height: 200px;
+  animation: ${fadeIn} 0.1s ease forwards;
+  ${(p: ImgProps) => p.$shrink && css`animation: ${shrinkAnim} 2.5s ease forwards;`}
+  @media (max-width: 1000px) { height: 40%; max-height: 120px; }
 `;
 
-const PokemonImage = styled(PixelImage)`
-  height: 35%;
-  max-height: 160px;
-  animation: ${appear} 0.1s ease-in-out forwards;
-
-  @media (max-width: 1000px) {
-    height: 28%;
-    max-height: 100px;
-  }
+const PokemonImg = styled(PixelImage)`
+  height: 35%; max-height: 160px;
+  animation: ${fadeIn} 0.1s ease forwards;
+  @media (max-width: 1000px) { height: 28%; max-height: 100px; }
 `;
 
 const MapSprite = styled(PixelImage)`
-  width: 16px;
-  height: 16px;
+  width: 16px; height: 16px;
   animation: ${popIn} 0.3s ease-out forwards;
-
-  @media (min-width: 1000px) {
-    width: 32px;
-    height: 32px;
-  }
+  @media (min-width: 1000px) { width: 32px; height: 32px; }
 `;
 
-// Panel "▶ NEW NAME" que aparece cuando hay que elegir nombre
-const NamePromptPanel = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.4em;
-  border: 3px solid black;
-  padding: 6% 10%;
-  background: var(--bg);
-
-  @media (max-width: 1000px) {
-    border-width: 2px;
-    padding: 5% 8%;
-  }
+const DuoWrap = styled.div`
+  display: flex; flex-direction: row;
+  align-items: flex-end; gap: 12%;
+  animation: ${fadeIn} 0.15s ease forwards;
 `;
 
-const NamePromptLabel = styled.h2`
-  font-family: "PokemonGB";
-  font-size: 16px;
-  color: #181010;
-  margin-bottom: 8px;
-  text-align: center;
-
-  @media (max-width: 1000px) {
-    font-size: 7px;
-    margin-bottom: 4px;
-  }
-`;
-
-const NamePromptOption = styled.h2`
-  font-family: "PokemonGB";
-  font-size: 20px;
-  color: #181010;
-  display: flex;
-  align-items: center;
-  gap: 0.3em;
-
-  @media (max-width: 1000px) {
-    font-size: 8px;
-  }
+const DuoPortrait = styled(PixelImage)`
+  height: 45%; max-height: 160px;
+  @media (max-width: 1000px) { height: 33%; max-height: 100px; }
 `;
 
 const TextBox = styled.div`
-  position: relative;
-  width: 100%;
-  height: 22%;
-  background: var(--bg);
-  border-top: 3px solid black;
-  padding: 8px 18px;
-  display: flex;
-  align-items: center;
-
-  @media (max-width: 1000px) {
-    height: 30%;
-    padding: 5px 10px;
-    border-top: 2px solid black;
-  }
+  position: relative; width: 100%; height: 22%;
+  background: var(--bg); border-top: 3px solid black;
+  padding: 8px 18px; display: flex; align-items: center;
+  @media (max-width: 1000px) { height: 30%; padding: 5px 10px; border-top: 2px solid black; }
 `;
 
 const DialogueText = styled.h1`
-  color: black;
-  font-size: 22px;
-  font-family: "PokemonGB";
-  line-height: 1.6;
-  white-space: pre-wrap;
-
-  @media (max-width: 1000px) {
-    font-size: 8px;
-    line-height: 1.5;
-  }
+  color: black; font-size: 22px;
+  font-family: "PokemonGB"; line-height: 1.6; white-space: pre-wrap;
+  @media (max-width: 1000px) { font-size: 8px; line-height: 1.5; }
 `;
 
-interface ArrowProps {
-  $visible: boolean;
-}
-
+interface ArrowProps { $visible: boolean; }
 const Arrow = styled.span<ArrowProps>`
-  position: absolute;
-  bottom: 12px;
-  right: 16px;
-  width: 3px;
-  height: 3px;
-  font-size: 3px;
-  color: #181010;
+  position: absolute; bottom: 12px; right: 16px;
+  width: 3px; height: 3px; font-size: 3px; color: #181010;
   box-shadow:
     1em 0em 0 #181010, 2em 0em 0 #181010,
     1em 1em 0 #181010, 2em 1em 0 #181010, 3em 1em 0 #181010,
@@ -217,161 +206,320 @@ const Arrow = styled.span<ArrowProps>`
     1em 4em 0 #181010, 2em 4em 0 #181010, 3em 4em 0 #181010, 4em 4em 0 #181010,
     1em 5em 0 #181010, 2em 5em 0 #181010, 3em 5em 0 #181010,
     1em 6em 0 #181010, 2em 6em 0 #181010;
-  transform: rotate(90deg);
-  animation: ${blink} 1s infinite;
-  opacity: ${(p) => (p.$visible ? 1 : 0)};
-
-  @media (max-width: 1000px) {
-    bottom: 6px;
-    right: 8px;
-  }
+  transform: rotate(90deg); animation: ${blink} 1s infinite;
+  opacity: ${(p: ArrowProps) => (p.$visible ? 1 : 0)};
+  @media (max-width: 1000px) { bottom: 6px; right: 8px; }
 `;
 
-// ── Component ────────────────────────────────────────────────────────────────
+const ChoicePanel = styled.div`
+  position: absolute; top: 20%; right: 4%;
+  border: 3px solid black; background: var(--bg);
+  padding: 4% 6%; display: flex; flex-direction: column;
+  gap: 0.6em; z-index: 10;
+  @media (max-width: 1000px) { border-width: 2px; padding: 3% 5%; gap: 0.4em; }
+`;
 
-interface Props {
-  onNameRequired: () => void;
-  confirmedName: string | null;
-  onComplete: () => void;
-}
+interface CIProps { $selected: boolean; }
+const ChoiceItem = styled.h2<CIProps>`
+  font-family: "PokemonGB"; font-size: 18px; color: #181010;
+  display: flex; align-items: center; gap: 0.4em;
+  &::before { content: "${(p: CIProps) => p.$selected ? "\\u25B6" : "\\u00a0"}"; }
+  @media (max-width: 1000px) { font-size: 8px; }
+`;
+
+const NumberBox = styled.div`
+  display: flex; align-items: center; gap: 1em;
+  border: 3px solid black; background: var(--bg);
+  padding: 5% 8%; position: absolute; top: 20%; right: 4%; z-index: 10;
+  @media (max-width: 1000px) { border-width: 2px; padding: 3% 5%; gap: 0.5em; }
+`;
+
+const NumberLabel = styled.h2`
+  font-family: "PokemonGB"; font-size: 28px; color: #181010;
+  min-width: 2ch; text-align: center;
+  @media (max-width: 1000px) { font-size: 12px; }
+`;
+
+const ArrowLbl = styled.h2`
+  font-family: "PokemonGB"; font-size: 20px; color: #181010;
+  @media (max-width: 1000px) { font-size: 9px; }
+`;
+
+const AllergyWrap = styled.div`
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 6%; gap: 8px; background: var(--bg); z-index: 10;
+`;
+
+const AllergyLabel = styled.h2`
+  font-family: "PokemonGB"; font-size: 16px; color: #181010; text-align: center;
+  @media (max-width: 1000px) { font-size: 7px; }
+`;
+
+const AllergyTextarea = styled.textarea`
+  width: 100%; flex: 1; max-height: 55%;
+  background: var(--bg); border: 3px solid black; padding: 8px;
+  font-family: "PokemonGB", monospace; font-size: 14px; color: #181010;
+  resize: none; outline: none;
+  @media (max-width: 1000px) { border-width: 2px; font-size: 6px; padding: 4px; }
+`;
+
+const ConfirmBtn = styled.button`
+  font-family: "PokemonGB"; font-size: 14px;
+  background: #181010; color: var(--bg);
+  border: none; padding: 8px 18px; cursor: pointer;
+  @media (max-width: 1000px) { font-size: 6px; padding: 5px 10px; }
+`;
+
+const SavingText = styled.h1`
+  font-family: "PokemonGB"; font-size: 22px; color: #181010; padding: 8px 18px;
+  @media (max-width: 1000px) { font-size: 8px; padding: 5px 10px; }
+`;
+
+// ── Component ────────────────────────────────────────────────────────────────────
+
+interface Props { onComplete: () => void; }
 
 const TYPEWRITER_MS = 40;
 
-const OakIntro = ({ onNameRequired, confirmedName, onComplete }: Props) => {
-  // Random Pokémon for the "pokemon" sprite slot
-  const [pokemonId] = useState(() => Math.floor(Math.random() * 151) + 1);
-  const pokemon = usePokemon(pokemonId);
+const OakIntro = ({ onComplete }: Props) => {
+  const dispatch = useDispatch();
+  const chansey = usePokemon(113);
+  const ditto   = usePokemon(132);
 
-  // dialogue lines (extended when confirmedName arrives)
-  const linesRef = useRef<DialogueLine[]>(BASE_DIALOGUE);
-  const [lineIndex, setLineIndex] = useState(0);
-  const [displayed, setDisplayed] = useState("");  // typewriter buffer
-  const [finished, setFinished] = useState(false); // all chars shown
-  const [waitingForName, setWaitingForName] = useState(false); // showing name panel
-  const [shrinkPhase, setShrinkPhase] = useState<"idle" | "shrinking" | "overworld">("idle");
+  const [displayed,   setDisplayed]  = useState("");
+  const [finished,    setFinished]   = useState(false);
+  const [stage,       setStage]      = useState<Stage>("dialogue");
+  const [lines,       setLines]      = useState<DialogueLine[]>(INTRO_LINES);
+  const [idx,         setIdx]        = useState(0);
+  const [playerName,  setPlayerName] = useState("");
+  const [companion,   setCompanion]  = useState<string | null>(null);
+  const [children,    setChildren]   = useState(0);
+  const [allergyTxt,  setAllergyTxt] = useState("");
+  const [busOutbound, setBusOutbound]= useState(false);
+  const [busReturn,   setBusReturn]  = useState<"none" | "23:00" | "1:45">("none");
+  const [preboda,     setPreboda]    = useState(false);
+  const [cursor,      setCursor]     = useState(0);
+  const [shrink,      setShrink]     = useState<"idle" | "shrinking" | "overworld">("idle");
 
-  const currentLine = linesRef.current[lineIndex];
+  const currentLine = lines[idx];
   const fullText = currentLine?.text ?? "";
 
-  // ── Typewriter effect ────────────────────────────────────────────────────
   useEffect(() => {
-    if (!currentLine || finished) return;
-    if (displayed.length >= fullText.length) {
-      setFinished(true);
-      return;
-    }
-    const t = setTimeout(() => {
-      setDisplayed(fullText.slice(0, displayed.length + 1));
-    }, TYPEWRITER_MS);
+    if (stage !== "dialogue" || !currentLine || finished) return;
+    if (displayed.length >= fullText.length) { setFinished(true); return; }
+    const t = setTimeout(() => setDisplayed(fullText.slice(0, displayed.length + 1)), TYPEWRITER_MS);
     return () => clearTimeout(t);
-  }, [displayed, fullText, finished, currentLine]);
+  }, [displayed, fullText, finished, currentLine, stage]);
 
-  // ── When confirmedName arrives, inject post-name lines ───────────────────
-  useEffect(() => {
-    if (!confirmedName) return;
-    const alreadyInjected = linesRef.current.some((l) =>
-      l.text.includes(confirmedName)
-    );
-    if (alreadyInjected) return;
-    linesRef.current = [...BASE_DIALOGUE, ...POST_NAME_DIALOGUE(confirmedName)];
-    setLineIndex(BASE_DIALOGUE.length);
-    setDisplayed("");
-    setFinished(false);
-    setWaitingForName(false);
-  }, [confirmedName]);
+  const enterLines = useCallback((newLines: DialogueLine[]) => {
+    setLines(newLines); setIdx(0);
+    setDisplayed(""); setFinished(false);
+    setStage("dialogue"); setCursor(0);
+  }, []);
 
-  // ── Advance handler (A button) ───────────────────────────────────────────
-  const advance = useCallback(() => {
-    // Si está esperando elección de nombre, A equivale a pulsar "NUEVO NOMBRE"
-    if (waitingForName) {
-      setWaitingForName(false);
-      onNameRequired();
-      return;
-    }
+  const advanceDialogue = useCallback(() => {
+    if (!finished) { setDisplayed(fullText); setFinished(true); return; }
+    if (currentLine?.next) { setStage(currentLine.next); setCursor(0); return; }
+    const next = idx + 1;
+    if (next < lines.length) { setIdx(next); setDisplayed(""); setFinished(false); }
+  }, [finished, fullText, currentLine, idx, lines]);
 
-    if (!finished) {
-      // Skip typewriter: show all text at once
-      setDisplayed(fullText);
-      setFinished(true);
-      return;
-    }
-
-    const pause = currentLine?.pauseAfter;
-
-    if (pause === "name-picker") {
-      setWaitingForName(true);
-      return;
-    }
-
-    if (pause === "start-game") {
-      setShrinkPhase("shrinking");
-      setTimeout(() => setShrinkPhase("overworld"), 900);
+  const doneRef = useRef(false);
+  const triggerEnding = useCallback((
+    pre: boolean, busOut: boolean,
+    busRet: "none" | "23:00" | "1:45",
+    comp: string | null,
+    allergy: string,
+  ) => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    setShrink("shrinking");
+    setStage("saving");
+    const rsvpData: RSVPData = {
+      playerName, companion: comp, children,
+      allergies: allergy.trim() || null,
+      busOutbound: busOut, busReturn: busRet, preboda: pre,
+    };
+    dispatch(setName(playerName));
+    dispatch(setRsvp(rsvpData));
+    saveRsvp(getCurrentUserId() ?? "", rsvpData).finally(() => {
+      setTimeout(() => setShrink("overworld"), 900);
       setTimeout(() => onComplete(), 1700);
+    });
+  }, [playerName, children, dispatch, onComplete]);
+
+  useEffect(() => {
+    if (stage === "done") {
+      triggerEnding(preboda, busOutbound, busReturn, companion, allergyTxt);
+    }
+  }, [stage]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEvent(Event.A, () => {
+    if (stage === "dialogue") { advanceDialogue(); return; }
+    if (stage === "companion-choice") {
+      if (cursor === 0) {
+        enterLines([{ sprite: "oak", text: "¡Magnífico!\n¿Y cómo se llama\ntu acompañante?", next: "companion-picker" }]);
+      } else {
+        setCompanion(null);
+        enterLines(buildChildrenIntro());
+      }
       return;
     }
-
-    // Advance to next line
-    const next = lineIndex + 1;
-    if (next < linesRef.current.length) {
-      setLineIndex(next);
-      setDisplayed("");
-      setFinished(false);
+    if (stage === "children-select") { enterLines(buildAllergyIntro()); return; }
+    if (stage === "allergy-choice") {
+      if (cursor === 0) setStage("allergy-input");
+      else enterLines(buildBusLines());
+      return;
     }
-  }, [finished, fullText, currentLine, waitingForName, lineIndex, onComplete]);
+    if (stage === "bus-outbound") {
+      if (cursor === 0) { setBusOutbound(true); setStage("bus-return"); setCursor(0); }
+      else { setBusOutbound(false); enterLines(buildPrebodaLines()); }
+      return;
+    }
+    if (stage === "bus-return") {
+      const opts: ("none" | "23:00" | "1:45")[] = ["none", "23:00", "1:45"];
+      setBusReturn(opts[cursor]);
+      enterLines(buildPrebodaLines());
+      return;
+    }
+    if (stage === "preboda-choice") {
+      const pre = cursor === 0; setPreboda(pre);
+      enterLines(buildFinaleLines());
+      return;
+    }
+    if (stage === "done") {
+      triggerEnding(preboda, busOutbound, busReturn, companion, allergyTxt);
+      return;
+    }
+  });
 
-  useEvent(Event.A, advance);
+  useEvent(Event.Up, () => {
+    const mc = ["companion-choice","allergy-choice","bus-outbound","bus-return","preboda-choice"];
+    if (mc.includes(stage)) { setCursor(c => Math.max(0, c - 1)); return; }
+    if (stage === "children-select") setChildren(n => Math.min(5, n + 1));
+  });
 
-  if (!currentLine) return null;
+  useEvent(Event.Down, () => {
+    const maxMap: Record<string, number> = {
+      "companion-choice": 1, "allergy-choice": 1,
+      "bus-outbound": 1,     "bus-return": 2,
+      "preboda-choice": 1,
+    };
+    if (stage in maxMap) { setCursor(c => Math.min(maxMap[stage], c + 1)); return; }
+    if (stage === "children-select") setChildren(n => Math.max(0, n - 1));
+  });
 
-  const sprite = currentLine.sprite;
+  const renderSprite = (sprite: SpriteId) => {
+    switch (sprite) {
+      case "oak":
+        return <Portrait key="oak" src={oakPortrait} alt="" />;
+      case "player":
+        if (shrink === "shrinking") return <Portrait key="shrink" src={ashPortrait} alt="" $shrink />;
+        if (shrink === "overworld") return <MapSprite key="map" src={ashDownSprite} alt="" />;
+        return <Portrait key="player" src={ashPortrait} alt="" />;
+      case "duo":
+        return (
+          <DuoWrap key="duo">
+            <DuoPortrait src={sergioPortrait} alt="Sergio" />
+            <DuoPortrait src={martaPortrait}  alt="Marta"  />
+          </DuoWrap>
+        );
+      case "youngster":   return <Portrait key="y" src={youngsterPortrait} alt="" />;
+      case "biker":       return <Portrait key="b" src={bikerPortrait} alt="" />;
+      case "hiker":       return <Portrait key="h" src={hikerPortrait} alt="" />;
+      case "pokemon113":  return chansey ? <PokemonImg key="c" src={chansey.images.front} alt="" /> : null;
+      case "pokemon132":  return ditto   ? <PokemonImg key="d" src={ditto.images.front}   alt="" /> : null;
+      default: return null;
+    }
+  };
+
+  const renderChoice = () => {
+    if (["companion-choice", "allergy-choice", "bus-outbound", "preboda-choice"].includes(stage))
+      return (
+        <ChoicePanel>
+          <ChoiceItem $selected={cursor === 0}>SÍ</ChoiceItem>
+          <ChoiceItem $selected={cursor === 1}>NO</ChoiceItem>
+        </ChoicePanel>
+      );
+    if (stage === "children-select")
+      return (
+        <NumberBox>
+          <ArrowLbl>&#9668;</ArrowLbl>
+          <NumberLabel>{children}</NumberLabel>
+          <ArrowLbl>&#9658;</ArrowLbl>
+        </NumberBox>
+      );
+    if (stage === "bus-return")
+      return (
+        <ChoicePanel>
+          <ChoiceItem $selected={cursor === 0}>Sin vuelta</ChoiceItem>
+          <ChoiceItem $selected={cursor === 1}>Vuelta 23:00</ChoiceItem>
+          <ChoiceItem $selected={cursor === 2}>Vuelta 1:45</ChoiceItem>
+        </ChoicePanel>
+      );
+    if (stage === "allergy-input")
+      return (
+        <AllergyWrap>
+          <AllergyLabel>Indica alergias o intolerancias:</AllergyLabel>
+          <AllergyTextarea
+            autoFocus
+            maxLength={200}
+            value={allergyTxt}
+            onChange={e => setAllergyTxt(e.target.value)}
+            placeholder="Ej: sin gluten, sin lactosa..."
+          />
+          <ConfirmBtn onClick={() => enterLines(buildBusLines())}>CONFIRMAR</ConfirmBtn>
+        </AllergyWrap>
+      );
+    return null;
+  };
+
+  if (stage === "name-picker")
+    return (
+      <Overlay>
+        <NameKeyboard onConfirm={name => {
+          setPlayerName(name);
+          enterLines(buildPostNameLines(name));
+        }} />
+      </Overlay>
+    );
+
+  if (stage === "companion-picker")
+    return (
+      <Overlay>
+        <NameKeyboard onConfirm={name => {
+          setCompanion(name);
+          enterLines(buildChildrenIntro());
+        }} />
+      </Overlay>
+    );
+
+  if (stage === "saving" && shrink === "idle")
+    return (
+      <Overlay>
+        <SpriteArea />
+        <TextBox><SavingText>Guardando...</SavingText></TextBox>
+      </Overlay>
+    );
+
+  const sprite = currentLine?.sprite ?? "oak";
+  const CHOICE_STAGES: Stage[] = [
+    "companion-choice", "children-select", "allergy-choice",
+    "allergy-input", "bus-outbound", "bus-return", "preboda-choice",
+  ];
+  const showArrow = finished && !CHOICE_STAGES.includes(stage);
 
   return (
-    <Overlay onClick={advance}>
+    <Overlay onClick={() => stage === "dialogue" && advanceDialogue()}>
       <SpriteArea>
-        {sprite === "oak" && (
-          <OakImage key="oak" src={oakPortrait} alt="Prof. Oak" />
-        )}
-        {sprite === "pokemon" && pokemon && (
-          <PokemonImage key="pokemon" src={pokemon.images.front} alt="POKÉMON" />
-        )}
-        {sprite === "player" && shrinkPhase === "idle" && (
-          <OakImage key="player-idle" src={playerPortrait} alt="Player" />
-        )}
-        {sprite === "player" && shrinkPhase === "shrinking" && (
-          <OakImage key="player-shrink" src={playerPortrait} alt="Player" $shrink />
-        )}
-        {sprite === "player" && shrinkPhase === "overworld" && (
-          <MapSprite key="map-sprite" src={ashDownSprite} alt="Player" />
-        )}
-        {sprite === "silhouette" && (
-          <OakImage
-            key="silhouette"
-            src={playerPortrait}
-            alt="Player"
-            $silhouette
-          />
-        )}
-
-        {/* Name choice panel */}
-        {waitingForName && (
-          <NamePromptPanel>
-            <NamePromptLabel>NAME</NamePromptLabel>
-            <NamePromptOption
-              onClick={(e) => {
-                e.stopPropagation();
-                setWaitingForName(false);
-                onNameRequired();
-              }}
-            >
-              NUEVO NOMBRE
-            </NamePromptOption>
-          </NamePromptPanel>
-        )}
+        {renderSprite(sprite)}
+        {renderChoice()}
       </SpriteArea>
-
       <TextBox>
         <DialogueText>{displayed}</DialogueText>
-        <Arrow $visible={finished && !waitingForName} />
+        <Arrow $visible={showArrow} />
       </TextBox>
     </Overlay>
   );

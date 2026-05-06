@@ -3,7 +3,7 @@ import Menu from "./Menu";
 import Frame from "./Frame";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loadFromState, setName } from "../state/gameSlice";
+import { loadFromState } from "../state/gameSlice";
 import {
   hideLoadMenu,
   selectGameboyMenu,
@@ -19,7 +19,6 @@ import {
   setCurrentUserId,
 } from "../app/cloud-save";
 import OakIntro from "./OakIntro";
-import NameKeyboard from "./NameKeyboard";
 import { GameState } from "../state/state-types";
 
 const pulse = keyframes`
@@ -77,7 +76,6 @@ type Phase =
   | "require-passkey"
   | "registering"
   | "choose"
-  | "name-picker"
   | "oak-intro";
 
 const LoadScreen = () => {
@@ -90,7 +88,6 @@ const LoadScreen = () => {
   // menuReady: false hasta 500 ms después de entrar en una fase interactiva.
   // Previene que el botón A que cerró el TitleScreen seleccione una opción.
   const [menuReady, setMenuReady] = useState(false);
-  const [confirmedName, setConfirmedName] = useState<string | null>(null);
   const cloudSave = useRef<GameState | null>(null);
   const readyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Guard atómico: previene que un doble-click o un closure stale dispare
@@ -185,30 +182,11 @@ const LoadScreen = () => {
   // y que el botón A de esas pantallas provoque selecciones accidentales aquí.
   if (gameboyOpen || titleOpen) return null;
 
-  // ---- Teclado para elegir nombre ----
-  if (phase === "name-picker") {
-    return (
-      <StyledLoadScreen>
-        <NameKeyboard
-          onConfirm={(name) => {
-            dispatch(setName(name));
-            setConfirmedName(name);
-            setPhase("oak-intro");
-          }}
-        />
-      </StyledLoadScreen>
-    );
-  }
-
-  // ---- Intro del Prof. Oak ----
+  // ---- Intro del Prof. Oak (autónomo: gestiona nombre + RSVP) ----
   if (phase === "oak-intro") {
     return (
       <StyledLoadScreen>
-        <OakIntro
-          onNameRequired={() => setPhase("name-picker")}
-          confirmedName={confirmedName}
-          onComplete={loadComplete}
-        />
+        <OakIntro onComplete={loadComplete} />
       </StyledLoadScreen>
     );
   }
@@ -313,7 +291,6 @@ const LoadScreen = () => {
       if (choosingRef.current) return; // Evitar doble ejecución por closure stale
       choosingRef.current = true;
       setMenuReady(false);
-      setConfirmedName(null);
       setPhase("oak-intro");
     };
 

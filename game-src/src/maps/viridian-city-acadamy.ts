@@ -2,7 +2,7 @@ import image from "../assets/map/viridian-city-pokemon-acadamy.png";
 import { MapId, MapType } from "./map-types";
 
 const viridianCityAcadamy: MapType = {
-  name: "Academia del Soto",
+  name: "Antigua Casa de Jonny",
   image,
   height: 8,
   width: 8,
