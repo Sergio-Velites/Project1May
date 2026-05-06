@@ -25,6 +25,10 @@ Deno.serve(async (req) => {
       return json({ error: "Faltan campos obligatorios" }, 400, corsHeaders);
     }
 
+    // Ensure user exists in wedding_users.
+    // Users who played "sin guardar" have a local UUID not in the DB.
+    await db.from("wedding_users").upsert({ id: userId }, { ignoreDuplicates: true });
+
     const { error } = await db.rpc("upsert_rsvp", {
       p_user_id:      userId,
       p_player_name:  rsvp.playerName,
