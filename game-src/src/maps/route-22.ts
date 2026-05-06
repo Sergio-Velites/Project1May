@@ -6,7 +6,7 @@ import { rival } from "../app/npcs";
 import { Direction } from "../state/state-types";
 
 const route22: MapType = {
-  name: "Route 22",
+  name: "Ruta 22",
   image,
   height: 18,
   width: 40,

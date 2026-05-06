@@ -6,7 +6,7 @@ import { scientist } from "../app/npcs";
 import music from "../assets/music/maps/pokemon-center.mp3";
 
 const route3PokemonCenter: MapType = {
-  name: "Route 3 Pokemon Center",
+  name: "Centro Pokémon Ruta 3",
   image,
   height: 8,
   width: 14,
@@ -24,7 +24,7 @@ const route3PokemonCenter: MapType = {
   },
   text: {
     4: {
-      0: ["If you have too many POKEMON,", "you should store them via PC."],
+      0: ["Si tienes demasiados PKMN,", "guárdalos en el PC."],
     },
   },
   maps: {},
@@ -55,7 +55,7 @@ const route3PokemonCenter: MapType = {
       npc: scientist,
       pokemon: [{ id: 1, level: 1 }],
       facing: Direction.Down,
-      pos: { x: 10, y: 2 },
+      pos: { x: 10, y: 1 },
       intro: [],
       outtro: [],
       money: 0,

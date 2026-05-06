@@ -4,7 +4,7 @@ import { MapId, MapType } from "./map-types";
 import music from "../assets/music/maps/pokemon-gym.mp3";
 
 const viridianCityGym: MapType = {
-  name: "Viridian City GYM",
+  name: "Gimnasio de Soto Lezkairu",
   image,
   music,
   height: 18,

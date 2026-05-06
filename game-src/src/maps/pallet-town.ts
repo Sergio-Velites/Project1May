@@ -7,7 +7,7 @@ import music from "../assets/music/maps/pallet-town.mp3";
 import getEncounterData from "./get-location-data";
 
 const palletTown: MapType = {
-  name: "Pallet Town",
+  name: "PUEBLO PALETA",
   image: palletTownImage,
   height: 18,
   width: 20,

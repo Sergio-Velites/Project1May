@@ -5,7 +5,7 @@ import arodactyl from "../assets/map/pewter-museum-photo-1.png";
 import kabutops from "../assets/map/pewter-museum-photo-2.png";
 
 const pewterMuseum1f: MapType = {
-  name: "Pewter Museum 1F",
+  name: "Museo de Villamayor 1F",
   image,
   height: 8,
   width: 20,

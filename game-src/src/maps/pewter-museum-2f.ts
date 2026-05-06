@@ -2,7 +2,7 @@ import image from "../assets/map/pewter-museum-2f.png";
 import { MapId, MapType } from "./map-types";
 
 const pewterMuseum2f: MapType = {
-  name: "Pewter Museum 2F",
+  name: "Museo de Villamayor 2F",
   image,
   height: 8,
   width: 14,

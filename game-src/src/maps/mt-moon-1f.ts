@@ -7,7 +7,7 @@ import getEncounterData from "./get-location-data";
 import { MapId, MapType } from "./map-types";
 
 const mtMoon1f: MapType = {
-  name: "Mt. Moon 1F",
+  name: "Monte Luna 1F",
   image,
   music,
   cave: true,
@@ -64,7 +64,7 @@ const mtMoon1f: MapType = {
   grass: {},
   text: {
     23: {
-      15: ["Beware! ZUBAT is a blood sucker!"],
+      15: ["¡Cuidado! ¡Los ZUBAT son chupasangres!"],
     },
   },
   maps: {},

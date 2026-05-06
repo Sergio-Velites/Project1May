@@ -2,7 +2,7 @@ import houseA2FImage from "../assets/map/house-a-2f.png";
 import { MapId, MapType } from "./map-types";
 
 const houseA2f: MapType = {
-  name: "House A 2F",
+  name: "Casa 2F",
   image: houseA2FImage,
   height: 8,
   width: 8,

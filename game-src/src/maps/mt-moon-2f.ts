@@ -11,7 +11,7 @@ import { MapId, MapType } from "./map-types";
 // TODO Add fossils (You want the HELIX FOSSIL? (yes no) on the right... You want the DOME FOSSIL? (yes no) on the left...
 
 const mtMoon2f: MapType = {
-  name: "Mt Moon 2F",
+  name: "Monte Luna 2F",
   image,
   music,
   cave: true,

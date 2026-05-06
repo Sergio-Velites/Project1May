@@ -6,7 +6,7 @@ import getEncounterData from "./get-location-data";
 import { MapId, MapType } from "./map-types";
 
 const route3: MapType = {
-  name: "Route 3",
+  name: "Ruta 3",
   image,
   music,
   height: 36,
@@ -94,11 +94,11 @@ const route3: MapType = {
   },
   text: {
     7: {
-      67: ["MT. MOON", "Tunnel Entrance"],
+      67: ["MONTE LUNA", "Entrada al túnel"],
     },
 
     27: {
-      59: ["ROUTE 3", "MT. MOON AHEAD"],
+      59: ["RUTA 3", "MONTE LUNA → próxima parada"],
     },
   },
   maps: {

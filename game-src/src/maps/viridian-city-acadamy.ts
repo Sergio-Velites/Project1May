@@ -2,7 +2,7 @@ import image from "../assets/map/viridian-city-pokemon-acadamy.png";
 import { MapId, MapType } from "./map-types";
 
 const viridianCityAcadamy: MapType = {
-  name: "Viridian City Academy",
+  name: "Academia del Soto",
   image,
   height: 8,
   width: 8,
@@ -30,7 +30,7 @@ const viridianCityAcadamy: MapType = {
       3: [
         "Encontrado este curioso pokemon.",
         "No sabemos su procedencia",
-        "Juraría que le he escuchado decir un nombre....",
+        "Juraría que le he oído susurrar algo....",
         "'Soy Jonny, Soy Jonny...'",
       ],
     },
