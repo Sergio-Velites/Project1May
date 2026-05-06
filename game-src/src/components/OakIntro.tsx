@@ -56,8 +56,8 @@ const INTRO_LINES: DialogueLine[] = [
   { sprite: "oak",        text: "...puedes llamarme\nMAESTRO DE CEREMONIAS." },
   { sprite: "oak",        text: "Este mundo está lleno de\namistades, aventuras..." },
   { sprite: "pokemon122", text: "¡Y grandes celebraciones!" },
-  { sprite: "pokemon132", text: "Durante años, entrenadores\nde todas partes han viajado\njuntos, compartido combates..." },
-  { sprite: "pokemon132", text: "...y encontrado compañeros\npara toda la vida." },
+  { sprite: "pokemon122", text: "Durante años, entrenadores\nde todas partes han viajado\njuntos, compartido combates..." },
+  { sprite: "pokemon122", text: "...y encontrado compañeros\npara toda la vida." },
   { sprite: "oak",        text: "Precisamente por eso\nestamos hoy aquí." },
   { sprite: "oak",        text: "Porque dos entrenadores\nlegendarios..." },
   { sprite: "duo",        text: "¡MARTA y SERGIO..." },
@@ -85,18 +85,18 @@ const buildAllergyIntro = (): DialogueLine[] => [
 ];
 
 const buildBusLines = (): DialogueLine[] => [
-  { sprite: "biker", text: "Para facilitar el viaje\nhasta VILLAMAYOR..." },
+  { sprite: "oak", text: "Para facilitar el viaje\nhasta VILLAMAYOR..." },
   { sprite: "biker", text: "Habrá un BUS especial\npara entrenadores invitados." },
   { sprite: "biker", text: "Las paradas serán:" },
   { sprite: "biker", text: "11:00 CLUB DE TENIS\n11:20 HOTEL TRES REYES" },
-  { sprite: "biker", text: "¿Utilizarás el bus de ida?", next: "bus-outbound" },
+  { sprite: "biker", text: "¿Utilizarás el bus?", next: "bus-outbound" },
 ];
 
 const buildPrebodaLines = (): DialogueLine[] => [
   { sprite: "oak",   text: "Una última cosa." },
   { sprite: "oak",   text: "Antes del gran día..." },
-  { sprite: "hiker", text: "Se celebrará una PREBODA\nel día 6 en EL BOSQUECILLO" },
-  { sprite: "hiker", text: "(Junto al Hotel Tres Reyes\nde Pamplona)" },
+  { sprite: "oak", text: "Se celebrará una PREBODA\nel día 6 en EL BOSQUECILLO" },
+  { sprite: "oak", text: "(Junto al Hotel Tres Reyes\nde Pamplona)" },
   { sprite: "hiker", text: "¿Te unirás al encuentro\nde entrenadores?", next: "preboda-choice" },
 ];
 

@@ -6,6 +6,8 @@
 import { redirect } from "next/navigation";
 
 const SUPABASE_URL = "https://kplfjrjibjptigvfgdvy.supabase.co";
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwbGZqcmppYmpwdGlndmZnZHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1OTMxNjMsImV4cCI6MjA5MzE2OTE2M30.lOgErwiQHTp98A3a7Z3ZotvYKmdxbwScNFgN_9lOijM";
 
 interface PokemonInst {
   id: number;
@@ -33,6 +35,8 @@ async function fetchRsvps(
       headers: {
         "x-admin-key": adminKey,
         "Content-Type": "application/json",
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       },
       cache: "no-store",
     });
