@@ -184,7 +184,7 @@ const OnlineBattleMenu = () => {
         <TextContainer>
           <Frame wide tall flashing={["greeting", "empty", "error"].includes(stage)}>
             {stage === "greeting" &&
-              "¡Hola! ¡Puedo conectarte con un invitado para una batalla en línea!"}
+              "¡Hola! ¿Quieres combatir con el equipo Pokémon de otro invitado?"}
             {stage === "loading" && "Buscando invitados..."}
             {stage === "empty" &&
               "No hay otros jugadores conectados ahora. ¡Inténtalo más tarde!"}
