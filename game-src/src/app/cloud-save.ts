@@ -5,6 +5,10 @@ const SUPABASE_URL =
   (process.env.REACT_APP_SUPABASE_URL as string | undefined) ||
   "https://kplfjrjibjptigvfgdvy.supabase.co";
 
+const SUPABASE_ANON_KEY =
+  (process.env.REACT_APP_SUPABASE_ANON_KEY as string | undefined) ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwbGZqcmppYmpwdGlndmZnZHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1OTMxNjMsImV4cCI6MjA5MzE2OTE2M30.lOgErwiQHTp98A3a7Z3ZotvYKmdxbwScNFgN_9lOijM";
+
 // In-memory current user ID (also persisted in localStorage)
 // Se inicializa con el valor de localStorage para que persista entre recargas.
 let currentUserId: string | null = localStorage.getItem("wedding_user_id");
@@ -29,7 +33,11 @@ export const isWebAuthnAvailable = (): boolean => {
 const callEdge = (endpoint: string, body: unknown) =>
   fetch(`${SUPABASE_URL}/functions/v1/${endpoint}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    },
     body: JSON.stringify(body),
   });
 
@@ -66,7 +74,13 @@ export const loadFromCloud = async (userId: string): Promise<unknown | null> => 
   if (!SUPABASE_URL) return null;
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/functions/v1/load-game?userId=${userId}`
+      `${SUPABASE_URL}/functions/v1/load-game?userId=${userId}`,
+      {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      }
     );
     if (!res.ok) return null;
     const { gameState } = await res.json();
@@ -87,10 +101,18 @@ export interface PlayerEntry {
 export const listPlayers = async (): Promise<PlayerEntry[]> => {
   if (!SUPABASE_URL) return [];
   try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/list-players`);
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/list-players`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    });
     if (!res.ok) return [];
     const { players } = await res.json();
-    return (players ?? []) as PlayerEntry[];
+    // Filtrar jugadores sin pokémon (no tienen equipo con el que batallar)
+    return ((players ?? []) as PlayerEntry[]).filter(
+      (p) => p.pokemonCount > 0
+    );
   } catch {
     return [];
   }
