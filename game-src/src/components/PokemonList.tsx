@@ -77,7 +77,7 @@ const PokemonList = ({
     if (selected || viewingStats) return;
 
     if (active === pokemon.length - 1) return;
-    if (scroll === pokemon.length - 5) return;
+    if (pokemon.length > 6 && scroll === pokemon.length - 5) return;
 
     if (pokemon.length > 6 && active === 4) setScroll((prev) => prev + 1);
     else setActive((prev) => prev + 1);
