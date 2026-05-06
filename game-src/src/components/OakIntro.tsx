@@ -56,7 +56,8 @@ const INTRO_LINES: DialogueLine[] = [
   { sprite: "oak",        text: "...puedes llamarme\nMAESTRO DE CEREMONIAS." },
   { sprite: "oak",        text: "Este mundo está lleno de\namistades, aventuras..." },
   { sprite: "pokemon122", text: "¡Y grandes celebraciones!" },
-  { sprite: "pokemon122", text: "Durante años, entrenadores\nde todas partes han viajado\njuntos, compartido combates..." },
+  { sprite: "pokemon122", text: "Durante años, entrenadores\nde todas partes han viajado\njuntos," },
+  { sprite: "pokemon122", text: "compartido combates..." },
   { sprite: "pokemon122", text: "...y encontrado compañeros\npara toda la vida." },
   { sprite: "oak",        text: "Precisamente por eso\nestamos hoy aquí." },
   { sprite: "oak",        text: "Porque dos entrenadores\nlegendarios..." },
@@ -106,7 +107,7 @@ const buildFinaleLines = (): DialogueLine[] => [
   { sprite: "oak",        text: "MARTA y SERGIO te esperan\npara una aventura\ninolvidable." },
   { sprite: "oak",        text: "Risas, baile, amigos,\nvino y combates en pista..." },
   { sprite: "pokemon132", text: "...y probablemente algún\nderretido después de las copas." },
-  { sprite: "oak",        text: "Si cambias de opinión,\ncomienza una nueva partida\ny actualizarás tu registro." },
+  { sprite: "oak",        text: "Si cambias de opinión,\ncomienza una nueva partida\ny actualiza tu registro." },
   { sprite: "oak",        text: "¡Prepárate!" },
   { sprite: "player",     text: "¡Tu aventura hacia la\ngran boda está a punto\nde comenzar!", next: "done" },
 ];
