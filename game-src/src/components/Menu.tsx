@@ -46,6 +46,7 @@ const Bold = styled.div`
   font-weight: bold;
   color: black;
   margin-left: 45px;
+  font-family: "PokemonGB";
 
   font-size: 3rem;
   @media (max-width: 1000px) {

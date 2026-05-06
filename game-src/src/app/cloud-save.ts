@@ -109,10 +109,7 @@ export const listPlayers = async (): Promise<PlayerEntry[]> => {
     });
     if (!res.ok) return [];
     const { players } = await res.json();
-    // Filtrar jugadores sin pokémon (no tienen equipo con el que batallar)
-    return ((players ?? []) as PlayerEntry[]).filter(
-      (p) => p.pokemonCount > 0
-    );
+    return (players ?? []) as PlayerEntry[];
   } catch {
     return [];
   }

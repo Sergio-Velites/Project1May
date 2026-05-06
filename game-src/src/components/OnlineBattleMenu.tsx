@@ -52,6 +52,7 @@ type Stage =
   | "empty"
   | "select"
   | "loading-battle"
+  | "no-pokemon"
   | "error"
   | "done";
 
@@ -99,7 +100,7 @@ const OnlineBattleMenu = () => {
       const gs = gameState as { pokemon?: { id: number; level: number }[] };
       const opponentPokemon = gs.pokemon ?? [];
       if (opponentPokemon.length === 0) {
-        setStage("error");
+        setStage("no-pokemon");
         return;
       }
       const fakeTrainer: TrainerType = {
@@ -132,7 +133,7 @@ const OnlineBattleMenu = () => {
       dispatch(hideOnlineBattleMenu());
       setStage("greeting");
     }
-    if (stage === "error") {
+    if (stage === "error" || stage === "no-pokemon") {
       dispatch(hideOnlineBattleMenu());
       setStage("greeting");
     }
@@ -141,7 +142,7 @@ const OnlineBattleMenu = () => {
   // B-button handler — cancel
   useEvent(Event.B, () => {
     if (!show) return;
-    if (stage === "greeting" || stage === "empty" || stage === "error") {
+    if (stage === "greeting" || stage === "empty" || stage === "error" || stage === "no-pokemon") {
       dispatch(hideOnlineBattleMenu());
       setStage("greeting");
     }
@@ -182,14 +183,16 @@ const OnlineBattleMenu = () => {
       {/* Text box */}
       {stage !== "select" && stage !== "done" && (
         <TextContainer>
-          <Frame wide tall flashing={["greeting", "empty", "error"].includes(stage)}>
+          <Frame wide tall flashing={["greeting", "empty", "error", "no-pokemon"].includes(stage)}>
             {stage === "greeting" &&
               "¡Hola! ¿Quieres combatir con el equipo Pokémon de otro invitado?"}
             {stage === "loading" && "Buscando invitados..."}
             {stage === "empty" &&
-              "No hay otros jugadores conectados ahora. ¡Inténtalo más tarde!"}
+              "No hay otros invitados en el juego todavía."}
             {stage === "loading-battle" &&
               `Cargando datos de ${selected?.name ?? ""}...`}
+            {stage === "no-pokemon" &&
+              `${selected?.name ?? "Este invitado"} aún no tiene equipo Pokémon. ¡Dile que juegue más!`}
             {stage === "error" &&
               "No se pudo cargar la partida del invitado. Inténtalo de nuevo."}
           </Frame>

@@ -56,7 +56,8 @@ const INTRO_LINES: DialogueLine[] = [
   { sprite: "oak",        text: "...puedes llamarme\nMAESTRO DE CEREMONIAS." },
   { sprite: "oak",        text: "Este mundo está lleno de\namistades, aventuras..." },
   { sprite: "pokemon122", text: "¡Y grandes celebraciones!" },
-  { sprite: "pokemon122", text: "Durante años, entrenadores\nde todas partes han viajado\njuntos, compartido combates..." },
+  { sprite: "pokemon122", text: "Durante años, entrenadores\nde todas partes han viajado\njuntos," },
+  { sprite: "pokemon122", text: "compartido combates..." },
   { sprite: "pokemon122", text: "...y encontrado compañeros\npara toda la vida." },
   { sprite: "oak",        text: "Precisamente por eso\nestamos hoy aquí." },
   { sprite: "oak",        text: "Porque dos entrenadores\nlegendarios..." },
@@ -106,7 +107,7 @@ const buildFinaleLines = (): DialogueLine[] => [
   { sprite: "oak",        text: "MARTA y SERGIO te esperan\npara una aventura\ninolvidable." },
   { sprite: "oak",        text: "Risas, baile, amigos,\nvino y combates en pista..." },
   { sprite: "pokemon132", text: "...y probablemente algún\nderretido después de las copas." },
-  { sprite: "oak",        text: "Si cambias de opinión,\ncomienza una nueva partida\ny actualizarás tu registro." },
+  { sprite: "oak",        text: "Si cambias de opinión,\ncomienza una nueva partida\ny actualiza tu registro." },
   { sprite: "oak",        text: "¡Prepárate!" },
   { sprite: "player",     text: "¡Tu aventura hacia la\ngran boda está a punto\nde comenzar!", next: "done" },
 ];
@@ -223,7 +224,7 @@ interface CIProps { $selected: boolean; }
 const ChoiceItem = styled.h2<CIProps>`
   font-family: "PokemonGB"; font-size: 18px; color: #181010;
   display: flex; align-items: center; gap: 0.4em;
-  &::before { content: "${(p: CIProps) => p.$selected ? "▶" : " "}"; }
+  &::before { content: "${(p: CIProps) => p.$selected ? "▶\uFE0E" : "\u00A0"}"; }
   @media (max-width: 1000px) { font-size: 8px; }
 `;
 
@@ -263,8 +264,7 @@ const AllergyTextarea = styled.textarea`
   background: var(--bg); border: 3px solid black; padding: 8px;
   font-family: "PokemonGB", monospace; font-size: 16px; color: #181010;
   resize: none; outline: none;
-  /* font-size >= 16px prevents iOS auto-zoom on focus */
-  @media (max-width: 1000px) { border-width: 2px; padding: 4px; }
+  @media (max-width: 1000px) { border-width: 2px; padding: 4px; font-size: 9px; }
 `;
 
 const ConfirmBtn = styled.button`
@@ -298,9 +298,9 @@ const NativeField = styled.input`
   background: var(--bg); border: 3px solid black;
   padding: 10px 14px;
   font-family: "PokemonGB", monospace;
-  font-size: 16px; /* ≥16px previene zoom iOS */
+  font-size: 16px;
   color: #181010; outline: none; text-align: center; letter-spacing: 0.08em;
-  @media (max-width: 1000px) { border-width: 2px; }
+  @media (max-width: 1000px) { border-width: 2px; font-size: 9px; }
 `;
 
 const NativeOkBtn = styled.button`
@@ -308,6 +308,22 @@ const NativeOkBtn = styled.button`
   background: #181010; color: var(--bg);
   border: none; padding: 10px 22px; cursor: pointer;
   @media (max-width: 1000px) { font-size: 8px; padding: 8px 16px; }
+`;
+
+const NativeArrow = styled.span`
+  display: inline-block;
+  width: 2px; height: 2px; font-size: 2px; color: var(--bg);
+  box-shadow:
+    1em 0em 0 var(--bg), 2em 0em 0 var(--bg),
+    1em 1em 0 var(--bg), 2em 1em 0 var(--bg), 3em 1em 0 var(--bg),
+    1em 2em 0 var(--bg), 2em 2em 0 var(--bg), 3em 2em 0 var(--bg), 4em 2em 0 var(--bg),
+    1em 3em 0 var(--bg), 2em 3em 0 var(--bg), 3em 3em 0 var(--bg), 4em 3em 0 var(--bg), 5em 3em 0 var(--bg),
+    1em 4em 0 var(--bg), 2em 4em 0 var(--bg), 3em 4em 0 var(--bg), 4em 4em 0 var(--bg),
+    1em 5em 0 var(--bg), 2em 5em 0 var(--bg), 3em 5em 0 var(--bg),
+    1em 6em 0 var(--bg), 2em 6em 0 var(--bg);
+  transform: rotate(90deg);
+  margin-left: 8px;
+  vertical-align: middle;
 `;
 
 interface NativeNameProps { prompt: string; onConfirm: (name: string) => void; }
@@ -325,7 +341,7 @@ const NativeNamePicker = ({ prompt, onConfirm }: NativeNameProps) => {
         onKeyDown={e => { if (e.key === "Enter") submit(); }}
         placeholder="MAX 10"
       />
-      <NativeOkBtn onClick={submit}>OK ▶</NativeOkBtn>
+      <NativeOkBtn onClick={submit}>OK <NativeArrow /></NativeOkBtn>
     </NativeInputWrap>
   );
 };
