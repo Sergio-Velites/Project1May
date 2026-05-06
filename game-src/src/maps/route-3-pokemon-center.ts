@@ -48,7 +48,7 @@ const route3PokemonCenter: MapType = {
   },
   onlineBattleNpc: {
     x: 10,
-    y: 2,
+    y: 1,
   },
   trainers: [
     {

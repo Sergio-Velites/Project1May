@@ -75,8 +75,8 @@ const Screen = styled.div`
   border: 3px solid #181010;
   box-sizing: border-box;
   overflow: hidden;
-  font-size: 7cqw;
-  @media (min-width: 600px) { font-size: 1.8vh; }
+  font-size: 9px;
+  @media (min-width: 1000px) { font-size: 1.8vh; }
 `;
 
 const HeaderBar = styled.div`
@@ -98,6 +98,7 @@ const Txt = styled.span<{ $size?: number; $bold?: boolean }>`
   font-size: ${(p) => (p.$size ? `${p.$size}em` : "1em")};
   font-weight: ${(p) => (p.$bold ? "bold" : "normal")};
   line-height: 1.6;
+  color: inherit;
 `;
 
 const ListArea = styled.div`
@@ -115,8 +116,9 @@ const ListRow = styled.div<RowProps>`
   padding: 1px 4px;
   border-bottom: 1px solid #c8c0b0;
   background: ${(p) => (p.$active ? "#181010" : "var(--bg)")};
-  color: ${(p) => (p.$active ? "var(--bg)" : "#181010")};
+  color: ${(p) => (p.$active ? "#f9f2fa" : "#181010")};
   flex-shrink: 0;
+  & * { color: inherit; }
 `;
 
 const NavHint = styled.div`

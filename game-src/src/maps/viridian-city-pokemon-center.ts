@@ -52,7 +52,7 @@ const viridianCityPokemonCenter: MapType = {
   },
   onlineBattleNpc: {
     x: 10,
-    y: 2,
+    y: 1,
   },
   trainers: [
     {

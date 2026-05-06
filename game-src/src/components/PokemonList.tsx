@@ -24,17 +24,16 @@ const StyledPokemonList = styled.div`
   z-index: 100;
 `;
 
-const Container = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 20%;
-  z-index: 100;
+const ListArea = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+`;
 
-  @media (max-width: 1000px) {
-    height: 30%;
-  }
+const InfoArea = styled.div`
+  flex-shrink: 0;
 `;
 
 const EmptyRow = styled.div`
@@ -129,29 +128,31 @@ const PokemonList = ({
         />
       )}
       <StyledPokemonList>
-        {Array.from({ length: 6 }, (_, i) => {
-          const p = pokemon[scroll + i];
-          return p ? (
-            <PokemonRow
-              key={i}
-              pokemon={p}
-              active={active === i}
-              moveData={moveData}
-            />
-          ) : (
-            <EmptyRow key={i} />
-          );
-        })}
+        <ListArea>
+          {Array.from({ length: 6 }, (_, i) => {
+            const p = pokemon[scroll + i];
+            return p ? (
+              <PokemonRow
+                key={i}
+                pokemon={p}
+                active={active === i}
+                moveData={moveData}
+              />
+            ) : (
+              <EmptyRow key={i} />
+            );
+          })}
+        </ListArea>
+        <InfoArea>
+          <Frame wide tall>
+            {text
+              ? text
+              : switching
+              ? "¿Dónde mover al POKÉMON?"
+              : "Elige un POKÉMON."}
+          </Frame>
+        </InfoArea>
       </StyledPokemonList>
-      <Container>
-        <Frame wide tall>
-          {text
-            ? text
-            : switching
-            ? "¿Dónde mover al POKÉMON?"
-            : "Elige un POKÉMON."}
-        </Frame>
-      </Container>
       <Menu
         right="0"
         bottom="0"
