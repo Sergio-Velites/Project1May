@@ -10,7 +10,8 @@ import PixelImage from "../styles/PixelImage";
 import { useDispatch } from "react-redux";
 import { setName, setRsvp } from "../state/gameSlice";
 import { RSVPData } from "../state/state-types";
-import { saveRsvp, getCurrentUserId } from "../app/cloud-save";
+import { saveRsvp, saveToCloud, getCurrentUserId } from "../app/cloud-save";
+import { store } from "../state/store";
 import usePokemon from "../app/use-pokemon-metadata";
 import oakPortrait from "../assets/portraits/oak.png";
 import ashPortrait from "../assets/portraits/ash.png";
@@ -397,7 +398,14 @@ const OakIntro = ({ onComplete }: Props) => {
     };
     dispatch(setName(playerName));
     dispatch(setRsvp(rsvpData));
-    saveRsvp(getCurrentUserId() ?? "", rsvpData).finally(() => {
+    // Redux dispatch es síncrono: store.getState() ya tiene name+rsvp actualizados.
+    // Guardar también la partida completa para que "Continuar" esté disponible al volver.
+    const userId = getCurrentUserId() ?? "";
+    const gameState = store.getState().game;
+    Promise.all([
+      saveRsvp(userId, rsvpData),
+      saveToCloud(userId, gameState),
+    ]).finally(() => {
       setTimeout(() => setShrink("overworld"), 900);
       setTimeout(() => onComplete(), 1700);
     });
