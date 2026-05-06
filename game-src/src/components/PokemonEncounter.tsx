@@ -902,14 +902,15 @@ const PokemonEncounter = () => {
             } else {
               throwPokeballAtEnemy();
               setTimeout(() => {
-                if (startTimes === 1) {
+                const effectiveTimes = startTimes ?? times;
+                if (effectiveTimes === 1) {
                   setStage(42);
-                } else if (startTimes === 2) {
+                } else if (effectiveTimes === 2) {
                   setStage(43);
-                } else if (startTimes === 3) {
+                } else if (effectiveTimes === 3) {
                   setStage(44);
                 } else {
-                  throw new Error("Invalid start times");
+                  setStage(42);
                 }
               }, FRAME_DURATION * 6);
             }
@@ -1099,6 +1100,7 @@ const PokemonEncounter = () => {
     if (stage === 45) {
       if (!enemy) throw new Error("No enemy found");
       if (!enemyMetadata) throw new Error("No enemy metadata found");
+      const teamFull = pokemon.length >= 6;
       dispatch(
         addPokemon({
           id: enemy.id,
@@ -1116,6 +1118,14 @@ const PokemonEncounter = () => {
       );
       // Register as CAUGHT in Pokédex
       dispatch(catchPokemonPokedex(enemy.id));
+      if (teamFull) {
+        setStage(53);
+      } else {
+        endEncounter_();
+      }
+    }
+
+    if (stage === 53) {
       endEncounter_();
     }
 
@@ -1189,6 +1199,8 @@ const PokemonEncounter = () => {
     if (stage === 44) return `¡Uf! ¡Por tan poco!`;
     if (stage === 45)
       return `¡Bien! ¡${enemyMetadata.name.toUpperCase()} fue capturado!`;
+    if (stage === 53)
+      return `¡El equipo está lleno! ¡${enemyMetadata.name.toUpperCase()} fue enviado al PC!`;
     if (stage === 48 || stage === 49) {
       return `¡${trainer?.npc.name.toUpperCase()} sacó a ${enemyMetadata.name.toUpperCase()}!`;
     }
@@ -1918,7 +1930,7 @@ const PokemonEncounter = () => {
               flashing={
                 [
                   2, 20, 21, 22, 24, 26, 27, 29, 30, 31, 32, 42, 43, 44, 45, 48,
-                  49, 50, 51, 52,
+                  49, 50, 51, 52, 53,
                 ].includes(stage) || !!clickableNotice
               }
             >
