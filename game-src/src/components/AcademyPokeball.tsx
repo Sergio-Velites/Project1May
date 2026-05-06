@@ -26,7 +26,7 @@ import { xToPx, yToPx } from "../app/position-helper";
 import pokeball from "../assets/misc/pokeball.png";
 
 const DITTO_QUEST_ID = "academy-ditto-taken";
-const DITTO_POS = { x: 4, y: 4 };
+const DITTO_POS = { x: 4, y: 3 };
 
 const StyledBall = styled.div<{ $x: number; $y: number }>`
   position: absolute;
