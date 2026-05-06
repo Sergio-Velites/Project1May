@@ -6,7 +6,7 @@ import { scientist } from "../app/npcs";
 import music from "../assets/music/maps/pokemon-center.mp3";
 
 const viridianCityPokemonCenter: MapType = {
-  name: "Viridian City Pokemon Center",
+  name: "Centro Pokémon del Soto",
   image,
   height: 8,
   width: 14,
@@ -59,7 +59,7 @@ const viridianCityPokemonCenter: MapType = {
       npc: scientist,
       pokemon: [{ id: 1, level: 1 }],
       facing: Direction.Down,
-      pos: { x: 10, y: 2 },
+      pos: { x: 10, y: 1 },
       intro: [],
       outtro: [],
       money: 0,

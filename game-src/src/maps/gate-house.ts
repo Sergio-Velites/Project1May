@@ -2,7 +2,7 @@ import image from "../assets/map/gate-house.png";
 import { MapId, MapType } from "./map-types";
 
 const gateHouse: MapType = {
-  name: "Gate House",
+  name: "Caseta de Control",
   image,
   height: 8,
   width: 10,

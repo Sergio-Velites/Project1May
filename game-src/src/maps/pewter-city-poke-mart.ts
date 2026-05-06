@@ -5,7 +5,7 @@ import music from "../assets/music/maps/pokemon-center.mp3";
 import { ItemType } from "../app/use-item-data";
 
 const pewterCityPokeMart: MapType = {
-  name: "Pewter City Poke Mart",
+  name: "Tienda de Villamayor",
   image,
   height: 8,
   width: 8,

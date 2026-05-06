@@ -2,7 +2,7 @@ import image from "../assets/map/route-2-gate.png";
 import { MapId, MapType } from "./map-types";
 
 const route2Gate: MapType = {
-  name: "Route 2 Gate",
+  name: "Control Ruta 2",
   image,
   height: 8,
   width: 10,

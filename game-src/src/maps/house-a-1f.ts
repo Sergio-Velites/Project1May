@@ -4,7 +4,7 @@ import { Direction } from "../state/state-types";
 import { beauty } from "../app/npcs";
 
 const houseA1f: MapType = {
-  name: "House A 1F",
+  name: "Casa 1F",
   image: houseA1FImage,
   height: 8,
   width: 8,

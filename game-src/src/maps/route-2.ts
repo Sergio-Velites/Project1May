@@ -4,7 +4,7 @@ import getEncounterData from "./get-location-data";
 import { MapId, MapType } from "./map-types";
 
 const route2: MapType = {
-  name: "Route 2",
+  name: "Ruta 2",
   image,
   music,
   height: 72,

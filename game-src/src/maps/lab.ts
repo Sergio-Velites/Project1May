@@ -6,7 +6,7 @@ import { oak } from "../app/npcs";
 import music from "../assets/music/maps/oaks-laboratory.mp3";
 
 const lab: MapType = {
-  name: "Lab",
+  name: "DESTILERÍA DEL PROF. OAK",
   image: labImage,
   height: 12,
   width: 10,

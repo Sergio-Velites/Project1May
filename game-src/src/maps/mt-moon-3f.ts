@@ -6,7 +6,7 @@ import { MapId, MapType } from "./map-types";
 // TODO Add propper exit
 
 const mtMoon3f: MapType = {
-  name: "Mt Moon 3F",
+  name: "Monte Luna 3F",
   image,
   cave: true,
   music,

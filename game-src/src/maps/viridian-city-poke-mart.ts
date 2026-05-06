@@ -5,7 +5,7 @@ import music from "../assets/music/maps/pokemon-center.mp3";
 import { ItemType } from "../app/use-item-data";
 
 const viridianCityPokeMart: MapType = {
-  name: "Viridian City Poke Mart",
+  name: "Tienda del Soto",
   image,
   height: 8,
   width: 8,
