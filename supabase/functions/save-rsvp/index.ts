@@ -11,6 +11,7 @@ interface RSVPPayload {
     busOutbound: boolean;
     busReturn: "none" | "23:00" | "1:45";
     preboda: boolean;
+    attended: boolean;
   };
 }
 
@@ -41,6 +42,7 @@ Deno.serve(async (req) => {
       p_bus_outbound: rsvp.busOutbound ?? false,
       p_bus_return:   rsvp.busReturn ?? "none",
       p_preboda:      rsvp.preboda ?? false,
+      p_attended:     rsvp.attended ?? true,
     });
 
     if (error) throw error;

@@ -30,6 +30,7 @@ type SpriteId =
 type Stage =
   | "dialogue"
   | "name-picker"
+  | "attendance-choice"
   | "companion-choice"
   | "companion-picker"
   | "children-select"
@@ -74,7 +75,7 @@ const INTRO_LINES: DialogueLine[] = [
 const buildPostNameLines = (name: string): DialogueLine[] => [
   { sprite: "player",  text: `¡Ah, claro!\n¡Tu nombre es ${name}!` },
   { sprite: "oak",     text: "Excelente.\nDime una cosa..." },
-  { sprite: "oak",     text: "¿Viajarás acompañado\nen esta aventura?", next: "companion-choice" },
+  { sprite: "oak",     text: "¿Asistirás a la boda\nde MARTA y SERGIO?", next: "attendance-choice" },
 ];
 
 const buildChildrenIntro = (): DialogueLine[] => [
@@ -91,6 +92,13 @@ const buildBusLines = (): DialogueLine[] => [
   { sprite: "biker", text: "Las paradas serán:" },
   { sprite: "biker", text: "11:00 CLUB DE TENIS\n11:20 HOTEL TRES REYES" },
   { sprite: "biker", text: "¿Utilizarás el bus?", next: "bus-outbound" },
+];
+
+const buildDeclinedLines = (): DialogueLine[] => [
+  { sprite: "oak",    text: "ooh.... pues una pena,\npero bueno, te dejaremos disfrutar\nde esta pequeña aventura previa..." },
+  { sprite: "oak",    text: "Si cambias de opinión,\ncomienza una nueva partida\ny actualiza tu registro." },
+  { sprite: "oak",    text: "¡Prepárate!" },
+  { sprite: "player", text: "¡Tu aventura hacia la\ngran boda está a punto\nde comenzar!", next: "done" },
 ];
 
 const buildPrebodaLines = (): DialogueLine[] => [
@@ -345,7 +353,16 @@ const NativeNamePicker = ({ prompt, onConfirm }: NativeNameProps) => {
     </NativeInputWrap>
   );
 };
-
+// ── Snapshot para historial de navegación (tecla B = volver) ────────────────────────────────────
+interface Snapshot {
+  lines: DialogueLine[]; idx: number;
+  stage: Stage;          cursor: number;
+  displayed: string;     finished: boolean;
+  playerName: string;    companion: string | null;
+  children: number;      allergyTxt: string;
+  busOutbound: boolean;  busReturn: "none" | "23:00" | "1:45";
+  preboda: boolean;      attended: boolean | null;
+}
 // ── Component ────────────────────────────────────────────────────────────────────
 
 interface Props { onComplete: () => void; }
@@ -372,9 +389,33 @@ const OakIntro = ({ onComplete }: Props) => {
   const [preboda,     setPreboda]    = useState(false);
   const [cursor,      setCursor]     = useState(0);
   const [shrink,      setShrink]     = useState<"idle" | "shrinking" | "overworld">("idle");
+  const [attended,    setAttended]   = useState<boolean | null>(null);
+  const historyRef = useRef<Snapshot[]>([]);
 
   const currentLine = lines[idx];
   const fullText = currentLine?.text ?? "";
+
+  // ── History (B = volver) ──
+  const push = () => {
+    historyRef.current = [...historyRef.current, {
+      lines, idx, stage, cursor, displayed, finished,
+      playerName, companion, children, allergyTxt,
+      busOutbound, busReturn, preboda, attended,
+    }];
+  };
+  const pop = () => {
+    const h = historyRef.current;
+    if (h.length === 0) return;
+    const prev = h[h.length - 1];
+    historyRef.current = h.slice(0, -1);
+    setLines(prev.lines);       setIdx(prev.idx);
+    setStage(prev.stage);       setCursor(prev.cursor);
+    setDisplayed(prev.displayed); setFinished(prev.finished);
+    setPlayerName(prev.playerName); setCompanion(prev.companion);
+    setChildren(prev.children); setAllergyTxt(prev.allergyTxt);
+    setBusOutbound(prev.busOutbound); setBusReturn(prev.busReturn);
+    setPreboda(prev.preboda);   setAttended(prev.attended);
+  };
 
   useEffect(() => {
     if (stage !== "dialogue" || !currentLine || finished) return;
@@ -383,18 +424,18 @@ const OakIntro = ({ onComplete }: Props) => {
     return () => clearTimeout(t);
   }, [displayed, fullText, finished, currentLine, stage]);
 
-  const enterLines = useCallback((newLines: DialogueLine[]) => {
+  const enterLines = (newLines: DialogueLine[]) => {
     setLines(newLines); setIdx(0);
     setDisplayed(""); setFinished(false);
     setStage("dialogue"); setCursor(0);
-  }, []);
+  };
 
-  const advanceDialogue = useCallback(() => {
+  const advanceDialogue = () => {
     if (!finished) { setDisplayed(fullText); setFinished(true); return; }
-    if (currentLine?.next) { setStage(currentLine.next); setCursor(0); return; }
+    if (currentLine?.next) { push(); setStage(currentLine.next); setCursor(0); return; }
     const next = idx + 1;
     if (next < lines.length) { setIdx(next); setDisplayed(""); setFinished(false); }
-  }, [finished, fullText, currentLine, idx, lines]);
+  };
 
   const doneRef = useRef(false);
   const triggerEnding = useCallback((
@@ -402,15 +443,21 @@ const OakIntro = ({ onComplete }: Props) => {
     busRet: "none" | "23:00" | "1:45",
     comp: string | null,
     allergy: string,
+    isAttended: boolean,
   ) => {
     if (doneRef.current) return;
     doneRef.current = true;
     setShrink("shrinking");
     setStage("saving");
     const rsvpData: RSVPData = {
-      playerName, companion: comp, children,
-      allergies: allergy.trim() || null,
-      busOutbound: busOut, busReturn: busRet, preboda: pre,
+      playerName,
+      companion:   isAttended ? comp                    : null,
+      children:    isAttended ? children                : 0,
+      allergies:   isAttended ? (allergy.trim() || null) : null,
+      busOutbound: isAttended ? busOut                  : false,
+      busReturn:   isAttended ? busRet                  : "none",
+      preboda:     isAttended ? pre                     : false,
+      attended:    isAttended,
     };
     dispatch(setName(playerName));
     dispatch(setRsvp(rsvpData));
@@ -429,13 +476,25 @@ const OakIntro = ({ onComplete }: Props) => {
 
   useEffect(() => {
     if (stage === "done") {
-      triggerEnding(preboda, busOutbound, busReturn, companion, allergyTxt);
+      triggerEnding(preboda, busOutbound, busReturn, companion, allergyTxt, attended ?? true);
     }
   }, [stage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEvent(Event.A, () => {
     if (stage === "dialogue") { advanceDialogue(); return; }
+    if (stage === "attendance-choice") {
+      push();
+      if (cursor === 0) {
+        setAttended(true);
+        enterLines([{ sprite: "oak", text: "¡Perfecto!\n¿Viajarás acompañado\nen esta aventura?", next: "companion-choice" }]);
+      } else {
+        setAttended(false);
+        enterLines(buildDeclinedLines());
+      }
+      return;
+    }
     if (stage === "companion-choice") {
+      push();
       if (cursor === 0) {
         enterLines([{ sprite: "oak", text: "¡Magnífico!\n¿Y cómo se llama\ntu acompañante?", next: "companion-picker" }]);
       } else {
@@ -444,48 +503,58 @@ const OakIntro = ({ onComplete }: Props) => {
       }
       return;
     }
-    if (stage === "children-select") { enterLines(buildAllergyIntro()); return; }
+    if (stage === "children-select") { push(); enterLines(buildAllergyIntro()); return; }
     if (stage === "allergy-choice") {
+      push();
       if (cursor === 0) setStage("allergy-input");
       else enterLines(buildBusLines());
       return;
     }
     if (stage === "bus-outbound") {
+      push();
       if (cursor === 0) { setBusOutbound(true); setStage("bus-return"); setCursor(0); }
       else { setBusOutbound(false); enterLines(buildPrebodaLines()); }
       return;
     }
     if (stage === "bus-return") {
+      push();
       const opts: ("none" | "23:00" | "1:45")[] = ["none", "23:00", "1:45"];
       setBusReturn(opts[cursor]);
       enterLines(buildPrebodaLines());
       return;
     }
     if (stage === "preboda-choice") {
+      push();
       const pre = cursor === 0; setPreboda(pre);
       enterLines(buildFinaleLines());
       return;
     }
     if (stage === "done") {
-      triggerEnding(preboda, busOutbound, busReturn, companion, allergyTxt);
+      triggerEnding(preboda, busOutbound, busReturn, companion, allergyTxt, attended ?? true);
       return;
     }
   });
 
   useEvent(Event.Up, () => {
-    const mc = ["companion-choice","allergy-choice","bus-outbound","bus-return","preboda-choice"];
+    const mc = ["attendance-choice","companion-choice","allergy-choice","bus-outbound","bus-return","preboda-choice"];
     if (mc.includes(stage)) { setCursor(c => Math.max(0, c - 1)); return; }
     if (stage === "children-select") setChildren(n => Math.min(5, n + 1));
   });
 
   useEvent(Event.Down, () => {
     const maxMap: Record<string, number> = {
+      "attendance-choice": 1,
       "companion-choice": 1, "allergy-choice": 1,
       "bus-outbound": 1,     "bus-return": 2,
       "preboda-choice": 1,
     };
     if (stage in maxMap) { setCursor(c => Math.min(maxMap[stage], c + 1)); return; }
     if (stage === "children-select") setChildren(n => Math.max(0, n - 1));
+  });
+
+  useEvent(Event.B, () => {
+    if (stage === "saving" || stage === "done") return;
+    pop();
   });
 
   useEvent(Event.Left,  () => { if (stage === "children-select") setChildren(n => Math.max(0, n - 1)); });
@@ -517,7 +586,7 @@ const OakIntro = ({ onComplete }: Props) => {
   };
 
   const renderChoice = () => {
-    if (["companion-choice", "allergy-choice", "bus-outbound", "preboda-choice"].includes(stage))
+    if (["attendance-choice", "companion-choice", "allergy-choice", "bus-outbound", "preboda-choice"].includes(stage))
       return (
         <ChoicePanel>
           <ChoiceItem $selected={cursor === 0}>SÍ</ChoiceItem>
@@ -563,6 +632,7 @@ const OakIntro = ({ onComplete }: Props) => {
         <NativeNamePicker
           prompt={"¿Cómo te llamas?"}
           onConfirm={name => {
+            push();
             setPlayerName(name);
             enterLines(buildPostNameLines(name));
           }}
@@ -576,6 +646,7 @@ const OakIntro = ({ onComplete }: Props) => {
         <NativeNamePicker
           prompt={"¿Cómo se llama\ntu acompañante?"}
           onConfirm={name => {
+            push();
             setCompanion(name);
             enterLines(buildChildrenIntro());
           }}
@@ -593,7 +664,7 @@ const OakIntro = ({ onComplete }: Props) => {
 
   const sprite = currentLine?.sprite ?? "oak";
   const CHOICE_STAGES: Stage[] = [
-    "companion-choice", "children-select", "allergy-choice",
+    "attendance-choice", "companion-choice", "children-select", "allergy-choice",
     "allergy-input", "bus-outbound", "bus-return", "preboda-choice",
   ];
   const showArrow = finished && !CHOICE_STAGES.includes(stage);

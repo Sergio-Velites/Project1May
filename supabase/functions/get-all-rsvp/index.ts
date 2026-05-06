@@ -44,6 +44,7 @@ Deno.serve(async (req) => {
       bus_outbound: boolean;
       bus_return: string;
       preboda: boolean;
+      attended: boolean;
       created_at: string;
       updated_at: string;
     };

@@ -24,6 +24,7 @@ interface RSVPEntry {
   bus_outbound: boolean;
   bus_return: string;
   preboda: boolean;
+  attended?: boolean;
   pokemon: PokemonInst[];
 }
 
@@ -81,13 +82,16 @@ export default async function AdminPage({
   const { entries, httpStatus, errorMsg } = await fetchRsvps(key);
 
   const totalRsvps     = entries.length;
-  const totalAdults    = entries.length + entries.filter((e) => e.companion).length;
-  const totalChildren  = entries.reduce((s, e) => s + (e.children ?? 0), 0);
-  const totalAllergies = entries.filter((e) => e.allergies && e.allergies.trim() !== "").length;
-  const totalBusOut    = entries.filter((e) => e.bus_outbound).length;
-  const totalBus2300   = entries.filter((e) => e.bus_return === "23:00").length;
-  const totalBus145    = entries.filter((e) => e.bus_return === "1:45").length;
-  const totalPreboda   = entries.filter((e) => e.preboda).length;
+  const attendingEntries = entries.filter((e) => e.attended !== false);
+  const totalAttended  = attendingEntries.length;
+  const totalDeclined  = entries.length - totalAttended;
+  const totalAdults    = attendingEntries.length + attendingEntries.filter((e) => e.companion).length;
+  const totalChildren  = attendingEntries.reduce((s, e) => s + (e.children ?? 0), 0);
+  const totalAllergies = attendingEntries.filter((e) => e.allergies && e.allergies.trim() !== "").length;
+  const totalBusOut    = attendingEntries.filter((e) => e.bus_outbound).length;
+  const totalBus2300   = attendingEntries.filter((e) => e.bus_return === "23:00").length;
+  const totalBus145    = attendingEntries.filter((e) => e.bus_return === "1:45").length;
+  const totalPreboda   = attendingEntries.filter((e) => e.preboda).length;
   const totalPokemon   = entries.reduce((s, e) => s + (Array.isArray(e.pokemon) ? e.pokemon.length : 0), 0);
 
   const now = new Date().toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
@@ -155,6 +159,8 @@ export default async function AdminPage({
           gap: 0.15rem;
           box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
+        .stat-card.declined { background: #fff0f0; }
+        .stat-card.declined .stat-value { color: #b91c1c; }
         .stat-card.accent { background: #1a3a2a; }
         .stat-card.accent .stat-label { color: rgba(255,255,255,0.45); }
         .stat-card.accent .stat-value { color: #fff; }
@@ -162,8 +168,6 @@ export default async function AdminPage({
         .stat-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.055em; color: #aaa; font-weight: 700; }
         .stat-value { font-size: 1.55rem; font-weight: 800; color: #1a3a2a; line-height: 1; }
         .stat-sub   { font-size: 0.6rem; color: #ccc; margin-top: 1px; }
-
-        /* ── Section heading ── */
         .section-title {
           font-size: 0.68rem;
           font-weight: 700;
@@ -323,6 +327,14 @@ export default async function AdminPage({
             <span className="stat-value">{totalRsvps}</span>
           </div>
           <div className="stat-card">
+            <span className="stat-label">Asistirán</span>
+            <span className="stat-value">{totalAttended}</span>
+          </div>
+          <div className="stat-card declined">
+            <span className="stat-label">Rechazados</span>
+            <span className="stat-value">{totalDeclined}</span>
+          </div>
+          <div className="stat-card">
             <span className="stat-label">Adultos</span>
             <span className="stat-value">{totalAdults}</span>
           </div>
@@ -364,27 +376,31 @@ export default async function AdminPage({
           </p>
         ) : (
           <>
-            <p className="section-title">Invitados · {entries.length}</p>
+            <p className="section-title">Invitados · {entries.length} ({totalAttended} asisten· {totalDeclined} rechazados)</p>
             <div className="cards-list">
               {entries.map((e, i) => {
                 const team = Array.isArray(e.pokemon) ? e.pokemon : [];
                 const hasAllergy = !!(e.allergies && e.allergies.trim() !== "");
+                const isDeclined = e.attended === false;
                 return (
                   <details className="rsvp-card" key={i}>
                     <summary>
                       <span className="summary-num">#{i + 1}</span>
                       <span className="summary-name">{e.player_name}</span>
                       <span className="summary-chips">
-                        {e.companion && (
+                        {isDeclined && (
+                          <span className="chip chip-red">✗ No asiste</span>
+                        )}
+                        {!isDeclined && e.companion && (
                           <span className="chip chip-gray">+{e.companion}</span>
                         )}
-                        {(e.children ?? 0) > 0 && (
+                        {!isDeclined && (e.children ?? 0) > 0 && (
                           <span className="chip chip-blue">{e.children} niño{e.children !== 1 ? "s" : ""}</span>
                         )}
-                        {hasAllergy && (
+                        {!isDeclined && hasAllergy && (
                           <span className="chip chip-red">⚠ alergia</span>
                         )}
-                        {e.preboda && (
+                        {!isDeclined && e.preboda && (
                           <span className="chip chip-amber">Preboda</span>
                         )}
                         {team.length > 0 && (
@@ -395,6 +411,16 @@ export default async function AdminPage({
                     </summary>
 
                     <div className="rsvp-detail">
+                      {isDeclined && (
+                        <div style={{
+                          background: "#fee2e2", border: "1px solid #fca5a5",
+                          borderRadius: "8px", padding: "0.6rem 0.9rem",
+                          marginBottom: "0.75rem", color: "#b91c1c",
+                          fontWeight: 700, fontSize: "0.85rem",
+                        }}>
+                          ✗ Ha indicado que NO asistirá a la boda.
+                        </div>
+                      )}
                       <div className="detail-grid">
 
                         <div>
