@@ -4,6 +4,8 @@ import useEvent from "../app/use-event";
 import emitter, { Event } from "../app/emitter";
 import { useDispatch, useSelector } from "react-redux";
 import { healPokemon, selectMap, selectPos } from "../state/gameSlice";
+import { saveToCloud, getCurrentUserId } from "../app/cloud-save";
+import { store } from "../state/store";
 import {
   hidePokemonCenterMenu,
   selectPokemonCenterMenu,
@@ -106,6 +108,9 @@ const PokemonCenter = () => {
               setTimeout(() => {
                 dispatch(healPokemon());
                 setStage(4);
+                // Auto-save al cloud para que otros jugadores puedan batallar
+                const userId = getCurrentUserId();
+                if (userId) saveToCloud(userId, store.getState().game);
               }, 3000);
             },
           },
