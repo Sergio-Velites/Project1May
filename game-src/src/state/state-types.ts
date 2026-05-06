@@ -72,4 +72,5 @@ export interface RSVPData {
   busOutbound: boolean;
   busReturn: "none" | "23:00" | "1:45";
   preboda: boolean;
+  attended: boolean;
 }

@@ -125,6 +125,7 @@ export interface RSVPPayload {
   busOutbound: boolean;
   busReturn: "none" | "23:00" | "1:45";
   preboda: boolean;
+  attended: boolean;
 }
 
 export const saveRsvp = async (
