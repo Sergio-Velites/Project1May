@@ -60,4 +60,16 @@ export interface GameState {
   npcFacings: Record<string, Direction>;
   /** Mapa y posición donde el jugador curó por última vez (recuperación tras derrota) */
   lastHealLocation?: { map: MapId; pos: PosType };
+  /** Datos de confirmación de asistencia a la boda */
+  rsvp?: RSVPData;
+}
+
+export interface RSVPData {
+  playerName: string;
+  companion: string | null;
+  children: number;
+  allergies: string | null;
+  busOutbound: boolean;
+  busReturn: "none" | "23:00" | "1:45";
+  preboda: boolean;
 }

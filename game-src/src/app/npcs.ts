@@ -563,7 +563,7 @@ export const ash = {
 export const oak = {
   canBattle: true,
   canWalk: true,
-  name: "Oak",
+  name: "Enólogo Oak",
   portrait: oakPortrait,
   sprites: {
     down: oakDown,

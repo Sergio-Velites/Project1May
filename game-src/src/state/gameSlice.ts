@@ -15,6 +15,7 @@ import {
   PokemonEncounterType,
   PokemonInstance,
   PosType,
+  RSVPData,
 } from "./state-types";
 
 const initialState: GameState = {
@@ -41,6 +42,7 @@ const initialState: GameState = {
   seenPokemon: [],
   caughtPokemon: [],
   npcFacings: {} as Record<string, Direction>,
+  rsvp: undefined,
 };
 
 export const gameSlice = createSlice({
@@ -200,6 +202,10 @@ export const gameSlice = createSlice({
       state.defeatedTrainers = s.defeatedTrainers;
       state.collectedItems = s.collectedItems;
       state.completedQuests = s.completedQuests;
+      if (s.rsvp) state.rsvp = s.rsvp;
+    },
+    setRsvpInternal: (state, action: PayloadAction<RSVPData>) => {
+      state.rsvp = action.payload;
     },
     swapPokemonPositions: (state, action: PayloadAction<number[]>) => {
       const [index1, index2] = action.payload;
@@ -405,8 +411,10 @@ export const {
   seePokemon,
   catchPokemonPokedex,
   setNpcFacing,
+    setRsvpInternal,
 } = gameSlice.actions;
 
+export const setRsvp = setRsvpInternal;
 export const selectPos = (state: RootState) => state.game.pos;
 
 export const selectMap = (state: RootState) => mapData[state.game.map];
