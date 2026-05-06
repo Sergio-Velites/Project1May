@@ -25,7 +25,9 @@ interface RSVPEntry {
   pokemon: PokemonInst[];
 }
 
-async function fetchRsvps(adminKey: string): Promise<RSVPEntry[]> {
+async function fetchRsvps(
+  adminKey: string
+): Promise<{ entries: RSVPEntry[]; httpStatus: number; errorMsg: string | null }> {
   try {
     const res = await fetch(`${SUPABASE_URL}/functions/v1/get-all-rsvp`, {
       headers: {
@@ -34,11 +36,14 @@ async function fetchRsvps(adminKey: string): Promise<RSVPEntry[]> {
       },
       cache: "no-store",
     });
-    if (!res.ok) return [];
-    const json = await res.json();
-    return json.entries ?? [];
-  } catch {
-    return [];
+    const text = await res.text();
+    if (!res.ok) {
+      return { entries: [], httpStatus: res.status, errorMsg: text };
+    }
+    const data = JSON.parse(text);
+    return { entries: data.entries ?? [], httpStatus: 200, errorMsg: data.error ?? null };
+  } catch (e) {
+    return { entries: [], httpStatus: 0, errorMsg: String(e) };
   }
 }
 
@@ -55,7 +60,7 @@ export default async function AdminPage({
     redirect("/");
   }
 
-  const entries = await fetchRsvps(key);
+  const { entries, httpStatus, errorMsg } = await fetchRsvps(key);
 
   const busLabel = (v: string) => {
     if (v === "23:00") return "23:00 h";
@@ -275,6 +280,20 @@ export default async function AdminPage({
           <h1>💒 Wedding RSVPs</h1>
           <p>{entries.length} {entries.length === 1 ? "respuesta" : "respuestas"} &mdash; Recarga para actualizar</p>
         </div>
+
+        {/* Debug panel — visible only when there's an error */}
+        {(httpStatus !== 200 || errorMsg) && (
+          <div style={{
+            background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 10,
+            padding: "0.9rem 1.1rem", marginBottom: "1.25rem",
+            fontFamily: "monospace", fontSize: "0.78rem", color: "#b91c1c",
+            wordBreak: "break-all",
+          }}>
+            <strong>⚠ Error al cargar RSVPs</strong><br />
+            HTTP {httpStatus || "0 (red error)"}<br />
+            {errorMsg}
+          </div>
+        )}
 
         {/* Stats */}
         <div className="stats-grid">
