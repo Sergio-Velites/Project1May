@@ -37,6 +37,19 @@ const Container = styled.div`
   }
 `;
 
+const EmptyRow = styled.div`
+  width: 100%;
+  display: flex;
+  margin-bottom: 1px;
+  align-items: center;
+  min-height: 19px;
+
+  @media (min-width: 1000px) {
+    min-height: 8vh;
+    margin-bottom: 1vh;
+  }
+`;
+
 interface Props {
   close: () => void;
   switchAction?: (index: number) => void;
@@ -116,14 +129,17 @@ const PokemonList = ({
         />
       )}
       <StyledPokemonList>
-        {pokemon.slice(scroll, scroll + 6).map((p, i) => {
-          return (
+        {Array.from({ length: 6 }, (_, i) => {
+          const p = pokemon[scroll + i];
+          return p ? (
             <PokemonRow
               key={i}
               pokemon={p}
               active={active === i}
               moveData={moveData}
             />
+          ) : (
+            <EmptyRow key={i} />
           );
         })}
       </StyledPokemonList>
