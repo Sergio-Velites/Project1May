@@ -12,7 +12,6 @@ import { setName, setRsvp } from "../state/gameSlice";
 import { RSVPData } from "../state/state-types";
 import { saveRsvp, getCurrentUserId } from "../app/cloud-save";
 import usePokemon from "../app/use-pokemon-metadata";
-import NameKeyboard from "./NameKeyboard";
 import oakPortrait from "../assets/portraits/oak.png";
 import ashPortrait from "../assets/portraits/ash.png";
 import sergioPortrait from "../assets/portraits/sergio.png";
@@ -25,7 +24,7 @@ import ashDownSprite from "../assets/walk-sprites/ash-down.png";
 type SpriteId =
   | "oak" | "player" | "duo"
   | "youngster" | "biker" | "hiker"
-  | "pokemon113" | "pokemon132";
+  | "pokemon113" | "pokemon122" | "pokemon132";
 
 type Stage =
   | "dialogue"
@@ -55,13 +54,13 @@ const INTRO_LINES: DialogueLine[] = [
   { sprite: "oak",        text: "¡Me llamo OAK!\nAunque hoy..." },
   { sprite: "oak",        text: "...puedes llamarme\nMAESTRO DE CEREMONIAS." },
   { sprite: "oak",        text: "Este mundo está lleno de\namistades, aventuras..." },
-  { sprite: "pokemon132", text: "¡Y grandes celebraciones!" },
+  { sprite: "pokemon122", text: "¡Y grandes celebraciones!" },
   { sprite: "pokemon132", text: "Durante años, entrenadores\nde todas partes han viajado\njuntos, compartido combates..." },
   { sprite: "pokemon132", text: "...y encontrado compañeros\npara toda la vida." },
   { sprite: "oak",        text: "Precisamente por eso\nestamos hoy aquí." },
   { sprite: "oak",        text: "Porque dos entrenadores\nlegendarios..." },
   { sprite: "duo",        text: "¡MARTA y SERGIO..." },
-  { sprite: "duo",        text: "...van a unir sus caminos\nel 28 de agosto de 2026!" },
+  { sprite: "duo",        text: "...van a unir sus caminos\nel 8 de agosto de 2026!" },
   { sprite: "oak",        text: "Pero antes de comenzar\nesta gran aventura..." },
   { sprite: "oak",        text: "¡Necesitamos registrar\ntu ficha de\nENTRENADOR INVITADO!" },
   { sprite: "player",     text: "Primero de todo..." },
@@ -223,7 +222,7 @@ interface CIProps { $selected: boolean; }
 const ChoiceItem = styled.h2<CIProps>`
   font-family: "PokemonGB"; font-size: 18px; color: #181010;
   display: flex; align-items: center; gap: 0.4em;
-  &::before { content: "${(p: CIProps) => p.$selected ? "\\u25B6" : "\\u00a0"}"; }
+  &::before { content: "${(p: CIProps) => p.$selected ? "▶" : " "}"; }
   @media (max-width: 1000px) { font-size: 8px; }
 `;
 
@@ -242,6 +241,7 @@ const NumberLabel = styled.h2`
 
 const ArrowLbl = styled.h2`
   font-family: "PokemonGB"; font-size: 20px; color: #181010;
+  cursor: pointer; user-select: none;
   @media (max-width: 1000px) { font-size: 9px; }
 `;
 
@@ -260,9 +260,10 @@ const AllergyLabel = styled.h2`
 const AllergyTextarea = styled.textarea`
   width: 100%; flex: 1; max-height: 55%;
   background: var(--bg); border: 3px solid black; padding: 8px;
-  font-family: "PokemonGB", monospace; font-size: 14px; color: #181010;
+  font-family: "PokemonGB", monospace; font-size: 16px; color: #181010;
   resize: none; outline: none;
-  @media (max-width: 1000px) { border-width: 2px; font-size: 6px; padding: 4px; }
+  /* font-size >= 16px prevents iOS auto-zoom on focus */
+  @media (max-width: 1000px) { border-width: 2px; padding: 4px; }
 `;
 
 const ConfirmBtn = styled.button`
@@ -277,6 +278,57 @@ const SavingText = styled.h1`
   @media (max-width: 1000px) { font-size: 8px; padding: 5px 10px; }
 `;
 
+// ── Native name input (teclado nativo móvil) ──────────────────────────────────────
+const NativeInputWrap = styled.div`
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: var(--bg); padding: 8%; gap: 1.2em; z-index: 20;
+`;
+
+const NativeLabel = styled.h2`
+  font-family: "PokemonGB"; font-size: 16px; color: #181010;
+  text-align: center; line-height: 1.8; white-space: pre-wrap;
+  @media (max-width: 1000px) { font-size: 9px; }
+`;
+
+const NativeField = styled.input`
+  width: 100%; max-width: 280px;
+  background: var(--bg); border: 3px solid black;
+  padding: 10px 14px;
+  font-family: "PokemonGB", monospace;
+  font-size: 16px; /* ≥16px previene zoom iOS */
+  color: #181010; outline: none; text-align: center; letter-spacing: 0.08em;
+  @media (max-width: 1000px) { border-width: 2px; }
+`;
+
+const NativeOkBtn = styled.button`
+  font-family: "PokemonGB"; font-size: 14px;
+  background: #181010; color: var(--bg);
+  border: none; padding: 10px 22px; cursor: pointer;
+  @media (max-width: 1000px) { font-size: 8px; padding: 8px 16px; }
+`;
+
+interface NativeNameProps { prompt: string; onConfirm: (name: string) => void; }
+const NativeNamePicker = ({ prompt, onConfirm }: NativeNameProps) => {
+  const [val, setVal] = useState("");
+  const submit = () => { const t = val.trim(); if (t) onConfirm(t); };
+  return (
+    <NativeInputWrap>
+      <NativeLabel>{prompt}</NativeLabel>
+      <NativeField
+        autoFocus
+        maxLength={10}
+        value={val}
+        onChange={e => setVal(e.target.value)}
+        onKeyDown={e => { if (e.key === "Enter") submit(); }}
+        placeholder="MAX 10"
+      />
+      <NativeOkBtn onClick={submit}>OK ▶</NativeOkBtn>
+    </NativeInputWrap>
+  );
+};
+
 // ── Component ────────────────────────────────────────────────────────────────────
 
 interface Props { onComplete: () => void; }
@@ -286,6 +338,7 @@ const TYPEWRITER_MS = 40;
 const OakIntro = ({ onComplete }: Props) => {
   const dispatch = useDispatch();
   const chansey = usePokemon(113);
+  const mrMime  = usePokemon(122);
   const ditto   = usePokemon(132);
 
   const [displayed,   setDisplayed]  = useState("");
@@ -411,6 +464,9 @@ const OakIntro = ({ onComplete }: Props) => {
     if (stage === "children-select") setChildren(n => Math.max(0, n - 1));
   });
 
+  useEvent(Event.Left,  () => { if (stage === "children-select") setChildren(n => Math.max(0, n - 1)); });
+  useEvent(Event.Right, () => { if (stage === "children-select") setChildren(n => Math.min(5, n + 1)); });
+
   const renderSprite = (sprite: SpriteId) => {
     switch (sprite) {
       case "oak":
@@ -430,6 +486,7 @@ const OakIntro = ({ onComplete }: Props) => {
       case "biker":       return <Portrait key="b" src={bikerPortrait} alt="" />;
       case "hiker":       return <Portrait key="h" src={hikerPortrait} alt="" />;
       case "pokemon113":  return chansey ? <PokemonImg key="c" src={chansey.images.front} alt="" /> : null;
+      case "pokemon122":  return mrMime  ? <PokemonImg key="m" src={mrMime.images.front}  alt="" /> : null;
       case "pokemon132":  return ditto   ? <PokemonImg key="d" src={ditto.images.front}   alt="" /> : null;
       default: return null;
     }
@@ -446,9 +503,9 @@ const OakIntro = ({ onComplete }: Props) => {
     if (stage === "children-select")
       return (
         <NumberBox>
-          <ArrowLbl>&#9668;</ArrowLbl>
+          <ArrowLbl onClick={() => setChildren(n => Math.max(0, n - 1))}>–</ArrowLbl>
           <NumberLabel>{children}</NumberLabel>
-          <ArrowLbl>&#9658;</ArrowLbl>
+          <ArrowLbl onClick={() => setChildren(n => Math.min(5, n + 1))}>+</ArrowLbl>
         </NumberBox>
       );
     if (stage === "bus-return")
@@ -479,20 +536,26 @@ const OakIntro = ({ onComplete }: Props) => {
   if (stage === "name-picker")
     return (
       <Overlay>
-        <NameKeyboard onConfirm={name => {
-          setPlayerName(name);
-          enterLines(buildPostNameLines(name));
-        }} />
+        <NativeNamePicker
+          prompt={"¿Cómo te llamas?"}
+          onConfirm={name => {
+            setPlayerName(name);
+            enterLines(buildPostNameLines(name));
+          }}
+        />
       </Overlay>
     );
 
   if (stage === "companion-picker")
     return (
       <Overlay>
-        <NameKeyboard onConfirm={name => {
-          setCompanion(name);
-          enterLines(buildChildrenIntro());
-        }} />
+        <NativeNamePicker
+          prompt={"¿Cómo se llama\ntu acompañante?"}
+          onConfirm={name => {
+            setCompanion(name);
+            enterLines(buildChildrenIntro());
+          }}
+        />
       </Overlay>
     );
 
