@@ -798,6 +798,7 @@ const PokemonEncounter = () => {
   useEffect(() => {
     if (isInBattle) {
       dispatch(resetActivePokemon());
+      dispatch(setItemUsedInBattle(false));
       setPlayerStages(DEFAULT_STAGES);
       setEnemyStages(DEFAULT_STAGES);
       setTransformedData({});
@@ -2145,7 +2146,8 @@ const PokemonEncounter = () => {
             padding={isMobile ? "100px" : "40vw"}
             show={stage === 33}
             menuItems={[
-              ...processingPokemon.moves.map((m) => {
+              ...(processingPokemon?.moves ?? []).map((m) => {
+                if (!processingPokemon) return { label: "", action: () => {} };
                 const pokemonForLearn33 = pendingLevelRef.current !== null
                   ? { ...processingPokemon, level: pendingLevelRef.current }
                   : processingPokemon;
