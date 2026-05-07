@@ -48,15 +48,10 @@ const Button = styled.button`
 const Bold = styled.div`
   font-weight: bold;
   color: black;
-  margin-left: 45px;
+  margin-left: 4cqw;
   font-family: "PokemonGB";
-
-  font-size: 3rem;
-  @media (max-width: 1000px) {
-    font-size: 1rem;
-    line-height: 1;
-    margin-left: 15px;
-  }
+  font-size: 2.67cqw;
+  line-height: 1;
 `;
 
 const ArrowContainer = styled.div`

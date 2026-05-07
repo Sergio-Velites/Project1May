@@ -27,22 +27,19 @@ const StyledFrame = styled.div<FrameProps>`
 
   h1 {
     color: black;
-    font-size: 30px;
+    /* cqw escala proporcional al ancho del GameBoy (container-type: inline-size) */
+    font-size: 2.4cqw;
     font-family: "PokemonGB";
-
-    @media (max-width: 1000px) {
-      font-size: 9px;
-    }
   }
 
   ::after {
     content: "";
     position: absolute;
-    bottom: ${(props) => (props.$flashing ? "25px" : "-1000px")};
-    right: 20px;
-    width: 3px;
-    height: 3px;
-    font-size: 3px;
+    bottom: ${(props) => (props.$flashing ? "5cqw" : "-1000px")};
+    right: 3cqw;
+    width: 0.5cqw;
+    height: 0.5cqw;
+    font-size: 0.5cqw;
     color: #181010;
     box-shadow: 1em 0em 0 #181010, 2em 0em 0 #181010, 1em 1em 0 #181010,
       2em 1em 0 #181010, 3em 1em 0 #181010, 1em 2em 0 #181010, 2em 2em 0 #181010,
@@ -53,13 +50,6 @@ const StyledFrame = styled.div<FrameProps>`
     transform: rotate(90deg);
     animation: ${animation} 1s infinite;
 
-    @media (max-width: 1000px) {
-      bottom: ${(props) => (props.$flashing ? "13px" : "-1000px")};
-      right: 10px;
-      width: 1.3px;
-      height: 1.3px;
-      font-size: 1.3px;
-    }
   }
 `;
 

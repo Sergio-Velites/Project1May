@@ -52,27 +52,18 @@ interface CharProps {
 
 const Char = styled.span<CharProps>`
   font-family: "PokemonGB";
-  font-size: 30px;
+  font-size: 2.67cqw;
   color: black;
   width: 1.1em;
   text-align: center;
-  border-bottom: ${(p) => (p.$filled ? "none" : "3px solid black")};
-
-  @media (max-width: 1000px) {
-    font-size: 10px;
-    border-bottom: ${(p) => (p.$filled ? "none" : "2px solid black")};
-  }
+  border-bottom: ${(p) => (p.$filled ? "none" : "2px solid black")};
 `;
 
 const Cursor = styled.span`
   font-family: "PokemonGB";
-  font-size: 30px;
+  font-size: 2.67cqw;
   color: black;
   animation: ${blink} 0.8s step-start infinite;
-
-  @media (max-width: 1000px) {
-    font-size: 10px;
-  }
 `;
 
 const Grid = styled.div`
@@ -90,7 +81,7 @@ interface KeyProps {
 
 const Key = styled.button<KeyProps>`
   font-family: "PokemonGB";
-  font-size: ${(p) => (p.$wide ? "18px" : "22px")};
+  font-size: ${(p) => (p.$wide ? "1.87cqw" : "2.4cqw")};
   background: ${(p) => (p.$active ? "black" : "var(--bg)")};
   color: ${(p) => (p.$active ? "var(--bg)" : "black")};
   display: flex;
@@ -100,10 +91,6 @@ const Key = styled.button<KeyProps>`
   cursor: pointer;
   padding: 0;
   line-height: 1;
-
-  @media (max-width: 1000px) {
-    font-size: ${(p) => (p.$wide ? "7px" : "9px")};
-  }
 `;
 
 interface EndBtnProps {
@@ -112,38 +99,26 @@ interface EndBtnProps {
 
 const EndButton = styled.button<EndBtnProps>`
   font-family: "PokemonGB";
-  font-size: 20px;
+  font-size: 2.4cqw;
   width: 100%;
   padding: 4% 0;
   background: ${(p) => (p.$active ? "black" : "var(--bg)")};
   color: ${(p) => (p.$active ? "var(--bg)" : "black")};
-  border: 3px solid black;
+  border: 2px solid black;
   cursor: pointer;
   letter-spacing: 0.15em;
-
-  @media (max-width: 1000px) {
-    font-size: 9px;
-    padding: 5% 0;
-    border-width: 2px;
-  }
 `;
 
 const MobileKeyboardBtn = styled.button`
   font-family: "PokemonGB";
-  font-size: 16px;
+  font-size: 1.87cqw;
   padding: 3% 5%;
   background: var(--bg);
   color: black;
-  border: 3px solid black;
+  border: 2px solid black;
   cursor: pointer;
   letter-spacing: 0.1em;
   flex: 1;
-
-  @media (max-width: 1000px) {
-    font-size: 7px;
-    padding: 5% 3%;
-    border-width: 2px;
-  }
 `;
 
 const BottomRow = styled.div`

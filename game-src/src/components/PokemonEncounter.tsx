@@ -120,46 +120,27 @@ const RightInfoSection = styled.div`
 `;
 
 const Name = styled.div`
-  font-size: 5.5vh;
+  font-size: 3.47cqw;
   font-family: "PokemonGB";
   text-transform: uppercase;
-
-  @media (max-width: 1000px) {
-    font-size: 13px;
-  }
 `;
 
 const Level = styled.div`
-  font-size: 4.5vh;
-  margin: 0 12vh;
+  font-size: 3.2cqw;
+  margin: 0 7.5cqw;
   font-family: "PressStart2P", sans-serif;
-
-  @media (max-width: 1000px) {
-    font-size: 12px;
-    margin: 0 28px;
-  }
 `;
 
 const HealthBarContainer = styled.div`
-  margin: 0 3.3vh;
-  margin-top: 1.2vh;
-
-  @media (max-width: 1000px) {
-    margin: 0 8px;
-  }
+  margin: 0 2.13cqw;
+  margin-top: 0.8cqw;
 `;
 
 const Health = styled.div`
   font-family: "PokemonGB";
-
-  font-size: 5vh;
-  margin: 0 3.3vh;
-  margin-top: 1.2vh;
-  @media (max-width: 1000px) {
-    font-size: 13px;
-    margin: 0 8px;
-    margin-top: 3px;
-  }
+  font-size: 3.47cqw;
+  margin: 0 2.13cqw;
+  margin-top: 0.8cqw;
 `;
 
 const flashing = keyframes`

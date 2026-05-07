@@ -62,21 +62,15 @@ const MoneyContainer = styled.div`
 `;
 
 const MoneyHeader = styled.div`
-  padding: 5px;
+  padding: 1.3cqw;
   padding-bottom: 0;
-  font-size: 30px;
+  font-size: 2.4cqw;
   font-family: "PokemonGB";
   background: var(--bg);
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-
-  @media (max-width: 1000px) {
-    font-size: 10px;
-    padding: 3px;
-    padding-bottom: 0;
-  }
 `;
 
 const PokeMart = () => {
