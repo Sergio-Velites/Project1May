@@ -30,10 +30,20 @@ const ListArea = styled.div`
   flex-direction: column;
   overflow: hidden;
   min-height: 0;
+  /* Reserva espacio para la InfoArea superpuesta al fondo */
+  padding-bottom: 32px;
+
+  @media (min-width: 1000px) {
+    padding-bottom: 11vh;
+  }
 `;
 
+/* InfoArea flota sobre el fondo de la lista (como en Gen I) */
 const InfoArea = styled.div`
-  flex-shrink: 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
 `;
 
 const EmptyRow = styled.div`
@@ -89,9 +99,9 @@ const PokemonList = ({
     if (selected || viewingStats) return;
 
     if (active === pokemon.length - 1) return;
-    if (pokemon.length > 6 && scroll === pokemon.length - 5) return;
+    if (pokemon.length > 6 && scroll === pokemon.length - 6) return;
 
-    if (pokemon.length > 6 && active === 4) setScroll((prev) => prev + 1);
+    if (pokemon.length > 6 && active === 5) setScroll((prev) => prev + 1);
     else setActive((prev) => prev + 1);
   });
 
@@ -136,6 +146,7 @@ const PokemonList = ({
                 key={i}
                 pokemon={p}
                 active={active === i}
+                switching={switching !== null && switching === scroll + i && active !== i}
                 moveData={moveData}
               />
             ) : (

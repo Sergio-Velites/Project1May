@@ -180,10 +180,11 @@ const Health = styled.div`
 interface Props {
   pokemon: PokemonInstance;
   active: boolean;
+  switching?: boolean; // seleccionado para intercambiar — muestra flecha hueca
   moveData?: MoveMetadata;
 }
 
-const PokemonRow = ({ pokemon, active, moveData }: Props) => {
+const PokemonRow = ({ pokemon, active, switching, moveData }: Props) => {
   const metadata = usePokemonMetadata(pokemon.id);
   const stats = usePokemonStats(pokemon.id, pokemon.level);
 
@@ -191,12 +192,11 @@ const PokemonRow = ({ pokemon, active, moveData }: Props) => {
 
   const icons = getIcons(metadata);
 
-  // TODO Add animation while active
-
   return (
     <StyledPokemonRow>
       <ArrowContainer>
-        <Arrow show={active} />
+        {/* Cursor activo → flecha sólida; seleccionado para swap → flecha hueca */}
+        <Arrow show={active || !!switching} disabled={!!switching && !active} />
       </ArrowContainer>
       <Image src={icons.a} />
 
