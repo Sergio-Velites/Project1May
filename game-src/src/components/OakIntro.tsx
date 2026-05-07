@@ -198,9 +198,8 @@ const TextBox = styled.div`
 `;
 
 const DialogueText = styled.h1`
-  color: black; font-size: 22px;
+  color: black; font-size: 2.4cqw;
   font-family: "PokemonGB"; line-height: 1.6; white-space: pre-wrap;
-  @media (max-width: 1000px) { font-size: 8px; line-height: 1.5; }
 `;
 
 interface ArrowProps { $visible: boolean; }
@@ -230,10 +229,9 @@ const ChoicePanel = styled.div`
 
 interface CIProps { $selected: boolean; }
 const ChoiceItem = styled.h2<CIProps>`
-  font-family: "PokemonGB"; font-size: 18px; color: #181010;
+  font-family: "PokemonGB"; font-size: 2.13cqw; color: #181010;
   display: flex; align-items: center; gap: 0.4em;
   &::before { content: "${(p: CIProps) => p.$selected ? "▶\uFE0E" : "\u00A0"}"; }
-  @media (max-width: 1000px) { font-size: 8px; }
 `;
 
 const NumberBox = styled.div`
@@ -244,15 +242,13 @@ const NumberBox = styled.div`
 `;
 
 const NumberLabel = styled.h2`
-  font-family: "PokemonGB"; font-size: 28px; color: #181010;
+  font-family: "PokemonGB"; font-size: 3.2cqw; color: #181010;
   min-width: 2ch; text-align: center;
-  @media (max-width: 1000px) { font-size: 12px; }
 `;
 
 const ArrowLbl = styled.h2`
-  font-family: "PokemonGB"; font-size: 20px; color: #181010;
+  font-family: "PokemonGB"; font-size: 2.4cqw; color: #181010;
   cursor: pointer; user-select: none;
-  @media (max-width: 1000px) { font-size: 9px; }
 `;
 
 const AllergyWrap = styled.div`
@@ -263,28 +259,24 @@ const AllergyWrap = styled.div`
 `;
 
 const AllergyLabel = styled.h2`
-  font-family: "PokemonGB"; font-size: 16px; color: #181010; text-align: center;
-  @media (max-width: 1000px) { font-size: 7px; }
+  font-family: "PokemonGB"; font-size: 1.87cqw; color: #181010; text-align: center;
 `;
 
 const AllergyTextarea = styled.textarea`
   width: 100%; flex: 1; max-height: 55%;
-  background: var(--bg); border: 3px solid black; padding: 8px;
-  font-family: "PokemonGB", monospace; font-size: 16px; color: #181010;
+  background: var(--bg); border: 2px solid black; padding: 1.07cqw;
+  font-family: "PokemonGB", monospace; font-size: 2.4cqw; color: #181010;
   resize: none; outline: none;
-  @media (max-width: 1000px) { border-width: 2px; padding: 4px; font-size: 9px; }
 `;
 
 const ConfirmBtn = styled.button`
-  font-family: "PokemonGB"; font-size: 14px;
+  font-family: "PokemonGB"; font-size: 1.6cqw;
   background: #181010; color: var(--bg);
-  border: none; padding: 8px 18px; cursor: pointer;
-  @media (max-width: 1000px) { font-size: 6px; padding: 5px 10px; }
+  border: none; padding: 1.33cqw 2.4cqw; cursor: pointer;
 `;
 
 const SavingText = styled.h1`
-  font-family: "PokemonGB"; font-size: 22px; color: #181010; padding: 8px 18px;
-  @media (max-width: 1000px) { font-size: 8px; padding: 5px 10px; }
+  font-family: "PokemonGB"; font-size: 2.4cqw; color: #181010; padding: 1.33cqw 2.4cqw;
 `;
 
 // ── Native name input (teclado nativo móvil) ──────────────────────────────────────
@@ -296,26 +288,23 @@ const NativeInputWrap = styled.div`
 `;
 
 const NativeLabel = styled.h2`
-  font-family: "PokemonGB"; font-size: 16px; color: #181010;
+  font-family: "PokemonGB"; font-size: 2.13cqw; color: #181010;
   text-align: center; line-height: 1.8; white-space: pre-wrap;
-  @media (max-width: 1000px) { font-size: 9px; }
 `;
 
 const NativeField = styled.input`
   width: 100%; max-width: 280px;
-  background: var(--bg); border: 3px solid black;
-  padding: 10px 14px;
+  background: var(--bg); border: 2px solid black;
+  padding: 1.33cqw 1.87cqw;
   font-family: "PokemonGB", monospace;
-  font-size: 16px;
+  font-size: 2.13cqw;
   color: #181010; outline: none; text-align: center; letter-spacing: 0.08em;
-  @media (max-width: 1000px) { border-width: 2px; font-size: 9px; }
 `;
 
 const NativeOkBtn = styled.button`
-  font-family: "PokemonGB"; font-size: 14px;
+  font-family: "PokemonGB"; font-size: 1.87cqw;
   background: #181010; color: var(--bg);
-  border: none; padding: 10px 22px; cursor: pointer;
-  @media (max-width: 1000px) { font-size: 8px; padding: 8px 16px; }
+  border: none; padding: 1.07cqw 2.93cqw; cursor: pointer;
 `;
 
 const NativeArrow = styled.span`
