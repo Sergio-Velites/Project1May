@@ -731,6 +731,13 @@ const PokemonEncounter = () => {
         encounterPokemon(getPokemonEncounter(newPokemon.id, newPokemon.level))
       );
       setTrainerPokemonIndex(newIndex);
+      // Resetear estados del enemigo al sacar nuevo pokémon
+      setEnemyStages(DEFAULT_STAGES);
+      setEnemyStatus(null);
+      enemyStatusRef.current = null;
+      setEnemyLeechSeeded(false);
+      enemyLeechSeededRef.current = false;
+      enemyFlinchRef.current = false;
       throwPokeballAtEnemy(49);
       return;
     }
@@ -1977,6 +1984,13 @@ const PokemonEncounter = () => {
               switchAction={(index) => {
                 dispatch(setActivePokemon(index));
                 setInvolvedPokemon([...involvedPokemon, index]);
+                // Resetear estados del jugador al sacar nuevo pokémon
+                setPlayerStages(DEFAULT_STAGES);
+                setPlayerStatus(null);
+                playerStatusRef.current = null;
+                setPlayerLeechSeeded(false);
+                playerLeechSeededRef.current = false;
+                playerFlinchRef.current = false;
                 throwPokeball();
               }}
             />
@@ -1995,6 +2009,13 @@ const PokemonEncounter = () => {
                 if (pokemon[index].hp <= 0) return;
                 dispatch(setActivePokemon(index));
                 setInvolvedPokemon([...involvedPokemon, index]);
+                // Resetear estados del jugador al sacar nuevo pokémon
+                setPlayerStages(DEFAULT_STAGES);
+                setPlayerStatus(null);
+                playerStatusRef.current = null;
+                setPlayerLeechSeeded(false);
+                playerLeechSeededRef.current = false;
+                playerFlinchRef.current = false;
                 throwPokeball();
               }}
             />

@@ -74,18 +74,34 @@ const Gameboy = ({ children }: Props) => {
             <div className="middle"></div>
           </div>
           <div className="a-b">
-            <div className="b" onClick={() => emitter.emit(Event.B)}>
+            <div
+              className="b"
+              onTouchStart={(e) => { e.preventDefault(); emitter.emit(Event.B); }}
+              onClick={() => emitter.emit(Event.B)}
+            >
               B
             </div>
-            <div className="a" onClick={() => emitter.emit(Event.A)}>
+            <div
+              className="a"
+              onTouchStart={(e) => { e.preventDefault(); emitter.emit(Event.A); }}
+              onClick={() => emitter.emit(Event.A)}
+            >
               A
             </div>
           </div>
         </div>
 
         <div className="start-select">
-          <div className="select">SELECT</div>
-          <div className="start" onClick={() => emitter.emit(Event.Start)}>
+          <div
+            className="select"
+            onTouchStart={(e) => { e.preventDefault(); emitter.emit(Event.Select); }}
+            onClick={() => emitter.emit(Event.Select)}
+          >SELECT</div>
+          <div
+            className="start"
+            onTouchStart={(e) => { e.preventDefault(); emitter.emit(Event.Start); }}
+            onClick={() => emitter.emit(Event.Start)}
+          >
             START
           </div>
         </div>
