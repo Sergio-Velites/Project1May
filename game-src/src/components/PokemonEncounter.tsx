@@ -54,6 +54,8 @@ import {
   showItemsMenu,
   showTextThenAction,
   stopThrowingPokeball,
+  selectItemUsedInBattle,
+  setItemUsedInBattle,
 } from "../state/uiSlice";
 import useIsMobile from "../app/use-is-mobile";
 import { getMoveMetadata } from "../app/use-move-metadata";
@@ -550,6 +552,8 @@ const PokemonEncounter = () => {
   const activeMetadata = usePokemonMetadata(active?.id || null);
   const activeStats = usePokemonStats(active?.id || 1, active?.level || 1);
   const itemMenuOpen = useSelector(selectItemsMenu);
+  const itemUsedInBattle = useSelector(selectItemUsedInBattle);
+  const prevItemMenuOpenRef = useRef(false);
   const isMobile = useIsMobile();
   const pokemon = useSelector(selectPokemon);
   const name = useSelector(selectName);
@@ -852,6 +856,35 @@ const PokemonEncounter = () => {
     }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 5 + 500);
   };
 
+  // Igual que throwPokeball pero al final el rival ataca (cambio voluntario en batalla).
+  const throwPokeballThenEnemyTurn = () => {
+    setTimeout(() => {
+      setStage(4);
+    }, MOVEMENT_ANIMATION);
+    setTimeout(() => {
+      setStage(5);
+    }, MOVEMENT_ANIMATION * 2);
+    setTimeout(() => {
+      setStage(6);
+    }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION);
+    setTimeout(() => {
+      setStage(7);
+    }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 2);
+    setTimeout(() => {
+      setStage(8);
+    }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 3);
+    setTimeout(() => {
+      setStage(9);
+    }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 4);
+    setTimeout(() => {
+      setStage(10);
+    }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 5);
+    setTimeout(() => {
+      // El rival ataca después del cambio voluntario (Gen I)
+      triggerEnemyAttackOnly();
+    }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 5 + 500);
+  };
+
   const throwPokeballAtEnemy = (end: number = 39) => {
     setStage(34);
     setTimeout(() => {
@@ -1101,7 +1134,8 @@ const PokemonEncounter = () => {
     }
 
     if ([42, 43, 44].includes(stage)) {
-      setStage(11);
+      // Pokéball fallida: el pokémon salvaje ataca antes de continuar (Gen I)
+      triggerEnemyAttackOnly();
     }
 
     if (stage === 45) {
@@ -1604,6 +1638,90 @@ const PokemonEncounter = () => {
     }, hasMsg ? 1000 : 0);
   };
 
+  // ── turno del rival tras usar objeto / cambio voluntario / pokéball fallida ──
+  // El jugador siempre actúa primero en estos casos (Gen I: ítems y cambios
+  // tienen prioridad absoluta de velocidad).
+  const triggerEnemyAttackOnly = () => {
+    if (!enemy || !active) return;
+    const enemyMove = getMoveMetadata(getRandomEnemyMove());
+    const stagesSnapshot = { us: playerStages, them: enemyStages };
+    const effectivePlayer =
+      transformedId !== null
+        ? { ...active, id: transformedId, moves: transformedMoves }
+        : active;
+
+    // Comprobar si el rival salta su turno (flinch / estado)
+    const checkEnemySkip = (): boolean => {
+      if (enemyFlinchRef.current) {
+        enemyFlinchRef.current = false;
+        return true;
+      }
+      const status = enemyStatusRef.current;
+      if (!status) return false;
+      const name = enemyMetadata.name.toUpperCase() + " rival";
+      if (status.type === "sleep") {
+        const newTurns = status.turns - 1;
+        if (newTurns <= 0) {
+          setEnemyStatus(null);
+          enemyStatusRef.current = null;
+          setAlertText(`¡${name} se despertó!`);
+          return false;
+        }
+        const upd: BattleStatus = { ...status, turns: newTurns };
+        setEnemyStatus(upd);
+        enemyStatusRef.current = upd;
+        setAlertText(`¡${name} está dormido...!`);
+        return true;
+      }
+      if (status.type === "freeze") {
+        if (Math.random() < 0.20) {
+          setEnemyStatus(null);
+          enemyStatusRef.current = null;
+          setAlertText(`¡${name} se descongeló!`);
+          return false;
+        }
+        setAlertText(`¡${name} está congelado!`);
+        return true;
+      }
+      if (status.type === "paralysis" && Math.random() < 0.25) {
+        return true; // paralizado — no ataca
+      }
+      return false;
+    };
+
+    if (checkEnemySkip()) {
+      setTimeout(() => {
+        setAlertText(null);
+        applyEndOfTurnStatus(effectivePlayer, enemy);
+      }, ATTACK_ANIMATION);
+      return;
+    }
+
+    const { us: usNew } = processMoveResult(
+      processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot, {
+        lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+        isTargetSleeping: playerStatusRef.current?.type === "sleep",
+      }),
+      false
+    );
+    setTimeout(() => {
+      if (usNew.hp <= 0) setStage(24);
+      else applyEndOfTurnStatus(usNew, enemy);
+    }, ATTACK_ANIMATION + 1000);
+  };
+
+  // useEffect: detecta cuando el menú de objetos se cierra tras haber usado uno
+  useEffect(() => {
+    if (prevItemMenuOpenRef.current && !itemMenuOpen && itemUsedInBattle) {
+      dispatch(setItemUsedInBattle(false));
+      triggerEnemyAttackOnly();
+    }
+    prevItemMenuOpenRef.current = itemMenuOpen;
+    // triggerEnemyAttackOnly se omite de las dependencias intencionalmente:
+    // es una función nueva en cada render pero siempre captura el estado correcto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemMenuOpen, itemUsedInBattle, dispatch]);
+
   const processBattle = (attackId: string) => {
     const activeMove = getMoveMetadata(attackId);
     const enemyMove  = getMoveMetadata(getRandomEnemyMove());
@@ -1991,7 +2109,8 @@ const PokemonEncounter = () => {
                 setPlayerLeechSeeded(false);
                 playerLeechSeededRef.current = false;
                 playerFlinchRef.current = false;
-                throwPokeball();
+                // Cambio voluntario en batalla: el rival ataca después (Gen I)
+                throwPokeballThenEnemyTurn();
               }}
             />
           )}
