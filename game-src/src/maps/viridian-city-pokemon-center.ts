@@ -59,7 +59,7 @@ const viridianCityPokemonCenter: MapType = {
       npc: scientist,
       pokemon: [{ id: 1, level: 1 }],
       facing: Direction.Down,
-      pos: { x: 10, y: 1 },
+      pos: { x: 10, y: 2 },
       intro: [],
       outtro: [],
       money: 0,

@@ -175,7 +175,7 @@ const viridianCity: MapType = {
       npc: teamRocketGrunt,
       pokemon: [{ id: 33, level: 5 }, { id: 52, level: 4 }],
       facing: Direction.Down,
-      pos: { x: 11, y: 11 },
+      pos: { x: 11, y: 18 },
       intro: [
         "¡Con este vino seremos los reyes de la fiesta!",
         "¡No te metas en nuestros asuntos!",
@@ -216,7 +216,7 @@ const viridianCity: MapType = {
       npc: lass,
       pokemon: [{ id: 35, level: 3 }],
       facing: Direction.Down,
-      pos: { x: 9, y: 4 },
+      pos: { x: 9, y: 7 },
       persistent: true,
       intro: [],
       outtro: [

@@ -40,6 +40,9 @@ const Button = styled.button`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const Bold = styled.div`

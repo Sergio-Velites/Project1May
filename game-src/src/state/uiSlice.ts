@@ -51,6 +51,7 @@ interface UiState {
   pokeballCardId: number | null;
   academyPokeballOpen: boolean;
   onlineBattleMenu: boolean;
+  itemUsedInBattle: boolean;
 }
 
 const initialState: UiState = {
@@ -77,6 +78,7 @@ const initialState: UiState = {
   pokeballCardId: null,
   academyPokeballOpen: false,
   onlineBattleMenu: false,
+  itemUsedInBattle: false,
 };
 
 export const uiSlice = createSlice({
@@ -216,6 +218,9 @@ export const uiSlice = createSlice({
     hideOnlineBattleMenu: (state) => {
       state.onlineBattleMenu = false;
     },
+    setItemUsedInBattle: (state, action: PayloadAction<boolean>) => {
+      state.itemUsedInBattle = action.payload;
+    },
   },
 });
 
@@ -261,6 +266,7 @@ export const {
   closeAcademyPokeball,
   showOnlineBattleMenu,
   hideOnlineBattleMenu,
+  setItemUsedInBattle,
 } = uiSlice.actions;
 
 export const selectText = (state: RootState) => state.ui.text;
@@ -310,13 +316,17 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.confirmationMenu !== null ||
   state.ui.evolution !== null ||
   state.ui.pokeballCardId !== null ||
-  state.ui.academyPokeballOpen;
+  state.ui.academyPokeballOpen ||
+  state.ui.onlineBattleMenu;
 
 export const selectStartMenuSubOpen = (state: RootState) =>
   state.ui.itemsMenu || state.ui.playerMenu;
 
 export const selectPokeballThrowing = (state: RootState) =>
   state.ui.pokeballThrowing;
+
+export const selectItemUsedInBattle = (state: RootState) =>
+  state.ui.itemUsedInBattle;
 
 export const selectSpinning = (state: RootState) => state.ui.spinning;
 

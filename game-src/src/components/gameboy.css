@@ -217,6 +217,7 @@
   position: absolute;
   background-color: #565e6a;
   cursor: pointer;
+  touch-action: manipulation;
 }
 .gameboy .controls .dpad > * i {
   position: relative;
@@ -347,6 +348,7 @@
   text-align: center;
   -webkit-user-select: none;
   cursor: pointer;
+  touch-action: manipulation;
   transition: box-shadow 0.1s ease-out, border 0.1s ease-out,
     line-height 0.2s ease-out;
 }
@@ -380,6 +382,8 @@
   font-size: 4.3cqw;
   text-align: center;
   margin-top: 16cqw;
+  cursor: pointer;
+  touch-action: manipulation;
 }
 .gameboy .start-select .select::before,
 .gameboy .start-select .start::before {

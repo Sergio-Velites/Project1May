@@ -163,6 +163,22 @@ const OnlineBattleMenu = () => {
     },
   }));
 
+  // Texto como string puro para que Frame use su path con <h1 fontFamily="PokemonGB">
+  const frameText =
+    stage === "greeting"
+      ? "¡Hola! ¿Quieres combatir con el equipo Pokémon de otro invitado?"
+      : stage === "loading"
+      ? "Buscando invitados..."
+      : stage === "empty"
+      ? "No hay otros invitados en el juego todavía."
+      : stage === "loading-battle"
+      ? `Cargando datos de ${selected?.name ?? ""}...`
+      : stage === "no-pokemon"
+      ? `${selected?.name ?? "Este invitado"} aún no tiene equipo Pokémon. ¡Dile que juegue más!`
+      : stage === "error"
+      ? "No se pudo cargar la partida del invitado. Inténtalo de nuevo."
+      : "";
+
   // ---- Render ----
   return (
     <Overlay>
@@ -184,17 +200,7 @@ const OnlineBattleMenu = () => {
       {stage !== "select" && stage !== "done" && (
         <TextContainer>
           <Frame wide tall flashing={["greeting", "empty", "error", "no-pokemon"].includes(stage)}>
-            {stage === "greeting" &&
-              "¡Hola! ¿Quieres combatir con el equipo Pokémon de otro invitado?"}
-            {stage === "loading" && "Buscando invitados..."}
-            {stage === "empty" &&
-              "No hay otros invitados en el juego todavía."}
-            {stage === "loading-battle" &&
-              `Cargando datos de ${selected?.name ?? ""}...`}
-            {stage === "no-pokemon" &&
-              `${selected?.name ?? "Este invitado"} aún no tiene equipo Pokémon. ¡Dile que juegue más!`}
-            {stage === "error" &&
-              "No se pudo cargar la partida del invitado. Inténtalo de nuevo."}
+            {frameText}
           </Frame>
         </TextContainer>
       )}
