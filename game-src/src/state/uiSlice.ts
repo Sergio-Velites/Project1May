@@ -310,7 +310,8 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.confirmationMenu !== null ||
   state.ui.evolution !== null ||
   state.ui.pokeballCardId !== null ||
-  state.ui.academyPokeballOpen;
+  state.ui.academyPokeballOpen ||
+  state.ui.onlineBattleMenu;
 
 export const selectStartMenuSubOpen = (state: RootState) =>
   state.ui.itemsMenu || state.ui.playerMenu;
