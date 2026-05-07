@@ -7,14 +7,14 @@ Deno.serve(async (req) => {
   try {
     const { data, error } = await db
       .from("saves")
-      .select("player_id, game_state")
+      .select("user_id, game_state")
       .order("updated_at", { ascending: false });
     if (error) throw error;
 
-    const players = (data ?? []).map((row: { player_id: string; game_state: unknown }) => {
+    const players = (data ?? []).map((row: { user_id: string; game_state: unknown }) => {
       const gs = row.game_state as { name?: string; pokemon?: unknown[] } | null;
       return {
-        playerId: row.player_id,
+        playerId: row.user_id,
         name: gs?.name ?? "Invitado",
         pokemonCount: gs?.pokemon?.length ?? 0,
       };

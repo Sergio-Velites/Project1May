@@ -67,10 +67,11 @@ const OnlineBattleMenu = () => {
   const [players, setPlayers] = useState<PlayerEntry[]>([]);
   const [selected, setSelected] = useState<PlayerEntry | null>(null);
 
-  // Reset state on open
+  // Reset state on open — arranca directamente en "loading" porque el saludo
+  // ya lo muestra el sistema de texto estándar (showTextThenAction en OnlineBattleNpc)
   useEffect(() => {
     if (show) {
-      setStage("greeting");
+      setStage("loading");
       setPlayers([]);
       setSelected(null);
     }
@@ -128,7 +129,6 @@ const OnlineBattleMenu = () => {
   // A-button handler for text stages
   useEvent(Event.A, () => {
     if (!show) return;
-    if (stage === "greeting") setStage("loading");
     if (stage === "empty") {
       dispatch(hideOnlineBattleMenu());
       setStage("greeting");
@@ -148,7 +148,7 @@ const OnlineBattleMenu = () => {
     }
     if (stage === "select") {
       dispatch(hideOnlineBattleMenu());
-      setStage("greeting");
+      setStage("loading");
     }
   });
 
@@ -165,9 +165,7 @@ const OnlineBattleMenu = () => {
 
   // Texto como string puro para que Frame use su path con <h1 fontFamily="PokemonGB">
   const frameText =
-    stage === "greeting"
-      ? "¡Hola! ¿Quieres combatir con el equipo Pokémon de otro invitado?"
-      : stage === "loading"
+    stage === "loading"
       ? "Buscando invitados..."
       : stage === "empty"
       ? "No hay otros invitados en el juego todavía."
@@ -189,7 +187,7 @@ const OnlineBattleMenu = () => {
           menuItems={menuItems}
           close={() => {
             dispatch(hideOnlineBattleMenu());
-            setStage("greeting");
+            setStage("loading");
           }}
           bottom="20%"
           right="0"
@@ -199,7 +197,7 @@ const OnlineBattleMenu = () => {
       {/* Text box */}
       {stage !== "select" && stage !== "done" && (
         <TextContainer>
-          <Frame wide tall flashing={["greeting", "empty", "error", "no-pokemon"].includes(stage)}>
+          <Frame wide tall flashing={["empty", "error", "no-pokemon"].includes(stage)}>
             {frameText}
           </Frame>
         </TextContainer>
