@@ -1190,6 +1190,22 @@ const PokemonEncounter = () => {
     }
   });
 
+  // useEffect: detecta cuando el menú de objetos se cierra tras haber usado uno
+  // NOTA: debe estar ANTES del early return (!isInBattle) para no violar
+  // las reglas de hooks (mismo número de hooks en cada render).
+  useEffect(() => {
+    const prev = prevItemMenuOpenRef.current;
+    prevItemMenuOpenRef.current = itemMenuOpen;
+    if (!isInBattle) return;
+    if (prev && !itemMenuOpen && itemUsedInBattle) {
+      dispatch(setItemUsedInBattle(false));
+      triggerEnemyAttackOnly();
+    }
+    // triggerEnemyAttackOnly se omite de las dependencias intencionalmente:
+    // es una función nueva en cada render pero siempre captura el estado correcto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInBattle, itemMenuOpen, itemUsedInBattle, dispatch]);
+
   if (!isInBattle) return null;
 
   const text = () => {
@@ -1709,18 +1725,6 @@ const PokemonEncounter = () => {
       else applyEndOfTurnStatus(usNew, enemy);
     }, ATTACK_ANIMATION + 1000);
   };
-
-  // useEffect: detecta cuando el menú de objetos se cierra tras haber usado uno
-  useEffect(() => {
-    if (prevItemMenuOpenRef.current && !itemMenuOpen && itemUsedInBattle) {
-      dispatch(setItemUsedInBattle(false));
-      triggerEnemyAttackOnly();
-    }
-    prevItemMenuOpenRef.current = itemMenuOpen;
-    // triggerEnemyAttackOnly se omite de las dependencias intencionalmente:
-    // es una función nueva en cada render pero siempre captura el estado correcto.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemMenuOpen, itemUsedInBattle, dispatch]);
 
   const processBattle = (attackId: string) => {
     const activeMove = getMoveMetadata(attackId);
