@@ -598,6 +598,8 @@ const PokemonEncounter = () => {
   const pendingXpRef = useRef<number | null>(null);
   // Ref to pass new level from stage 21 to stages 22/29/33 without stale closure
   const pendingLevelRef = useRef<number | null>(null);
+  // Guard against multiple processBattle calls from rapid A presses (React #310)
+  const processBattleRef = useRef(false);
 
   // Stat stages — reset al inicio de cada combate
   const [playerStages, setPlayerStages] = useState<StatStages>(DEFAULT_STAGES);
@@ -777,6 +779,7 @@ const PokemonEncounter = () => {
       lastPhysicalDamageRef.current = 0;
       enemyFlinchRef.current  = false;
       playerFlinchRef.current = false;
+      processBattleRef.current = false;
       setMoveAnim(null);
       setStage(0);
       // Register enemy as SEEN in Pokédex
@@ -817,6 +820,7 @@ const PokemonEncounter = () => {
       setStage(10);
     }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 5);
     setTimeout(() => {
+      processBattleRef.current = false;
       setStage(11);
     }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 5 + 500);
   };
@@ -966,6 +970,7 @@ const PokemonEncounter = () => {
     }
 
     if (stage === 49) {
+      processBattleRef.current = false;
       setStage(11);
     }
 
@@ -1115,7 +1120,7 @@ const PokemonEncounter = () => {
           moves: enemy.moves.map((move) => {
             return {
               id: move,
-              pp: getMoveMetadata(move).pp || 0,
+              pp: getMoveMetadata(move)?.pp ?? 0,
             };
           }),
           // Keep current HP (Gen I behaviour: caught pokemon retains battle HP)
@@ -1599,7 +1604,10 @@ const PokemonEncounter = () => {
       setAlertText(null);
       if (newUsHp <= 0)   setStage(24);
       else if (newThemHp <= 0) setStage(20);
-      else setStage(11);
+      else {
+        processBattleRef.current = false;
+        setStage(11);
+      }
     }, hasMsg ? 1000 : 0);
   };
 
@@ -2084,7 +2092,11 @@ const PokemonEncounter = () => {
           )}
           <MoveSelect
             show={stage === 14}
-            select={(move: string) => processBattle(move)}
+            select={(move: string) => {
+              if (processBattleRef.current) return;
+              processBattleRef.current = true;
+              processBattle(move);
+            }}
             close={() => setStage(11)}
             overrideMoves={transformedId !== null ? transformedMoves : undefined}
           />
