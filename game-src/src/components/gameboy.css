@@ -13,9 +13,10 @@
   flex-direction: column;
   justify-content: space-between;
 
-  /* ── Maintain 3:5 aspect ratio, always fully visible ─────── */
-  /* Width = narrowest of: viewport width OR height × (3/5)    */
-  width: min(calc(100vw - 10px), calc((100dvh - 33px) * 3 / 5));
+  /* ── Maintain 9:16 aspect ratio, always fully visible ─────── */
+  /* Width = narrowest of: viewport width OR height × (9/16)    */
+  width: min(calc(100vw - 10px), calc((100dvh - 33px) * 9 / 16));
+  aspect-ratio: 9 / 16;
   height: auto;
 
   /* Container query context: 1cqw = 1% of .gameboy width */
@@ -52,6 +53,7 @@
 
 .gameboy .control-section {
   width: 100%;
+  flex: 1;
   min-height: 66.7cqw;
 }
 
