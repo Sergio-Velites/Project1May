@@ -13,11 +13,14 @@
   flex-direction: column;
   justify-content: space-between;
 
-  /* ── Maintain 9:16 aspect ratio, always fully visible ─────── */
-  /* Width = narrowest of: viewport width OR height × (9/16)    */
+  /* ── Portrait 9:16 forzado — ambos ejes calculados explícitamente ── */
+  /* Anchura: el menor de (viewport-width) y (viewport-height × 9/16)  */
   width: min(calc(100vw - 10px), calc((100dvh - 33px) * 9 / 16));
-  aspect-ratio: 9 / 16;
-  height: auto;
+  /* Altura: el menor de (viewport-height) y (viewport-width × 16/9)   */
+  /* → NO se usa aspect-ratio porque en flex items con height:auto es  */
+  /*   poco fiable; calculamos directamente el valor correcto.          */
+  height: min(calc(100dvh - 33px), calc((100vw - 10px) * 16 / 9));
+  flex-shrink: 0; /* el contenedor flex no comprime el gameboy */
 
   /* Container query context: 1cqw = 1% of .gameboy width */
   container-type: inline-size;
@@ -54,7 +57,7 @@
 .gameboy .control-section {
   width: 100%;
   flex: 1;
-  min-height: 66.7cqw;
+  min-height: 0; /* flex rellena el espacio restante sin imponer mínimo */
 }
 
 .gameboy .screen-area {
