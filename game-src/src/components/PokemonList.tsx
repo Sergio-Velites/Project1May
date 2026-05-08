@@ -32,10 +32,6 @@ const ListArea = styled.div`
   min-height: 0;
   /* Reserva espacio para la InfoArea superpuesta al fondo */
   padding-bottom: 32px;
-
-  @media (min-width: 1000px) {
-    padding-bottom: 11vh;
-  }
 `;
 
 /* InfoArea flota sobre el fondo de la lista (como en Gen I) */
@@ -52,11 +48,6 @@ const EmptyRow = styled.div`
   margin-bottom: 1px;
   align-items: center;
   min-height: 19px;
-
-  @media (min-width: 1000px) {
-    min-height: 8vh;
-    margin-bottom: 1vh;
-  }
 `;
 
 interface Props {

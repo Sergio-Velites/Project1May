@@ -88,10 +88,6 @@ const StyledPokemonRow = styled.div`
   display: flex;
   margin-bottom: 1px;
   align-items: center;
-
-  @media (min-width: 1000px) {
-    margin-bottom: 1vh;
-  }
 `;
 
 const ArrowContainer = styled.div`

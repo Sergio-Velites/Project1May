@@ -20,10 +20,7 @@ const StyledEvolution = styled.div`
   background: var(--bg);
   z-index: 200;
 
-  height: 80%;
-  @media (max-width: 1000px) {
-    height: 70%;
-  }
+  height: 70%;
 `;
 
 const firstAnimation = keyframes`
@@ -237,12 +234,8 @@ const TextContainer = styled.div`
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 20%;
+  height: 30%;
   z-index: 100;
-
-  @media (max-width: 1000px) {
-    height: 30%;
-  }
 `;
 
 const Evolution = () => {

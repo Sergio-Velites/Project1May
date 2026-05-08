@@ -59,8 +59,7 @@ const Screen = styled.div`
   overflow: hidden;
 
   /* all font-sizes scale with container */
-  font-size: 9px;
-  @media (min-width: 1000px) { font-size: 1.8vh; }
+  font-size: 2.4cqw;
 `;
 
 const HRule = styled.div`
