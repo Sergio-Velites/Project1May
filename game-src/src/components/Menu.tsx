@@ -27,12 +27,7 @@ const StyledMenu = styled.div<MenuProps>`
   transform: ${(props) =>
     props.$bottom || props.$top ? "none" : "translateY(-50%)"};
   width: ${(props) =>
-    props.$compact ? "410px" : props.$wide ? "100%" : "auto"};
-
-  @media (max-width: 1000px) {
-    width: ${(props) =>
-      props.$compact ? "130px" : props.$wide ? "100%" : "auto"};
-  }
+    props.$compact ? "35cqw" : props.$wide ? "100%" : "auto"};
 `;
 
 const Button = styled.button`

@@ -212,7 +212,7 @@ const LoadScreen = () => {
           noExit
           top="2px"
           left="2px"
-          padding="7vw"
+          padding="7cqw"
           close={() => {}}
           menuItems={[
             {
@@ -293,7 +293,7 @@ const LoadScreen = () => {
           noExit
           top="2px"
           left="2px"
-          padding="7vw"
+          padding="7cqw"
           close={() => {}}
           menuItems={[
             { label: "Continuar", action: handleContinue },
