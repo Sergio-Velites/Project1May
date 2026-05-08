@@ -658,6 +658,11 @@ const PokemonEncounter = () => {
   useEffect(() => { playerStatusRef.current = playerStatus; }, [playerStatus]);
   useEffect(() => { enemyStatusRef.current = enemyStatus; }, [enemyStatus]);
 
+  // Ref al pokémon activo — evita stale-closure en triggerEnemyAttackOnly
+  // cuando se llama desde throwPokeballThenEnemyTurn tras un cambio voluntario.
+  const activeRef = useRef(active);
+  useEffect(() => { activeRef.current = active; }, [active]);
+
   // Leech Seed (puede coexistir con otros estados — se guarda por separado)
   const [playerLeechSeeded, setPlayerLeechSeeded] = useState(false);
   const [enemyLeechSeeded, setEnemyLeechSeeded] = useState(false);
@@ -1665,10 +1670,13 @@ const PokemonEncounter = () => {
     if (!enemy || !active) return;
     const enemyMove = getMoveMetadata(getRandomEnemyMove());
     const stagesSnapshot = { us: playerStages, them: enemyStages };
+    // Usar activeRef para evitar stale-closure: tras un cambio voluntario de pokémon,
+    // el setTimeout captura la función antigua pero necesita el pokémon ya actualizado.
+    const currentActive = activeRef.current ?? active;
     const effectivePlayer =
       transformedId !== null
-        ? { ...active, id: transformedId, moves: transformedMoves }
-        : active;
+        ? { ...currentActive, id: transformedId, moves: transformedMoves }
+        : currentActive;
 
     // Comprobar si el rival salta su turno (flinch / estado)
     const checkEnemySkip = (): boolean => {
