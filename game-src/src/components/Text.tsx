@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import {
   selectDirection,
   selectPos,
@@ -18,75 +18,17 @@ import {
 import { Direction } from "../state/state-types";
 import { useActiveMapQuests } from "../app/use-quests";
 import PixelImage from "../styles/PixelImage";
+import Frame from "./Frame";
 
-interface TextProps {
-  $done: boolean;
-}
-
-// Flashing animation
-const flashing = keyframes`
-  0% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-`;
-
-const StyledText = styled.div<TextProps>`
+// Contenedor posicionado — ocupa el 30% inferior del display, siempre.
+// El Frame interior (cqw) gestiona border, padding, fuente y flecha.
+const StyledTextContainer = styled.div`
   position: absolute !important;
   left: 0;
   bottom: 0;
   width: 100%;
-  height: 20%;
-  background: var(--bg);
+  height: 30%;
   z-index: 1000;
-  overflow: hidden;
-
-  h1 {
-    color: black;
-    font-size: min(30px, 3.5vh);
-    font-family: "PokemonGB";
-    line-height: 1.3;
-
-    @media (max-width: 1000px) {
-      font-size: 9px;
-    }
-  }
-
-  @media (max-width: 1000px) {
-    height: 30%;
-  }
-
-  ::after {
-    content: "";
-    position: absolute;
-    bottom: ${(props) => (props.$done ? "25px" : "-100px")};
-    right: 20px;
-    width: 3px;
-    height: 3px;
-    font-size: 3px;
-    color: #181010;
-    box-shadow: 1em 0em 0 #181010, 2em 0em 0 #181010, 1em 1em 0 #181010,
-      2em 1em 0 #181010, 3em 1em 0 #181010, 1em 2em 0 #181010, 2em 2em 0 #181010,
-      3em 2em 0 #181010, 4em 2em 0 #181010, 1em 3em 0 #181010, 2em 3em 0 #181010,
-      3em 3em 0 #181010, 4em 3em 0 #181010, 5em 3em 0 #181010, 1em 4em 0 #181010,
-      2em 4em 0 #181010, 3em 4em 0 #181010, 4em 4em 0 #181010, 1em 5em 0 #181010,
-      2em 5em 0 #181010, 3em 5em 0 #181010, 1em 6em 0 #181010, 2em 6em 0 #181010;
-    transform: rotate(90deg);
-    animation: ${flashing} 1s infinite;
-
-    @media (max-width: 1000px) {
-      bottom: ${(props) => (props.$done ? "13px" : "-100px")};
-      right: 10px;
-      width: 1.3px;
-      height: 1.3px;
-      font-size: 1.3px;
-    }
-  }
 `;
 
 const Image = styled(PixelImage)`
@@ -195,16 +137,19 @@ const Text = () => {
 
   if (!text) return null;
 
+  const currentLine = text[textIndex];
+  const isDone = liveIndex >= currentLine.length;
+
   return (
-    <>
-      {text[textIndex].length > 300 ? (
-        <Image src={text[textIndex]} />
+    <StyledTextContainer>
+      {currentLine.length > 300 ? (
+        <Image src={currentLine} />
       ) : (
-        <StyledText className="framed no-hd" $done={liveIndex >= text[textIndex].length}>
-          <h1>{text[textIndex].substring(0, liveIndex)}</h1>
-        </StyledText>
+        <Frame wide tall flashing={isDone}>
+          {currentLine.substring(0, liveIndex)}
+        </Frame>
       )}
-    </>
+    </StyledTextContainer>
   );
 };
 
