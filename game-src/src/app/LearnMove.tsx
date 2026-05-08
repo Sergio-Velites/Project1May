@@ -21,12 +21,8 @@ const TextContainer = styled.div`
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 20%;
+  height: 30%;
   z-index: 100;
-
-  @media (max-width: 1000px) {
-    height: 30%;
-  }
 `;
 
 const LearnMove = () => {
@@ -121,7 +117,7 @@ const LearnMove = () => {
       )}
       <Menu
         noExitOption
-        padding={isMobile ? "100px" : "40vw"}
+        padding="7cqw"
         show={stage === 6}
         menuItems={[
           ...pokemon[pokemonIndex].moves.map((m) => {

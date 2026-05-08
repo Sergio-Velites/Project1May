@@ -10,15 +10,10 @@ const StyledHealthBar = styled.div`
 
 const HealthContainer = styled.div`
   position: absolute;
-  top: 23.3%;
+  top: 40%;
   right: 1.5%;
   width: 75.2%;
-  height: 46%;
-
-  @media (max-width: 1000px) {
-    height: 30%;
-    top: 40%;
-  }
+  height: 30%;
 `;
 
 interface HealthProps {
@@ -50,11 +45,7 @@ interface ImageProps {
 
 const Image = styled(PixelImage)<ImageProps>`
   position: relative;
-  height: ${(props) => (props.$big ? "6px" : "5px")};
-
-  @media (min-width: 1000px) {
-    height: 2.5vh;
-  }
+  height: ${(props) => (props.$big ? "1.6cqw" : "1.33cqw")};
 `;
 
 interface Props {

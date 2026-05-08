@@ -83,16 +83,12 @@ const StyledPokemonEncounter = styled.div`
   width: 100%;
   height: 100%;
   background: var(--bg);
-  padding-top: 1.5vh;
+  padding-top: 3px;
   display: flex;
   flex-direction: column;
   width: 100%;
 
-  height: 80%;
-  @media (max-width: 1000px) {
-    height: 70%;
-    padding-top: 3px;
-  }
+  height: 70%;
 `;
 
 const Row = styled.div`
@@ -353,25 +349,16 @@ const AttackLeft = styled.div<AttackingProps>`
 const Corner = styled(PixelImage)`
   transform: translateY(-50%);
 
-  height: 8vh;
-  @media (max-width: 1000px) {
-    height: 19px;
-  }
+  height: 5cqw;
 `;
 
 const CornerContainer = styled.div`
-  height: 5vh;
-  @media (max-width: 1000px) {
-    height: 10px;
-  }
+  height: 3cqw;
 `;
 
 const CornerRight = styled(PixelImage)`
-  height: 8vh;
+  height: 5cqw;
   transform: translateY(-70%) scaleX(-1);
-  @media (max-width: 1000px) {
-    height: 19px;
-  }
 `;
 
 const TextContainer = styled.div`
@@ -379,12 +366,8 @@ const TextContainer = styled.div`
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 20%;
+  height: 30%;
   z-index: 100;
-
-  @media (max-width: 1000px) {
-    height: 30%;
-  }
 `;
 
 const moveLeft = keyframes`
@@ -2124,7 +2107,7 @@ const PokemonEncounter = () => {
           <Menu
             noExitOption
             disabled={startMenuOpen}
-            padding={isMobile ? "100px" : "40vw"}
+            padding="7cqw"
             show={stage === 33}
             menuItems={[
               ...(processingPokemon?.moves ?? []).map((m) => {

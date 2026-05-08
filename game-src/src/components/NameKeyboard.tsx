@@ -37,13 +37,9 @@ const NameDisplay = styled.div`
   justify-content: center;
   border-bottom: 3px solid black;
   padding-bottom: 2%;
-  min-height: 13%;
+  min-height: 11%;
   gap: 0.5em;
-
-  @media (max-width: 1000px) {
-    border-bottom: 2px solid black;
-    min-height: 11%;
-  }
+  border-bottom: 2px solid black;
 `;
 
 interface CharProps {

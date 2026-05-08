@@ -75,8 +75,7 @@ const Screen = styled.div`
   border: 3px solid #181010;
   box-sizing: border-box;
   overflow: hidden;
-  font-size: 9px;
-  @media (min-width: 1000px) { font-size: 1.8vh; }
+  font-size: 2.4cqw;
 `;
 
 const HeaderBar = styled.div`

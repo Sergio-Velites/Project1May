@@ -23,7 +23,7 @@ const StyledGameboyMenu = styled.div`
 const colorAnimation = keyframes`
   0% {
     color: #ffd759;
-    background-position: -100vw;
+    background-position: -100cqw;
     opacity: 0;
   }
   11.7% {
@@ -31,7 +31,7 @@ const colorAnimation = keyframes`
   }
   12% {
     color: #ffd759;
-    background-position: -100vw;
+    background-position: -100cqw;
     opacity: 1;
   }
   19.5% {
@@ -59,10 +59,10 @@ const colorAnimation = keyframes`
     color: #3493f8;
   }
   54% {
-    background-position: 100vw;
+    background-position: 100cqw;
   }
   100% {
-    background-position: 100vw;
+    background-position: 100cqw;
     opacity: 1;
   }
 `;
@@ -70,12 +70,12 @@ const colorAnimation = keyframes`
 const Text = styled.div`
   margin-top: 13%;
   font-family: "PressStart2P", sans-serif;
-  font-size: 9rem;
+  font-size: 8cqw;
   font-weight: 700;
   font-style: italic;
   text-align: center;
   opacity: 0;
-  width: 300vw;
+  width: 100%;
   transform: skew(-5deg);
   overflow: hidden;
   white-space: nowrap;
@@ -93,15 +93,11 @@ const Text = styled.div`
     #ffd759 60%,
     var(--bg) 60%
   );
-  background-position: -100vw;
+  background-position: -100cqw;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   -webkit-animation: ${colorAnimation} 3s 1 linear forwards;
   animation: ${colorAnimation} 3s 1 linear forwards;
-
-  @media (max-width: 1000px) {
-    font-size: 2.5rem;
-  }
 `;
 
 const apearIn = keyframes`

@@ -161,10 +161,9 @@ const SpriteArea = styled.div`
 interface ImgProps { $shrink?: boolean; }
 
 const Portrait = styled(PixelImage)<ImgProps>`
-  height: 55%; max-height: 200px;
+  height: 40%; max-height: 32cqw;
   animation: ${fadeIn} 0.1s ease forwards;
   ${(p: ImgProps) => p.$shrink && css`animation: ${shrinkAnim} 2.5s ease forwards;`}
-  @media (max-width: 1000px) { height: 40%; max-height: 120px; }
 `;
 
 const PokemonImg = styled(PixelImage)`
