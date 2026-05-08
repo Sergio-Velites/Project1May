@@ -19,5 +19,4 @@ root.render(
   </React.StrictMode>
 );
 
-// Service worker desactivado — se usa unregister() para limpiar instancias previas
-serviceWorkerRegistration.unregister();
+serviceWorkerRegistration.register();

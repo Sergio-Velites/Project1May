@@ -27,7 +27,12 @@ const StyledMenu = styled.div<MenuProps>`
   transform: ${(props) =>
     props.$bottom || props.$top ? "none" : "translateY(-50%)"};
   width: ${(props) =>
-    props.$compact ? "35cqw" : props.$wide ? "100%" : "auto"};
+    props.$compact ? "410px" : props.$wide ? "100%" : "auto"};
+
+  @media (max-width: 1000px) {
+    width: ${(props) =>
+      props.$compact ? "130px" : props.$wide ? "100%" : "auto"};
+  }
 `;
 
 const Button = styled.button`
@@ -43,10 +48,15 @@ const Button = styled.button`
 const Bold = styled.div`
   font-weight: bold;
   color: black;
-  margin-left: 4cqw;
+  margin-left: 45px;
   font-family: "PokemonGB";
-  font-size: 2.67cqw;
-  line-height: 1;
+
+  font-size: 3rem;
+  @media (max-width: 1000px) {
+    font-size: 1rem;
+    line-height: 1;
+    margin-left: 15px;
+  }
 `;
 
 const ArrowContainer = styled.div`

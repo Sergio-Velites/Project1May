@@ -281,7 +281,8 @@ export const webauthnAuth = async (credentialId: string): Promise<string | null>
     try {
       const finishRes = await callEdge("webauthn-auth-finish", {
         challengeId,
-        credential: assertionJSON, // el servidor espera 'credential', no 'assertion'
+        credentialId,
+        assertion: assertionJSON,
       });
       if (finishRes.ok) {
         const { userId } = await finishRes.json();

@@ -13,14 +13,10 @@
   flex-direction: column;
   justify-content: space-between;
 
-  /* ── Portrait 9:16 forzado — ambos ejes calculados explícitamente ── */
-  /* Anchura: el menor de (viewport-width) y (viewport-height × 9/16)  */
-  width: min(calc(100vw - 10px), calc((100dvh - 33px) * 9 / 16));
-  /* Altura: el menor de (viewport-height) y (viewport-width × 16/9)   */
-  /* → NO se usa aspect-ratio porque en flex items con height:auto es  */
-  /*   poco fiable; calculamos directamente el valor correcto.          */
-  height: min(calc(100dvh - 33px), calc((100vw - 10px) * 16 / 9));
-  flex-shrink: 0; /* el contenedor flex no comprime el gameboy */
+  /* ── Maintain 3:5 aspect ratio, always fully visible ─────── */
+  /* Width = narrowest of: viewport width OR height × (3/5)    */
+  width: min(calc(100vw - 10px), calc((100dvh - 33px) * 3 / 5));
+  height: auto;
 
   /* Container query context: 1cqw = 1% of .gameboy width */
   container-type: inline-size;
@@ -56,8 +52,7 @@
 
 .gameboy .control-section {
   width: 100%;
-  flex: 1;
-  min-height: 0; /* flex rellena el espacio restante sin imponer mínimo */
+  min-height: 66.7cqw;
 }
 
 .gameboy .screen-area {
@@ -224,15 +219,6 @@
   cursor: pointer;
   touch-action: manipulation;
 }
-/* Zona táctil ampliada en cada botón del dpad */
-.gameboy .controls .dpad .up::after,
-.gameboy .controls .dpad .right::after,
-.gameboy .controls .dpad .down::after,
-.gameboy .controls .dpad .left::after {
-  content: "";
-  position: absolute;
-  inset: -9px;
-}
 .gameboy .controls .dpad > * i {
   position: relative;
   display: block;
@@ -372,14 +358,6 @@
   border-width: 0px;
   line-height: 12cqw;
 }
-/* Zona táctil ampliada: área invisible 14px mayor en cada dirección */
-.gameboy .controls .a-b .a::after,
-.gameboy .controls .a-b .b::after {
-  content: "";
-  position: absolute;
-  inset: -14px;
-  border-radius: 50%;
-}
 .gameboy .controls .a-b .a {
   top: 4cqw;
   right: 2.7cqw;
@@ -396,7 +374,6 @@
 }
 .gameboy .start-select .select,
 .gameboy .start-select .start {
-  position: relative;
   display: inline-block;
   color: #6b67ed;
   text-shadow: 0px -1px 0px #3436bf;
@@ -407,13 +384,6 @@
   margin-top: 16cqw;
   cursor: pointer;
   touch-action: manipulation;
-}
-/* Zona táctil ampliada en start/select */
-.gameboy .start-select .select::after,
-.gameboy .start-select .start::after {
-  content: "";
-  position: absolute;
-  inset: -12px -16px;
 }
 .gameboy .start-select .select::before,
 .gameboy .start-select .start::before {

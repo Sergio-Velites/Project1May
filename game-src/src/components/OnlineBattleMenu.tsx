@@ -36,8 +36,12 @@ const TextContainer = styled.div`
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 30%;
+  height: 20%;
   z-index: 100;
+
+  @media (max-width: 1000px) {
+    height: 30%;
+  }
 `;
 
 // ---- Types ----
@@ -63,11 +67,10 @@ const OnlineBattleMenu = () => {
   const [players, setPlayers] = useState<PlayerEntry[]>([]);
   const [selected, setSelected] = useState<PlayerEntry | null>(null);
 
-  // Reset state on open — arranca directamente en "loading" porque el saludo
-  // ya lo muestra el sistema de texto estándar (showTextThenAction en OnlineBattleNpc)
+  // Reset state on open
   useEffect(() => {
     if (show) {
-      setStage("loading");
+      setStage("greeting");
       setPlayers([]);
       setSelected(null);
     }
@@ -125,6 +128,7 @@ const OnlineBattleMenu = () => {
   // A-button handler for text stages
   useEvent(Event.A, () => {
     if (!show) return;
+    if (stage === "greeting") setStage("loading");
     if (stage === "empty") {
       dispatch(hideOnlineBattleMenu());
       setStage("greeting");
@@ -144,7 +148,7 @@ const OnlineBattleMenu = () => {
     }
     if (stage === "select") {
       dispatch(hideOnlineBattleMenu());
-      setStage("loading");
+      setStage("greeting");
     }
   });
 
@@ -161,7 +165,9 @@ const OnlineBattleMenu = () => {
 
   // Texto como string puro para que Frame use su path con <h1 fontFamily="PokemonGB">
   const frameText =
-    stage === "loading"
+    stage === "greeting"
+      ? "¡Hola! ¿Quieres combatir con el equipo Pokémon de otro invitado?"
+      : stage === "loading"
       ? "Buscando invitados..."
       : stage === "empty"
       ? "No hay otros invitados en el juego todavía."
@@ -183,7 +189,7 @@ const OnlineBattleMenu = () => {
           menuItems={menuItems}
           close={() => {
             dispatch(hideOnlineBattleMenu());
-            setStage("loading");
+            setStage("greeting");
           }}
           bottom="20%"
           right="0"
@@ -193,7 +199,7 @@ const OnlineBattleMenu = () => {
       {/* Text box */}
       {stage !== "select" && stage !== "done" && (
         <TextContainer>
-          <Frame wide tall flashing={["empty", "error", "no-pokemon"].includes(stage)}>
+          <Frame wide tall flashing={["greeting", "empty", "error", "no-pokemon"].includes(stage)}>
             {frameText}
           </Frame>
         </TextContainer>

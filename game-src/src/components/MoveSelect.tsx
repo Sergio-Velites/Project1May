@@ -11,23 +11,33 @@ import useMoveMetadata, { getMoveMetadata } from "../app/use-move-metadata";
 
 const Stats = styled.div`
   position: absolute;
-  bottom: 16cqw;
-  left: 0;
-  right: auto;
+  bottom: 20rem;
+  right: 45vw;
   display: flex;
   flex-direction: column;
-  width: 50%;
+  width: 35rem;
   z-index: 100;
+
+  @media (max-width: 1000px) {
+    bottom: 6rem;
+    left: 0;
+    width: 50%;
+  }
 `;
 
 const StatsRow = styled.div`
   font-family: "PokemonGB";
-  font-size: 2.67cqw;
+  font-size: 3rem;
   text-transform: uppercase;
   text-align: left;
   color: black;
   width: 100%;
-  margin-top: 2px;
+  margin-top: 5px;
+
+  @media (max-width: 1000px) {
+    font-size: 1rem;
+    margin-top: 2px;
+  }
 `;
 
 interface Props {
@@ -54,7 +64,7 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
         noExitOption
         disabled={startMenuOpen}
         padd={4}
-        padding="7cqw"
+        padding={isMobile ? "100px" : "40vw"}
         show={show}
         menuItems={displayMoves.map((m) => {
           const item: MenuItemType = {

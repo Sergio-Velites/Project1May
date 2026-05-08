@@ -42,8 +42,12 @@ const TextArea = styled.div`
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 30%;
+  height: 20%;
   z-index: 100;
+
+  @media (max-width: 1000px) {
+    height: 30%;
+  }
 `;
 
 interface FlashProps {
@@ -52,10 +56,15 @@ interface FlashProps {
 
 const StatusText = styled.h1<FlashProps>`
   font-family: "PokemonGB";
-  font-size: 2.4cqw;
+  font-size: 30px;
   color: black;
-  padding: 2cqw 2.7cqw;
+  padding: 16px 18px;
   animation: ${(p) => (p.$flashing ? pulse : "none")} 1.2s infinite;
+
+  @media (max-width: 1000px) {
+    font-size: 9px;
+    padding: 6px 10px;
+  }
 `;
 
 // Fases de la secuencia de arranque. Las fases "idle" y "bootstrapping" muestran
@@ -212,7 +221,7 @@ const LoadScreen = () => {
           noExit
           top="2px"
           left="2px"
-          padding="7cqw"
+          padding="7vw"
           close={() => {}}
           menuItems={[
             {
@@ -293,7 +302,7 @@ const LoadScreen = () => {
           noExit
           top="2px"
           left="2px"
-          padding="7cqw"
+          padding="7vw"
           close={() => {}}
           menuItems={[
             { label: "Continuar", action: handleContinue },
