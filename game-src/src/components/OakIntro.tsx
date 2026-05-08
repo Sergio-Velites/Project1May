@@ -379,6 +379,11 @@ const OakIntro = ({ onComplete }: Props) => {
   const [shrink,      setShrink]     = useState<"idle" | "shrinking" | "overworld">("idle");
   const [attended,    setAttended]   = useState<boolean | null>(null);
   const historyRef = useRef<Snapshot[]>([]);
+  const blockInputRef = useRef(true);
+  useEffect(() => {
+    const t = setTimeout(() => { blockInputRef.current = false; }, 300);
+    return () => clearTimeout(t);
+  }, []);
 
   const currentLine = lines[idx];
   const fullText = currentLine?.text ?? "";
@@ -469,6 +474,7 @@ const OakIntro = ({ onComplete }: Props) => {
   }, [stage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEvent(Event.A, () => {
+    if (blockInputRef.current) return;
     if (stage === "dialogue") { advanceDialogue(); return; }
     if (stage === "attendance-choice") {
       push();
@@ -542,6 +548,8 @@ const OakIntro = ({ onComplete }: Props) => {
 
   useEvent(Event.B, () => {
     if (stage === "saving" || stage === "done") return;
+    blockInputRef.current = true;
+    setTimeout(() => { blockInputRef.current = false; }, 250);
     pop();
   });
 

@@ -108,6 +108,10 @@ const Text = () => {
   useEvent(Event.A, () => {
     // Reading text
     if (text) {
+      if (liveIndex < text[textIndex].length) {
+        setLiveIndex(text[textIndex].length);
+        return;
+      }
       if (textIndex === text.length - 1) {
         setTextIndex(0);
         dispatch(hideText());
