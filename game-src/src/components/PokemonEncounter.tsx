@@ -2103,19 +2103,6 @@ const PokemonEncounter = () => {
           {stage === 13 && (
             <PokemonList
               close={() => setStage(11)}
-              switchAction={(index) => {
-                dispatch(setActivePokemon(index));
-                setInvolvedPokemon([...involvedPokemon, index]);
-                // Resetear estados del jugador al sacar nuevo pokémon
-                setPlayerStages(DEFAULT_STAGES);
-                setPlayerStatus(null);
-                playerStatusRef.current = null;
-                setPlayerLeechSeeded(false);
-                playerLeechSeededRef.current = false;
-                playerFlinchRef.current = false;
-                // Cambio voluntario en batalla: el rival ataca después (Gen I)
-                throwPokeballThenEnemyTurn();
-              }}
             />
           )}
           <MoveSelect
