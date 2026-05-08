@@ -1609,6 +1609,7 @@ const PokemonEncounter = () => {
   const triggerEnemyAttackOnly = () => {
     if (!enemy || !active) return;
     const enemyMove = getMoveMetadata(getRandomEnemyMove());
+    if (!enemyMove) return;
     const stagesSnapshot = { us: playerStages, them: enemyStages };
     const effectivePlayer =
       transformedId !== null
@@ -1690,6 +1691,8 @@ const PokemonEncounter = () => {
   const processBattle = (attackId: string) => {
     const activeMove = getMoveMetadata(attackId);
     const enemyMove  = getMoveMetadata(getRandomEnemyMove());
+
+    if (!activeMove || !enemyMove) return;
 
     const activeMovesFirst = getActiveMovesFirst(activeMove, enemyMove);
     const stagesSnapshot   = { us: playerStages, them: enemyStages };

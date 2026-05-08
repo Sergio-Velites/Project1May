@@ -44,8 +44,9 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
 
   const [active, setActive] = useState(0);
 
-  const displayMoves = overrideMoves ?? activePokemon.moves;
-  const move = useMoveMetadata(displayMoves[Math.min(active, displayMoves.length - 1)]?.id ?? activePokemon.moves[0].id);
+  const displayMoves = overrideMoves ?? (activePokemon?.moves ?? []);
+  const currentIndex = displayMoves.length > 0 ? Math.min(active, displayMoves.length - 1) : 0;
+  const move = useMoveMetadata(displayMoves[currentIndex]?.id ?? null);
 
   return (
     <>
@@ -58,7 +59,7 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
         show={show}
         menuItems={displayMoves.map((m) => {
           const item: MenuItemType = {
-            label: getMoveMetadata(m.id).name,
+            label: getMoveMetadata(m.id)?.name ?? m.id,
             action: () => select(m.id),
           };
           return item;
@@ -75,7 +76,7 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
             <StatsRow style={{ textAlign: "center" }}>{move?.type}</StatsRow>
             <StatsRow
               style={{ textAlign: "right" }}
-            >{`${displayMoves[Math.min(active, displayMoves.length - 1)]?.pp ?? 0}/${move.pp}`}</StatsRow>
+            >{`${displayMoves[currentIndex]?.pp ?? 0}/${move.pp ?? 0}`}</StatsRow>
           </Frame>
         </Stats>
       )}

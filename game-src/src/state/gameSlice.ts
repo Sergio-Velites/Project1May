@@ -247,7 +247,7 @@ export const gameSlice = createSlice({
         ).hp;
         for (let j = 0; j < state.pokemon[i].moves.length; j++) {
           state.pokemon[i].moves[j].pp =
-            getMoveMetadata(state.pokemon[i].moves[j].id).pp || 0;
+            getMoveMetadata(state.pokemon[i].moves[j].id)?.pp ?? 0;
         }
       }
       // Registrar el último centro donde se curó (para recuperación tras derrota)
@@ -271,7 +271,7 @@ export const gameSlice = createSlice({
         ).hp;
         for (let j = 0; j < state.pokemon[i].moves.length; j++) {
           state.pokemon[i].moves[j].pp =
-            getMoveMetadata(state.pokemon[i].moves[j].id).pp || 0;
+            getMoveMetadata(state.pokemon[i].moves[j].id)?.pp ?? 0;
         }
       }
 

@@ -240,6 +240,21 @@ const processMove = (
 
   const usAfterPP = isAttacking ? reducePP(us, move) : us;
 
+  // Guard: if move has no metadata, treat it as a miss (unknown/invalid move)
+  if (!moveMetadata) {
+    return {
+      moveName: move,
+      us: usAfterPP,
+      them,
+      missed: true,
+      superEffective: false,
+      notVeryEffective: false,
+      critical: false,
+      isBuff: false,
+      isDebuff: false,
+    };
+  }
+
   const defaultReturn: MoveResult = {
     moveName: moveMetadata.name,
     us: usAfterPP,

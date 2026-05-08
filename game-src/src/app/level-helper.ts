@@ -72,6 +72,6 @@ export const getLearnedMove = (pokemon: PokemonInstance): MoveState | null => {
   if (pokemon.moves.some((m) => m.id === move.name)) return null;
   return {
     id: move.name,
-    pp: getMoveMetadata(move.name).pp || 0,
+    pp: getMoveMetadata(move.name)?.pp ?? 0,
   };
 };
