@@ -6,7 +6,7 @@ import {
   selectMap,
   selectMapId,
 } from "../state/gameSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useEvent from "../app/use-event";
 import emitter, { Event } from "../app/emitter";
 import {
@@ -44,11 +44,13 @@ const StyledText = styled.div<TextProps>`
   height: 20%;
   background: var(--bg);
   z-index: 1000;
+  overflow: hidden;
 
   h1 {
     color: black;
-    font-size: 30px;
+    font-size: min(30px, 3.5vh);
     font-family: "PokemonGB";
+    line-height: 1.3;
 
     @media (max-width: 1000px) {
       font-size: 9px;
@@ -107,6 +109,10 @@ const Text = () => {
   const mapId = useSelector(selectMapId);
   const quests = useActiveMapQuests(mapId);
 
+  // Timestamp del último cierre de texto — para cooldown post-close
+  const closedAtRef = useRef(0);
+  const CLOSE_COOLDOWN = 400;
+
   useEffect(() => {
     setLiveIndex(0);
     if (text) {
@@ -118,17 +124,36 @@ const Text = () => {
     }
   }, [text, textIndex]);
 
-  useEvent(Event.A, () => {
-    // Reading text
-    if (text) {
-      if (textIndex === text.length - 1) {
-        setTextIndex(0);
-        dispatch(hideText());
-      } else {
-        setTextIndex((prev) => prev + 1);
-      }
-      return;
+  // Avanza el texto: si el typewriter no ha terminado, lo completa.
+  // Si ya terminó, pasa a la siguiente línea o cierra el cuadro.
+  // Devuelve true si había texto activo (para cortocircuitar el handler del mundo).
+  const advanceText = () => {
+    if (!text) return false;
+    const currentLine = text[textIndex];
+    if (liveIndex < currentLine.length) {
+      setLiveIndex(currentLine.length);
+      return true;
     }
+    if (textIndex === text.length - 1) {
+      closedAtRef.current = Date.now();
+      setTextIndex(0);
+      dispatch(hideText());
+    } else {
+      setTextIndex((prev) => prev + 1);
+    }
+    return true;
+  };
+
+  useEvent(Event.B, () => {
+    advanceText();
+  });
+
+  useEvent(Event.A, () => {
+    // Cooldown post-cierre: evita que el mismo 'A' que cerró el texto
+    // active inmediatamente una acción en el mundo.
+    if (Date.now() - closedAtRef.current < CLOSE_COOLDOWN) return;
+
+    if (advanceText()) return;
 
     if (menuOpen) return;
 
@@ -175,7 +200,7 @@ const Text = () => {
       {text[textIndex].length > 300 ? (
         <Image src={text[textIndex]} />
       ) : (
-        <StyledText className="framed no-hd" $done={liveIndex > text.length}>
+        <StyledText className="framed no-hd" $done={liveIndex >= text[textIndex].length}>
           <h1>{text[textIndex].substring(0, liveIndex)}</h1>
         </StyledText>
       )}

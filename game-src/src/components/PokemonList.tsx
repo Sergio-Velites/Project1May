@@ -136,6 +136,7 @@ const PokemonList = ({
                 key={i}
                 pokemon={p}
                 active={active === i}
+                switching={switching === scroll + i}
                 moveData={moveData}
               />
             ) : (

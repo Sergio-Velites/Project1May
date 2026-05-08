@@ -1005,7 +1005,11 @@ const PokemonEncounter = () => {
     }
 
     if (stage === 12) {
-      endEncounter_();
+      // Huir: terminar directamente sin dar XP ni activar evoluciones
+      setTrainerPokemonIndex(0);
+      setInvolvedPokemon([activePokemonIndex]);
+      setProcessingInvolvedPokemon(0);
+      dispatch(endEncounter());
     }
 
     if (stage === 20) {
