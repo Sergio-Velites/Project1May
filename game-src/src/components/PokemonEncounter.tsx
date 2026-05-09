@@ -81,16 +81,12 @@ const StyledPokemonEncounter = styled.div`
   width: 100%;
   height: 100%;
   background: var(--bg);
-  padding-top: 1.5vh;
+  padding-top: 0.8cqw;
   display: flex;
   flex-direction: column;
   width: 100%;
 
-  height: 80%;
-  @media (max-width: 1000px) {
-    height: 70%;
-    padding-top: 3px;
-  }
+  height: 70%;
 `;
 
 const Row = styled.div`
@@ -118,46 +114,27 @@ const RightInfoSection = styled.div`
 `;
 
 const Name = styled.div`
-  font-size: 5.5vh;
+  font-size: 3.5cqw;
   font-family: "PokemonGB";
   text-transform: uppercase;
-
-  @media (max-width: 1000px) {
-    font-size: 13px;
-  }
 `;
 
 const Level = styled.div`
-  font-size: 4.5vh;
-  margin: 0 12vh;
+  font-size: 3.2cqw;
+  margin: 0 7.5cqw;
   font-family: "PressStart2P", sans-serif;
-
-  @media (max-width: 1000px) {
-    font-size: 12px;
-    margin: 0 28px;
-  }
 `;
 
 const HealthBarContainer = styled.div`
-  margin: 0 3.3vh;
-  margin-top: 1.2vh;
-
-  @media (max-width: 1000px) {
-    margin: 0 8px;
-  }
+  margin: 0 2.1cqw;
+  margin-top: 0.8cqw;
 `;
 
 const Health = styled.div`
   font-family: "PokemonGB";
-
-  font-size: 5vh;
-  margin: 0 3.3vh;
-  margin-top: 1.2vh;
-  @media (max-width: 1000px) {
-    font-size: 13px;
-    margin: 0 8px;
-    margin-top: 3px;
-  }
+  font-size: 3.5cqw;
+  margin: 0 2.1cqw;
+  margin-top: 0.8cqw;
 `;
 
 const flashing = keyframes`
@@ -369,26 +346,16 @@ const AttackLeft = styled.div<AttackingProps>`
 
 const Corner = styled(PixelImage)`
   transform: translateY(-50%);
-
-  height: 8vh;
-  @media (max-width: 1000px) {
-    height: 19px;
-  }
+  height: 5.1cqw;
 `;
 
 const CornerContainer = styled.div`
-  height: 5vh;
-  @media (max-width: 1000px) {
-    height: 10px;
-  }
+  height: 2.7cqw;
 `;
 
 const CornerRight = styled(PixelImage)`
-  height: 8vh;
+  height: 5.1cqw;
   transform: translateY(-70%) scaleX(-1);
-  @media (max-width: 1000px) {
-    height: 19px;
-  }
 `;
 
 const TextContainer = styled.div`
@@ -396,12 +363,8 @@ const TextContainer = styled.div`
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 20%;
+  height: 30%;
   z-index: 100;
-
-  @media (max-width: 1000px) {
-    height: 30%;
-  }
 `;
 
 const moveLeft = keyframes`

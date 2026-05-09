@@ -41,32 +41,24 @@ const StyledText = styled.div<TextProps>`
   left: 0;
   bottom: 0;
   width: 100%;
-  height: 20%;
+  height: 30%;
   background: var(--bg);
   z-index: 1000;
 
   h1 {
     color: black;
-    font-size: 30px;
+    font-size: 2.4cqw;
     font-family: "PokemonGB";
-
-    @media (max-width: 1000px) {
-      font-size: 9px;
-    }
-  }
-
-  @media (max-width: 1000px) {
-    height: 30%;
   }
 
   ::after {
     content: "";
     position: absolute;
-    bottom: ${(props) => (props.$done ? "25px" : "-100px")};
-    right: 20px;
-    width: 3px;
-    height: 3px;
-    font-size: 3px;
+    bottom: ${(props) => (props.$done ? "3.5cqw" : "-100px")};
+    right: 2.7cqw;
+    width: 0.35cqw;
+    height: 0.35cqw;
+    font-size: 0.35cqw;
     color: #181010;
     box-shadow: 1em 0em 0 #181010, 2em 0em 0 #181010, 1em 1em 0 #181010,
       2em 1em 0 #181010, 3em 1em 0 #181010, 1em 2em 0 #181010, 2em 2em 0 #181010,
@@ -76,14 +68,6 @@ const StyledText = styled.div<TextProps>`
       2em 5em 0 #181010, 3em 5em 0 #181010, 1em 6em 0 #181010, 2em 6em 0 #181010;
     transform: rotate(90deg);
     animation: ${flashing} 1s infinite;
-
-    @media (max-width: 1000px) {
-      bottom: ${(props) => (props.$done ? "13px" : "-100px")};
-      right: 10px;
-      width: 1.3px;
-      height: 1.3px;
-      font-size: 1.3px;
-    }
   }
 `;
 

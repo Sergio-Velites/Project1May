@@ -27,22 +27,18 @@ const StyledFrame = styled.div<FrameProps>`
 
   h1 {
     color: black;
-    font-size: 30px;
+    font-size: 2.4cqw;
     font-family: "PokemonGB";
-
-    @media (max-width: 1000px) {
-      font-size: 9px;
-    }
   }
 
   ::after {
     content: "";
     position: absolute;
-    bottom: ${(props) => (props.$flashing ? "25px" : "-1000px")};
-    right: 20px;
-    width: 3px;
-    height: 3px;
-    font-size: 3px;
+    bottom: ${(props) => (props.$flashing ? "3.5cqw" : "-1000px")};
+    right: 2.7cqw;
+    width: 0.35cqw;
+    height: 0.35cqw;
+    font-size: 0.35cqw;
     color: #181010;
     box-shadow: 1em 0em 0 #181010, 2em 0em 0 #181010, 1em 1em 0 #181010,
       2em 1em 0 #181010, 3em 1em 0 #181010, 1em 2em 0 #181010, 2em 2em 0 #181010,
@@ -52,14 +48,6 @@ const StyledFrame = styled.div<FrameProps>`
       2em 5em 0 #181010, 3em 5em 0 #181010, 1em 6em 0 #181010, 2em 6em 0 #181010;
     transform: rotate(90deg);
     animation: ${animation} 1s infinite;
-
-    @media (max-width: 1000px) {
-      bottom: ${(props) => (props.$flashing ? "13px" : "-1000px")};
-      right: 10px;
-      width: 1.3px;
-      height: 1.3px;
-      font-size: 1.3px;
-    }
   }
 `;
 

@@ -86,12 +86,8 @@ const getIcons = (metadata: PokemonMetadata): { a: string; b: string } => {
 const StyledPokemonRow = styled.div`
   width: 100%;
   display: flex;
-  margin-bottom: 1px;
+  margin-bottom: 0.27cqw;
   align-items: center;
-
-  @media (min-width: 1000px) {
-    margin-bottom: 1vh;
-  }
 `;
 
 const ArrowContainer = styled.div`
@@ -102,16 +98,11 @@ const ArrowContainer = styled.div`
 `;
 
 const Image = styled(PixelImage)`
-  height: 19px;
-  margin-right: 10px;
+  height: 5.1cqw;
+  margin-right: 2.7cqw;
 
   // The sprites seemd a bit yellow, so I added a hue-rotate filter to make them more red
   filter: hue-rotate(-25deg);
-
-  @media (min-width: 1000px) {
-    height: 8vh;
-    margin-right: 4vh;
-  }
 `;
 
 const InfoContainer = styled.div`
@@ -122,59 +113,35 @@ const InfoContainer = styled.div`
 `;
 
 const Name = styled.div`
-  font-size: 9px;
-  transform: translateY(3px);
+  font-size: 2.4cqw;
+  transform: translateY(0.8cqw);
   font-family: "PokemonGB";
   text-transform: uppercase;
-
-  @media (min-width: 1000px) {
-    font-size: 3.7vh;
-    transform: translateY(1vh);
-  }
 `;
 
 const HealthBarContainer = styled.div`
-  margin-left: 10px;
-
-  @media (min-width: 1000px) {
-    margin-left: 4vh;
-  }
+  margin-left: 2.7cqw;
 `;
 
 const StatsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 10px;
+  margin-left: 2.7cqw;
   height: 100%;
   justify-content: space-between;
-
-  @media (min-width: 1000px) {
-    margin-left: 4vh;
-  }
 `;
 
 const Level = styled.div`
-  font-size: 8px;
+  font-size: 2.1cqw;
   font-family: "PressStart2P", sans-serif;
-  margin-bottom: 2px;
-  margin-top: 1px;
-
-  @media (min-width: 1000px) {
-    font-size: 3.3vh;
-    margin-bottom: 1vh;
-    margin-top: 0.5vh;
-  }
+  margin-bottom: 0.53cqw;
+  margin-top: 0.27cqw;
 `;
 
 const Health = styled.div`
-  font-size: 9px;
-  margin-left: 10px;
+  font-size: 2.4cqw;
+  margin-left: 2.7cqw;
   font-family: "PokemonGB";
-
-  @media (min-width: 1000px) {
-    font-size: 3.3vh;
-    margin-left: 4vh;
-  }
 `;
 
 interface Props {
