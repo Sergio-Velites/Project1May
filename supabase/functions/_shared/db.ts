@@ -17,7 +17,9 @@ export function encodeBase64Url(bytes: Uint8Array): string {
 
 export function decodeBase64Url(str: string): Uint8Array {
   const b64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  const binary = atob(b64);
+  // atob en Deno es estricto: requiere padding. Lo restauramos antes de decodificar.
+  const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
+  const binary = atob(padded);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return bytes;
