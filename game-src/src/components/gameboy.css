@@ -15,7 +15,8 @@
 
   /* ── Maintain 3:5 aspect ratio, always fully visible ─────── */
   /* Width = narrowest of: viewport width OR height × (3/5)    */
-  width: min(calc(100vw - 10px), calc((100dvh - 33px) * 3 / 5));
+  /* On desktop: cap at 400px so it always looks like mobile   */
+  width: min(400px, calc(100vw - 10px), calc((100dvh - 33px) * 3 / 5));
   height: auto;
 
   /* Container query context: 1cqw = 1% of .gameboy width */
