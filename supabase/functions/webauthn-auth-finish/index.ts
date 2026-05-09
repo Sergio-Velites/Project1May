@@ -2,6 +2,15 @@ import { verifyAuthenticationResponse } from "npm:@simplewebauthn/server@10";
 import { corsHeaders } from "../_shared/cors.ts";
 import { db, RP_ID, RP_ORIGIN, decodeBase64Url, json } from "../_shared/db.ts";
 
+// Deno's atob() requires strict base64 padding (múltiplo de 4).
+// simplewebauthn recibe strings base64url sin padding del cliente (spec WebAuthn).
+// Al correr bajo Deno, la librería puede fallar al decodificar internamente.
+// Esta función añade el padding necesario sin alterar el significado del string.
+function padB64(s: string | null | undefined): string | undefined {
+  if (!s) return undefined;
+  return s + "=".repeat((4 - (s.length % 4)) % 4);
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -28,7 +37,17 @@ Deno.serve(async (req) => {
     if (credErr || !cred) throw new Error("Credential not found");
 
     const verification = await verifyAuthenticationResponse({
-      response: credential,
+      // Añadir padding a los campos base64url del response.
+      // simplewebauthn@10 bajo Deno falla si atob() recibe strings sin padding.
+      response: {
+        ...credential,
+        response: {
+          authenticatorData: padB64(credential.response.authenticatorData)!,
+          clientDataJSON: padB64(credential.response.clientDataJSON)!,
+          signature: padB64(credential.response.signature)!,
+          userHandle: padB64(credential.response.userHandle),
+        },
+      },
       expectedChallenge: ch.challenge,
       expectedOrigin: RP_ORIGIN,
       expectedRPID: RP_ID,
