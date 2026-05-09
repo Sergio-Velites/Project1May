@@ -31,14 +31,23 @@ Deno.serve(async (req) => {
       throw new Error("Verification failed");
     }
 
-    const { credential: cred } = verification.registrationInfo;
+    const info = verification.registrationInfo;
+    // @simplewebauthn/server@10 expone los campos directamente en registrationInfo
+    // (no anidados bajo .credential como en versiones anteriores)
+    const credentialId: string = (info as any).credential?.id ?? (info as any).credentialID ?? (info as any).credentialId;
+    const credentialPublicKey: Uint8Array = (info as any).credential?.publicKey ?? (info as any).credentialPublicKey;
+    const credentialCounter: number = (info as any).credential?.counter ?? (info as any).counter ?? 0;
+
+    if (!credentialId || !credentialPublicKey) {
+      throw new Error("Missing credential data in registrationInfo: " + JSON.stringify(Object.keys(info)));
+    }
 
     // Si el credential ya existe (registro previo parcial o re-registro del mismo dispositivo),
     // devolver el user_id existente en lugar de fallar con UNIQUE constraint violation.
     const { data: existing } = await db
       .from("webauthn_credentials")
       .select("user_id")
-      .eq("credential_id", cred.id)
+      .eq("credential_id", credentialId)
       .maybeSingle();
 
     if (existing) {
@@ -46,10 +55,10 @@ Deno.serve(async (req) => {
     }
 
     const { error: credErr } = await db.from("webauthn_credentials").insert({
-      credential_id: cred.id,
+      credential_id: credentialId,
       user_id: userId,
-      public_key: encodeBase64Url(cred.publicKey),
-      sign_count: cred.counter,
+      public_key: encodeBase64Url(credentialPublicKey),
+      sign_count: credentialCounter,
     });
     if (credErr) throw credErr;
 
