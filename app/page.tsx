@@ -1,6 +1,5 @@
-import { redirect } from 'next/navigation';
-
-// El juego está en /public/game/ - servido como estático en /game/index.html
+// El middleware reescribe / → /game/index.html sin cambiar la URL.
+// Esta página no se llega a renderizar en producción.
 export default function Home() {
-  redirect('/game/index.html');
+  return null;
 }
