@@ -37,10 +37,14 @@ Deno.serve(async (req) => {
     if (credErr || !cred) throw new Error("Credential not found");
 
     const verification = await verifyAuthenticationResponse({
-      // Añadir padding a los campos base64url del response.
-      // simplewebauthn@10 bajo Deno falla si atob() recibe strings sin padding.
+      // Añadir padding a TODOS los campos base64url.
+      // simplewebauthn@10 bajo Deno puede usar atob() internamente,
+      // que es estricto con el padding. Buffer.from es lenient pero
+      // la librería npm puede elegir atob en su build isomórfico.
       response: {
         ...credential,
+        id: padB64(credential.id)!,
+        rawId: padB64(credential.rawId)!,
         response: {
           authenticatorData: padB64(credential.response.authenticatorData)!,
           clientDataJSON: padB64(credential.response.clientDataJSON)!,
