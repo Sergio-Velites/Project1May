@@ -248,7 +248,18 @@ const LoadScreen = () => {
                     }
                     transitionTo("oak-intro");
                   } else {
-                    transitionTo("require-passkey");
+                    // Registro falló en el servidor — usar userId local como fallback
+                    const fallbackId =
+                      localStorage.getItem("wedding_user_id") ?? crypto.randomUUID();
+                    localStorage.setItem("wedding_user_id", fallbackId);
+                    setCurrentUserId(fallbackId);
+                    const save = await loadFromCloud(fallbackId);
+                    if (save) {
+                      cloudSave.current = save as GameState;
+                      transitionTo("choose");
+                      return;
+                    }
+                    transitionTo("oak-intro");
                   }
                 } catch {
                   transitionTo("require-passkey");
@@ -257,13 +268,21 @@ const LoadScreen = () => {
             },
             {
               label: "Jugar sin guardar",
-              action: () => {
+              action: async () => {
+                setPhase("registering");
                 localStorage.removeItem("wedding_credential_id");
                 const existingId = localStorage.getItem("wedding_user_id");
                 const localId = existingId ?? crypto.randomUUID();
                 localStorage.setItem("wedding_user_id", localId);
                 setCurrentUserId(localId);
-                transitionTo("oak-intro");
+                // Intentar recuperar save existente aunque no haya passkey
+                const save = await loadFromCloud(localId);
+                if (save) {
+                  cloudSave.current = save as GameState;
+                  transitionTo("choose");
+                } else {
+                  transitionTo("oak-intro");
+                }
               },
             },
           ]}

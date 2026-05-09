@@ -210,7 +210,7 @@ export const webauthnRegister = async (): Promise<string | null> => {
       clientExtensionResults: credential.getClientExtensionResults(),
     };
 
-    // Intentar verificación en el servidor (puede fallar si RP_ORIGIN no coincide)
+    // Intentar verificación en el servidor
     try {
       const finishRes = await callEdge("webauthn-register-finish", {
         challengeId,
@@ -222,11 +222,16 @@ export const webauthnRegister = async (): Promise<string | null> => {
         localStorage.setItem("wedding_user_id", confirmedId);
         return confirmedId;
       }
-    } catch {
-      // Servidor falló — seguimos con el userId local
+      // Servidor rechazó el registro — limpiar credencial local para no crear loop
+      const errBody = await finishRes.text();
+      console.warn("[WebAuthn] register-finish", finishRes.status, errBody);
+      localStorage.removeItem("wedding_credential_id");
+      return null;
+    } catch (netErr) {
+      console.warn("[WebAuthn] register-finish network error:", netErr);
+      localStorage.removeItem("wedding_credential_id");
+      return null;
     }
-
-    return localUserId;
   } catch (err) {
     console.warn("[WebAuthn] Registration failed:", err);
     return null;

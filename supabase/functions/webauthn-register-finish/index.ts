@@ -33,6 +33,18 @@ Deno.serve(async (req) => {
 
     const { credential: cred } = verification.registrationInfo;
 
+    // Si el credential ya existe (registro previo parcial o re-registro del mismo dispositivo),
+    // devolver el user_id existente en lugar de fallar con UNIQUE constraint violation.
+    const { data: existing } = await db
+      .from("webauthn_credentials")
+      .select("user_id")
+      .eq("credential_id", cred.id)
+      .maybeSingle();
+
+    if (existing) {
+      return json({ success: true, userId: existing.user_id }, 200, corsHeaders);
+    }
+
     const { error: credErr } = await db.from("webauthn_credentials").insert({
       credential_id: cred.id,
       user_id: userId,
