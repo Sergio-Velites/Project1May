@@ -290,7 +290,16 @@ export const webauthnAuth = async (credentialId: string): Promise<string | null>
       } else {
         const errBody = await finishRes.text();
         console.warn("[WebAuthn] auth-finish", finishRes.status, errBody);
-        console.debug("[WebAuthn] payload enviado:", { challengeId, credential: assertionJSON });
+        try {
+          const parsed = JSON.parse(errBody);
+          if (parsed.error === "Credential not found") {
+            // La passkey existe en el dispositivo pero no en el servidor.
+            // Limpiar para forzar re-registro en el próximo intento.
+            localStorage.removeItem("wedding_credential_id");
+            console.info("[WebAuthn] credential_id limpiado — se pedirá re-registro");
+            return null;
+          }
+        } catch { /* no JSON */ }
       }
     } catch (netErr) {
       console.warn("[WebAuthn] auth-finish network error:", netErr);
