@@ -55,9 +55,11 @@ Deno.serve(async (req) => {
       expectedChallenge: ch.challenge,
       expectedOrigin: RP_ORIGIN,
       expectedRPID: RP_ID,
-      credential: {
-        id: credential.id,
-        publicKey: decodeBase64Url(cred.public_key),
+      // En @simplewebauthn/server@10 el parámetro es `authenticator` con
+      // credentialID / credentialPublicKey / counter (no `credential` de v11+)
+      authenticator: {
+        credentialID: new Uint8Array(Buffer.from(credential.id, "base64url")),
+        credentialPublicKey: decodeBase64Url(cred.public_key),
         counter: cred.sign_count,
       },
       requireUserVerification: false,
