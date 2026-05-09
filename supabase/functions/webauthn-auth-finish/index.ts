@@ -37,7 +37,9 @@ Deno.serve(async (req) => {
       .single();
     if (credErr || !cred) throw new Error("Credential not found");
 
-    const verification = await verifyAuthenticationResponse({
+    let verification: Awaited<ReturnType<typeof verifyAuthenticationResponse>>;
+    try {
+      verification = await verifyAuthenticationResponse({
       // Añadir padding a TODOS los campos base64url.
       // simplewebauthn@10 bajo Deno puede usar atob() internamente,
       // que es estricto con el padding. Buffer.from es lenient pero
@@ -65,8 +67,12 @@ Deno.serve(async (req) => {
       },
       requireUserVerification: false,
     });
-
-    if (!verification.verified) throw new Error("Authentication failed");
+    } catch (verifyErr) {
+      // La clave pública almacenada está corrupta (deploy buggy anterior).
+      // Eliminarla para que el siguiente register-finish la regenere correctamente.
+      await db.from("webauthn_credentials").delete().eq("credential_id", credential.id);
+      throw new Error("Credential not found");
+    }
 
     await db
       .from("webauthn_credentials")

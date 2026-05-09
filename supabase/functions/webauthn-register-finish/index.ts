@@ -1,4 +1,5 @@
 import { verifyRegistrationResponse } from "npm:@simplewebauthn/server@10";
+import { Buffer } from "node:buffer";
 import { corsHeaders } from "../_shared/cors.ts";
 import { db, RP_ID, RP_ORIGIN, encodeBase64Url, json } from "../_shared/db.ts";
 
@@ -32,9 +33,12 @@ Deno.serve(async (req) => {
     }
 
     const info = verification.registrationInfo;
-    // @simplewebauthn/server@10 expone los campos directamente en registrationInfo
-    // (no anidados bajo .credential como en versiones anteriores)
-    const credentialId: string = (info as any).credential?.id ?? (info as any).credentialID ?? (info as any).credentialId;
+    // En @simplewebauthn/server@10, credentialID es Uint8Array (no string).
+    // En v11+ está en info.credential.id como string. Manejamos ambos.
+    const rawId = (info as any).credential?.id ?? (info as any).credentialID ?? (info as any).credentialId;
+    const credentialId: string = typeof rawId === "string"
+      ? rawId
+      : Buffer.from(rawId as Uint8Array).toString("base64url");
     const credentialPublicKey: Uint8Array = (info as any).credential?.publicKey ?? (info as any).credentialPublicKey;
     const credentialCounter: number = (info as any).credential?.counter ?? (info as any).counter ?? 0;
 
@@ -42,8 +46,10 @@ Deno.serve(async (req) => {
       throw new Error("Missing credential data in registrationInfo: " + JSON.stringify(Object.keys(info)));
     }
 
-    // Si el credential ya existe (registro previo parcial o re-registro del mismo dispositivo),
-    // devolver el user_id existente en lugar de fallar con UNIQUE constraint violation.
+    const encodedPublicKey = encodeBase64Url(credentialPublicKey);
+
+    // Si el credential ya existe, ACTUALIZAR la public_key (puede haberse guardado
+    // incorrectamente en un deploy anterior) y devolver el user_id existente.
     const { data: existing } = await db
       .from("webauthn_credentials")
       .select("user_id")
@@ -51,13 +57,16 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (existing) {
+      await db.from("webauthn_credentials")
+        .update({ public_key: encodedPublicKey, sign_count: credentialCounter })
+        .eq("credential_id", credentialId);
       return json({ success: true, userId: existing.user_id }, 200, corsHeaders);
     }
 
     const { error: credErr } = await db.from("webauthn_credentials").insert({
       credential_id: credentialId,
       user_id: userId,
-      public_key: encodeBase64Url(credentialPublicKey),
+      public_key: encodedPublicKey,
       sign_count: credentialCounter,
     });
     if (credErr) throw credErr;
