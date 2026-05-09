@@ -285,10 +285,15 @@ export const webauthnAuth = async (credentialId: string): Promise<string | null>
       });
       if (finishRes.ok) {
         const { userId } = await finishRes.json();
+        console.info("[WebAuthn] auth-finish OK →", userId);
         return userId;
+      } else {
+        const errBody = await finishRes.text();
+        console.warn("[WebAuthn] auth-finish", finishRes.status, errBody);
+        console.debug("[WebAuthn] payload enviado:", { challengeId, credential: assertionJSON });
       }
-    } catch {
-      // Servidor falló — seguimos con el userId local
+    } catch (netErr) {
+      console.warn("[WebAuthn] auth-finish network error:", netErr);
     }
 
     // El dispositivo autenticó al usuario → usar userId local
