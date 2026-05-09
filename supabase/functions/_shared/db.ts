@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { Buffer } from "node:buffer";
 
 export const db = createClient(
   Deno.env.get("SUPABASE_URL")!,
