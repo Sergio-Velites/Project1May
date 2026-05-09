@@ -1,4 +1,5 @@
 import { verifyAuthenticationResponse } from "npm:@simplewebauthn/server@10";
+import { Buffer } from "node:buffer";
 import { corsHeaders } from "../_shared/cors.ts";
 import { db, RP_ID, RP_ORIGIN, decodeBase64Url, json } from "../_shared/db.ts";
 
