@@ -5,6 +5,8 @@ import {
   selectConfirmationMenu,
   selectStartMenu,
   selectStartMenuSubOpen,
+  selectText,
+  selectTextThenAction,
   showConfirmationMenu,
   showItemsMenu,
   showPlayerMenu,
@@ -19,6 +21,8 @@ import {
   selectName,
   selectPokemon,
   selectGameState,
+  selectPokemonEncounter,
+  selectTrainerEncounter,
   updateSpecificPokemon,
 } from "../state/gameSlice";
 import { saveToCloud, getCurrentUserId } from "../app/cloud-save";
@@ -35,9 +39,17 @@ const StartMenu = () => {
   const saving = !!useSelector(selectConfirmationMenu);
   const allPokemon = useSelector(selectPokemon);
 
+  // Bloquear apertura del menú Start durante combate, diálogo o encuentro con entrenador
+  const pokemonEncounter = useSelector(selectPokemonEncounter);
+  const trainerEncounter = useSelector(selectTrainerEncounter);
+  const activeText = useSelector(selectText);
+  const activeTextThenAction = useSelector(selectTextThenAction);
+  const isBlocked = !!pokemonEncounter || !!trainerEncounter || !!activeText || !!activeTextThenAction;
+
   const [pokemon, setPokemon] = useState(false);
 
   useEvent(Event.Start, () => {
+    if (isBlocked) return;
     dispatch(showStartMenu());
     emitter.emit(Event.StopMoving);
   });

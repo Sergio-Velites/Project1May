@@ -27,12 +27,7 @@ const StyledMenu = styled.div<MenuProps>`
   transform: ${(props) =>
     props.$bottom || props.$top ? "none" : "translateY(-50%)"};
   width: ${(props) =>
-    props.$compact ? "410px" : props.$wide ? "100%" : "auto"};
-
-  @media (max-width: 1000px) {
-    width: ${(props) =>
-      props.$compact ? "130px" : props.$wide ? "100%" : "auto"};
-  }
+    props.$compact ? "35cqw" : props.$wide ? "100%" : "auto"};
 `;
 
 const Button = styled.button`
@@ -41,22 +36,15 @@ const Button = styled.button`
   justify-content: space-between;
   width: 100%;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 `;
 
 const Bold = styled.div`
   font-weight: bold;
   color: black;
-  margin-left: 45px;
+  margin-left: 4cqw;
   font-family: "PokemonGB";
-
-  font-size: 3rem;
-  @media (max-width: 1000px) {
-    font-size: 1rem;
-    line-height: 1;
-    margin-left: 15px;
-  }
+  font-size: 2.4cqw;
+  line-height: 1;
 `;
 
 const ArrowContainer = styled.div`
@@ -126,10 +114,8 @@ const Menu = ({
     if (!show) return;
 
     if (compact) {
-      setActiveIndex((prev) => {
-        if (prev === 0) return prev;
-        return prev - 1;
-      });
+      // Cuadrícula 2×2: subir = restar 2 (fila superior), detenerse en fila 0
+      setActiveIndex((prev) => (prev >= 2 ? prev - 2 : prev));
       return;
     }
 
@@ -151,10 +137,10 @@ const Menu = ({
     if (!show) return;
 
     if (compact) {
-      setActiveIndex((prev) => {
-        if (prev === menuItems.length - 1) return prev;
-        return prev + 1;
-      });
+      // Cuadrícula 2×2: bajar = sumar 2 (fila inferior), detenerse en fila 1
+      setActiveIndex((prev) =>
+        prev + 2 < menuItems.length ? prev + 2 : prev
+      );
       return;
     }
 
