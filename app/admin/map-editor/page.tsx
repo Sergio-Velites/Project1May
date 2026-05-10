@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { parseMapTS } from './parse-ts';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────
 
@@ -449,6 +450,58 @@ export default function MapEditor() {
     navigator.clipboard.writeText(parts.join('\n')).then(() => alert('¡Spots copiados!'));
   }
 
+  // ── Importar .ts ──────────────────────────────────────────────────────
+  // Lee un archivo .ts (de game-src/src/maps/*.ts) y reemplaza por completo
+  // el estado local del mapa (trainers, walls, fences, grass, texts, items,
+  // gifts y spots). Marca dirty para que el usuario pueda guardar.
+  const importFileRef = useRef<HTMLInputElement>(null);
+
+  function doImportTs() {
+    importFileRef.current?.click();
+  }
+
+  async function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // permitir reimportar mismo archivo
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = parseMapTS(text);
+      const ok = window.confirm(
+        `Importar "${file.name}"?\n\n` +
+          `· ${parsed.trainers.length} NPCs\n` +
+          `· ${Object.values(parsed.walls).reduce((a, b) => a + b.length, 0)} walls\n` +
+          `· ${Object.values(parsed.fences).reduce((a, b) => a + b.length, 0)} fences\n` +
+          `· ${Object.values(parsed.grass).reduce((a, b) => a + b.length, 0)} grass\n` +
+          `· ${Object.keys(parsed.texts).length} filas de texto\n` +
+          `· ${parsed.items.length} items\n` +
+          `· ${parsed.gifts.length} gifts\n` +
+          `· spots: ${
+            ['pokemonCenter', 'pc', 'store', 'recoverLocation']
+              .filter((k) => parsed[k as 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation'])
+              .join(', ') || '(ninguno)'
+          }\n\n` +
+          `Esto SUSTITUYE el contenido actual del mapa "${selectedMapId}".`,
+      );
+      if (!ok) return;
+      setTrainers(parsed.trainers);
+      setWalls(parsed.walls);
+      setFences(parsed.fences);
+      setGrass(parsed.grass);
+      setTexts(parsed.texts);
+      setItems(parsed.items);
+      setGifts(parsed.gifts);
+      setPokemonCenter(parsed.pokemonCenter);
+      setPcPos(parsed.pc);
+      setStorePos(parsed.store);
+      setRecoverLocation(parsed.recoverLocation);
+      setSelectedIdx(null);
+      setDirty(true);
+    } catch (err) {
+      alert(`Error importando .ts: ${String(err)}`);
+    }
+  }
+
   // ── Añadir NPC ────────────────────────────────────────────────────────
   function addNpc() {
     const newT: Trainer = {
@@ -872,6 +925,22 @@ export default function MapEditor() {
         <button onClick={save} disabled={!dirty || saving} style={{ padding: '4px 12px', background: saveFlash ? '#2a6a2a' : (dirty ? '#3a3a7a' : '#1a1a3a'), border: `1px solid ${dirty ? '#6060c0' : '#2a2a4a'}`, borderRadius: 4, color: dirty ? '#fff' : '#555', cursor: dirty ? 'pointer' : 'default', fontSize: 13, transition: 'all 0.3s' }}>
           {saveFlash ? '✓ Guardado' : saving ? 'Guardando...' : '💾 Guardar'}
         </button>
+
+        {/* Importar .ts (sustituye todo el mapa) */}
+        <button
+          onClick={doImportTs}
+          title="Cargar un .ts de game-src/src/maps y sustituir el contenido del mapa actual"
+          style={{ padding: '4px 12px', background: '#2a2a1a', border: '1px solid #7a7a3a', borderRadius: 4, color: '#ffff88', cursor: 'pointer', fontSize: 12 }}
+        >
+          📥 Importar .ts
+        </button>
+        <input
+          ref={importFileRef}
+          type="file"
+          accept=".ts,text/plain,text/typescript"
+          onChange={handleImportFile}
+          style={{ display: 'none' }}
+        />
 
         {/* Exportar TS según modo */}
         {editMode === 'npc' && (
