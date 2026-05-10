@@ -35,7 +35,8 @@
             "id": 19,
             "level": 1
           }
-        ]
+        ],
+        "postGame": null
       }
     ],
     "sourceFile": "house-a-1f.ts"
@@ -98,7 +99,8 @@
             "id": 1,
             "level": 5
           }
-        ]
+        ],
+        "postGame": null
       }
     ],
     "sourceFile": "lab.ts"
@@ -128,7 +130,8 @@
         "outtro": [
           "¡Los vi! ¡Seguro que son del EQUIPO ROCKET!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "lass",
@@ -147,7 +150,8 @@
         "outtro": [
           "Dicen que hay fósiles muy raros en estas cuevas."
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "superNerd",
@@ -166,7 +170,8 @@
         "outtro": [
           "Tengo que encontrar PKMN más fuertes."
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "bugCatcher",
@@ -185,7 +190,8 @@
         "outtro": [
           "Los Zubat son duros, ¡pero muy útiles si los capturas!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "lass",
@@ -204,7 +210,8 @@
         "outtro": [
           "¿Cómo se sale de aquí?"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "hiker",
@@ -224,7 +231,8 @@
         "outtro": [
           "¡Los niños no deberíais estar aquí!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "youngster",
@@ -243,7 +251,8 @@
         "outtro": [
           "Yo vine a buscar novia, que aquí hay mucha humedad."
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       }
     ],
     "sourceFile": "mt-moon-1f.ts"
@@ -272,7 +281,8 @@
         "outtro": [
           "¡Maldición! ¡Mis compañeros no perdonarán esto!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -291,7 +301,8 @@
         "outtro": [
           "¡Si encuentras un fósil, dámelo y pírate!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -310,7 +321,8 @@
         "outtro": [
           "Los PKMN vivieron aquí mucho antes que las personas."
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -329,7 +341,8 @@
         "outtro": [
           "¡Me has enfadado! ¡El EQUIPO ROCKET te tendrá fichado!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "superNerd",
@@ -349,7 +362,8 @@
           "¡Nos quedamos uno cada uno!",
           "¡Nada de avaricia!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       }
     ],
     "sourceFile": "mt-moon-2f.ts"
@@ -391,7 +405,8 @@
             "id": 19,
             "level": 2
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "lass",
@@ -415,7 +430,8 @@
             "id": 35,
             "level": 3
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -441,7 +457,8 @@
             "id": 19,
             "level": 2
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -467,7 +484,8 @@
             "id": 19,
             "level": 2
           }
-        ]
+        ],
+        "postGame": null
       }
     ],
     "sourceFile": "pallet-town.ts"
@@ -508,7 +526,8 @@
             "id": 54,
             "level": 10
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "sergioNpc",
@@ -541,7 +560,8 @@
             "id": 77,
             "level": 12
           }
-        ]
+        ],
+        "postGame": "{\n        message: [\n          \"¡Toma la INSIGNIA DEL VINO!\",\n          \"Es el símbolo de que mereces brindar.\",\n          \"¡Úsala bien, y que el vino fluya!\",\n        ],\n        items: [ItemType.BoulderBadge, ItemType.Tm34],\n      }"
       },
       {
         "npcKey": "martaNpc",
@@ -572,7 +592,8 @@
             "id": 36,
             "level": 14
           }
-        ]
+        ],
+        "postGame": null
       }
     ],
     "sourceFile": "pewter-city-gym.ts"
@@ -620,7 +641,8 @@
             "id": 1,
             "level": 1
           }
-        ]
+        ],
+        "postGame": null
       }
     ],
     "sourceFile": "pewter-city-pokemon-center.ts"
@@ -654,7 +676,8 @@
             "id": 56,
             "level": 10
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "jrTrainerMale",
@@ -684,7 +707,8 @@
             "id": 27,
             "level": 11
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "beauty",
@@ -708,7 +732,8 @@
             "id": 35,
             "level": 1
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "scientist",
@@ -737,7 +762,8 @@
             "id": 101,
             "level": 12
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "aceTrainerMale",
@@ -761,7 +787,8 @@
             "id": 58,
             "level": 15
           }
-        ]
+        ],
+        "postGame": null
       }
     ],
     "sourceFile": "pewter-city.ts"
@@ -815,7 +842,8 @@
             "id": 21,
             "level": 3
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "beauty",
@@ -837,7 +865,8 @@
             "id": 35,
             "level": 2
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "lass",
@@ -860,7 +889,8 @@
             "id": 19,
             "level": 4
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "fisher",
@@ -889,7 +919,8 @@
             "id": 118,
             "level": 4
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "sailor",
@@ -918,7 +949,8 @@
             "id": 54,
             "level": 5
           }
-        ]
+        ],
+        "postGame": null
       }
     ],
     "sourceFile": "route-1.ts"
@@ -969,7 +1001,8 @@
         "outtro": [
           "¡Vaya suerte la tuya!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       }
     ],
     "sourceFile": "route-22.ts"
@@ -999,7 +1032,8 @@
             "id": 1,
             "level": 1
           }
-        ]
+        ],
+        "postGame": null
       }
     ],
     "sourceFile": "viridian-city-pokemon-center.ts"
@@ -1028,7 +1062,8 @@
         "outtro": [
           "¡Deja de mirarme si no quieres pelea!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "bugCatcher",
@@ -1048,7 +1083,8 @@
           "Hay otros tipos de PKMN",
           "además de los del bosque!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "youngster",
@@ -1068,7 +1104,8 @@
           "¿Guardas PKMN en el PC?",
           "¡Cada caja tiene capacidad para 20 PKMN!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "bugCatcher",
@@ -1088,7 +1125,8 @@
           "Si una CAJA del PC se llena,",
           "¡cambia a otra CAJA!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "youngster",
@@ -1107,7 +1145,8 @@
         "outtro": [
           "¡Yo siempre llevo pantalones cortos, hasta en invierno!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "lass",
@@ -1127,7 +1166,8 @@
         "outtro": [
           "¡Evita peleas sin que te vean!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "bugCatcher",
@@ -1146,7 +1186,8 @@
         "outtro": [
           "¡Los PKMN entrenados son más fuertes que los salvajes!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "lass",
@@ -1165,7 +1206,8 @@
         "outtro": [
           "La RUTA 4 está al pie del MONTE LUNA."
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       }
     ],
     "sourceFile": "route-3.ts"
@@ -1237,7 +1279,8 @@
             "id": 19,
             "level": 4
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "jrTrainerFemale",
@@ -1262,7 +1305,8 @@
             "id": 41,
             "level": 5
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -1291,7 +1335,8 @@
             "id": 52,
             "level": 4
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "gentleman",
@@ -1315,7 +1360,8 @@
             "id": 1,
             "level": 1
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "rocker",
@@ -1338,7 +1384,8 @@
             "id": 25,
             "level": 1
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "lass",
@@ -1361,7 +1408,8 @@
             "id": 35,
             "level": 3
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "sailor",
@@ -1384,7 +1432,8 @@
             "id": 54,
             "level": 5
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "fisher",
@@ -1413,7 +1462,8 @@
             "id": 129,
             "level": 4
           }
-        ]
+        ],
+        "postGame": null
       }
     ],
     "sourceFile": "viridian-city.ts"
@@ -1444,7 +1494,8 @@
           "¡Qué batalla tan emocionante!",
           "¡Sigue tu camino, valiente!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "bugCatcher",
@@ -1465,7 +1516,8 @@
           "¡Bien luchado!",
           "¡Disfruta la celebración!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "bugCatcher",
@@ -1486,7 +1538,8 @@
           "¡Felicidades a los novios!",
           "¡Que sean muy felices!"
         ],
-        "pokemon": []
+        "pokemon": [],
+        "postGame": null
       },
       {
         "npcKey": "beauty",
@@ -1508,7 +1561,8 @@
             "id": 16,
             "level": 4
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "lass",
@@ -1530,7 +1584,8 @@
             "id": 35,
             "level": 4
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -1560,7 +1615,8 @@
             "id": 41,
             "level": 6
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "hiker",
@@ -1584,7 +1640,8 @@
             "id": 74,
             "level": 7
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "pokeManiac",
@@ -1614,7 +1671,8 @@
             "id": 48,
             "level": 7
           }
-        ]
+        ],
+        "postGame": null
       },
       {
         "npcKey": "lass",
@@ -1638,7 +1696,8 @@
             "id": 10,
             "level": 5
           }
-        ]
+        ],
+        "postGame": null
       }
     ],
     "sourceFile": "viridian-forrest.ts"

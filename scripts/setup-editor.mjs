@@ -20,8 +20,9 @@ const PUBLIC_EDITOR = path.join(ROOT, "public/editor");
 const DEST_MAPS = path.join(PUBLIC_EDITOR, "maps");
 const DEST_SPRITES = path.join(PUBLIC_EDITOR, "sprites");
 const DEST_PORTRAITS = path.join(PUBLIC_EDITOR, "portraits");
+const DEST_POKEMON = path.join(PUBLIC_EDITOR, "pokemon");
 
-for (const dir of [PUBLIC_EDITOR, DEST_MAPS, DEST_SPRITES, DEST_PORTRAITS]) {
+for (const dir of [PUBLIC_EDITOR, DEST_MAPS, DEST_SPRITES, DEST_PORTRAITS, DEST_POKEMON]) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
@@ -39,6 +40,7 @@ console.log("📂 Copiando assets...");
 copyDir(path.join(GAME_SRC, "assets/map"), DEST_MAPS);
 copyDir(path.join(GAME_SRC, "assets/walk-sprites"), DEST_SPRITES);
 copyDir(path.join(GAME_SRC, "assets/portraits"), DEST_PORTRAITS);
+copyDir(path.join(GAME_SRC, "assets/pokemon/front"), DEST_POKEMON);
 
 // ── Mapeo imagen de archivo .ts → nombre de archivo PNG ──────────────────
 // La primera línea import del mapa siempre es la imagen.
@@ -131,6 +133,25 @@ function parseTrainerObject(text) {
     // pokemon
     const pokemon = parsePokemonArray(text);
 
+    // postGame — extraer como texto raw (puede contener ItemType.xxx)
+    const postGameM = text.match(/postGame\s*:/);
+    let postGame = null;
+    if (postGameM) {
+      const start = text.indexOf("{", postGameM.index + postGameM[0].length);
+      if (start !== -1) {
+        let depth = 0;
+        let end = start;
+        for (let i = start; i < text.length; i++) {
+          if (text[i] === "{") depth++;
+          else if (text[i] === "}") {
+            depth--;
+            if (depth === 0) { end = i; break; }
+          }
+        }
+        postGame = text.slice(start, end + 1).trim();
+      }
+    }
+
     return {
       npcKey,
       pos,
@@ -142,6 +163,7 @@ function parseTrainerObject(text) {
       intro,
       outtro,
       pokemon,
+      postGame,
     };
   } catch {
     return null;

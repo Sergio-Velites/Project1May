@@ -17,6 +17,9 @@ interface Trainer {
   intro: string[];
   outtro: string[];
   pokemon: Pokemon[];
+  // Raw TypeScript text preservado del fuente (ej: ItemType.BoulderBadge).
+  // El editor no edita este campo — solo lo preserva y lo re-emite en el export.
+  postGame?: string | null;
 }
 
 interface MapEntry {
@@ -107,6 +110,7 @@ function exportTS(trainers: Trainer[], mapId: string): string {
     if (t.persistent) opts.push('  persistent: true,');
     if (t.hideCondition) opts.push(`  hideCondition: "${t.hideCondition}",`);
     if (t.isOnline) opts.push('  isOnline: true,');
+    if (t.postGame) opts.push(`  postGame: ${t.postGame},`);
     return `  {
   npc: ${npc},
   pokemon: [${pokemon}],
@@ -620,6 +624,14 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
         <label style={labelStyle}>Pokémon</label>
         {trainer.pokemon.map((p, i) => (
           <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6, alignItems: 'center' }}>
+            {/* Sprite del pokémon */}
+            {p.id > 0 && p.id <= 151 && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={`/editor/pokemon/${p.id}.png`} alt={`#${p.id}`} title={`#${p.id}`}
+                style={{ width: 24, height: 24, imageRendering: 'pixelated', flexShrink: 0, background: '#0a0a18', borderRadius: 2 }}
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+            )}
             <input type="number" value={p.id} placeholder="#ID" onChange={(e) => {
               const next = trainer.pokemon.map((pk, j) => j === i ? { ...pk, id: parseInt(e.target.value) || 0 } : pk);
               onChange({ pokemon: next });
@@ -636,6 +648,21 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
           + Pokémon
         </button>
       </div>
+
+      {/* postGame (solo lectura) */}
+      {trainer.postGame && (
+        <div style={{ ...sectionStyle, background: '#1a1a0a', border: '1px solid #5a5a00', borderRadius: 6, padding: '10px 12px', marginTop: 12 }}>
+          <div style={{ color: '#cccc00', fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 }}>
+            ⚠ postGame (solo lectura)
+          </div>
+          <div style={{ color: '#888', fontSize: 11, marginBottom: 6 }}>
+            Este trainer da ítems/insignias tras ganar. Se preserva en el export automáticamente.
+          </div>
+          <pre style={{ color: '#aaaa44', fontSize: 10, background: '#0a0a00', padding: 8, borderRadius: 4, overflow: 'auto', maxHeight: 120, margin: 0, fontFamily: 'monospace' }}>
+            {trainer.postGame}
+          </pre>
+        </div>
+      )}
 
       {/* Intro */}
       <div style={sectionStyle}>
