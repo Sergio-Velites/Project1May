@@ -662,8 +662,13 @@ const PokemonEncounter = () => {
     // Handle evolutions
     handleEvolution();
 
+    // Solo se reparte XP si el rival ha sido derrotado. Huir, ser KO o
+    // capturar tras animación normal NO debe pagar a los Pokémon que
+    // entraron al combate por cambio.
+    const enemyDefeated = !!enemy && enemy.hp <= 0;
+
     // Handling switching to the next processing pokemon
-    if (processingInvolvedPokemon < involvedPokemon.length - 1) {
+    if (enemyDefeated && processingInvolvedPokemon < involvedPokemon.length - 1) {
       const nextIndex = processingInvolvedPokemon + 1;
       if (enemy) {
         dispatch(
