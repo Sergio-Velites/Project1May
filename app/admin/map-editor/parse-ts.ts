@@ -11,6 +11,7 @@ export interface ParsedTrainer {
   persistent: boolean;
   isOnline: boolean;
   hideCondition: string | null;
+  sightRange: number | null;
   intro: string[];
   outtro: string[];
   pokemon: { id: number; level: number }[];
@@ -314,6 +315,8 @@ function parseTrainerObject(text: string): ParsedTrainer | null {
     const isOnline = /(?<![\w])isOnline\s*:\s*true/.test(text);
     const hideM = text.match(/(?<![\w])hideCondition\s*:\s*"([^"]+)"/);
     const hideCondition = hideM ? hideM[1] : null;
+    const sightM = text.match(/(?<![\w])sightRange\s*:\s*(\d+)/);
+    const sightRange = sightM ? parseInt(sightM[1], 10) : null;
 
     const intro = parseStringArray(text, 'intro');
     const outtro = parseStringArray(text, 'outtro');
@@ -337,6 +340,7 @@ function parseTrainerObject(text: string): ParsedTrainer | null {
       persistent,
       isOnline,
       hideCondition,
+      sightRange,
       intro,
       outtro,
       pokemon,

@@ -43,7 +43,6 @@ const lab: MapType = {
   exitReturnMap: MapId.PalletTown,
   music,
   grass: {},
-  recoverLocation: { x: 1, y: 1 },
   trainers: [
     {
       npc: oak,

@@ -362,6 +362,10 @@ function parseTrainerObject(text) {
     const hideM = text.match(/hideCondition\s*:\s*"([^"]+)"/);
     const hideCondition = hideM ? hideM[1] : null;
 
+    // sightRange
+    const sightM = text.match(/sightRange\s*:\s*(\d+)/);
+    const sightRange = sightM ? parseInt(sightM[1], 10) : null;
+
     // intro — extraer array de strings
     const intro = parseStringArray(text, "intro");
 
@@ -398,6 +402,7 @@ function parseTrainerObject(text) {
       persistent,
       isOnline,
       hideCondition,
+      sightRange,
       intro,
       outtro,
       pokemon,

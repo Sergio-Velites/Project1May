@@ -105,7 +105,11 @@ const isEncounter = (
   let { x: pX, y: pY } = pos;
 
   const direction = directionModifier(trainer.facing);
-  for (let i = 1; i < TRAINER_VISION; i++) {
+  // sightRange: por NPC, override del valor global. 0 = nunca dispara por
+  // proximidad (solo al hablar). undefined = usa TRAINER_VISION.
+  const range = trainer.sightRange ?? TRAINER_VISION;
+  if (range <= 0) return false;
+  for (let i = 1; i < range; i++) {
     tX += direction.x;
     tY += direction.y;
 

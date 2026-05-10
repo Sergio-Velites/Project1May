@@ -15,6 +15,11 @@ interface Trainer {
   persistent: boolean;
   isOnline: boolean;
   hideCondition: string | null;
+  /**
+   * Distancia de visión (tiles). undefined/null = valor global por defecto (5).
+   * 0 = no detecta al jugador, solo combate al hablar.
+   */
+  sightRange: number | null;
   intro: string[];
   outtro: string[];
   pokemon: Pokemon[];
@@ -128,6 +133,8 @@ function exportTS(trainers: Trainer[], mapId: string): string {
     if (t.persistent) opts.push('  persistent: true,');
     if (t.hideCondition) opts.push(`  hideCondition: "${t.hideCondition}",`);
     if (t.isOnline) opts.push('  isOnline: true,');
+    if (t.sightRange !== null && t.sightRange !== undefined)
+      opts.push(`  sightRange: ${t.sightRange},`);
     if (t.postGame) opts.push(`  postGame: ${t.postGame},`);
     return `  {
   npc: ${npc},
@@ -533,6 +540,7 @@ export default function MapEditor() {
       persistent: false,
       isOnline: false,
       hideCondition: null,
+      sightRange: null,
       intro: [],
       outtro: ['...'],
       pokemon: [{ id: 19, level: 2 }],
@@ -1639,6 +1647,36 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
           <option value="">— ninguna —</option>
           <option value="has-pokemon">has-pokemon</option>
         </select>
+      </div>
+
+      {/* Sight range */}
+      <div style={sectionStyle}>
+        <label style={labelStyle}>
+          Distancia de visión <span style={{ color: '#555', fontSize: 11 }}>(0 = solo al hablar)</span>
+        </label>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input
+            type="number"
+            min={0}
+            max={20}
+            value={trainer.sightRange ?? ''}
+            placeholder="5 (default)"
+            onChange={(e) => {
+              const v = e.target.value;
+              onChange({ sightRange: v === '' ? null : Math.max(0, parseInt(v, 10) || 0) });
+            }}
+            style={inputStyle}
+          />
+          {trainer.sightRange !== null && (
+            <button
+              onClick={() => onChange({ sightRange: null })}
+              style={{ padding: '4px 8px', background: '#1a1a2a', border: '1px solid #3a3a5a', borderRadius: 4, color: '#88aacc', cursor: 'pointer', fontSize: 11 }}
+              title="Quitar override y usar el valor global (5)"
+            >
+              default
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Eliminar */}

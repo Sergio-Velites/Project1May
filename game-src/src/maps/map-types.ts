@@ -85,6 +85,12 @@ export interface TrainerType {
   outtro: string[];
   money: number;
   pos: PosType;
+  /**
+   * Distancia (en tiles) a la que el entrenador detecta al jugador y
+   * fuerza el combate. Si se omite, se usa el valor global TRAINER_VISION (5).
+   * 0 = nunca dispara combate por proximidad — solo combate al hablar (A).
+   */
+  sightRange?: number;
   persistent?: boolean;
   hideCondition?: "has-pokemon";
   isOnline?: boolean;

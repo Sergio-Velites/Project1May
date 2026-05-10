@@ -70,6 +70,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "¡Espabila pringao!"
@@ -188,10 +189,7 @@
     "pokemonCenter": null,
     "pc": null,
     "store": null,
-    "recoverLocation": {
-      "x": 0,
-      "y": 6
-    },
+    "recoverLocation": null,
     "sourceFile": "house-a-2f.ts"
   },
   "pallet-town-house-b": {
@@ -263,6 +261,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "Hoy no hay tiempo de tonterías.",
           "Pon las pilas que es un día importante.",
@@ -360,10 +359,7 @@
     "pokemonCenter": null,
     "pc": null,
     "store": null,
-    "recoverLocation": {
-      "x": 1,
-      "y": 1
-    },
+    "recoverLocation": null,
     "sourceFile": "lab.ts"
   },
   "mt-moon-1f": {
@@ -384,6 +380,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "Hay hombres sospechosos en la cueva.",
           "¿Y tú qué haces por aquí?"
@@ -405,6 +402,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¿Qué? Estoy esperando a mis amigos aquí."
         ],
@@ -425,6 +423,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Eh! ¡No te me acerques así!"
         ],
@@ -445,6 +444,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Cruza esta cueva y llegarás a CIUDAD CELESTE!"
         ],
@@ -465,6 +465,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Madre mía! ¡Es mucho más grande por dentro!"
         ],
@@ -485,6 +486,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Anda! ¡Menudo susto me has dado!",
           "Ah, solo eres un criño."
@@ -506,6 +508,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¿Tú también has venido a explorar?"
         ],
@@ -1064,6 +1067,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "Nosotros, el EQUIPO ROCKET, ¡somos los malos del PKMN!"
         ],
@@ -1084,6 +1088,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Estamos haciendo un trabajo aquí! ¡Larga, crío!"
         ],
@@ -1104,6 +1109,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Los niños no deben meterse con los mayores!"
         ],
@@ -1124,6 +1130,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡El EQUIPO ROCKET encontrará los fósiles, los revivirá y los venderá!"
         ],
@@ -1144,6 +1151,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Eh, para! ¡Estos fósiles los encontré yo! ¡Son míos los dos!"
         ],
@@ -1856,6 +1864,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "Hoy noto como un cancaneo por mi cuerpo.",
@@ -1880,6 +1889,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "Me voy a poner como el kiko en la preboda.",
@@ -1905,6 +1915,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": "has-pokemon",
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "Viva el vino!",
@@ -1932,6 +1943,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": "has-pokemon",
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "Viva el vino!",
@@ -1966,6 +1978,7 @@
         8,
         9,
         12,
+        13,
         14,
         15,
         16,
@@ -2107,6 +2120,8 @@
       "17": [
         0,
         1,
+        2,
+        3,
         4,
         5,
         6,
@@ -2117,6 +2132,11 @@
         11,
         12,
         13,
+        14,
+        15,
+        16,
+        17,
+        18,
         19
       ],
       "18": [
@@ -2184,12 +2204,15 @@
         },
         "facing": "right",
         "money": 200,
-        "persistent": false,
+        "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Eh, espera!",
-          "Soy BROCK, el primer rival de SERGIO.",
+          "Soy BROCK, antiguo líder de lo que antes,",
+          "era un gimnasio de roca.",
+          "Ahora triunfa el tipo vino.",
           "Hoy custodio la puerta de la bodega.",
           "¡Demuéstrame que mereces brindar con los novios!"
         ],
@@ -2217,9 +2240,10 @@
         },
         "facing": "left",
         "money": 400,
-        "persistent": false,
+        "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Vaya, otro invitado curioso!",
           "Soy MISTY. Vine por el cava, me quedé por la fiesta.",
@@ -2248,9 +2272,10 @@
         },
         "facing": "right",
         "money": 800,
-        "persistent": false,
+        "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡EH, RECLUTA!",
           "Soy el TENIENTE SURGE.",
@@ -2281,9 +2306,10 @@
         },
         "facing": "left",
         "money": 1000,
-        "persistent": false,
+        "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "Mmm... el aroma del vino me adormece.",
           "Soy ERICA. He traído flores para la boda.",
@@ -2317,9 +2343,10 @@
         },
         "facing": "right",
         "money": 1200,
-        "persistent": false,
+        "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "FUFUFU... un intruso.",
           "Soy KOGA. Solo los dignos pasan al fondo.",
@@ -2353,9 +2380,10 @@
         },
         "facing": "left",
         "money": 1400,
-        "persistent": false,
+        "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "Te estaba esperando.",
           "Soy SABRINA. Vi tu llegada en mi mente.",
@@ -2385,9 +2413,10 @@
         },
         "facing": "right",
         "money": 1700,
-        "persistent": false,
+        "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡JA! ¿Vienes a quemarte las manos?",
           "Soy BLAINE. Aquí dentro hace calor.",
@@ -2421,9 +2450,10 @@
         },
         "facing": "left",
         "money": 2500,
-        "persistent": false,
+        "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "Vaya, vaya... has llegado lejos.",
           "Soy GIOVANNI. El último obstáculo.",
@@ -2466,6 +2496,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Lo lograste! Llegaste hasta nosotros.",
           "Soy SERGIO. Hoy me caso con MARTA.",
@@ -2500,6 +2531,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Yo soy MARTA!",
           "Y no te creas que SERGIO se lleva todo el mérito.",
@@ -2751,6 +2783,7 @@
         "persistent": false,
         "isOnline": true,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [],
         "pokemon": [
@@ -2847,6 +2880,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "La BODEGA CASTILLO DE MONJARDÍN está ahí dentro.",
@@ -2872,6 +2906,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Yo también quiero la Insignia del Vino!",
           "¡Pero como llegues tú antes, se acaba el cupo!",
@@ -2903,6 +2938,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "Si quieres ganar a Sergio y Marta,",
@@ -2928,6 +2964,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Estoy analizando el terroir de MONJARDÍN!",
           "¡No me molestes... a menos que puedas con mis POKÉMON!"
@@ -2958,6 +2995,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "Sergio y Marta me dieron la Insignia del Vino el año pasado.",
@@ -3618,6 +3656,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Para ahí, tú!",
           "¡No te creas que llegarás tan fácil!",
@@ -3645,6 +3684,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "¡No olvides que la preboda sin anís no es preboda!"
@@ -3668,6 +3708,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "¡El coche de los novios ya ha salido de Pamplona!",
@@ -3692,6 +3733,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Yo pensaba que la preboda era en el río!",
           "¡Pues aun así, a ver si me ganas!"
@@ -3722,6 +3764,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡El padrino me manda a probarte!",
           "¡Si llegas tarde, él no responde!"
@@ -4842,6 +4885,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Ey!",
           "¿Vas a la LIGA PKMN?",
@@ -5192,6 +5236,7 @@
         "persistent": false,
         "isOnline": true,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [],
         "pokemon": [
@@ -5287,6 +5332,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¿Me has mirado, verdad?"
         ],
@@ -5307,6 +5353,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Ey! ¡Te vi en el BOSQUE AÑIL!"
         ],
@@ -5328,6 +5375,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Hola! ¡Me gustan los pantalones cortos! ¡Son cómodos y fáciles de llevar!"
         ],
@@ -5349,6 +5397,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¿Eres entrenador? ¡A pelear!"
         ],
@@ -5370,6 +5419,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Ey! ¡Tú no llevas pantalones cortos!"
         ],
@@ -5390,6 +5440,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "Esa mirada que me has echado...",
           "¡me resulta muy intrigante!"
@@ -5411,6 +5462,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Ven a pelear contra mi nuevo PKMN!"
         ],
@@ -5431,6 +5483,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Uy! ¿Me has tocado?"
         ],
@@ -6380,6 +6433,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Hemos montado nuestra propia preboda!",
           "¡Con vino barato y sin protocolo!",
@@ -6407,6 +6461,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Nosotros también queremos brindar!",
           "¡Pero solo si nos ganas!"
@@ -6433,6 +6488,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Con este vino seremos los reyes de la fiesta!",
           "¡No te metas en nuestros asuntos!"
@@ -6463,6 +6519,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "Joven, el vino tinto cura... y anima.",
@@ -6488,6 +6545,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "¡El equipo de sonido ya está enchufado!",
@@ -6512,6 +6570,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "Llegué la primera. Esta silla ya tiene dueña.",
@@ -6536,6 +6595,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "¡Quieto! ¡Esto es para las fotos del álbum!",
@@ -6560,6 +6620,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡No sé dónde es la preboda!",
           "¡Y encima tú te has metido en mi camino!"
@@ -7058,6 +7119,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Detente, invitado de la boda!",
           "¡Primero debes combatir!"
@@ -7080,6 +7142,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Los insectos son los mejores!",
           "¡Protegen el bosque de la boda!"
@@ -7102,6 +7165,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Nadie pasa sin combatir!",
           "¡Así lo dice la ley del bosque!"
@@ -7124,6 +7188,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "¡Corre, que la barra libre se acaba!"
@@ -7147,6 +7212,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "¡El DJ ya está calentando! ¡Mueve las piernas!"
@@ -7170,6 +7236,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Teníamos un plan perfecto!",
           "¡Queríamos los Pokémon de la boda!",
@@ -7201,6 +7268,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "¡Este bosque lleva directo a VILLAMAYOR!",
@@ -7226,6 +7294,7 @@
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [
           "¡Llevo tres días leyendo el menú del banquete!",
           "¡Nadie merece ese chuletón más que yo!",
@@ -7257,6 +7326,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
+        "sightRange": null,
         "intro": [],
         "outtro": [
           "¿Has visto a mis padres?",
