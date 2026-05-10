@@ -73,28 +73,28 @@ export async function GET() {
 
     stage = 'select(overrides)';
     let rows: Array<Record<string, unknown>> = [];
-    const res = await supabase
+    let res = await supabase
       .from('map_editor_data')
       .select('map_id, trainers, walls, overrides');
 
     if (res.error && /column .*overrides.* does not exist/i.test(res.error.message)) {
-      stage = 'select(fallback)';
-      const fallback = await supabase
+      stage = 'select(no overrides)';
+      res = await supabase
         .from('map_editor_data')
         .select('map_id, trainers, walls');
-      if (fallback.error) {
-        console.error('[map-data][GET] fallback error:', fallback.error);
-        // Aún devolvemos los datos bundleados para que el editor cargue.
-        return NextResponse.json(base);
-      }
-      rows = (fallback.data ?? []) as Array<Record<string, unknown>>;
-    } else if (res.error) {
+    }
+    if (res.error && /column .*walls.* does not exist/i.test(res.error.message)) {
+      stage = 'select(no walls)';
+      res = await supabase
+        .from('map_editor_data')
+        .select('map_id, trainers');
+    }
+    if (res.error) {
       console.error('[map-data][GET] select error:', res.error);
       // No devolvemos 500 para no romper el editor: solo bundle.
       return NextResponse.json(base);
-    } else {
-      rows = (res.data ?? []) as Array<Record<string, unknown>>;
     }
+    rows = (res.data ?? []) as Array<Record<string, unknown>>;
 
     stage = 'apply rows';
     for (const row of rows) {
@@ -143,40 +143,40 @@ export async function POST(request: Request) {
 
     const supabase = getSupabase();
 
-    // Intento de leer fila existente con overrides; si la columna no existe
-    // hacemos fallback sin overrides para no romper.
+    // Intento de leer fila existente con todas las columnas; si alguna no
+    // existe (migraciones 003/004 no aplicadas), reintentamos con el
+    // subconjunto disponible para no romper.
     type ExistingRow = { trainers?: unknown; walls?: unknown; overrides?: unknown };
     let existing: ExistingRow | null = null;
     let overridesColumnAvailable = true;
+    let wallsColumnAvailable = true;
 
-    {
-      const { data, error } = await supabase
+    async function trySelect(cols: string) {
+      return supabase
         .from('map_editor_data')
-        .select('trainers, walls, overrides')
+        .select(cols)
         .eq('map_id', mapId)
         .maybeSingle();
-      if (error && /column .*overrides.* does not exist/i.test(error.message)) {
+    }
+
+    {
+      let r = await trySelect('trainers, walls, overrides');
+      if (r.error && /column .*overrides.* does not exist/i.test(r.error.message)) {
         overridesColumnAvailable = false;
-        const fb = await supabase
-          .from('map_editor_data')
-          .select('trainers, walls')
-          .eq('map_id', mapId)
-          .maybeSingle();
-        if (fb.error) {
-          return NextResponse.json(
-            { error: `supabase select: ${fb.error.message}` },
-            { status: 500 },
-          );
-        }
-        existing = (fb.data ?? null) as ExistingRow | null;
-      } else if (error) {
+        r = await trySelect('trainers, walls');
+      }
+      if (r.error && /column .*walls.* does not exist/i.test(r.error.message)) {
+        wallsColumnAvailable = false;
+        r = await trySelect('trainers');
+      }
+      if (r.error) {
+        console.error('[map-data][POST] select error:', r.error);
         return NextResponse.json(
-          { error: `supabase select: ${error.message}` },
+          { error: `supabase select: ${r.error.message}` },
           { status: 500 },
         );
-      } else {
-        existing = (data ?? null) as ExistingRow | null;
       }
+      existing = (r.data ?? null) as ExistingRow | null;
     }
 
     // Merge parcial de overrides: las claves enviadas sustituyen, las no
@@ -203,9 +203,11 @@ export async function POST(request: Request) {
     const payload: Record<string, unknown> = {
       map_id: mapId,
       trainers: trainers !== undefined ? trainers : existing?.trainers ?? [],
-      walls: walls !== undefined ? walls : existing?.walls ?? {},
       updated_at: new Date().toISOString(),
     };
+    if (wallsColumnAvailable) {
+      payload.walls = walls !== undefined ? walls : existing?.walls ?? {};
+    }
     if (overridesColumnAvailable) {
       payload.overrides = mergedOverrides;
     }
@@ -213,22 +215,30 @@ export async function POST(request: Request) {
     const { error } = await supabase.from('map_editor_data').upsert(payload);
 
     if (error) {
+      const missingMigrations: string[] = [];
+      if (!wallsColumnAvailable) missingMigrations.push('003_map_editor_walls.sql');
+      if (!overridesColumnAvailable) missingMigrations.push('004_map_editor_overrides.sql');
+      console.error('[map-data][POST] upsert error:', error);
       return NextResponse.json(
         {
           error: `supabase upsert: ${error.message}`,
-          hint: !overridesColumnAvailable
-            ? 'La columna `overrides` no existe en Supabase. Aplica la migración supabase/migrations/004_map_editor_overrides.sql en el SQL Editor del Dashboard.'
+          hint: missingMigrations.length
+            ? `Aplica en Supabase SQL Editor: ${missingMigrations.join(', ')}`
             : undefined,
         },
         { status: 500 },
       );
     }
 
+    const warnings: string[] = [];
+    if (!wallsColumnAvailable)
+      warnings.push('Walls no persistidos: aplica 003_map_editor_walls.sql en Supabase.');
+    if (!overridesColumnAvailable)
+      warnings.push('Overrides no persistidos: aplica 004_map_editor_overrides.sql en Supabase.');
+
     return NextResponse.json({
       ok: true,
-      ...(overridesColumnAvailable
-        ? {}
-        : { warning: 'Overrides no persistidos: aplica la migración 004_map_editor_overrides.sql en Supabase.' }),
+      ...(warnings.length ? { warning: warnings.join(' ') } : {}),
     });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
