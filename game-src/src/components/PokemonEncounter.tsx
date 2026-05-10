@@ -1133,6 +1133,41 @@ const PokemonEncounter = () => {
     }
   });
 
+  // ─── useEffects de turno enemigo ──────────────────────────────────────
+  // IMPORTANTE: deben ir ANTES del early return `if (!isInBattle) return null;`
+  // o React lanza error #310 (hook count cambia entre renders).
+  // Referencian `processEnemyOnlyTurn` que se define más abajo; las closures
+  // capturan la variable por referencia, así que es seguro.
+
+  // Tick de turno del jugador (cambiar Pokémon, usar objeto, fallo de Poké Ball)
+  // ejecutar el turno del rival. Solo si estamos en el menú de combate
+  // (stage 11) para no pisar otras animaciones en curso.
+  useEffect(() => {
+    if (playerTurnTick === lastTurnTickRef.current) return;
+    lastTurnTickRef.current = playerTurnTick;
+    if (!isInBattle) return;
+    // Esperar al siguiente tick de event loop para asegurar que el menú
+    // se ha cerrado y los reducers han propagado.
+    setTimeout(() => {
+      if (active && active.hp > 0) processEnemyOnlyTurn();
+    }, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playerTurnTick]);
+
+  // Encadenar ataque del rival al terminar la animación de entrada del
+  // Pokémon recién cambiado en combate. La animación termina dejando
+  // stage = 11; usamos el ref para distinguir un swap mid-combate
+  // (rival ataca) de un cambio tras KO (rival ya atacó previamente).
+  useEffect(() => {
+    if (stage !== 11) return;
+    if (!enemyTurnAfterSwapRef.current) return;
+    enemyTurnAfterSwapRef.current = false;
+    setTimeout(() => {
+      if (active && active.hp > 0) processEnemyOnlyTurn();
+    }, 200);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
+
   if (!isInBattle) return null;
 
   const text = () => {
@@ -1351,33 +1386,7 @@ const PokemonEncounter = () => {
     setInvolvedPokemon([...involvedPokemon, index]);
     throwPokeball();
   };
-  // ejecutar el turno del rival. Solo si estamos en el menú de combate
-  // (stage 11) para no pisar otras animaciones en curso.
-  useEffect(() => {
-    if (playerTurnTick === lastTurnTickRef.current) return;
-    lastTurnTickRef.current = playerTurnTick;
-    if (!isInBattle) return;
-    // Esperar al siguiente tick de event loop para asegurar que el menú
-    // se ha cerrado y los reducers han propagado.
-    setTimeout(() => {
-      if (active && active.hp > 0) processEnemyOnlyTurn();
-    }, 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playerTurnTick]);
 
-  // useEffect: encadenar ataque del rival al terminar la animación de
-  // entrada del Pokémon recién cambiado en combate. La animación termina
-  // dejando stage = 11; usamos el ref para distinguir un swap mid-combate
-  // (rival ataca) de un cambio tras KO (rival ya atacó previamente).
-  useEffect(() => {
-    if (stage !== 11) return;
-    if (!enemyTurnAfterSwapRef.current) return;
-    enemyTurnAfterSwapRef.current = false;
-    setTimeout(() => {
-      if (active && active.hp > 0) processEnemyOnlyTurn();
-    }, 200);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage]);
 
   const getActiveMovesFirst = (
     activeMove: MoveMetadata,
