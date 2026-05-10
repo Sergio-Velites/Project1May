@@ -33,55 +33,60 @@ type MapData = Record<string, MapEntry>;
 
 // ── NPC Registry ──────────────────────────────────────────────────────────
 
-const NPC_REGISTRY: Record<string, { label: string; sprite: string }> = {
-  ash:             { label: 'Ash',           sprite: 'ash' },
-  oak:             { label: 'Oak',           sprite: 'oak' },
-  rival:           { label: 'Rival',         sprite: 'red' },
-  beauty:          { label: 'Beauty',        sprite: 'ad'  },
-  birdKeeper:      { label: 'Bird Keeper',   sprite: 'g'   },
-  blackBelt:       { label: 'Black Belt',    sprite: 'u'   },
-  bugCatcher:      { label: 'Bug Catcher',   sprite: 'f'   },
-  burglar:         { label: 'Burglar',       sprite: 'q'   },
-  channeler:       { label: 'Channeler',     sprite: 'al'  },
-  aceTrainerMale:  { label: 'Ace Trainer ♂', sprite: 'g'   },
-  aceTrainerFemale:{ label: 'Ace Trainer ♀', sprite: 'l'   },
-  cueBall:         { label: 'Cue Ball',      sprite: 'ao'  },
-  engineer:        { label: 'Engineer',      sprite: 'q'   },
-  fisher:          { label: 'Fisher',        sprite: 'd'   },
-  gambler:         { label: 'Gambler',       sprite: 'o'   },
-  gentleman:       { label: 'Gentleman',     sprite: 'h'   },
-  hiker:           { label: 'Hiker',         sprite: 'u'   },
-  jrTrainerMale:   { label: 'Jr Trainer ♂',  sprite: 'g'   },
-  jrTrainerFemale: { label: 'Jr Trainer ♀',  sprite: 'l'   },
-  juggler:         { label: 'Juggler',       sprite: 'ai'  },
-  lass:            { label: 'Lass',          sprite: 'l'   },
-  pokeManiac:      { label: 'Poke Maniac',   sprite: 'q'   },
-  psychic:         { label: 'Psychic',       sprite: 'f'   },
-  rocker:          { label: 'Rocker',        sprite: 'r'   },
-  teamRocketGrunt: { label: 'Team Rocket',   sprite: 'at'  },
-  sailor:          { label: 'Sailor',        sprite: 'b'   },
-  scientist:       { label: 'Scientist',     sprite: 'n'   },
-  superNerd:       { label: 'Super Nerd',    sprite: 'q'   },
-  swimmer:         { label: 'Swimmer',       sprite: 'av'  },
-  tamer:           { label: 'Tamer',         sprite: 'u'   },
-  youngster:       { label: 'Youngster',     sprite: 'b'   },
-  biker:           { label: 'Biker',         sprite: 'aw'  },
-  brock:           { label: 'Brock',         sprite: 'a'   },
-  misty:           { label: 'Misty',         sprite: 'aa'  },
-  ltSurge:         { label: 'Lt. Surge',     sprite: 'ac'  },
-  erica:           { label: 'Erica',         sprite: 'l'   },
-  koga:            { label: 'Koga',          sprite: 'h'   },
-  sabrina:         { label: 'Sabrina',       sprite: 'l'   },
-  blaine:          { label: 'Blaine',        sprite: 'h'   },
-  giovanni:        { label: 'Giovanni',      sprite: 'h'   },
-  sergioNpc:       { label: 'Sergio',        sprite: 'g'   },
-  martaNpc:        { label: 'Marta',         sprite: 'l'   },
+const NPC_REGISTRY: Record<string, { label: string; sprite: string; portrait: string }> = {
+  ash:             { label: 'Ash',           sprite: 'ash',  portrait: 'ash.png'              },
+  oak:             { label: 'Oak',           sprite: 'oak',  portrait: 'oak.png'              },
+  rival:           { label: 'Rival',         sprite: 'red',  portrait: 'rival.png'            },
+  beauty:          { label: 'Beauty',        sprite: 'ad',   portrait: 'beauty.png'           },
+  birdKeeper:      { label: 'Bird Keeper',   sprite: 'g',    portrait: 'bird-keeper.png'      },
+  blackBelt:       { label: 'Black Belt',    sprite: 'u',    portrait: 'black-belt.png'       },
+  bugCatcher:      { label: 'Bug Catcher',   sprite: 'f',    portrait: 'bug-catcher.png'      },
+  burglar:         { label: 'Burglar',       sprite: 'q',    portrait: 'burglar.png'          },
+  channeler:       { label: 'Channeler',     sprite: 'al',   portrait: 'channeler.png'        },
+  aceTrainerMale:  { label: 'Ace Trainer ♂', sprite: 'g',    portrait: 'ace-trainer-male.png' },
+  aceTrainerFemale:{ label: 'Ace Trainer ♀', sprite: 'l',    portrait: 'ace-trainer-female.png'},
+  cueBall:         { label: 'Cue Ball',      sprite: 'ao',   portrait: 'cue-ball.png'         },
+  engineer:        { label: 'Engineer',      sprite: 'q',    portrait: 'engineer.png'         },
+  fisher:          { label: 'Fisher',        sprite: 'd',    portrait: 'fisher.png'           },
+  gambler:         { label: 'Gambler',       sprite: 'o',    portrait: 'gambler.png'          },
+  gentleman:       { label: 'Gentleman',     sprite: 'h',    portrait: 'gentleman.png'        },
+  hiker:           { label: 'Hiker',         sprite: 'u',    portrait: 'hiker.png'            },
+  jrTrainerMale:   { label: 'Jr Trainer ♂',  sprite: 'g',    portrait: 'jr-trainer-male.png'  },
+  jrTrainerFemale: { label: 'Jr Trainer ♀',  sprite: 'l',    portrait: 'jr-trainer-male.png'  },
+  juggler:         { label: 'Juggler',       sprite: 'ai',   portrait: 'juggler.png'          },
+  lass:            { label: 'Lass',          sprite: 'l',    portrait: 'lass.png'             },
+  pokeManiac:      { label: 'Poke Maniac',   sprite: 'q',    portrait: 'poke-maniac.png'      },
+  psychic:         { label: 'Psychic',       sprite: 'f',    portrait: 'psychic.png'          },
+  rocker:          { label: 'Rocker',        sprite: 'q',    portrait: 'rocker.png'           },
+  teamRocketGrunt: { label: 'Team Rocket',   sprite: 'w',    portrait: 'team-rocket-grunt.png'},
+  sailor:          { label: 'Sailor',        sprite: 'ae',   portrait: 'sailor.png'           },
+  scientist:       { label: 'Scientist',     sprite: 'e',    portrait: 'scientist.png'        },
+  superNerd:       { label: 'Super Nerd',    sprite: 'q',    portrait: 'super-nerd.png'       },
+  swimmer:         { label: 'Swimmer',       sprite: 'ac',   portrait: 'swimmer.png'          },
+  tamer:           { label: 'Tamer',         sprite: 'ae',   portrait: 'tamer.png'            },
+  youngster:       { label: 'Youngster',     sprite: 'f',    portrait: 'youngster.png'        },
+  biker:           { label: 'Biker',         sprite: 'ao',   portrait: 'biker.png'            },
+  brock:           { label: 'Brock',         sprite: 'q',    portrait: 'brock.png'            },
+  misty:           { label: 'Misty',         sprite: 'k',    portrait: 'misty.png'            },
+  ltSurge:         { label: 'Lt. Surge',     sprite: 'ai',   portrait: 'lt-surge.png'         },
+  erica:           { label: 'Erica',         sprite: 'am',   portrait: 'erica.png'            },
+  koga:            { label: 'Koga',          sprite: 'ap',   portrait: 'koga.png'             },
+  sabrina:         { label: 'Sabrina',       sprite: 'c',    portrait: 'sabrina.png'          },
+  blaine:          { label: 'Blaine',        sprite: 'r',    portrait: 'blaine.png'           },
+  giovanni:        { label: 'Giovanni',      sprite: 'an',   portrait: 'giovanni.png'         },
+  sergioNpc:       { label: 'Sergio',        sprite: 'g',    portrait: 'sergio.png'           },
+  martaNpc:        { label: 'Marta',         sprite: 'l',    portrait: 'marta.png'            },
 };
 
 function spriteUrl(npcKey: string, facing: string) {
   const reg = NPC_REGISTRY[npcKey];
-  const prefix = reg?.sprite ?? 'b';
+  const prefix = reg?.sprite ?? 'f';
   return `/editor/sprites/${prefix}-${facing}.png`;
+}
+
+function portraitUrl(npcKey: string) {
+  const reg = NPC_REGISTRY[npcKey];
+  return reg ? `/editor/portraits/${reg.portrait}` : null;
 }
 
 function npcBorderColor(t: Trainer) {
@@ -552,14 +557,21 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
 }) {
   const reg = NPC_REGISTRY[trainer.npcKey];
   const sprite = spriteUrl(trainer.npcKey, trainer.facing);
+  const portrait = portraitUrl(trainer.npcKey);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-      {/* Avatar + nombre */}
+      {/* Avatar (walk sprite + portrait) + nombre */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={sprite} alt="" style={{ width: 48, height: 48, imageRendering: 'pixelated', border: `2px solid ${npcBorderColor(trainer)}`, borderRadius: 4, background: '#0a0a18' }} />
+        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={sprite} alt="" style={{ width: 32, height: 32, imageRendering: 'pixelated', border: `2px solid ${npcBorderColor(trainer)}`, borderRadius: 4, background: '#0a0a18' }} onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.2'; }} />
+          {portrait && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={portrait} alt="" title="Portrait" style={{ width: 32, height: 32, imageRendering: 'pixelated', border: '2px solid #5a5a8a', borderRadius: 4, background: '#0a0a18' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+          )}
+        </div>
         <div>
           <div style={{ fontWeight: 700, fontSize: 15 }}>{reg?.label ?? trainer.npcKey}</div>
           <div style={{ color: '#666', fontSize: 11 }}>NPC #{idx} · pos ({trainer.pos.x}, {trainer.pos.y})</div>
