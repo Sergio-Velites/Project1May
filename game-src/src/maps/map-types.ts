@@ -100,6 +100,19 @@ export interface MapItemType {
   hidden?: boolean;
 }
 
+/**
+ * Pokéball-regalo declarativa colocada desde el editor de mapas.
+ * Al pulsar A en su posición, el jugador recibe el pokémon (si tiene hueco)
+ * y la pokéball desaparece persistiendo el estado vía `completeQuest(questId)`.
+ */
+export interface SimpleGiftType {
+  pokemonId: number;
+  level: number;
+  pos: PosType;
+  /** Identificador único de quest. Si está en completedQuests, no se renderiza. */
+  questId: string;
+}
+
 export interface MapWithPos {
   map: MapId;
   pos: PosType;
@@ -132,6 +145,8 @@ export interface MapType {
   stoppers?: Record<number, number[]>;
   trainers?: TrainerType[];
   items?: MapItemType[];
+  /** Pokéballs-regalo declarativas (editables desde el editor de mapas). */
+  gifts?: SimpleGiftType[];
   /** Posición del NPC de batallas online en este mapa (centros Pokémon) */
   onlineBattleNpc?: PosType;
 }

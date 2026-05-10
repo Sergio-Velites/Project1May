@@ -87,6 +87,206 @@ function parseRowColMap(tsText, key) {
   }
 }
 
+// ── Parser genérico de bloque {...} balanceando llaves ────────────────────
+// Devuelve {start, end, text} del bloque que comienza en idx
+function findBalancedBlock(text, openIdx, openChar = "{", closeChar = "}") {
+  let depth = 0;
+  for (let i = openIdx; i < text.length; i++) {
+    if (text[i] === openChar) depth++;
+    else if (text[i] === closeChar) {
+      depth--;
+      if (depth === 0) return { start: openIdx, end: i, text: text.slice(openIdx, i + 1) };
+    }
+  }
+  return null;
+}
+
+// ── Parser de PosType: `key: { x: N, y: M }` ──────────────────────────────
+function parsePos(tsText, key) {
+  const re = new RegExp(`${key}\\s*:\\s*\\{\\s*x\\s*:\\s*(\\d+)\\s*,\\s*y\\s*:\\s*(\\d+)\\s*,?\\s*\\}`);
+  const m = tsText.match(re);
+  if (!m) return null;
+  return { x: parseInt(m[1], 10), y: parseInt(m[2], 10) };
+}
+
+// ── Parser de `text:` field — Record<row, Record<col, string[]>> ──────────
+// Extrae el bloque text: { ... } y devuelve estructura JSON con strings.
+function parseTextField(tsText) {
+  const m = tsText.match(/(?<![\w])text\s*:\s*\{/);
+  if (!m) return {};
+  const blockStart = tsText.indexOf("{", m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, blockStart);
+  if (!blk) return {};
+
+  const result = {};
+  // Iterar fila a fila: encontrar `<num>: { ... },`
+  // Usamos un parser simple basado en posición
+  const inner = blk.text.slice(1, -1);
+  let i = 0;
+  while (i < inner.length) {
+    // Saltar espacios y comas
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+
+    // Leer número (clave de fila)
+    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    if (!numMatch) {
+      // Avanzar para evitar bucle infinito
+      i++;
+      continue;
+    }
+    const rowKey = numMatch[1];
+    i += numMatch[0].length - 1; // dejar i en la `{` del subobjeto
+    const subBlk = findBalancedBlock(inner, i);
+    if (!subBlk) break;
+
+    // Parsear filas internas: cada `<col>: [ "...", "..." ]`
+    const rowInner = subBlk.text.slice(1, -1);
+    const cols = {};
+    let j = 0;
+    while (j < rowInner.length) {
+      while (j < rowInner.length && /\s|,/.test(rowInner[j])) j++;
+      if (j >= rowInner.length) break;
+      const colMatch = rowInner.slice(j).match(/^(-?\d+)\s*:\s*\[/);
+      if (!colMatch) { j++; continue; }
+      const colKey = colMatch[1];
+      j += colMatch[0].length - 1; // dejar j en `[`
+      const arrBlk = findBalancedBlock(rowInner, j, "[", "]");
+      if (!arrBlk) break;
+      // Extraer strings con comillas dobles o simples (preserva caracteres)
+      const arrInner = arrBlk.text.slice(1, -1);
+      const strings = [];
+      const reStr = /"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'/g;
+      let sm;
+      while ((sm = reStr.exec(arrInner)) !== null) {
+        const raw = sm[1] ?? sm[2] ?? "";
+        // Decodificar escapes básicos (\" \' \\ \n)
+        const decoded = raw
+          .replace(/\\"/g, '"')
+          .replace(/\\'/g, "'")
+          .replace(/\\\\/g, "\\")
+          .replace(/\\n/g, "\n");
+        strings.push(decoded);
+      }
+      cols[colKey] = strings;
+      j = arrBlk.end + 1;
+    }
+    result[rowKey] = cols;
+    i = subBlk.end + 1;
+  }
+  return result;
+}
+
+// ── Parser de `items:` field — array de { item: ItemType.X, pos: {x,y}, hidden? } ──
+function parseItemsField(tsText) {
+  const m = tsText.match(/items\s*:\s*\[/);
+  if (!m) return [];
+  const arrStart = tsText.indexOf("[", m.index + m[0].length - 1);
+  const arrBlk = findBalancedBlock(tsText, arrStart, "[", "]");
+  if (!arrBlk) return [];
+
+  const inner = arrBlk.text.slice(1, -1);
+  const result = [];
+  // Iterar objetos balanceados
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    if (inner[i] !== "{") { i++; continue; }
+    const objBlk = findBalancedBlock(inner, i);
+    if (!objBlk) break;
+    const objText = objBlk.text;
+
+    const itemM = objText.match(/item\s*:\s*ItemType\.(\w+)/);
+    const posStartM = objText.match(/pos\s*:\s*\{/);
+    const hidden = /hidden\s*:\s*true/.test(objText);
+
+    let pos = null;
+    if (posStartM) {
+      const posOpenIdx = objText.indexOf("{", posStartM.index + posStartM[0].length - 1);
+      const posBlk = findBalancedBlock(objText, posOpenIdx);
+      if (posBlk) {
+        const xm = posBlk.text.match(/x\s*:\s*(\d+)/);
+        const ym = posBlk.text.match(/y\s*:\s*(\d+)/);
+        if (xm && ym) pos = { x: parseInt(xm[1], 10), y: parseInt(ym[1], 10) };
+      }
+    }
+
+    if (itemM && pos) {
+      result.push({
+        itemKey: itemM[1],
+        pos,
+        ...(hidden ? { hidden: true } : {}),
+      });
+    }
+    i = objBlk.end + 1;
+  }
+  return result;
+}
+
+// ── Parser del enum ItemType (genera lista de claves disponibles) ─────────
+function parseItemTypeEnum() {
+  const itemDataPath = path.join(GAME_SRC, "app/use-item-data.ts");
+  if (!fs.existsSync(itemDataPath)) return [];
+  const src = fs.readFileSync(itemDataPath, "utf-8");
+  const enumMatch = src.match(/export\s+enum\s+ItemType\s*\{([\s\S]*?)\}/);
+  if (!enumMatch) return [];
+  const body = enumMatch[1];
+  const keys = [];
+  const re = /^\s*(\w+)\s*=/gm;
+  let m;
+  while ((m = re.exec(body)) !== null) {
+    keys.push(m[1]);
+  }
+  return keys;
+}
+
+// ── Parser de `gifts:` (campo nuevo, opcional) ────────────────────────────
+function parseGiftsField(tsText) {
+  const m = tsText.match(/gifts\s*:\s*\[/);
+  if (!m) return [];
+  const arrStart = tsText.indexOf("[", m.index + m[0].length - 1);
+  const arrBlk = findBalancedBlock(tsText, arrStart, "[", "]");
+  if (!arrBlk) return [];
+  const inner = arrBlk.text.slice(1, -1);
+  const result = [];
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    if (inner[i] !== "{") { i++; continue; }
+    const objBlk = findBalancedBlock(inner, i);
+    if (!objBlk) break;
+    const t = objBlk.text;
+    const pid = t.match(/pokemonId\s*:\s*(\d+)/);
+    const lvl = t.match(/level\s*:\s*(\d+)/);
+    const qid = t.match(/questId\s*:\s*"([^"]+)"/);
+
+    let pos = null;
+    const posStartM = t.match(/pos\s*:\s*\{/);
+    if (posStartM) {
+      const posOpenIdx = t.indexOf("{", posStartM.index + posStartM[0].length - 1);
+      const posBlk = findBalancedBlock(t, posOpenIdx);
+      if (posBlk) {
+        const xm = posBlk.text.match(/x\s*:\s*(\d+)/);
+        const ym = posBlk.text.match(/y\s*:\s*(\d+)/);
+        if (xm && ym) pos = { x: parseInt(xm[1], 10), y: parseInt(ym[1], 10) };
+      }
+    }
+
+    if (pid && lvl && pos && qid) {
+      result.push({
+        pokemonId: parseInt(pid[1], 10),
+        level: parseInt(lvl[1], 10),
+        pos,
+        questId: qid[1],
+      });
+    }
+    i = objBlk.end + 1;
+  }
+  return result;
+}
+
 // ── Parsear los trainers del archivo .ts con regex ────────────────────────
 // Extrae el bloque trainers: [...] como texto y lo convierte en objetos planos.
 function parseTrainers(tsText) {
@@ -332,6 +532,17 @@ for (const file of MAP_FILES) {
   // Extraer walls (campo obligatorio en MapType)
   const walls = parseRowColMap(tsText, "walls");
 
+  // Campos extra (todos opcionales en MapType)
+  const fences = parseRowColMap(tsText, "fences");
+  const grass = parseRowColMap(tsText, "grass");
+  const texts = parseTextField(tsText);
+  const items = parseItemsField(tsText);
+  const gifts = parseGiftsField(tsText);
+  const pokemonCenter = parsePos(tsText, "pokemonCenter");
+  const pc = parsePos(tsText, "pc");
+  const store = parsePos(tsText, "store");
+  const recoverLocation = parsePos(tsText, "recoverLocation");
+
   // Inferir MapId desde el nombre de archivo .ts
   const mapId = file
     .replace(".ts", "")
@@ -379,17 +590,32 @@ for (const file of MAP_FILES) {
     width,
     trainers,
     walls,
+    fences,
+    grass,
+    texts,
+    items,
+    gifts,
+    pokemonCenter,
+    pc,
+    store,
+    recoverLocation,
     sourceFile: file,
   };
 
   processed++;
-  console.log(`  ✓ ${name} (${resolvedMapId}) — ${trainers.length} NPCs, ${Object.values(walls).reduce((a, b) => a + b.length, 0)} walls`);
+  console.log(`  ✓ ${name} (${resolvedMapId}) — ${trainers.length} NPCs, ${Object.values(walls).reduce((a, b) => a + b.length, 0)} walls, ${items.length} items, ${Object.keys(texts).length} text rows`);
 }
 
 // ── Escribir JSON ─────────────────────────────────────────────────────────
 const outputPath = path.join(PUBLIC_EDITOR, "map-data.json");
 fs.writeFileSync(outputPath, JSON.stringify(mapData, null, 2), "utf-8");
-
+// Exportar también la lista de claves del enum ItemType (para el dropdown del editor)
+const itemTypeKeys = parseItemTypeEnum();
+fs.writeFileSync(
+  path.join(PUBLIC_EDITOR, "item-types.json"),
+  JSON.stringify(itemTypeKeys, null, 2),
+  "utf-8",
+);
 console.log(`\n✅ Listo — ${processed} mapas procesados`);
 console.log(`   JSON: ${path.relative(ROOT, outputPath)}`);
 console.log(`   Maps: public/editor/maps/`);

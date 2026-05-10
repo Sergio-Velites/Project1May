@@ -17,29 +17,73 @@ function readBundledData(): Record<string, unknown> {
   return JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
 }
 
+type OverrideKey =
+  | 'texts'
+  | 'items'
+  | 'gifts'
+  | 'fences'
+  | 'grass'
+  | 'pokemonCenter'
+  | 'pc'
+  | 'store'
+  | 'recoverLocation';
+
+const OVERRIDE_KEYS: OverrideKey[] = [
+  'texts',
+  'items',
+  'gifts',
+  'fences',
+  'grass',
+  'pokemonCenter',
+  'pc',
+  'store',
+  'recoverLocation',
+];
+
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
+function applyOverridesToBase(
+  target: Record<string, unknown>,
+  overrides: unknown
+) {
+  if (!isPlainObject(overrides)) return;
+  for (const key of OVERRIDE_KEYS) {
+    if (!(key in overrides)) continue;
+    const val = (overrides as Record<string, unknown>)[key];
+    if (val === null || val === undefined) continue;
+    target[key] = val;
+  }
+}
+
 export async function GET() {
   try {
     const base = readBundledData();
 
-    // Overlay with any saved overrides from Supabase
     const supabase = getSupabase();
     const { data: rows } = await supabase
       .from('map_editor_data')
-      .select('map_id, trainers, walls');
+      .select('map_id, trainers, walls, overrides');
 
     if (rows) {
       for (const row of rows) {
-        if (base[row.map_id]) {
-          const target = base[row.map_id] as Record<string, unknown>;
-          if (row.trainers !== null && row.trainers !== undefined) {
-            target.trainers = row.trainers;
+        if (!base[row.map_id]) continue;
+        const target = base[row.map_id] as Record<string, unknown>;
+
+        if (row.trainers !== null && row.trainers !== undefined) {
+          target.trainers = row.trainers;
+        }
+        if (row.walls !== null && row.walls !== undefined) {
+          if (
+            typeof row.walls === 'object' &&
+            Object.keys(row.walls as object).length > 0
+          ) {
+            target.walls = row.walls;
           }
-          if (row.walls !== null && row.walls !== undefined) {
-            // Sólo aplicar overlay si el bloque de walls guardado no está vacío.
-            if (typeof row.walls === 'object' && Object.keys(row.walls).length > 0) {
-              target.walls = row.walls;
-            }
-          }
+        }
+        if (row.overrides !== null && row.overrides !== undefined) {
+          applyOverridesToBase(target, row.overrides);
         }
       }
     }
@@ -53,10 +97,11 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { mapId, trainers, walls } = body as {
+    const { mapId, trainers, walls, overrides } = body as {
       mapId?: string;
       trainers?: unknown;
       walls?: unknown;
+      overrides?: Partial<Record<OverrideKey, unknown>>;
     };
     if (!mapId) {
       return NextResponse.json({ error: 'mapId requerido' }, { status: 400 });
@@ -64,17 +109,38 @@ export async function POST(request: Request) {
 
     const supabase = getSupabase();
 
-    // Lectura del row existente para preservar los campos no enviados.
     const { data: existing } = await supabase
       .from('map_editor_data')
-      .select('trainers, walls')
+      .select('trainers, walls, overrides')
       .eq('map_id', mapId)
       .maybeSingle();
+
+    // Merge parcial de overrides: las claves enviadas sustituyen, las no
+    // enviadas conservan su valor anterior. Para borrar una clave concreta
+    // enviar `null` explícito en esa clave.
+    const mergedOverrides: Record<string, unknown> = isPlainObject(
+      existing?.overrides
+    )
+      ? { ...(existing!.overrides as Record<string, unknown>) }
+      : {};
+
+    if (overrides && isPlainObject(overrides)) {
+      for (const key of OVERRIDE_KEYS) {
+        if (!(key in overrides)) continue;
+        const val = overrides[key];
+        if (val === null) {
+          delete mergedOverrides[key];
+        } else {
+          mergedOverrides[key] = val;
+        }
+      }
+    }
 
     const payload: Record<string, unknown> = {
       map_id: mapId,
       trainers: trainers !== undefined ? trainers : existing?.trainers ?? [],
       walls: walls !== undefined ? walls : existing?.walls ?? {},
+      overrides: mergedOverrides,
       updated_at: new Date().toISOString(),
     };
 

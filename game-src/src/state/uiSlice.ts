@@ -2,6 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { ItemType } from "../app/use-item-data";
 import { Direction } from "./state-types";
+import { SimpleGiftType } from "../maps/map-types";
 
 interface TextThenActionType {
   text: string[];
@@ -51,6 +52,7 @@ interface UiState {
   pokeballCardId: number | null;
   academyPokeballOpen: boolean;
   onlineBattleMenu: boolean;
+  mapGiftPending: SimpleGiftType | null;
 }
 
 const initialState: UiState = {
@@ -77,6 +79,7 @@ const initialState: UiState = {
   pokeballCardId: null,
   academyPokeballOpen: false,
   onlineBattleMenu: false,
+  mapGiftPending: null,
 };
 
 export const uiSlice = createSlice({
@@ -216,6 +219,12 @@ export const uiSlice = createSlice({
     hideOnlineBattleMenu: (state) => {
       state.onlineBattleMenu = false;
     },
+    openMapGift: (state, action: PayloadAction<SimpleGiftType>) => {
+      state.mapGiftPending = action.payload;
+    },
+    closeMapGift: (state) => {
+      state.mapGiftPending = null;
+    },
   },
 });
 
@@ -261,6 +270,8 @@ export const {
   closeAcademyPokeball,
   showOnlineBattleMenu,
   hideOnlineBattleMenu,
+  openMapGift,
+  closeMapGift,
 } = uiSlice.actions;
 
 export const selectText = (state: RootState) => state.ui.text;
@@ -310,7 +321,8 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.confirmationMenu !== null ||
   state.ui.evolution !== null ||
   state.ui.pokeballCardId !== null ||
-  state.ui.academyPokeballOpen;
+  state.ui.academyPokeballOpen ||
+  state.ui.mapGiftPending !== null;
 
 export const selectStartMenuSubOpen = (state: RootState) =>
   state.ui.itemsMenu || state.ui.playerMenu;
@@ -343,5 +355,8 @@ export const selectAcademyPokeballOpen = (state: RootState) =>
 
 export const selectOnlineBattleMenu = (state: RootState) =>
   state.ui.onlineBattleMenu;
+
+export const selectMapGiftPending = (state: RootState) =>
+  state.ui.mapGiftPending;
 
 export default uiSlice.reducer;
