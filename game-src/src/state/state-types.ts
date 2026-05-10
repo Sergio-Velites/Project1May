@@ -69,8 +69,9 @@ export interface RSVPData {
   companion: string | null;
   children: number;
   allergies: string | null;
-  busOutbound: boolean;
-  busReturn: "none" | "23:00" | "1:45";
+  /** Parada de recogida del bus de ida o "none" si no usa bus */
+  busOutbound: "none" | "club-tenis" | "pio-xii" | "ardoi";
+  busReturn: "none" | "23:00" | "01:30";
   preboda: boolean;
   attended: boolean;
 }

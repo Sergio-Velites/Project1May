@@ -8,8 +8,8 @@ interface RSVPPayload {
     companion: string | null;
     children: number;
     allergies: string | null;
-    busOutbound: boolean;
-    busReturn: "none" | "23:00" | "1:45";
+    busOutbound: "none" | "club-tenis" | "pio-xii" | "ardoi";
+    busReturn: "none" | "23:00" | "01:30";
     preboda: boolean;
     attended: boolean;
   };
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
       p_companion:    rsvp.companion ?? null,
       p_children:     rsvp.children ?? 0,
       p_allergies:    rsvp.allergies ?? null,
-      p_bus_outbound: rsvp.busOutbound ?? false,
+      p_bus_outbound: rsvp.busOutbound ?? "none",
       p_bus_return:   rsvp.busReturn ?? "none",
       p_preboda:      rsvp.preboda ?? false,
       p_attended:     rsvp.attended ?? true,

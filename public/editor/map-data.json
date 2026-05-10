@@ -3768,38 +3768,38 @@
       "y": 29
     },
     "maps": {
-      "7": {
-        "14": "pewter-city-museum-1f"
-      },
-      "13": {
-        "29": "pewter-city-npc-b"
+      "10": {
+        "13": "pewter-city-museum-1f"
       },
       "16": {
-        "39": "route-3"
-      },
-      "17": {
-        "16": "pewter-city-gym",
-        "23": "pewter-city-poke-mart",
-        "39": "route-3"
-      },
-      "18": {
-        "39": "route-3"
+        "28": "pewter-city-npc-b"
       },
       "19": {
-        "39": "route-3"
+        "38": "route-3"
       },
-      "25": {
-        "13": "pewter-city-pokemon-center"
+      "20": {
+        "15": "pewter-city-gym",
+        "22": "pewter-city-poke-mart",
+        "38": "route-3"
       },
-      "29": {
-        "7": "pewter-city-npc-a"
+      "21": {
+        "38": "route-3"
+      },
+      "22": {
+        "38": "route-3"
+      },
+      "28": {
+        "12": "pewter-city-pokemon-center"
+      },
+      "32": {
+        "6": "pewter-city-npc-a"
       }
     },
     "teleports": {},
     "exits": {
       "35": [
-        18,
-        19
+        17,
+        18
       ]
     },
     "exitReturnMap": "route-2gate-north",

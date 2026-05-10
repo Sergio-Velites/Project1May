@@ -27,6 +27,9 @@ type SpriteId =
   | "youngster" | "biker" | "hiker"
   | "pokemon113" | "pokemon122" | "pokemon132";
 
+type BusStop = "none" | "club-tenis" | "pio-xii" | "ardoi";
+type BusReturn = "none" | "23:00" | "01:30";
+
 type Stage =
   | "dialogue"
   | "name-picker"
@@ -87,11 +90,12 @@ const buildAllergyIntro = (): DialogueLine[] => [
 ];
 
 const buildBusLines = (): DialogueLine[] => [
-  { sprite: "oak", text: "Para facilitar el viaje\nhasta VILLAMAYOR..." },
+  { sprite: "oak",   text: "Para facilitar el viaje\nhasta VILLAMAYOR DE\nMONJARDÍN..." },
   { sprite: "biker", text: "Habrá un BUS especial\npara entrenadores invitados." },
-  { sprite: "biker", text: "Las paradas serán:" },
-  { sprite: "biker", text: "11:00 CLUB DE TENIS\n11:20 HOTEL TRES REYES" },
-  { sprite: "biker", text: "¿Utilizarás el bus?", next: "bus-outbound" },
+  { sprite: "biker", text: "PARADAS DE IDA:\n11:00 CLUB DE TENIS" },
+  { sprite: "biker", text: "11:15 PÍO XII\n(HOTEL BLANCA DE\nNAVARRA)" },
+  { sprite: "biker", text: "11:30 ARDOI\n(PLAZA DE LA MUJER)" },
+  { sprite: "biker", text: "¿En qué parada\nte recogemos?", next: "bus-outbound" },
 ];
 
 const buildDeclinedLines = (): DialogueLine[] => [
@@ -103,9 +107,9 @@ const buildDeclinedLines = (): DialogueLine[] => [
 
 const buildPrebodaLines = (): DialogueLine[] => [
   { sprite: "oak",   text: "Una última cosa." },
-  { sprite: "oak",   text: "Antes del gran día..." },
-  { sprite: "oak", text: "Se celebrará una PREBODA\nel día 6 en EL BOSQUECILLO" },
-  { sprite: "oak", text: "(Junto al Hotel Tres Reyes\nde Pamplona)" },
+  { sprite: "oak",   text: "Antes del gran día\nse celebrará una PREBODA..." },
+  { sprite: "oak",   text: "JUEVES 6 DE AGOSTO\nDE 2026, A LAS 20:00H." },
+  { sprite: "oak",   text: "En EL BOSQUECILLO\n(junto al Hotel Tres Reyes\nde Pamplona)." },
   { sprite: "hiker", text: "¿Te unirás al encuentro\nde entrenadores?", next: "preboda-choice" },
 ];
 
@@ -360,7 +364,7 @@ interface Snapshot {
   displayed: string;     finished: boolean;
   playerName: string;    companion: string | null;
   children: number;      allergyTxt: string;
-  busOutbound: boolean;  busReturn: "none" | "23:00" | "1:45";
+  busOutbound: BusStop;  busReturn: BusReturn;
   preboda: boolean;      attended: boolean | null;
 }
 // ── Component ────────────────────────────────────────────────────────────────────
@@ -384,8 +388,8 @@ const OakIntro = ({ onComplete }: Props) => {
   const [companion,   setCompanion]  = useState<string | null>(null);
   const [children,    setChildren]   = useState(0);
   const [allergyTxt,  setAllergyTxt] = useState("");
-  const [busOutbound, setBusOutbound]= useState(false);
-  const [busReturn,   setBusReturn]  = useState<"none" | "23:00" | "1:45">("none");
+  const [busOutbound, setBusOutbound]= useState<BusStop>("none");
+  const [busReturn,   setBusReturn]  = useState<BusReturn>("none");
   const [preboda,     setPreboda]    = useState(false);
   const [cursor,      setCursor]     = useState(0);
   const [shrink,      setShrink]     = useState<"idle" | "shrinking" | "overworld">("idle");
@@ -439,8 +443,8 @@ const OakIntro = ({ onComplete }: Props) => {
 
   const doneRef = useRef(false);
   const triggerEnding = useCallback((
-    pre: boolean, busOut: boolean,
-    busRet: "none" | "23:00" | "1:45",
+    pre: boolean, busOut: BusStop,
+    busRet: BusReturn,
     comp: string | null,
     allergy: string,
     isAttended: boolean,
@@ -454,7 +458,7 @@ const OakIntro = ({ onComplete }: Props) => {
       companion:   isAttended ? comp                    : null,
       children:    isAttended ? children                : 0,
       allergies:   isAttended ? (allergy.trim() || null) : null,
-      busOutbound: isAttended ? busOut                  : false,
+      busOutbound: isAttended ? busOut                  : "none",
       busReturn:   isAttended ? busRet                  : "none",
       preboda:     isAttended ? pre                     : false,
       attended:    isAttended,
@@ -512,13 +516,17 @@ const OakIntro = ({ onComplete }: Props) => {
     }
     if (stage === "bus-outbound") {
       push();
-      if (cursor === 0) { setBusOutbound(true); setStage("bus-return"); setCursor(0); }
-      else { setBusOutbound(false); enterLines(buildPrebodaLines()); }
+      const opts: BusStop[] = ["club-tenis", "pio-xii", "ardoi", "none"];
+      const choice = opts[cursor];
+      setBusOutbound(choice);
+      // Si elige bus (cualquier parada), preguntamos vuelta. Si no, saltamos al preboda.
+      if (choice !== "none") { setStage("bus-return"); setCursor(0); }
+      else { enterLines(buildPrebodaLines()); }
       return;
     }
     if (stage === "bus-return") {
       push();
-      const opts: ("none" | "23:00" | "1:45")[] = ["none", "23:00", "1:45"];
+      const opts: BusReturn[] = ["none", "23:00", "01:30"];
       setBusReturn(opts[cursor]);
       enterLines(buildPrebodaLines());
       return;
@@ -545,7 +553,7 @@ const OakIntro = ({ onComplete }: Props) => {
     const maxMap: Record<string, number> = {
       "attendance-choice": 1,
       "companion-choice": 1, "allergy-choice": 1,
-      "bus-outbound": 1,     "bus-return": 2,
+      "bus-outbound": 3,     "bus-return": 2,
       "preboda-choice": 1,
     };
     if (stage in maxMap) { setCursor(c => Math.min(maxMap[stage], c + 1)); return; }
@@ -586,11 +594,20 @@ const OakIntro = ({ onComplete }: Props) => {
   };
 
   const renderChoice = () => {
-    if (["attendance-choice", "companion-choice", "allergy-choice", "bus-outbound", "preboda-choice"].includes(stage))
+    if (["attendance-choice", "companion-choice", "allergy-choice", "preboda-choice"].includes(stage))
       return (
         <ChoicePanel>
           <ChoiceItem $selected={cursor === 0}>SÍ</ChoiceItem>
           <ChoiceItem $selected={cursor === 1}>NO</ChoiceItem>
+        </ChoicePanel>
+      );
+    if (stage === "bus-outbound")
+      return (
+        <ChoicePanel>
+          <ChoiceItem $selected={cursor === 0}>11:00 Club Tenis</ChoiceItem>
+          <ChoiceItem $selected={cursor === 1}>11:15 Pío XII</ChoiceItem>
+          <ChoiceItem $selected={cursor === 2}>11:30 Ardoi</ChoiceItem>
+          <ChoiceItem $selected={cursor === 3}>Sin bus</ChoiceItem>
         </ChoicePanel>
       );
     if (stage === "children-select")
@@ -606,7 +623,7 @@ const OakIntro = ({ onComplete }: Props) => {
         <ChoicePanel>
           <ChoiceItem $selected={cursor === 0}>Sin vuelta</ChoiceItem>
           <ChoiceItem $selected={cursor === 1}>Vuelta 23:00</ChoiceItem>
-          <ChoiceItem $selected={cursor === 2}>Vuelta 1:45</ChoiceItem>
+          <ChoiceItem $selected={cursor === 2}>Vuelta 01:30</ChoiceItem>
         </ChoicePanel>
       );
     if (stage === "allergy-input")

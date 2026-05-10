@@ -21,7 +21,7 @@ interface RSVPEntry {
   companion: string | null;
   children: number;
   allergies: string | null;
-  bus_outbound: boolean;
+  bus_outbound: string;
   bus_return: string;
   preboda: boolean;
   attended?: boolean;
@@ -62,7 +62,14 @@ function spriteUrl(id: number) {
 
 function busLabel(v: string) {
   if (v === "23:00") return "23:00 h";
-  if (v === "1:45") return "1:45 h";
+  if (v === "01:30" || v === "1:45") return "01:30 h";
+  return "No";
+}
+
+function busStopLabel(v: string) {
+  if (v === "club-tenis") return "Club Tenis (11:00)";
+  if (v === "pio-xii")    return "Pío XII (11:15)";
+  if (v === "ardoi")      return "Ardoi (11:30)";
   return "No";
 }
 
@@ -88,9 +95,9 @@ export default async function AdminPage({
   const totalAdults    = attendingEntries.length + attendingEntries.filter((e) => e.companion).length;
   const totalChildren  = attendingEntries.reduce((s, e) => s + (e.children ?? 0), 0);
   const totalAllergies = attendingEntries.filter((e) => e.allergies && e.allergies.trim() !== "").length;
-  const totalBusOut    = attendingEntries.filter((e) => e.bus_outbound).length;
+  const totalBusOut    = attendingEntries.filter((e) => e.bus_outbound && e.bus_outbound !== "none").length;
   const totalBus2300   = attendingEntries.filter((e) => e.bus_return === "23:00").length;
-  const totalBus145    = attendingEntries.filter((e) => e.bus_return === "1:45").length;
+  const totalBus0130   = attendingEntries.filter((e) => e.bus_return === "01:30" || e.bus_return === "1:45").length;
   const totalPreboda   = attendingEntries.filter((e) => e.preboda).length;
   const totalPokemon   = entries.reduce((s, e) => s + (Array.isArray(e.pokemon) ? e.pokemon.length : 0), 0);
 
@@ -355,8 +362,8 @@ export default async function AdminPage({
             <span className="stat-value">{totalBus2300}</span>
           </div>
           <div className="stat-card">
-            <span className="stat-label">Bus 1:45</span>
-            <span className="stat-value">{totalBus145}</span>
+            <span className="stat-label">Bus 01:30</span>
+            <span className="stat-value">{totalBus0130}</span>
           </div>
           <div className="stat-card">
             <span className="stat-label">Preboda</span>
@@ -438,8 +445,8 @@ export default async function AdminPage({
                         <div>
                           <div className="detail-label">Bus ida</div>
                           <div className="detail-value">
-                            <span className={`chip ${e.bus_outbound ? "chip-green" : "chip-gray"}`}>
-                              {e.bus_outbound ? "Sí" : "No"}
+                            <span className={`chip ${e.bus_outbound && e.bus_outbound !== "none" ? "chip-green" : "chip-gray"}`}>
+                              {busStopLabel(e.bus_outbound)}
                             </span>
                           </div>
                         </div>

@@ -95,44 +95,42 @@ text: {
       ],
     },
   },
-  maps: {
-    7: {
-      14: MapId.PewterCityMuseum1f,
-    },
-    13: {
-      29: MapId.PewterCityNpcB,
-    },
-    16: {
-      39: MapId.Route3,
-    },
-    17: {
-      16: MapId.PewterCityGym,
-      23: MapId.PewterCityPokeMart,
-      39: MapId.Route3,
-    },
-    18: {
-      39: MapId.Route3,
-    },
-    19: {
-      39: MapId.Route3,
-    },
-    25: {
-      13: MapId.PewterCityPokemonCenter,
-    },
-    29: {
-      7: MapId.PewterCityNpcA,
-    },
-  },
 
 recoverLocation: { x: 12, y: 29 },
-  exits: {
-    35: [18, 19],
+maps: {
+    10: {
+      13: MapId.PewterCityMuseum1f,
+    },
+    16: {
+      28: MapId.PewterCityNpcB,
+    },
+    19: {
+      38: MapId.Route3,
+    },
+    20: {
+      15: MapId.PewterCityGym,
+      22: MapId.PewterCityPokeMart,
+      38: MapId.Route3,
+    },
+    21: {
+      38: MapId.Route3,
+    },
+    22: {
+      38: MapId.Route3,
+    },
+    28: {
+      12: MapId.PewterCityPokemonCenter,
+    },
+    32: {
+      6: MapId.PewterCityNpcA,
+    },
   },
-  exitReturnPos: {
-    x: 5,
-    y: 1,
+teleports: {},
+exits: {
+    35: [17, 18],
   },
-  exitReturnMap: MapId.Route2GateNorth,
+exitReturnMap: MapId.Route2GateNorth,
+exitReturnPos: { x: 5, y: 1 },
 // Trainers para "pewter-city"
 trainers: [
   {
