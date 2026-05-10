@@ -135,7 +135,8 @@ export async function POST(request: Request) {
 
     // Intento de leer fila existente con overrides; si la columna no existe
     // hacemos fallback sin overrides para no romper.
-    let existing: { trainers?: unknown; walls?: unknown; overrides?: unknown } | null = null;
+    type ExistingRow = { trainers?: unknown; walls?: unknown; overrides?: unknown };
+    let existing: ExistingRow | null = null;
     let overridesColumnAvailable = true;
 
     {
@@ -157,14 +158,14 @@ export async function POST(request: Request) {
             { status: 500 },
           );
         }
-        existing = (fb.data ?? null) as typeof existing;
+        existing = (fb.data ?? null) as ExistingRow | null;
       } else if (error) {
         return NextResponse.json(
           { error: `supabase select: ${error.message}` },
           { status: 500 },
         );
       } else {
-        existing = (data ?? null) as typeof existing;
+        existing = (data ?? null) as ExistingRow | null;
       }
     }
 
