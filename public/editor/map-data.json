@@ -432,7 +432,7 @@
   },
   "mt-moon-1f": {
     "id": "mt-moon-1f",
-    "name": "Monte Luna 1F",
+    "name": "Monte Luna de Miel 1F",
     "imageFile": "mt-moon-1f.png",
     "height": 36,
     "width": 40,
@@ -450,11 +450,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "Hay hombres sospechosos en la cueva.",
-          "¿Y tú qué haces por aquí?"
+          "Hay tipos sospechosos en la cueva.",
+          "¿O serán invitados perdidos?"
         ],
         "outtro": [
-          "¡Los vi! ¡Seguro que son del EQUIPO ROCKET!"
+          "¡Vi al EQUIPO ROCKET cargando",
+          "con cajas de vino del SOTO!"
         ],
         "pokemon": [],
         "postGame": null
@@ -472,10 +473,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¿Qué? Estoy esperando a mis amigos aquí."
+          "Estoy esperando a mis amigos…",
+          "¡Creíamos volver juntos del banquete!"
         ],
         "outtro": [
-          "Dicen que hay fósiles muy raros en estas cuevas."
+          "Dicen que MARTA y SERGIO ya están",
+          "buscando hoteles en KIOTO."
         ],
         "pokemon": [],
         "postGame": null
@@ -493,10 +496,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Eh! ¡No te me acerques así!"
+          "¡Eh! ¡No me grites,",
+          "que tengo el cerebro reseco!"
         ],
         "outtro": [
-          "Tengo que encontrar PKMN más fuertes."
+          "Necesito PKMN más fuertes",
+          "que mi resaca… imposible."
         ],
         "pokemon": [],
         "postGame": null
@@ -514,10 +519,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Cruza esta cueva y llegarás a CIUDAD CELESTE!"
+          "¡Cruza esta cueva y volverás",
+          "a CIUDAD CELESTE de luna de miel!"
         ],
         "outtro": [
-          "Los Zubat son duros, ¡pero muy útiles si los capturas!"
+          "¡Los novios vuelan a JAPÓN!",
+          "¡Yo me vuelvo a la cama!"
         ],
         "pokemon": [],
         "postGame": null
@@ -535,10 +542,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Madre mía! ¡Es mucho más grande por dentro!"
+          "¡Madre mía! ¡Esto retumba",
+          "como mi cabeza esta mañana!"
         ],
         "outtro": [
-          "¿Cómo se sale de aquí?"
+          "¿Por dónde se sale?",
+          "¡Yo solo quería un café!"
         ],
         "pokemon": [],
         "postGame": null
@@ -556,11 +565,13 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Anda! ¡Menudo susto me has dado!",
-          "Ah, solo eres un criño."
+          "¡Anda! ¡Menudo susto!",
+          "Creía que eras el camarero del SOTO",
+          "viniendo a cobrarme los chupitos."
         ],
         "outtro": [
-          "¡Los niños no deberíais estar aquí!"
+          "¡A vuestra edad ya deberíais",
+          "saber controlar el ANTÍS!"
         ],
         "pokemon": [],
         "postGame": null
@@ -578,10 +589,13 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¿Tú también has venido a explorar?"
+          "¿Tú también te has perdido",
+          "al volver de la boda?"
         ],
         "outtro": [
-          "Yo vine a buscar novia, que aquí hay mucha humedad."
+          "Yo vine a buscar pareja…",
+          "¡pero MARTA y SERGIO ya se llevaron",
+          "toda la suerte para JAPÓN!"
         ],
         "pokemon": [],
         "postGame": null
@@ -1061,7 +1075,9 @@
     "texts": {
       "23": {
         "15": [
-          "¡Cuidado! ¡Los ZUBAT son chupasangres!"
+          "¡Cuidado! ¡Los ZUBAT chupan",
+          "más sangre que el barman",
+          "de la barra libre de ayer!"
         ]
       }
     },
@@ -1160,7 +1176,7 @@
   },
   "mt-moon-2f": {
     "id": "mt-moon-2f",
-    "name": "Monte Luna 2F",
+    "name": "Monte Luna de Miel 2F",
     "imageFile": "mt-moon-2f.png",
     "height": 36,
     "width": 40,
@@ -1178,10 +1194,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "Nosotros, el EQUIPO ROCKET, ¡somos los malos del PKMN!"
+          "¡El EQUIPO ROCKET nunca falta",
+          "a un saqueo — ni a una boda!"
         ],
         "outtro": [
-          "¡Maldición! ¡Mis compañeros no perdonarán esto!"
+          "¡Maldición! ¡Mis compis siguen",
+          "durmiendo la mona en un rincón!"
         ],
         "pokemon": [],
         "postGame": null
@@ -1199,10 +1217,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Estamos haciendo un trabajo aquí! ¡Larga, crío!"
+          "¡Estamos buscando los regalos",
+          "de los novios! ¡Lárgate, crío!"
         ],
         "outtro": [
-          "¡Si encuentras un fósil, dámelo y pírate!"
+          "Si encuentras algún ANTÍS sin abrir,",
+          "¡dánoslo y nos largamos!"
         ],
         "pokemon": [],
         "postGame": null
@@ -1220,10 +1240,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Los niños no deben meterse con los mayores!"
+          "¡Los críos sin resaca",
+          "no entendéis el sufrimiento adulto!"
         ],
         "outtro": [
-          "Los PKMN vivieron aquí mucho antes que las personas."
+          "MARTA y SERGIO ya andan haciendo",
+          "las maletas para JAPÓN… ¡y nosotros aquí!"
         ],
         "pokemon": [],
         "postGame": null
@@ -1241,10 +1263,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡El EQUIPO ROCKET encontrará los fósiles, los revivirá y los venderá!"
+          "¡El EQUIPO ROCKET revenderá",
+          "todas las botellas vacías del banquete!"
         ],
         "outtro": [
-          "¡Me has enfadado! ¡El EQUIPO ROCKET te tendrá fichado!"
+          "¡Me has enfadado!",
+          "¡Ya nos vengaremos en TOKIO!"
         ],
         "pokemon": [],
         "postGame": null
@@ -1262,11 +1286,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Eh, para! ¡Estos fósiles los encontré yo! ¡Son míos los dos!"
+          "¡Eh, para! ¡Estos sushis caíos",
+          "de la mesa son míos! ¡Los dos!"
         ],
         "outtro": [
-          "¡Nos quedamos uno cada uno!",
-          "¡Nada de avaricia!"
+          "¡Vale, uno cada uno!",
+          "Que los novios se llevan el resto a JAPÓN."
         ],
         "pokemon": [],
         "postGame": null
@@ -1785,7 +1810,7 @@
   },
   "mt-moon-3f": {
     "id": "mt-moon-3f",
-    "name": "Monte Luna 3F",
+    "name": "Monte Luna de Miel 3F",
     "imageFile": "mt-moon-3f.png",
     "height": 28,
     "width": 28,
@@ -5802,7 +5827,7 @@
   },
   "route-3": {
     "id": "route-3",
-    "name": "Ruta 3",
+    "name": "Ruta 3 · Camino de la Resaca",
     "imageFile": "route-3.png",
     "height": 36,
     "width": 73,
@@ -5820,10 +5845,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¿Me has mirado, verdad?"
+          "Eh… ¿tú también vienes de la boda?",
+          "¡Pues a celebrar otra vez!"
         ],
         "outtro": [
-          "¡Deja de mirarme si no quieres pelea!"
+          "¡Marta y Sergio están ya",
+          "haciendo las MALETAS para JAPÓN!"
         ],
         "pokemon": [],
         "postGame": null
@@ -5841,11 +5868,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Ey! ¡Te vi en el BOSQUE AÑIL!"
+          "¿No te vi anoche bailando",
+          "sobre una mesa en el SOTO?"
         ],
         "outtro": [
-          "Hay otros tipos de PKMN",
-          "además de los del bosque!"
+          "Yo todavía llevo confeti",
+          "en sitios donde no debería haber confeti."
         ],
         "pokemon": [],
         "postGame": null
@@ -5863,11 +5891,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Hola! ¡Me gustan los pantalones cortos! ¡Son cómodos y fáciles de llevar!"
+          "¡Hola! ¡Me gustan los pantalones cortos!",
+          "¡Aunque hoy llevo el esmoquin aún puesto!"
         ],
         "outtro": [
-          "¿Guardas PKMN en el PC?",
-          "¡Cada caja tiene capacidad para 20 PKMN!"
+          "En la PC tengo guardado",
+          "todo lo que vomité ayer… metafóricamente."
         ],
         "pokemon": [],
         "postGame": null
@@ -5885,11 +5914,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¿Eres entrenador? ¡A pelear!"
+          "¿Entrenador o invitado de boda?",
+          "¡Da igual! ¡Pelea para despejarte!"
         ],
         "outtro": [
-          "Si una CAJA del PC se llena,",
-          "¡cambia a otra CAJA!"
+          "Esta resaca es PEOR",
+          "que un MEWTWO a nivel 70."
         ],
         "pokemon": [],
         "postGame": null
@@ -5907,10 +5937,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Ey! ¡Tú no llevas pantalones cortos!"
+          "¡Ey! ¡Tú no llevas la pajarita torcida!",
+          "¿Es que no fuiste al banquete?"
         ],
         "outtro": [
-          "¡Yo siempre llevo pantalones cortos, hasta en invierno!"
+          "¡Yo siempre llevo pantalones cortos!",
+          "¡Hasta debajo del esmoquin!"
         ],
         "pokemon": [],
         "postGame": null
@@ -5928,11 +5960,13 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "Esa mirada que me has echado...",
-          "¡me resulta muy intrigante!"
+          "Esa cara de resaca…",
+          "¡también estuviste en VILLAMAYOR!"
         ],
         "outtro": [
-          "¡Evita peleas sin que te vean!"
+          "Dicen que MARTA y SERGIO",
+          "vuelan a JAPÓN esta semana.",
+          "¡Qué envidia me dan!"
         ],
         "pokemon": [],
         "postGame": null
@@ -5950,10 +5984,12 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Ven a pelear contra mi nuevo PKMN!"
+          "¡Ven a pelear!",
+          "¡Necesito sudar el ANTÍS de anoche!"
         ],
         "outtro": [
-          "¡Los PKMN entrenados son más fuertes que los salvajes!"
+          "Mis PKMN también están con resaca.",
+          "¡A todos nos sentó fatal el brindis!"
         ],
         "pokemon": [],
         "postGame": null
@@ -5971,10 +6007,13 @@
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Uy! ¿Me has tocado?"
+          "¡Ay! ¡No me toques la cabeza!",
+          "¡Me retumba como un GONG!"
         ],
         "outtro": [
-          "La RUTA 4 está al pie del MONTE LUNA."
+          "El MONTE LUNA DE MIEL",
+          "queda al fondo de la ruta.",
+          "¡Igual que la suite de los novios!"
         ],
         "pokemon": [],
         "postGame": null
@@ -6523,14 +6562,17 @@
     "texts": {
       "7": {
         "67": [
-          "MONTE LUNA",
-          "Entrada al túnel"
+          "MONTE LUNA DE MIEL",
+          "¿Quién vuelve a casa así?"
         ]
       },
       "27": {
         "59": [
-          "RUTA 3",
-          "MONTE LUNA → próxima parada"
+          "RUTA 3 · CAMINO DE LA RESACA",
+          "Hacia el MONTE LUNA DE MIEL.",
+          "Cuidado con los chupasangres,",
+          "que ayer ya nos chuparon",
+          "hasta la última copa."
         ]
       }
     },

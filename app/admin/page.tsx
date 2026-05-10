@@ -1,9 +1,9 @@
 /**
  * Página admin — Lista de RSVPs y equipos Pokémon.
- * Acceso: /admin?key=ADMIN_SECRET
+ * Acceso: /admin (protegido por middleware con cookie ADMIN_PASSWORD).
  * Server Component (Next.js App Router) — sin JS de cliente.
  */
-import { redirect } from "next/navigation";
+import ImpersonateButtons from "./ImpersonateButtons";
 
 const SUPABASE_URL = "https://kplfjrjibjptigvfgdvy.supabase.co";
 const SUPABASE_ANON_KEY =
@@ -17,6 +17,7 @@ interface PokemonInst {
 }
 
 interface RSVPEntry {
+  user_id: string;
   player_name: string;
   companion: string | null;
   children: number;
@@ -73,20 +74,10 @@ function busStopLabel(v: string) {
   return "No";
 }
 
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ key?: string }>;
-}) {
-  const params = await searchParams;
-  const key = params.key ?? "";
-  const secret = process.env.ADMIN_SECRET ?? "";
+export default async function AdminPage() {
+  const adminSecret = process.env.ADMIN_SECRET ?? "";
 
-  if (!secret || key !== secret) {
-    redirect("/");
-  }
-
-  const { entries, httpStatus, errorMsg } = await fetchRsvps(key);
+  const { entries, httpStatus, errorMsg } = await fetchRsvps(adminSecret);
 
   const totalRsvps     = entries.length;
   const attendingEntries = entries.filter((e) => e.attended !== false);
@@ -96,6 +87,9 @@ export default async function AdminPage({
   const totalChildren  = attendingEntries.reduce((s, e) => s + (e.children ?? 0), 0);
   const totalAllergies = attendingEntries.filter((e) => e.allergies && e.allergies.trim() !== "").length;
   const totalBusOut    = attendingEntries.filter((e) => e.bus_outbound && e.bus_outbound !== "none").length;
+  const totalBusClubTenis = attendingEntries.filter((e) => e.bus_outbound === "club-tenis").length;
+  const totalBusPioXii    = attendingEntries.filter((e) => e.bus_outbound === "pio-xii").length;
+  const totalBusArdoi     = attendingEntries.filter((e) => e.bus_outbound === "ardoi").length;
   const totalBus2300   = attendingEntries.filter((e) => e.bus_return === "23:00").length;
   const totalBus0130   = attendingEntries.filter((e) => e.bus_return === "01:30" || e.bus_return === "1:45").length;
   const totalPreboda   = attendingEntries.filter((e) => e.preboda).length;
@@ -358,6 +352,18 @@ export default async function AdminPage({
             <span className="stat-value">{totalBusOut}</span>
           </div>
           <div className="stat-card">
+            <span className="stat-label">Club Tenis 11:00</span>
+            <span className="stat-value">{totalBusClubTenis}</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">Pío XII 11:15</span>
+            <span className="stat-value">{totalBusPioXii}</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">Ardoi 11:30</span>
+            <span className="stat-value">{totalBusArdoi}</span>
+          </div>
+          <div className="stat-card">
             <span className="stat-label">Bus 23:00</span>
             <span className="stat-value">{totalBus2300}</span>
           </div>
@@ -503,6 +509,11 @@ export default async function AdminPage({
                             ))}
                           </div>
                         </div>
+                      )}
+
+                      {/* ── Acciones de impersonación ── */}
+                      {e.user_id && (
+                        <ImpersonateButtons userId={e.user_id} playerName={e.player_name} />
                       )}
                     </div>
                   </details>

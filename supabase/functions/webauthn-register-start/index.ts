@@ -8,15 +8,36 @@ Deno.serve(async (req) => {
   try {
     await db.rpc("cleanup_webauthn_challenges");
 
-    // Create anonymous user
-    const { data: user, error: userErr } = await db
-      .from("wedding_users")
-      .insert({})
-      .select("id")
-      .single();
-    if (userErr) throw userErr;
+    // Si viene `userId` en el body → registrar passkey adicional sobre un user existente
+    // (modo "Recuperar partida" desde el admin). Si no, crear nuevo wedding_user anónimo.
+    let providedUserId: string | undefined;
+    try {
+      const body = await req.json();
+      if (body && typeof body.userId === "string" && body.userId.length > 0) {
+        providedUserId = body.userId;
+      }
+    } catch {
+      // sin body → flujo normal
+    }
 
-    const userId: string = user.id;
+    let userId: string;
+
+    if (providedUserId) {
+      // Asegurar que el row existe en wedding_users (idempotente)
+      await db
+        .from("wedding_users")
+        .upsert({ id: providedUserId }, { onConflict: "id", ignoreDuplicates: true });
+      userId = providedUserId;
+    } else {
+      // Create anonymous user
+      const { data: user, error: userErr } = await db
+        .from("wedding_users")
+        .insert({})
+        .select("id")
+        .single();
+      if (userErr) throw userErr;
+      userId = user.id;
+    }
 
     const options = await generateRegistrationOptions({
       rpName: RP_NAME,

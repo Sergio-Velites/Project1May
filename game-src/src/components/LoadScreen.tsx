@@ -17,6 +17,7 @@ import {
   loadFromCloud,
   createUser,
   setCurrentUserId,
+  setImpersonatedUserId,
 } from "../app/cloud-save";
 import OakIntro from "./OakIntro";
 import { GameState } from "../state/state-types";
@@ -93,6 +94,14 @@ const LoadScreen = () => {
   // Guard atómico: previene que un doble-click o un closure stale dispare
   // handleNewGame tras haber ya ejecutado handleContinue (o viceversa).
   const choosingRef = useRef(false);
+  // UUID a impersonar leído de la URL (?play_as= o ?recover=). Se mantiene en
+  // un ref para no recalcular search params en cada render.
+  const impersonationRef = useRef<{
+    userId: string;
+    mode: "play_as" | "recover";
+  } | null>(null);
+  // Mensaje de estado tras vincular dispositivo en modo recover.
+  const [linkedMsg, setLinkedMsg] = useState<string | null>(null);
 
   const loadComplete = () => {
     setTimeout(() => dispatch(hideLoadMenu()), 300);
@@ -114,6 +123,42 @@ const LoadScreen = () => {
   // DESPUÉS de que el TitleScreen se cierre, para que la secuencia de pantallas
   // sea estrictamente: GameboyMenu → Video → TitleScreen → passskey/choose.
   const runBootstrap = async () => {
+    // ── Modo impersonación desde admin (?play_as=UUID o ?recover=UUID) ──
+    // Salta passkey y carga directamente la partida del UUID indicado.
+    try {
+      const search = new URLSearchParams(window.location.search);
+      const playAs = search.get("play_as");
+      const recover = search.get("recover");
+      const target = (recover || playAs)?.trim();
+      const mode: "play_as" | "recover" | null = recover
+        ? "recover"
+        : playAs
+        ? "play_as"
+        : null;
+      // UUID v4 simple validation
+      if (
+        target &&
+        mode &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          target
+        )
+      ) {
+        impersonationRef.current = { userId: target, mode };
+        setImpersonatedUserId(target, mode);
+        const save = await loadFromCloud(target);
+        if (save) {
+          cloudSave.current = save as GameState;
+          transitionTo("choose");
+        } else {
+          // Sin save → solo nueva partida (raro en impersonación, pero soportado)
+          transitionTo("oak-intro");
+        }
+        return;
+      }
+    } catch {
+      // si algo falla, caer al flujo normal
+    }
+
     const userId = localStorage.getItem("wedding_user_id");
     const credentialId = localStorage.getItem("wedding_credential_id");
     const webAuthnOk = isWebAuthnAvailable();
@@ -313,8 +358,57 @@ const LoadScreen = () => {
       setPhase("oak-intro");
     };
 
+    const handleLinkDevice = async () => {
+      if (choosingRef.current) return;
+      choosingRef.current = true;
+      const target = impersonationRef.current?.userId;
+      if (!target) return;
+      setMenuReady(false);
+      setPhase("registering");
+      try {
+        const linkedId = await webauthnRegister(target);
+        if (linkedId) {
+          // Dispositivo enlazado: ya no necesitamos impersonar para futuras visitas
+          setCurrentUserId(linkedId);
+          setLinkedMsg("¡Dispositivo vinculado! Pulsa A para continuar.");
+        } else {
+          setLinkedMsg("No se pudo vincular. Pulsa A para seguir jugando.");
+        }
+      } catch {
+        setLinkedMsg("Error al vincular. Pulsa A para seguir jugando.");
+      }
+      // Tras un breve delay, volver a "choose" sin opción de vincular
+      // (mostraremos solo Continuar / Nueva). Forzamos releer el menú reseteando
+      // el flag de impersonación visual.
+      impersonationRef.current = impersonationRef.current
+        ? { ...impersonationRef.current, mode: "play_as" }
+        : null;
+      choosingRef.current = false;
+      setTimeout(() => {
+        transitionTo("choose");
+      }, 1500);
+    };
+
+    const isRecoverMode =
+      impersonationRef.current?.mode === "recover" && !linkedMsg;
+
+    const baseItems = [
+      { label: "Continuar", action: handleContinue },
+      { label: "Nueva partida", action: handleNewGame },
+    ];
+    const menuItems = isRecoverMode
+      ? [...baseItems, { label: "Vincular Face ID/Huella", action: handleLinkDevice }]
+      : baseItems;
+
     return (
       <StyledLoadScreen>
+        {linkedMsg && (
+          <TextArea>
+            <Frame>
+              <StatusText $flashing={false}>{linkedMsg}</StatusText>
+            </Frame>
+          </TextArea>
+        )}
         <Menu
           show={menuReady}
           disabled={!menuReady}
@@ -323,10 +417,7 @@ const LoadScreen = () => {
           left="2px"
           padding="7vw"
           close={() => {}}
-          menuItems={[
-            { label: "Continuar", action: handleContinue },
-            { label: "Nueva partida", action: handleNewGame },
-          ]}
+          menuItems={menuItems}
         />
       </StyledLoadScreen>
     );

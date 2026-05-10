@@ -13,12 +13,30 @@ const SUPABASE_ANON_KEY =
 // Se inicializa con el valor de localStorage para que persista entre recargas.
 let currentUserId: string | null = localStorage.getItem("wedding_user_id");
 
+// Impersonation: cuando se entra al juego con ?play_as=UUID o ?recover=UUID
+// desde el admin, este ID toma precedencia sobre el de localStorage SIN sobreescribirlo,
+// de forma que la próxima recarga normal vuelve a la cuenta original del dispositivo.
+let impersonatedUserId: string | null = null;
+let impersonationMode: "none" | "play_as" | "recover" = "none";
+
+export const setImpersonatedUserId = (
+  id: string,
+  mode: "play_as" | "recover"
+) => {
+  impersonatedUserId = id;
+  impersonationMode = mode;
+  // No tocamos localStorage — el dispositivo conserva su identidad original.
+};
+
+export const getImpersonationMode = () => impersonationMode;
+export const isImpersonating = () => impersonatedUserId !== null;
+
 export const setCurrentUserId = (id: string) => {
   currentUserId = id;
   localStorage.setItem("wedding_user_id", id);
 };
 
-export const getCurrentUserId = () => currentUserId;
+export const getCurrentUserId = () => impersonatedUserId ?? currentUserId;
 
 export const isWebAuthnAvailable = (): boolean => {
   if (!SUPABASE_URL || !window.PublicKeyCredential) return false;
@@ -164,9 +182,21 @@ export const createUser = async (): Promise<string | null> => {
 
 // ---- WebAuthn Registration ----
 
-export const webauthnRegister = async (): Promise<string | null> => {
+/**
+ * Registra una nueva passkey.
+ * - Sin argumentos: crea un nuevo wedding_user anónimo (flujo normal).
+ * - Con `existingUserId`: añade la passkey de este dispositivo al user_id dado
+ *   (modo "Recuperar partida" desde el admin).
+ *
+ * En ambos casos, al finalizar OK, persiste `wedding_user_id` y `wedding_credential_id`
+ * en localStorage (el dispositivo queda enlazado a esa cuenta).
+ */
+export const webauthnRegister = async (
+  existingUserId?: string
+): Promise<string | null> => {
   try {
-    const startRes = await callEdge("webauthn-register-start", {});
+    const startBody = existingUserId ? { userId: existingUserId } : {};
+    const startRes = await callEdge("webauthn-register-start", startBody);
     if (!startRes.ok) return null;
     const { challengeId, userId, options } = await startRes.json();
 
