@@ -34,6 +34,7 @@ const houseA2f: MapType = {
     x: 6,
     y: 2,
   },
+  recoverLocation: { x: 0, y: 6 },
   exitReturnMap: MapId.PalletTownHouseA1F,
   grass: {},
 };
