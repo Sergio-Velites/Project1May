@@ -53,6 +53,10 @@ interface UiState {
   academyPokeballOpen: boolean;
   onlineBattleMenu: boolean;
   mapGiftPending: SimpleGiftType | null;
+  // Counter incrementado cada vez que el jugador consume su turno de combate
+  // sin atacar (cambio de Pokémon o uso de objeto). PokemonEncounter lo
+  // observa para encadenar el ataque del rival inmediatamente después.
+  playerTurnTick: number;
 }
 
 const initialState: UiState = {
@@ -80,6 +84,7 @@ const initialState: UiState = {
   academyPokeballOpen: false,
   onlineBattleMenu: false,
   mapGiftPending: null,
+  playerTurnTick: 0,
 };
 
 export const uiSlice = createSlice({
@@ -225,6 +230,9 @@ export const uiSlice = createSlice({
     closeMapGift: (state) => {
       state.mapGiftPending = null;
     },
+    incrementPlayerTurnTick: (state) => {
+      state.playerTurnTick += 1;
+    },
   },
 });
 
@@ -272,6 +280,7 @@ export const {
   hideOnlineBattleMenu,
   openMapGift,
   closeMapGift,
+  incrementPlayerTurnTick,
 } = uiSlice.actions;
 
 export const selectText = (state: RootState) => state.ui.text;
@@ -358,5 +367,8 @@ export const selectOnlineBattleMenu = (state: RootState) =>
 
 export const selectMapGiftPending = (state: RootState) =>
   state.ui.mapGiftPending;
+
+export const selectPlayerTurnTick = (state: RootState) =>
+  state.ui.playerTurnTick;
 
 export default uiSlice.reducer;

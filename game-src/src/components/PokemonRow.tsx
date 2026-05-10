@@ -147,10 +147,11 @@ const Health = styled.div`
 interface Props {
   pokemon: PokemonInstance;
   active: boolean;
+  swapMarked?: boolean;
   moveData?: MoveMetadata;
 }
 
-const PokemonRow = ({ pokemon, active, moveData }: Props) => {
+const PokemonRow = ({ pokemon, active, swapMarked, moveData }: Props) => {
   const metadata = usePokemonMetadata(pokemon.id);
   const stats = usePokemonStats(pokemon.id, pokemon.level);
 
@@ -164,6 +165,7 @@ const PokemonRow = ({ pokemon, active, moveData }: Props) => {
     <StyledPokemonRow>
       <ArrowContainer>
         <Arrow show={active} />
+        {!active && swapMarked && <Arrow show disabled />}
       </ArrowContainer>
       <Image src={icons.a} />
 

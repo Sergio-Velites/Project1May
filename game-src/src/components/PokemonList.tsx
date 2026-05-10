@@ -51,6 +51,16 @@ const EmptyRow = styled.div`
 
 interface Props {
   close: () => void;
+  /**
+   * Modo del listado:
+   * - "default" (sin definir): party screen — menú [Datos, Cambiar]; el
+   *   "Cambiar" entra en modo intercambio interno (swap de posiciones del equipo).
+   * - "battle": pantalla PKMN dentro de combate — menú [Cambiar, Datos]; el
+   *   "Cambiar" delega en `switchAction(index)` (PokemonEncounter aplica la
+   *   sustitución y el turno del rival). No se permite cambiar al activo
+   *   (refusal lo gestiona el switchAction).
+   */
+  mode?: "default" | "battle";
   switchAction?: (index: number) => void;
   clickPokemon?: (index: number) => void;
   text?: string;
@@ -60,6 +70,7 @@ interface Props {
 
 const PokemonList = ({
   close,
+  mode,
   switchAction,
   text,
   clickPokemon,
@@ -75,6 +86,10 @@ const PokemonList = ({
   const [viewingStats, setViewingStats] = useState(false);
 
   const pokemon = customPokemon ?? pokemon_;
+  const isBattleMode = mode === "battle";
+
+  // Índice absoluto del cursor en la lista (active + scroll).
+  const cursorIndex = active + scroll;
 
   useEvent(Event.Up, () => {
     if (selected || viewingStats) return;
@@ -100,30 +115,67 @@ const PokemonList = ({
     close();
   });
 
+  // ── Helper: ejecutar swap de posiciones (party screen) ───────────────────
+  const performSwap = (from: number, to: number) => {
+    if (from === to) {
+      // En Game Boy, pulsar A sobre el mismo slot cancela el modo intercambio.
+      setSwitching(null);
+      return;
+    }
+    dispatch(swapPokemonPositions([from, to]));
+    setActive(0);
+    setSwitching(null);
+    setSelected(false);
+  };
+
   useEvent(Event.A, () => {
     if (selected || viewingStats) return;
 
     if (clickPokemon) {
-      clickPokemon(active + scroll);
+      clickPokemon(cursorIndex);
       return;
     }
 
     if (switching !== null) {
-      dispatch(swapPokemonPositions([active, switching]));
-      setActive(0);
-      setSwitching(null);
-      setSelected(false);
+      performSwap(cursorIndex, switching);
       return;
     }
 
     setSelected(true);
   });
 
+  // ── Items del menú [Datos / Cambiar] según contexto ──────────────────────
+  const datosItem = {
+    label: "Datos",
+    action: () => {
+      setSelected(false);
+      setViewingStats(true);
+    },
+  };
+
+  const cambiarItem = {
+    label: "Cambiar",
+    action: () => {
+      setSelected(false);
+      if (isBattleMode) {
+        // En combate: PokemonEncounter decide si rechaza (mismo activo, KO).
+        if (switchAction) switchAction(cursorIndex);
+      } else {
+        // Party screen: marcar slot y pedir destino.
+        setSwitching(cursorIndex);
+      }
+    },
+  };
+
+  const menuItems = isBattleMode
+    ? [cambiarItem, datosItem]
+    : [datosItem, cambiarItem];
+
   return (
     <>
       {viewingStats && (
         <PokemonSummary
-          pokemon={pokemon[active + scroll]}
+          pokemon={pokemon[cursorIndex]}
           onClose={() => setViewingStats(false)}
         />
       )}
@@ -136,6 +188,9 @@ const PokemonList = ({
                 key={i}
                 pokemon={p}
                 active={active === i}
+                swapMarked={
+                  switching !== null && switching === scroll + i
+                }
                 moveData={moveData}
               />
             ) : (
@@ -147,7 +202,7 @@ const PokemonList = ({
           <Frame wide tall>
             {text
               ? text
-              : switching
+              : switching !== null
               ? "¿Dónde mover al POKÉMON?"
               : "Elige un POKÉMON."}
           </Frame>
@@ -157,23 +212,7 @@ const PokemonList = ({
         right="0"
         bottom="0"
         show={selected}
-        menuItems={[
-          {
-            label: "Datos",
-            action: () => {
-              setSelected(false);
-              setViewingStats(true);
-            },
-          },
-          {
-            label: "Cambiar",
-            action: () => {
-              setSelected(false);
-              if (switchAction) switchAction(active);
-              else setSwitching(active);
-            },
-          },
-        ]}
+        menuItems={menuItems}
         close={() => setSelected(false)}
       />
     </>

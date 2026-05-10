@@ -49,6 +49,7 @@ import {
   selectEvolution,
   selectItemsMenu,
   selectPokeballThrowing,
+  selectPlayerTurnTick,
   selectStartMenu,
   showEvolution,
   showItemsMenu,
@@ -519,6 +520,15 @@ const PokemonEncounter = () => {
   const pokeballThrowing = useSelector(selectPokeballThrowing);
   const trainer = useSelector(selectTrainerEncounter);
   const activePokemonIndex = useSelector(selectActivePokemonIndex);
+  const playerTurnTick = useSelector(selectPlayerTurnTick);
+
+  // Cuando el jugador cambia de Pokémon en combate, encadenamos el turno
+  // del rival al terminar la animación de salida (stage 11). Este ref evita
+  // que el ataque del rival se dispare después de cambios sin combate
+  // (por KO previo, intro inicial, etc.).
+  const enemyTurnAfterSwapRef = useRef(false);
+  // Para detectar incrementos del tick (uso de objeto en combate).
+  const lastTurnTickRef = useRef(playerTurnTick);
 
   // 0 = intro animation started
   // 1 = intro animation finished
@@ -1056,7 +1066,9 @@ const PokemonEncounter = () => {
     }
 
     if ([42, 43, 44].includes(stage)) {
-      setStage(11);
+      // Tras un fallo de Poké Ball (Gen I), se consume el turno: el rival
+      // ataca antes de devolver el control al menú de combate.
+      processEnemyOnlyTurn();
     }
 
     if (stage === 45) {
@@ -1181,6 +1193,138 @@ const PokemonEncounter = () => {
     if (!enemy.moves || enemy.moves.length === 0) return "tackle";
     return enemy.moves[Math.floor(Math.random() * enemy.moves.length)];
   };
+
+  // ── Helper compartido por processBattle / processEnemyOnlyTurn ──────────
+  // Comprueba si un combatiente debe saltarse su turno por estado/flinch.
+  // Consume el flinch al comprobarlo y devuelve un mensaje de alerta cuando
+  // procede. Devuelve `true` si el combatiente NO puede actuar este turno.
+  const checkSkipTurn = (isPlayer: boolean): boolean => {
+    if (isPlayer && playerFlinchRef.current) {
+      playerFlinchRef.current = false;
+      setAlertText(`¡${activeMetadata.name.toUpperCase()} no puede moverse!`);
+      return true;
+    }
+    if (!isPlayer && enemyFlinchRef.current) {
+      enemyFlinchRef.current = false;
+      return true;
+    }
+
+    const status = isPlayer
+      ? playerStatusRef.current
+      : enemyStatusRef.current;
+    if (!status) return false;
+
+    type BT = { type: string; turns: number };
+    const setStatus = isPlayer
+      ? (s: BT | null) => {
+          setPlayerStatus(s as typeof playerStatus);
+          playerStatusRef.current = s as typeof playerStatus;
+        }
+      : (s: BT | null) => {
+          setEnemyStatus(s as typeof enemyStatus);
+          enemyStatusRef.current = s as typeof enemyStatus;
+        };
+
+    const name = isPlayer
+      ? activeMetadata.name.toUpperCase()
+      : enemyMetadata.name.toUpperCase() + " rival";
+
+    if (status.type === "sleep") {
+      const newTurns = status.turns - 1;
+      if (newTurns <= 0) {
+        setStatus(null);
+        setAlertText(`¡${name} se despertó!`);
+        return false;
+      }
+      setStatus({ ...status, turns: newTurns });
+      setAlertText(`¡${name} está dormido...!`);
+      return true;
+    }
+    if (status.type === "freeze") {
+      if (Math.random() < 0.20) {
+        setStatus(null);
+        setAlertText(`¡${name} se descongeló!`);
+        return false;
+      }
+      setAlertText(`¡${name} está congelado!`);
+      return true;
+    }
+    if (status.type === "paralysis" && Math.random() < 0.25) {
+      setAlertText(`¡${name} está paralizado! ¡No puede moverse!`);
+      return true;
+    }
+    return false;
+  };
+
+  // ── Turno solo del rival ────────────────────────────────────────────────
+  // Se invoca cuando el jugador "consume turno" sin atacar:
+  //   · Cambio de Pokémon en combate.
+  //   · Uso de objeto (poción, éter, revivir, etc.).
+  //   · Lanzamiento fallido de Poké Ball.
+  // El cambio/objeto siempre va antes (Gen I), así que aquí solo procesamos
+  // el ataque del rival contra el Pokémon activo actual.
+  const processEnemyOnlyTurn = () => {
+    if (!enemy || !active) return;
+    const enemyMoveId = getRandomEnemyMove();
+    const enemyMove = getMoveMetadata(enemyMoveId);
+    const stagesSnapshot = { us: playerStages, them: enemyStages };
+
+    // Snapshot del Pokémon activo actual (puede haber cambiado tras setActivePokemon).
+    const currentActive = pokemon[activePokemonIndex];
+    if (!currentActive) return;
+
+    if (checkSkipTurn(false)) {
+      // Rival salta turno
+      setStage(18);
+      setTimeout(() => {
+        setAlertText(null);
+        applyEndOfTurnStatus(currentActive, enemy);
+      }, ATTACK_ANIMATION);
+      return;
+    }
+
+    const { us } = processMoveResult(
+      processMove(currentActive, enemy, enemyMove.id, false, stagesSnapshot, {
+        lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+        isTargetSleeping: playerStatusRef.current?.type === "sleep",
+      }),
+      false,
+      enemyMove.id
+    );
+    setTimeout(() => {
+      if (us.hp <= 0) setStage(24);
+      else applyEndOfTurnStatus(us, enemy);
+    }, ATTACK_ANIMATION + 1000);
+  };
+
+  // useEffect: cuando el ItemsMenu (u otra UI) incrementa playerTurnTick,
+  // ejecutar el turno del rival. Solo si estamos en el menú de combate
+  // (stage 11) para no pisar otras animaciones en curso.
+  useEffect(() => {
+    if (playerTurnTick === lastTurnTickRef.current) return;
+    lastTurnTickRef.current = playerTurnTick;
+    if (!isInBattle) return;
+    // Esperar al siguiente tick de event loop para asegurar que el menú
+    // se ha cerrado y los reducers han propagado.
+    setTimeout(() => {
+      if (active && active.hp > 0) processEnemyOnlyTurn();
+    }, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playerTurnTick]);
+
+  // useEffect: encadenar ataque del rival al terminar la animación de
+  // entrada del Pokémon recién cambiado en combate. La animación termina
+  // dejando stage = 11; usamos el ref para distinguir un swap mid-combate
+  // (rival ataca) de un cambio tras KO (rival ya atacó previamente).
+  useEffect(() => {
+    if (stage !== 11) return;
+    if (!enemyTurnAfterSwapRef.current) return;
+    enemyTurnAfterSwapRef.current = false;
+    setTimeout(() => {
+      if (active && active.hp > 0) processEnemyOnlyTurn();
+    }, 200);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
 
   const getActiveMovesFirst = (
     activeMove: MoveMetadata,
@@ -1573,58 +1717,6 @@ const PokemonEncounter = () => {
         ? { ...active, id: transformedId, moves: transformedMoves }
         : active;
 
-    // ── Helper: comprobar si un pokémon debe saltar su turno ─────────────
-    const checkSkipTurn = (isPlayer: boolean): boolean => {
-      // Flinch tiene prioridad sobre estados (se consume al comprobar)
-      if (isPlayer && playerFlinchRef.current) {
-        playerFlinchRef.current = false;
-        setAlertText(`¡${activeMetadata.name.toUpperCase()} no puede moverse!`);
-        return true;
-      }
-      if (!isPlayer && enemyFlinchRef.current) {
-        enemyFlinchRef.current = false;
-        return true; // rival flincheó — sin mensaje visible
-      }
-
-      const status    = isPlayer ? playerStatusRef.current : enemyStatusRef.current;
-      if (!status) return false;
-
-      type BT = { type: string; turns: number };
-      const setStatus = isPlayer
-        ? (s: BT | null) => { setPlayerStatus(s as typeof playerStatus); playerStatusRef.current = s as typeof playerStatus; }
-        : (s: BT | null) => { setEnemyStatus(s as typeof enemyStatus);   enemyStatusRef.current  = s as typeof enemyStatus; };
-
-      const name = isPlayer
-        ? activeMetadata.name.toUpperCase()
-        : enemyMetadata.name.toUpperCase() + " rival";
-
-      if (status.type === "sleep") {
-        const newTurns = status.turns - 1;
-        if (newTurns <= 0) {
-          setStatus(null);
-          setAlertText(`¡${name} se despertó!`);
-          return false; // se despertó, puede moverse este turno
-        }
-        setStatus({ ...status, turns: newTurns });
-        setAlertText(`¡${name} está dormido...!`);
-        return true;
-      }
-      if (status.type === "freeze") {
-        if (Math.random() < 0.20) {
-          setStatus(null);
-          setAlertText(`¡${name} se descongeló!`);
-          return false;
-        }
-        setAlertText(`¡${name} está congelado!`);
-        return true;
-      }
-      if (status.type === "paralysis" && Math.random() < 0.25) {
-        setAlertText(`¡${name} está paralizado! ¡No puede moverse!`);
-        return true;
-      }
-      return false;
-    };
-
     // ── Jugador mueve primero ─────────────────────────────────────────────
     if (activeMovesFirst) {
       if (checkSkipTurn(true)) {
@@ -1944,8 +2036,19 @@ const PokemonEncounter = () => {
           />
           {stage === 13 && (
             <PokemonList
+              mode="battle"
               close={() => setStage(11)}
               switchAction={(index) => {
+                if (index === activePokemonIndex) {
+                  setClickableNotice("¡Ya está en combate!");
+                  return;
+                }
+                if (pokemon[index].hp <= 0) {
+                  setClickableNotice("¡No puede luchar!");
+                  return;
+                }
+                // Cambio voluntario en combate: consume turno (Gen I).
+                enemyTurnAfterSwapRef.current = true;
                 dispatch(setActivePokemon(index));
                 setInvolvedPokemon([...involvedPokemon, index]);
                 throwPokeball();
@@ -1960,10 +2063,16 @@ const PokemonEncounter = () => {
           />
           {stage === 25 && (
             <PokemonList
+              mode="battle"
               text="¿A cuál POKéMON mandas?"
               close={() => {}}
               switchAction={(index) => {
-                if (pokemon[index].hp <= 0) return;
+                if (pokemon[index].hp <= 0) {
+                  setClickableNotice("¡No puede luchar!");
+                  return;
+                }
+                // KO forzado: el rival ya gastó su turno al noquear, no
+                // encadenamos otro ataque.
                 dispatch(setActivePokemon(index));
                 setInvolvedPokemon([...involvedPokemon, index]);
                 throwPokeball();
