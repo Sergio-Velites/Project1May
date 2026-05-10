@@ -7,7 +7,7 @@ import getEncounterData from "./get-location-data";
 import { MapId, MapType } from "./map-types";
 
 const mtMoon1f: MapType = {
-  name: "Monte Luna 1F",
+  name: "Monte Luna de Miel 1F",
   image,
   music,
   cave: true,
@@ -64,7 +64,11 @@ const mtMoon1f: MapType = {
   grass: {},
   text: {
     23: {
-      15: ["¡Cuidado! ¡Los ZUBAT son chupasangres!"],
+      15: [
+        "¡Cuidado! ¡Los ZUBAT chupan",
+        "más sangre que el barman",
+        "de la barra libre de ayer!",
+      ],
     },
   },
   maps: {},
@@ -120,8 +124,14 @@ const mtMoon1f: MapType = {
         },
       ],
       facing: Direction.Down,
-      intro: ["Hay hombres sospechosos en la cueva.", "¿Y tú qué haces por aquí?"],
-      outtro: ["¡Los vi! ¡Seguro que son del EQUIPO ROCKET!"],
+      intro: [
+        "Hay tipos sospechosos en la cueva.",
+        "¿O serán invitados perdidos?",
+      ],
+      outtro: [
+        "¡Vi al EQUIPO ROCKET cargando",
+        "con cajas de vino del SOTO!",
+      ],
       money: 110,
       pos: {
         x: 7,
@@ -137,8 +147,14 @@ const mtMoon1f: MapType = {
         },
       ],
       facing: Direction.Down,
-      intro: ["¿Qué? Estoy esperando a mis amigos aquí."],
-      outtro: ["Dicen que hay fósiles muy raros en estas cuevas."],
+      intro: [
+        "Estoy esperando a mis amigos…",
+        "¡Creíamos volver juntos del banquete!",
+      ],
+      outtro: [
+        "Dicen que MARTA y SERGIO ya están",
+        "buscando hoteles en KIOTO.",
+      ],
       money: 210,
       pos: {
         x: 17,
@@ -158,8 +174,14 @@ const mtMoon1f: MapType = {
         },
       ],
       facing: Direction.Up,
-      intro: ["¡Eh! ¡No te me acerques así!"],
-      outtro: ["Tengo que encontrar PKMN más fuertes."],
+      intro: [
+        "¡Eh! ¡No me grites,",
+        "que tengo el cerebro reseco!",
+      ],
+      outtro: [
+        "Necesito PKMN más fuertes",
+        "que mi resaca… imposible.",
+      ],
       money: 275,
       pos: {
         x: 24,
@@ -183,8 +205,14 @@ const mtMoon1f: MapType = {
         },
       ],
       facing: Direction.Right,
-      intro: ["¡Cruza esta cueva y llegarás a CIUDAD CELESTE!"],
-      outtro: ["Los Zubat son duros, ¡pero muy útiles si los capturas!"],
+      intro: [
+        "¡Cruza esta cueva y volverás",
+        "a CIUDAD CELESTE de luna de miel!",
+      ],
+      outtro: [
+        "¡Los novios vuelan a JAPÓN!",
+        "¡Yo me vuelvo a la cama!",
+      ],
       money: 100,
       pos: {
         x: 30,
@@ -204,8 +232,14 @@ const mtMoon1f: MapType = {
         },
       ],
       facing: Direction.Down,
-      intro: ["¡Madre mía! ¡Es mucho más grande por dentro!"],
-      outtro: ["¿Cómo se sale de aquí?"],
+      intro: [
+        "¡Madre mía! ¡Esto retumba",
+        "como mi cabeza esta mañana!",
+      ],
+      outtro: [
+        "¿Por dónde se sale?",
+        "¡Yo solo quería un café!",
+      ],
       money: 165,
       pos: {
         x: 30,
@@ -229,8 +263,15 @@ const mtMoon1f: MapType = {
         },
       ],
       facing: Direction.Down,
-      intro: ["¡Anda! ¡Menudo susto me has dado!", "Ah, solo eres un criño."],
-      outtro: ["¡Los niños no deberíais estar aquí!"],
+      intro: [
+        "¡Anda! ¡Menudo susto!",
+        "Creía que eras el camarero del SOTO",
+        "viniendo a cobrarme los chupitos.",
+      ],
+      outtro: [
+        "¡A vuestra edad ya deberíais",
+        "saber controlar el ANTÍS!",
+      ],
       money: 150,
       pos: {
         x: 5,
@@ -254,8 +295,15 @@ const mtMoon1f: MapType = {
         },
       ],
       facing: Direction.Right,
-      intro: ["¿Tú también has venido a explorar?"],
-      outtro: ["Yo vine a buscar novia, que aquí hay mucha humedad."],
+      intro: [
+        "¿Tú también te has perdido",
+        "al volver de la boda?",
+      ],
+      outtro: [
+        "Yo vine a buscar pareja…",
+        "¡pero MARTA y SERGIO ya se llevaron",
+        "toda la suerte para JAPÓN!",
+      ],
       money: 150,
       pos: {
         x: 12,

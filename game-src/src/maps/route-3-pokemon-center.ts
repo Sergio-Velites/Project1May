@@ -6,7 +6,7 @@ import { scientist } from "../app/npcs";
 import music from "../assets/music/maps/pokemon-center.mp3";
 
 const route3PokemonCenter: MapType = {
-  name: "Centro Pokémon Ruta 3",
+  name: "Centro Pokémon Camino de la Resaca",
   image,
   height: 8,
   width: 14,
@@ -24,7 +24,10 @@ const route3PokemonCenter: MapType = {
   },
   text: {
     4: {
-      0: ["Si tienes demasiados PKMN,", "guárdalos en el PC."],
+      0: [
+        "Si tu cabeza no para de dar vueltas,",
+        "¡güárdala en el PC y sigue!",
+      ],
     },
   },
   maps: {},

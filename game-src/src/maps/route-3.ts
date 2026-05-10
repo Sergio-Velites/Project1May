@@ -6,7 +6,7 @@ import getEncounterData from "./get-location-data";
 import { MapId, MapType } from "./map-types";
 
 const route3: MapType = {
-  name: "Ruta 3",
+  name: "Ruta 3 · Camino de la Resaca",
   image,
   music,
   height: 36,
@@ -94,11 +94,17 @@ const route3: MapType = {
   },
   text: {
     7: {
-      67: ["MONTE LUNA", "Entrada al túnel"],
+      67: ["MONTE LUNA DE MIEL", "¿Quién vuelve a casa así?"],
     },
 
     27: {
-      59: ["RUTA 3", "MONTE LUNA → próxima parada"],
+      59: [
+        "RUTA 3 · CAMINO DE LA RESACA",
+        "Hacia el MONTE LUNA DE MIEL.",
+        "Cuidado con los chupasangres,",
+        "que ayer ya nos chuparon",
+        "hasta la última copa.",
+      ],
     },
   },
   maps: {
@@ -127,10 +133,12 @@ trainers: [
   facing: Direction.Left,
   pos: { x: 22, y: 27 },
   intro: [
-    "¿Me has mirado, verdad?"
+    "Eh… ¿tú también vienes de la boda?",
+    "¡Pues a celebrar otra vez!"
   ],
   outtro: [
-    "¡Deja de mirarme si no quieres pelea!"
+    "¡Marta y Sergio están ya",
+    "haciendo las MALETAS para JAPÓN!"
   ],
   money: 135,
 
@@ -141,11 +149,12 @@ trainers: [
   facing: Direction.Right,
   pos: { x: 24, y: 27 },
   intro: [
-    "¡Ey! ¡Te vi en el BOSQUE AÑIL!"
+    "¿No te vi anoche bailando",
+    "sobre una mesa en el SOTO?"
   ],
   outtro: [
-    "Hay otros tipos de PKMN",
-    "además de los del bosque!"
+    "Yo todavía llevo confeti",
+    "en sitios donde no debería haber confeti."
   ],
   money: 100,
 
@@ -156,11 +165,12 @@ trainers: [
   facing: Direction.Down,
   pos: { x: 21, y: 22 },
   intro: [
-    "¡Hola! ¡Me gustan los pantalones cortos! ¡Son cómodos y fáciles de llevar!"
+    "¡Hola! ¡Me gustan los pantalones cortos!",
+    "¡Aunque hoy llevo el esmoquin aún puesto!"
   ],
   outtro: [
-    "¿Guardas PKMN en el PC?",
-    "¡Cada caja tiene capacidad para 20 PKMN!"
+    "En la PC tengo guardado",
+    "todo lo que vomité ayer… metafóricamente."
   ],
   money: 165,
 
@@ -171,11 +181,12 @@ trainers: [
   facing: Direction.Down,
   pos: { x: 15, y: 22 },
   intro: [
-    "¿Eres entrenador? ¡A pelear!"
+    "¿Entrenador o invitado de boda?",
+    "¡Da igual! ¡Pelea para despejarte!"
   ],
   outtro: [
-    "Si una CAJA del PC se llena,",
-    "¡cambia a otra CAJA!"
+    "Esta resaca es PEOR",
+    "que un MEWTWO a nivel 70."
   ],
   money: 90,
 
@@ -186,10 +197,12 @@ trainers: [
   facing: Direction.Left,
   pos: { x: 27, y: 23 },
   intro: [
-    "¡Ey! ¡Tú no llevas pantalones cortos!"
+    "¡Ey! ¡Tú no llevas la pajarita torcida!",
+    "¿Es que no fuiste al banquete?"
   ],
   outtro: [
-    "¡Yo siempre llevo pantalones cortos, hasta en invierno!"
+    "¡Yo siempre llevo pantalones cortos!",
+    "¡Hasta debajo del esmoquin!"
   ],
   money: 210,
 
@@ -200,11 +213,13 @@ trainers: [
   facing: Direction.Left,
   pos: { x: 14, y: 26 },
   intro: [
-    "Esa mirada que me has echado...",
-    "¡me resulta muy intrigante!"
+    "Esa cara de resaca…",
+    "¡también estuviste en VILLAMAYOR!"
   ],
   outtro: [
-    "¡Evita peleas sin que te vean!"
+    "Dicen que MARTA y SERGIO",
+    "vuelan a JAPÓN esta semana.",
+    "¡Qué envidia me dan!"
   ],
   money: 150,
 
@@ -215,10 +230,12 @@ trainers: [
   facing: Direction.Right,
   pos: { x: 10, y: 24 },
   intro: [
-    "¡Ven a pelear contra mi nuevo PKMN!"
+    "¡Ven a pelear!",
+    "¡Necesito sudar el ANTÍS de anoche!"
   ],
   outtro: [
-    "¡Los PKMN entrenados son más fuertes que los salvajes!"
+    "Mis PKMN también están con resaca.",
+    "¡A todos nos sentó fatal el brindis!"
   ],
   money: 110,
 
@@ -229,10 +246,13 @@ trainers: [
   facing: Direction.Up,
   pos: { x: 18, y: 24 },
   intro: [
-    "¡Uy! ¿Me has tocado?"
+    "¡Ay! ¡No me toques la cabeza!",
+    "¡Me retumba como un GONG!"
   ],
   outtro: [
-    "La RUTA 4 está al pie del MONTE LUNA."
+    "El MONTE LUNA DE MIEL",
+    "queda al fondo de la ruta.",
+    "¡Igual que la suite de los novios!"
   ],
   money: 210,
 

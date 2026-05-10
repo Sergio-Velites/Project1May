@@ -11,7 +11,7 @@ import { MapId, MapType } from "./map-types";
 // TODO Add fossils (You want the HELIX FOSSIL? (yes no) on the right... You want the DOME FOSSIL? (yes no) on the left...
 
 const mtMoon2f: MapType = {
-  name: "Monte Luna 2F",
+  name: "Monte Luna de Miel 2F",
   image,
   music,
   cave: true,
@@ -151,8 +151,14 @@ const mtMoon2f: MapType = {
         },
       ],
       facing: Direction.Down,
-      intro: ["Nosotros, el EQUIPO ROCKET, ¡somos los malos del PKMN!"],
-      outtro: ["¡Maldición! ¡Mis compañeros no perdonarán esto!"],
+      intro: [
+        "¡El EQUIPO ROCKET nunca falta",
+        "a un saqueo — ni a una boda!",
+      ],
+      outtro: [
+        "¡Maldición! ¡Mis compis siguen",
+        "durmiendo la mona en un rincón!",
+      ],
       money: 330,
       pos: {
         x: 15,
@@ -172,8 +178,14 @@ const mtMoon2f: MapType = {
         },
       ],
       facing: Direction.Up,
-      intro: ["¡Estamos haciendo un trabajo aquí! ¡Larga, crío!"],
-      outtro: ["¡Si encuentras un fósil, dámelo y pírate!"],
+      intro: [
+        "¡Estamos buscando los regalos",
+        "de los novios! ¡Lárgate, crío!",
+      ],
+      outtro: [
+        "Si encuentras algún ANTÍS sin abrir,",
+        "¡dánoslo y nos largamos!",
+      ],
       money: 360,
       pos: {
         x: 29,
@@ -189,8 +201,14 @@ const mtMoon2f: MapType = {
         },
       ],
       facing: Direction.Left,
-      intro: ["¡Los niños no deben meterse con los mayores!"],
-      outtro: ["Los PKMN vivieron aquí mucho antes que las personas."],
+      intro: [
+        "¡Los críos sin resaca",
+        "no entendéis el sufrimiento adulto!",
+      ],
+      outtro: [
+        "MARTA y SERGIO ya andan haciendo",
+        "las maletas para JAPÓN… ¡y nosotros aquí!",
+      ],
       money: 390,
       pos: {
         x: 29,
@@ -211,9 +229,13 @@ const mtMoon2f: MapType = {
       ],
       facing: Direction.Down,
       intro: [
-        "¡El EQUIPO ROCKET encontrará los fósiles, los revivirá y los venderá!",
+        "¡El EQUIPO ROCKET revenderá",
+        "todas las botellas vacías del banquete!",
       ],
-      outtro: ["¡Me has enfadado! ¡El EQUIPO ROCKET te tendrá fichado!"],
+      outtro: [
+        "¡Me has enfadado!",
+        "¡Ya nos vengaremos en TOKIO!",
+      ],
       money: 390,
       pos: {
         x: 11,
@@ -237,8 +259,14 @@ const mtMoon2f: MapType = {
         },
       ],
       facing: Direction.Right,
-      intro: ["¡Eh, para! ¡Estos fósiles los encontré yo! ¡Son míos los dos!"],
-      outtro: ["¡Nos quedamos uno cada uno!", "¡Nada de avaricia!"],
+      intro: [
+        "¡Eh, para! ¡Estos sushis caíos",
+        "de la mesa son míos! ¡Los dos!",
+      ],
+      outtro: [
+        "¡Vale, uno cada uno!",
+        "Que los novios se llevan el resto a JAPÓN.",
+      ],
       money: 300,
       pos: {
         x: 12,
