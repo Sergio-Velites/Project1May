@@ -446,6 +446,13 @@ export default function MapEditor() {
   const [error, setError] = useState('');
 
   const dragging = useRef<{ idx: number; startX: number; startY: number } | null>(null);
+  // Drag genérico para texts/items/gifts/portals
+  const entityDrag = useRef<
+    | { kind: 'text'; row: number; col: number; moved: boolean }
+    | { kind: 'item' | 'gift' | 'portal'; idx: number; moved: boolean }
+    | null
+  >(null);
+  const suppressNextClick = useRef(false);
   // Pintado de walls por arrastre. mode = el efecto a aplicar a los tiles
   // por los que se pase (toggle inicial determina add/remove).
   const wallPaint = useRef<{ active: boolean; mode: 'add' | 'remove'; visited: Set<string> } | null>(null);
@@ -811,6 +818,12 @@ export default function MapEditor() {
       const tileX = Math.max(0, Math.min(Math.floor(relX / zoom), (currentMap?.width ?? 20) - 1));
       const tileY = Math.max(0, Math.min(Math.floor(relY / zoom), (currentMap?.height ?? 20) - 1));
 
+      // Drag de entidades (texts/items/gifts/portals)
+      if (entityDrag.current) {
+        moveEntityToTile(tileX, tileY);
+        return;
+      }
+
       // Mask paint en arrastre (walls, fences, grass)
       if (
         (editMode === 'walls' || editMode === 'fences' || editMode === 'grass') &&
@@ -839,9 +852,69 @@ export default function MapEditor() {
   );
 
   const onPointerUp = useCallback(() => {
+    if (entityDrag.current?.moved) suppressNextClick.current = true;
     dragging.current = null;
+    entityDrag.current = null;
     wallPaint.current = null;
   }, []);
+
+  // Drag handler genérico para entidades (texts/items/gifts/portals)
+  const onEntityPointerDown = useCallback(
+    (
+      e: React.PointerEvent,
+      target:
+        | { kind: 'text'; row: number; col: number }
+        | { kind: 'item' | 'gift' | 'portal'; idx: number },
+    ) => {
+      e.preventDefault();
+      e.stopPropagation();
+      entityDrag.current = { ...target, moved: false } as typeof entityDrag.current;
+      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      // Selección inmediata para portales
+      if (target.kind === 'portal') setSelectedPortalIdx(target.idx);
+    },
+    []
+  );
+
+  // Movimiento de entidades durante drag (se ejecuta dentro del onPointerMove del canvas)
+  function moveEntityToTile(tileX: number, tileY: number) {
+    const drag = entityDrag.current;
+    if (!drag) return;
+    if (drag.kind === 'text') {
+      const oldRow = String(drag.row);
+      const oldCol = String(drag.col);
+      const newRow = String(tileY);
+      const newCol = String(tileX);
+      if (oldRow === newRow && oldCol === newCol) return;
+      setTexts((prev) => {
+        const lines = prev[oldRow]?.[oldCol];
+        if (!lines) return prev;
+        // Si el destino ya tiene texto, no pisar.
+        if (prev[newRow]?.[newCol]) return prev;
+        const next: typeof prev = { ...prev };
+        const oldRowObj = { ...(next[oldRow] ?? {}) };
+        delete oldRowObj[oldCol];
+        if (Object.keys(oldRowObj).length === 0) delete next[oldRow];
+        else next[oldRow] = oldRowObj;
+        next[newRow] = { ...(next[newRow] ?? {}), [newCol]: lines };
+        return next;
+      });
+      drag.row = tileY;
+      drag.col = tileX;
+      drag.moved = true;
+      setDirty(true);
+      return;
+    }
+    if (drag.kind === 'item') {
+      setItems((prev) => prev.map((it, i) => i === drag.idx ? { ...it, pos: { x: tileX, y: tileY } } : it));
+    } else if (drag.kind === 'gift') {
+      setGifts((prev) => prev.map((g, i) => i === drag.idx ? { ...g, pos: { x: tileX, y: tileY } } : g));
+    } else if (drag.kind === 'portal') {
+      setPortals((prev) => prev.map((p, i) => i === drag.idx ? { ...p, pos: { x: tileX, y: tileY } } : p));
+    }
+    drag.moved = true;
+    setDirty(true);
+  }
 
   // ── Click en canvas ────────────────────────────────────────────────────────
   function tileFromEvent(e: React.MouseEvent | React.PointerEvent): { x: number; y: number } | null {
@@ -879,6 +952,10 @@ export default function MapEditor() {
   }
 
   function onCanvasClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (suppressNextClick.current) {
+      suppressNextClick.current = false;
+      return;
+    }
     const tile = tileFromEvent(e);
     if (!tile) return;
     if (editMode === 'npc') {
@@ -1375,6 +1452,7 @@ export default function MapEditor() {
                     <div
                       key={`t-${y}-${x}`}
                       title={cols[colKey].join('\n')}
+                      onPointerDown={editMode === 'texts' ? (e) => onEntityPointerDown(e, { kind: 'text', row: y, col: x }) : undefined}
                       style={{
                         position: 'absolute',
                         left: x * zoom,
@@ -1387,7 +1465,8 @@ export default function MapEditor() {
                         border: editMode === 'texts'
                           ? '1px solid rgba(120, 180, 255, 0.95)'
                           : '1px dashed rgba(120, 180, 255, 0.4)',
-                        pointerEvents: 'none',
+                        pointerEvents: editMode === 'texts' ? 'auto' : 'none',
+                        cursor: editMode === 'texts' ? 'grab' : 'default',
                         boxSizing: 'border-box',
                         display: 'flex',
                         alignItems: 'center',
@@ -1395,6 +1474,7 @@ export default function MapEditor() {
                         fontSize: Math.max(10, zoom * 0.4),
                         color: '#88ccff',
                         textShadow: '0 0 2px #000',
+                        touchAction: 'none',
                       }}
                     >
                       💬
@@ -1408,6 +1488,7 @@ export default function MapEditor() {
                 <div
                   key={`i-${i}`}
                   title={`${it.itemKey}${it.hidden ? ' (oculto)' : ''}`}
+                  onPointerDown={editMode === 'items' ? (e) => onEntityPointerDown(e, { kind: 'item', idx: i }) : undefined}
                   style={{
                     position: 'absolute',
                     left: it.pos.x * zoom,
@@ -1421,13 +1502,15 @@ export default function MapEditor() {
                       ? '1px solid rgba(220, 140, 255, 0.95)'
                       : '1px dashed rgba(220, 140, 255, 0.5)',
                     opacity: it.hidden ? 0.5 : 1,
-                    pointerEvents: 'none',
+                    pointerEvents: editMode === 'items' ? 'auto' : 'none',
+                    cursor: editMode === 'items' ? 'grab' : 'default',
                     boxSizing: 'border-box',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: Math.max(10, zoom * 0.4),
                     textShadow: '0 0 2px #000',
+                    touchAction: 'none',
                   }}
                 >
                   📦
@@ -1439,6 +1522,7 @@ export default function MapEditor() {
                 <div
                   key={`gf-${i}`}
                   title={`#${g.pokemonId} lvl ${g.level} · ${g.questId}`}
+                  onPointerDown={editMode === 'gifts' ? (e) => onEntityPointerDown(e, { kind: 'gift', idx: i }) : undefined}
                   style={{
                     position: 'absolute',
                     left: g.pos.x * zoom,
@@ -1451,13 +1535,15 @@ export default function MapEditor() {
                     border: editMode === 'gifts'
                       ? '1px solid rgba(255, 140, 220, 0.95)'
                       : '1px dashed rgba(255, 140, 220, 0.5)',
-                    pointerEvents: 'none',
+                    pointerEvents: editMode === 'gifts' ? 'auto' : 'none',
+                    cursor: editMode === 'gifts' ? 'grab' : 'default',
                     boxSizing: 'border-box',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: Math.max(10, zoom * 0.4),
                     textShadow: '0 0 2px #000',
+                    touchAction: 'none',
                   }}
                 >
                   🎁
@@ -1509,6 +1595,7 @@ export default function MapEditor() {
                   <div
                     key={`pt-${i}`}
                     title={`${p.kind} (${p.pos.x},${p.pos.y})${p.destMap ? ` → ${p.destMap}` : ''}`}
+                    onPointerDown={editMode === 'portals' ? (e) => onEntityPointerDown(e, { kind: 'portal', idx: i }) : undefined}
                     style={{
                       position: 'absolute',
                       left: p.pos.x * zoom,
@@ -1517,13 +1604,15 @@ export default function MapEditor() {
                       height: zoom,
                       background: isSel ? `${c}aa` : `${c}33`,
                       border: isSel ? `2px solid ${c}` : `1px dashed ${c}`,
-                      pointerEvents: 'none',
+                      pointerEvents: editMode === 'portals' ? 'auto' : 'none',
+                      cursor: editMode === 'portals' ? 'grab' : 'default',
                       boxSizing: 'border-box',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: Math.max(10, zoom * 0.45),
                       textShadow: '0 0 2px #000',
+                      touchAction: 'none',
                     }}
                   >
                     {emojis[p.kind]}
