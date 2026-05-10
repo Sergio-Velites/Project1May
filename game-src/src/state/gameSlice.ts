@@ -238,8 +238,22 @@ export const gameSlice = createSlice({
     ) => {
       state.pokemon[action.payload.index] = action.payload.pokemon;
     },
+    /**
+     * Asigna (o limpia con null) el estado persistente de un Pokémon concreto.
+     * Se invoca desde el sistema de combate cuando un movimiento aplica
+     * envenenamiento, quemadura, parálisis, sueño o congelación, y al
+     * actualizar el contador de tóxico al final de cada turno.
+     */
+    setPokemonStatus: (
+      state,
+      action: PayloadAction<{ index: number; status: { type: string; turns: number } | null }>
+    ) => {
+      const p = state.pokemon[action.payload.index];
+      if (!p) return;
+      p.status = action.payload.status as PokemonInstance["status"];
+    },
     healPokemon: (state) => {
-      // Heal
+      // Heal: HP máximo, PP máximo y elimina TODO estado persistente
       for (let i = 0; i < state.pokemon.length; i++) {
         state.pokemon[i].hp = getPokemonStats(
           state.pokemon[i].id,
@@ -249,6 +263,7 @@ export const gameSlice = createSlice({
           state.pokemon[i].moves[j].pp =
             getMoveMetadata(state.pokemon[i].moves[j].id).pp || 0;
         }
+        state.pokemon[i].status = null;
       }
       // Registrar el último centro donde se curó (para recuperación tras derrota)
       // Resolvemos la ubicación exterior del centro subiendo por exitReturnMap
@@ -263,7 +278,7 @@ export const gameSlice = createSlice({
       state.lastHealLocation = resolveHealLocation(state.map);
     },
     recoverFromFainting: (state) => {
-      // Heal
+      // Heal completo + limpia estados persistentes
       for (let i = 0; i < state.pokemon.length; i++) {
         state.pokemon[i].hp = getPokemonStats(
           state.pokemon[i].id,
@@ -273,6 +288,7 @@ export const gameSlice = createSlice({
           state.pokemon[i].moves[j].pp =
             getMoveMetadata(state.pokemon[i].moves[j].id).pp || 0;
         }
+        state.pokemon[i].status = null;
       }
 
       // Teleportar al último centro donde curó (si lo hay) o al recoverLocation del mapa
@@ -395,6 +411,7 @@ export const {
   updatePokemonEncounter,
   updatePokemon,
   updateSpecificPokemon,
+  setPokemonStatus,
   recoverFromFainting,
   resetActivePokemon,
   addPokemon,

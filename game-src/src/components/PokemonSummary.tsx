@@ -291,6 +291,18 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
               <BarFill $pct={hpPct} $color={hpCol} />
             </BarTrack>
             <Txt $size={0.9}>{pokemon.hp}/{maxHp}</Txt>
+            {pokemon.status && (
+              <Txt $size={0.9} $bold>
+                {" "}{({
+                  poison: "PSN",
+                  "badly-poisoned": "PSN",
+                  burn: "QMD",
+                  paralysis: "PAR",
+                  sleep: "DRM",
+                  freeze: "CNG",
+                } as Record<string, string>)[pokemon.status.type]}
+              </Txt>
+            )}
           </Row>
         </HpSection>
 

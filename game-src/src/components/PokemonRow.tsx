@@ -144,6 +144,27 @@ const Health = styled.div`
   font-family: "PokemonGB";
 `;
 
+// Etiqueta de estado pegada al HP — réplica del estilo Game Boy.
+const StatusBadge = styled.span`
+  display: inline-block;
+  margin-left: 1.2cqw;
+  padding: 0.2cqw 0.6cqw;
+  font-size: 1.8cqw;
+  font-family: "PokemonGB";
+  background: #000;
+  color: #fff;
+  letter-spacing: 0.1cqw;
+`;
+
+const STATUS_LABEL: Record<string, string> = {
+  poison:           "PSN",
+  "badly-poisoned": "PSN",
+  burn:             "QMD",
+  paralysis:        "PAR",
+  sleep:            "DRM",
+  freeze:           "CNG",
+};
+
 interface Props {
   pokemon: PokemonInstance;
   active: boolean;
@@ -183,6 +204,9 @@ const PokemonRow = ({ pokemon, active, swapMarked, moveData }: Props) => {
               ? "ABLE"
               : "NOT ABLE"
             : `${pokemon.hp}/${stats.hp}`}
+          {!moveData && pokemon.status && STATUS_LABEL[pokemon.status.type] && (
+            <StatusBadge>{STATUS_LABEL[pokemon.status.type]}</StatusBadge>
+          )}
         </Health>
       </StatsContainer>
     </StyledPokemonRow>

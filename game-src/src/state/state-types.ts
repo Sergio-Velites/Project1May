@@ -23,12 +23,38 @@ export interface MoveState {
   pp: number;
 }
 
+/**
+ * Estados de combate persistentes (Gen I).
+ *
+ * En Pokémon Rojo/Azul los siguientes estados se mantienen pegados al
+ * Pokémon individual y persisten entre combates. Solo se eliminan en un
+ * Centro Pokémon o consumiendo el ítem correspondiente
+ * (Antídoto, Antihielo, Despertar, Antiparalizante, Antiquemar, Cura Total).
+ *
+ * No es un atributo del equipo: cada Pokémon tiene su propio estado.
+ */
+export type StatusType =
+  | "poison"
+  | "badly-poisoned"
+  | "burn"
+  | "paralysis"
+  | "sleep"
+  | "freeze";
+
+export interface BattleStatus {
+  type: StatusType;
+  /** Contador interno: turnos restantes de sueño / contador de tóxico, etc. */
+  turns: number;
+}
+
 export interface PokemonInstance {
   id: number;
   level: number;
   xp: number;
   hp: number;
   moves: MoveState[];
+  /** Estado persistente entre combates (poison, burn, paralysis, sleep, freeze). */
+  status?: BattleStatus | null;
 }
 
 export interface PokemonEncounterType {

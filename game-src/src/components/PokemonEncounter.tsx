@@ -20,6 +20,7 @@ import {
   updatePokemon,
   updatePokemonEncounter,
   updateSpecificPokemon,
+  setPokemonStatus,
   seePokemon,
   catchPokemonPokedex,
 } from "../state/gameSlice";
@@ -767,9 +768,13 @@ const PokemonEncounter = () => {
       setPlayerStages(DEFAULT_STAGES);
       setEnemyStages(DEFAULT_STAGES);
       setTransformedData({});
-      setPlayerStatus(null);
+      // Cargar el estado persistente del Pokémon activo (Gen I: poison, burn,
+      // paralysis, sleep, freeze permanecen entre combates pegados al Pokémon).
+      const initialPlayerStatus = (active?.status ?? null) as typeof playerStatus;
+      setPlayerStatus(initialPlayerStatus);
+      playerStatusRef.current = initialPlayerStatus;
+      // El rival siempre empieza limpio (no tenemos persistencia para encuentros).
       setEnemyStatus(null);
-      playerStatusRef.current = null;
       enemyStatusRef.current = null;
       setPlayerLeechSeeded(false);
       setEnemyLeechSeeded(false);
@@ -1224,6 +1229,9 @@ const PokemonEncounter = () => {
       ? (s: BT | null) => {
           setPlayerStatus(s as typeof playerStatus);
           playerStatusRef.current = s as typeof playerStatus;
+          // Persistir el cambio en el Pokémon (Gen I: el estado se guarda
+          // entre combates hasta curarse en un Centro Pokémon).
+          dispatch(setPokemonStatus({ index: activePokemonIndex, status: s }));
         }
       : (s: BT | null) => {
           setEnemyStatus(s as typeof enemyStatus);
@@ -1302,7 +1310,47 @@ const PokemonEncounter = () => {
     }, ATTACK_ANIMATION + 1000);
   };
 
-  // useEffect: cuando el ItemsMenu (u otra UI) incrementa playerTurnTick,
+  // ── Cambio de Pokémon en combate ────────────────────────────────────────
+  // Centraliza la lógica que debe ejecutarse SIEMPRE que entra un Pokémon
+  // nuevo al campo (cambio voluntario en stage 13 o cambio forzado tras KO
+  // en stage 25). En Gen I:
+  //   · Las modificaciones de stat stages (Acepción, Filo, Síntesis...)
+  //     se RESETEAN cuando un Pokémon sale del campo.
+  //   · El estado persistente (poison, burn, paralysis, sleep, freeze) que
+  //     ya tuviera el Pokémon que entra se MANTIENE — viene pegado a él.
+  //   · Drenadoras es un estado de combate (no persiste en el Pokémon),
+  //     así que también se limpia al cambiar.
+  //   · Flinch se limpia (es solo del turno).
+  //   · El contador de tóxico (badly-poisoned.turns) se reinicia a 1 al
+  //     cambiar — el daño vuelve a empezar bajo en el siguiente turno.
+  const performSwitchTo = (index: number) => {
+    // Reset de stat stages del jugador.
+    setPlayerStages(DEFAULT_STAGES);
+    // Reset de estados de combate volátiles del jugador.
+    setPlayerLeechSeeded(false);
+    playerLeechSeededRef.current = false;
+    playerFlinchRef.current = false;
+    // Reset de la transformación (Transform es por-Pokémon en combate).
+    // No reseteamos enemyStages: el rival sigue siendo el mismo.
+
+    // Cargar el estado persistente del Pokémon que entra.
+    const incoming = pokemon[index];
+    const incomingStatus = (incoming?.status ?? null) as typeof playerStatus;
+    if (incomingStatus?.type === "badly-poisoned") {
+      // Reiniciar contador (Gen I).
+      const reset = { ...incomingStatus, turns: 1 };
+      setPlayerStatus(reset);
+      playerStatusRef.current = reset;
+      dispatch(setPokemonStatus({ index, status: reset }));
+    } else {
+      setPlayerStatus(incomingStatus);
+      playerStatusRef.current = incomingStatus;
+    }
+
+    dispatch(setActivePokemon(index));
+    setInvolvedPokemon([...involvedPokemon, index]);
+    throwPokeball();
+  };
   // ejecutar el turno del rival. Solo si estamos en el menú de combate
   // (stage 11) para no pisar otras animaciones en curso.
   useEffect(() => {
@@ -1454,6 +1502,8 @@ const PokemonEncounter = () => {
     if (affectsPlayer) {
       setPlayerStatus(newStatus);
       playerStatusRef.current = newStatus;
+      // Persistir nuevo estado en el Pokémon (Gen I: se mantiene entre combates).
+      dispatch(setPokemonStatus({ index: activePokemonIndex, status: newStatus }));
     } else {
       setEnemyStatus(newStatus);
       enemyStatusRef.current = newStatus;
@@ -1653,6 +1703,9 @@ const PokemonEncounter = () => {
         const upd = { ...pStatus, turns: pStatus.turns + 1 };
         setPlayerStatus(upd);
         playerStatusRef.current = upd;
+        // Persistir el contador de tóxico (Gen I: se reinicia al cambiar
+        // de Pokémon, pero mientras esté en combate sigue subiendo).
+        dispatch(setPokemonStatus({ index: activePokemonIndex, status: upd }));
       }
       const what = pStatus.type === "burn" ? "la quemadura" : "el veneno";
       setAlertText(`¡${activeMetadata.name.toUpperCase()} sufre por ${what}!`);
@@ -2054,9 +2107,7 @@ const PokemonEncounter = () => {
                 }
                 // Cambio voluntario en combate: consume turno (Gen I).
                 enemyTurnAfterSwapRef.current = true;
-                dispatch(setActivePokemon(index));
-                setInvolvedPokemon([...involvedPokemon, index]);
-                throwPokeball();
+                performSwitchTo(index);
               }}
             />
           )}
@@ -2078,9 +2129,7 @@ const PokemonEncounter = () => {
                 }
                 // KO forzado: el rival ya gastó su turno al noquear, no
                 // encadenamos otro ataque.
-                dispatch(setActivePokemon(index));
-                setInvolvedPokemon([...involvedPokemon, index]);
-                throwPokeball();
+                performSwitchTo(index);
               }}
             />
           )}
