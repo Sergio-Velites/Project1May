@@ -1,0 +1,1646 @@
+{
+  "gate-house": {
+    "id": "gate-house",
+    "name": "Caseta de Control",
+    "imageFile": "gate-house.png",
+    "height": 8,
+    "width": 10,
+    "trainers": [],
+    "sourceFile": "gate-house.ts"
+  },
+  "pallet-town-house-a-1f": {
+    "id": "pallet-town-house-a-1f",
+    "name": "Casa 1F",
+    "imageFile": "house-a-1f.png",
+    "height": 8,
+    "width": 8,
+    "trainers": [
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 6,
+          "y": 3
+        },
+        "facing": "up",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "¡Espabila pringao!"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ]
+      }
+    ],
+    "sourceFile": "house-a-1f.ts"
+  },
+  "pallet-town-house-a-2f": {
+    "id": "pallet-town-house-a-2f",
+    "name": "Casa 2F",
+    "imageFile": "house-a-2f.png",
+    "height": 8,
+    "width": 8,
+    "trainers": [],
+    "sourceFile": "house-a-2f.ts"
+  },
+  "pallet-town-house-b": {
+    "id": "pallet-town-house-b",
+    "name": "Casa B",
+    "imageFile": "house-b.png",
+    "height": 8,
+    "width": 8,
+    "trainers": [],
+    "sourceFile": "house-b.ts"
+  },
+  "pallet-town-lab": {
+    "id": "pallet-town-lab",
+    "name": "DESTILERÍA DEL PROF. OAK",
+    "imageFile": "lab.png",
+    "height": 12,
+    "width": 10,
+    "trainers": [
+      {
+        "npcKey": "oak",
+        "pos": {
+          "x": 5,
+          "y": 1
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "Hoy no hay tiempo de tonterías.",
+          "Pon las pilas que es un día importante.",
+          "Te esperan en EL BOSQUECILLO.",
+          "hip!",
+          "Yo ya voy un tanto borraja.",
+          "hip!",
+          "Date prisa!",
+          "¡Elige uno de los tres POKEMON de la mesa!",
+          "He oido que hay un tal Juanre",
+          "que no perdona con la comida a los rezagados."
+        ],
+        "outtro": [
+          "¡Buena elección!",
+          "¡Date prisa al BOSQUECILLO!",
+          "hip!"
+        ],
+        "pokemon": [
+          {
+            "id": 1,
+            "level": 5
+          }
+        ]
+      }
+    ],
+    "sourceFile": "lab.ts"
+  },
+  "mt-moon-1f": {
+    "id": "mt-moon-1f",
+    "name": "Monte Luna 1F",
+    "imageFile": "mt-moon-1f.png",
+    "height": 36,
+    "width": 40,
+    "trainers": [
+      {
+        "npcKey": "bugCatcher",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "down",
+        "money": 110,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "Hay hombres sospechosos en la cueva.",
+          "¿Y tú qué haces por aquí?"
+        ],
+        "outtro": [
+          "¡Los vi! ¡Seguro que son del EQUIPO ROCKET!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "down",
+        "money": 210,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¿Qué? Estoy esperando a mis amigos aquí."
+        ],
+        "outtro": [
+          "Dicen que hay fósiles muy raros en estas cuevas."
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "superNerd",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "up",
+        "money": 275,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Eh! ¡No te me acerques así!"
+        ],
+        "outtro": [
+          "Tengo que encontrar PKMN más fuertes."
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "bugCatcher",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "right",
+        "money": 100,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Cruza esta cueva y llegarás a CIUDAD CELESTE!"
+        ],
+        "outtro": [
+          "Los Zubat son duros, ¡pero muy útiles si los capturas!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "down",
+        "money": 165,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Madre mía! ¡Es mucho más grande por dentro!"
+        ],
+        "outtro": [
+          "¿Cómo se sale de aquí?"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "hiker",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "down",
+        "money": 150,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Anda! ¡Menudo susto me has dado!",
+          "Ah, solo eres un criño."
+        ],
+        "outtro": [
+          "¡Los niños no deberíais estar aquí!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "youngster",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "right",
+        "money": 150,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¿Tú también has venido a explorar?"
+        ],
+        "outtro": [
+          "Yo vine a buscar novia, que aquí hay mucha humedad."
+        ],
+        "pokemon": []
+      }
+    ],
+    "sourceFile": "mt-moon-1f.ts"
+  },
+  "mt-moon-2f": {
+    "id": "mt-moon-2f",
+    "name": "Monte Luna 2F",
+    "imageFile": "mt-moon-2f.png",
+    "height": 36,
+    "width": 40,
+    "trainers": [
+      {
+        "npcKey": "teamRocketGrunt",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "down",
+        "money": 330,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "Nosotros, el EQUIPO ROCKET, ¡somos los malos del PKMN!"
+        ],
+        "outtro": [
+          "¡Maldición! ¡Mis compañeros no perdonarán esto!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "teamRocketGrunt",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "up",
+        "money": 360,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Estamos haciendo un trabajo aquí! ¡Larga, crío!"
+        ],
+        "outtro": [
+          "¡Si encuentras un fósil, dámelo y pírate!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "teamRocketGrunt",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "left",
+        "money": 390,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Los niños no deben meterse con los mayores!"
+        ],
+        "outtro": [
+          "Los PKMN vivieron aquí mucho antes que las personas."
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "teamRocketGrunt",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "down",
+        "money": 390,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡El EQUIPO ROCKET encontrará los fósiles, los revivirá y los venderá!"
+        ],
+        "outtro": [
+          "¡Me has enfadado! ¡El EQUIPO ROCKET te tendrá fichado!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "superNerd",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "right",
+        "money": 300,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Eh, para! ¡Estos fósiles los encontré yo! ¡Son míos los dos!"
+        ],
+        "outtro": [
+          "¡Nos quedamos uno cada uno!",
+          "¡Nada de avaricia!"
+        ],
+        "pokemon": []
+      }
+    ],
+    "sourceFile": "mt-moon-2f.ts"
+  },
+  "mt-moon-3f": {
+    "id": "mt-moon-3f",
+    "name": "Monte Luna 3F",
+    "imageFile": "mt-moon-3f.png",
+    "height": 28,
+    "width": 28,
+    "trainers": [],
+    "sourceFile": "mt-moon-3f.ts"
+  },
+  "pallet-town": {
+    "id": "pallet-town",
+    "name": "PUEBLO PALETA",
+    "imageFile": "pallet-town.png",
+    "height": 18,
+    "width": 20,
+    "trainers": [
+      {
+        "npcKey": "youngster",
+        "pos": {
+          "x": 3,
+          "y": 7
+        },
+        "facing": "up",
+        "money": 0,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "Hoy noto como un cancaneo por mi cuerpo.",
+          "Parece que algo gordo se avecina!"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ]
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 15,
+          "y": 6
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "Me voy a poner como el kiko en la preboda.",
+          "Dicen que hay que llegar hasta EL BOSQUECILLO,",
+          "pero merecerá la pena."
+        ],
+        "pokemon": [
+          {
+            "id": 35,
+            "level": 3
+          }
+        ]
+      },
+      {
+        "npcKey": "teamRocketGrunt",
+        "pos": {
+          "x": 10,
+          "y": 0
+        },
+        "facing": "right",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": "has-pokemon",
+        "intro": [],
+        "outtro": [
+          "Viva el vino!",
+          "Hip! ¡Aquí no pasa nadie sin un POKEMON!",
+          "Hip! Habla con el borracho Oak y ",
+          "que te de uno, hip!",
+          "antes de que se los beba todos, hip!"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ]
+      },
+      {
+        "npcKey": "teamRocketGrunt",
+        "pos": {
+          "x": 11,
+          "y": 0
+        },
+        "facing": "left",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": "has-pokemon",
+        "intro": [],
+        "outtro": [
+          "Viva el vino!",
+          "Hip! ¡Aquí no pasa nadie sin un POKEMON!",
+          "Hip! Habla con el borracho Oak y ",
+          "que te de uno, hip!",
+          "antes de que se los beba todos, hip!"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ]
+      }
+    ],
+    "sourceFile": "pallet-town.ts"
+  },
+  "pewter-city-gym": {
+    "id": "pewter-city-gym",
+    "name": "Bodega CASTILLO DE MONJARDÍN",
+    "imageFile": "pewter-city-gym.png",
+    "height": 14,
+    "width": 10,
+    "trainers": [
+      {
+        "npcKey": "sailor",
+        "pos": {
+          "x": 3,
+          "y": 6
+        },
+        "facing": "right",
+        "money": 300,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Eh, espera!",
+          "¡Esta bodega es solo para los que demuestren su valor!",
+          "¡Derrótame primero!"
+        ],
+        "outtro": [
+          "Bien... pero dentro te esperan Sergio y Marta.",
+          "¡No podrás con ellos!"
+        ],
+        "pokemon": [
+          {
+            "id": 72,
+            "level": 10
+          },
+          {
+            "id": 54,
+            "level": 10
+          }
+        ]
+      },
+      {
+        "npcKey": "sergioNpc",
+        "pos": {
+          "x": 4,
+          "y": 1
+        },
+        "facing": "down",
+        "money": 1400,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Te lo advertimos!",
+          "Aquí entre barricas solo se habla de vino.",
+          "...y de Pokémon.",
+          "¡Demuestra que mereces brindar con nosotros!"
+        ],
+        "outtro": [
+          "¡Bien hecho!",
+          "Nos vemos el 8 de agosto.",
+          "Y esta vez tú brindas con nosotros."
+        ],
+        "pokemon": [
+          {
+            "id": 58,
+            "level": 14
+          },
+          {
+            "id": 77,
+            "level": 12
+          }
+        ]
+      },
+      {
+        "npcKey": "martaNpc",
+        "pos": {
+          "x": 5,
+          "y": 1
+        },
+        "facing": "down",
+        "money": 1600,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Yo soy Marta!",
+          "¡Y no te lo voy a poner fácil!",
+          "¡No todo en la boda es vino y flores!"
+        ],
+        "outtro": [
+          "¡Increíble! ¡Enhorabuena!",
+          "El 8 de agosto... trae buen vino."
+        ],
+        "pokemon": [
+          {
+            "id": 12,
+            "level": 16
+          },
+          {
+            "id": 36,
+            "level": 14
+          }
+        ]
+      }
+    ],
+    "sourceFile": "pewter-city-gym.ts"
+  },
+  "pewter-city-npc-a": {
+    "id": "pewter-city-npc-a",
+    "name": "Pewter City NPC House B",
+    "imageFile": "pewter-city-npc-house.png",
+    "height": 8,
+    "width": 8,
+    "trainers": [],
+    "sourceFile": "pewter-city-npc-b.ts"
+  },
+  "pewter-city-poke-mart": {
+    "id": "pewter-city-poke-mart",
+    "name": "Tienda de Villamayor",
+    "imageFile": "pewter-city-poke-mart.png",
+    "height": 8,
+    "width": 8,
+    "trainers": [],
+    "sourceFile": "pewter-city-poke-mart.ts"
+  },
+  "pewter-city-pokemon-center": {
+    "id": "pewter-city-pokemon-center",
+    "name": "Centro Pokémon de Villamayor",
+    "imageFile": "pewter-city-pokemon-center.png",
+    "height": 8,
+    "width": 14,
+    "trainers": [
+      {
+        "npcKey": "scientist",
+        "pos": {
+          "x": 10,
+          "y": 1
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": false,
+        "isOnline": true,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [],
+        "pokemon": [
+          {
+            "id": 1,
+            "level": 1
+          }
+        ]
+      }
+    ],
+    "sourceFile": "pewter-city-pokemon-center.ts"
+  },
+  "pewter-city": {
+    "id": "pewter-city",
+    "name": "VILLAMAYOR DE MONJARDÍN",
+    "imageFile": "pewter-city.png",
+    "height": 36,
+    "width": 40,
+    "trainers": [
+      {
+        "npcKey": "hiker",
+        "pos": {
+          "x": 15,
+          "y": 10
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "La BODEGA CASTILLO DE MONJARDÍN está ahí dentro.",
+          "Sergio y Marta no dejan pasar a cualquiera.",
+          "¡Demuestra lo que vales!"
+        ],
+        "pokemon": [
+          {
+            "id": 56,
+            "level": 10
+          }
+        ]
+      },
+      {
+        "npcKey": "jrTrainerMale",
+        "pos": {
+          "x": 25,
+          "y": 10
+        },
+        "facing": "left",
+        "money": 250,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Yo también quiero la Insignia del Vino!",
+          "¡Pero como llegues tú antes, se acaba el cupo!",
+          "¡Así que no te dejo pasar!"
+        ],
+        "outtro": [
+          "Está bien... supongo que te la has ganado."
+        ],
+        "pokemon": [
+          {
+            "id": 23,
+            "level": 12
+          },
+          {
+            "id": 27,
+            "level": 11
+          }
+        ]
+      },
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 8,
+          "y": 22
+        },
+        "facing": "right",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "Si quieres ganar a Sergio y Marta,",
+          "necesitas POKÉMON fuertes y buen vino.",
+          "Lo del vino ya lo tienes... ¿y lo otro?"
+        ],
+        "pokemon": [
+          {
+            "id": 35,
+            "level": 1
+          }
+        ]
+      },
+      {
+        "npcKey": "scientist",
+        "pos": {
+          "x": 18,
+          "y": 22
+        },
+        "facing": "down",
+        "money": 300,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Estoy analizando el terroir de MONJARDÍN!",
+          "¡No me molestes... a menos que puedas con mis POKÉMON!"
+        ],
+        "outtro": [
+          "Sorprendente. El terroir de tu equipo también es excelente."
+        ],
+        "pokemon": [
+          {
+            "id": 100,
+            "level": 13
+          },
+          {
+            "id": 101,
+            "level": 12
+          }
+        ]
+      },
+      {
+        "npcKey": "aceTrainerMale",
+        "pos": {
+          "x": 28,
+          "y": 30
+        },
+        "facing": "left",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "Sergio y Marta me dieron la Insignia del Vino el año pasado.",
+          "Fue lo más difícil y lo más memorable de mi vida.",
+          "¡Tú también puedes lograrlo!"
+        ],
+        "pokemon": [
+          {
+            "id": 58,
+            "level": 15
+          }
+        ]
+      }
+    ],
+    "sourceFile": "pewter-city.ts"
+  },
+  "pewter-city-museum-1f": {
+    "id": "pewter-city-museum-1f",
+    "name": "Museo de Villamayor 1F",
+    "imageFile": "pewter-museum-1f.png",
+    "height": 8,
+    "width": 20,
+    "trainers": [],
+    "sourceFile": "pewter-museum-1f.ts"
+  },
+  "pewter-city-museum-2f": {
+    "id": "pewter-city-museum-2f",
+    "name": "Museo de Villamayor 2F",
+    "imageFile": "pewter-museum-2f.png",
+    "height": 8,
+    "width": 14,
+    "trainers": [],
+    "sourceFile": "pewter-museum-2f.ts"
+  },
+  "route-1": {
+    "id": "route-1",
+    "name": "Ruta 1 · Camino al Soto",
+    "imageFile": "route-1.png",
+    "height": 36,
+    "width": 20,
+    "trainers": [
+      {
+        "npcKey": "youngster",
+        "pos": {
+          "x": 14,
+          "y": 18
+        },
+        "facing": "left",
+        "money": 50,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Para ahí, tú!",
+          "¡No te creas que llegarás tan fácil!",
+          "¡Yo quería el vino y tú me lo quitaste!"
+        ],
+        "outtro": [
+          "Bueno... puede que yo tampoco llegue a tiempo."
+        ],
+        "pokemon": [
+          {
+            "id": 21,
+            "level": 3
+          }
+        ]
+      },
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 7,
+          "y": 20
+        },
+        "facing": "right",
+        "money": 0,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "¡No olvides que la preboda sin anís no es preboda!"
+        ],
+        "pokemon": [
+          {
+            "id": 35,
+            "level": 2
+          }
+        ]
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 13,
+          "y": 10
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "¡El coche de los novios ya ha salido de Pamplona!",
+          "¡Muévete o te quedas sin sitio!"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 4
+          }
+        ]
+      },
+      {
+        "npcKey": "fisher",
+        "pos": {
+          "x": 13,
+          "y": 26
+        },
+        "facing": "left",
+        "money": 70,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Yo pensaba que la preboda era en el río!",
+          "¡Pues aun así, a ver si me ganas!"
+        ],
+        "outtro": [
+          "Bueno... en fin. Al menos el vino no estará en el río."
+        ],
+        "pokemon": [
+          {
+            "id": 129,
+            "level": 5
+          },
+          {
+            "id": 118,
+            "level": 4
+          }
+        ]
+      },
+      {
+        "npcKey": "sailor",
+        "pos": {
+          "x": 6,
+          "y": 16
+        },
+        "facing": "down",
+        "money": 90,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡El padrino me manda a probarte!",
+          "¡Si llegas tarde, él no responde!"
+        ],
+        "outtro": [
+          "Pasa, pasa. El padrino estará orgulloso."
+        ],
+        "pokemon": [
+          {
+            "id": 72,
+            "level": 6
+          },
+          {
+            "id": 54,
+            "level": 5
+          }
+        ]
+      }
+    ],
+    "sourceFile": "route-1.ts"
+  },
+  "route-2-gate": {
+    "id": "route-2-gate",
+    "name": "Control Ruta 2",
+    "imageFile": "route-2-gate.png",
+    "height": 8,
+    "width": 10,
+    "trainers": [],
+    "sourceFile": "route-2-gate.ts"
+  },
+  "route-2": {
+    "id": "route-2",
+    "name": "Ruta 2",
+    "imageFile": "route-2.png",
+    "height": 72,
+    "width": 20,
+    "trainers": [],
+    "sourceFile": "route-2.ts"
+  },
+  "route-22": {
+    "id": "route-22",
+    "name": "Ruta 22",
+    "imageFile": "route-22.png",
+    "height": 18,
+    "width": 40,
+    "trainers": [
+      {
+        "npcKey": "rival",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "right",
+        "money": 280,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Ey!",
+          "¿Vas a la LIGA PKMN?",
+          "¡Ni lo sueñes! ¡Seguro que no tienes ninguna MEDALLA!",
+          "¡El guardia no te dejará pasar!",
+          "Por cierto, ¿tus PKMN se han hecho más fuertes?"
+        ],
+        "outtro": [
+          "¡Vaya suerte la tuya!"
+        ],
+        "pokemon": []
+      }
+    ],
+    "sourceFile": "route-22.ts"
+  },
+  "viridian-city-pokemon-center": {
+    "id": "viridian-city-pokemon-center",
+    "name": "Centro Pokémon del Soto",
+    "imageFile": "viridian-city-pokemon-center.png",
+    "height": 8,
+    "width": 14,
+    "trainers": [
+      {
+        "npcKey": "scientist",
+        "pos": {
+          "x": 10,
+          "y": 1
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": false,
+        "isOnline": true,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [],
+        "pokemon": [
+          {
+            "id": 1,
+            "level": 1
+          }
+        ]
+      }
+    ],
+    "sourceFile": "viridian-city-pokemon-center.ts"
+  },
+  "route-3": {
+    "id": "route-3",
+    "name": "Ruta 3",
+    "imageFile": "route-3.png",
+    "height": 36,
+    "width": 73,
+    "trainers": [
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "left",
+        "money": 135,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¿Me has mirado, verdad?"
+        ],
+        "outtro": [
+          "¡Deja de mirarme si no quieres pelea!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "bugCatcher",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "right",
+        "money": 100,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Ey! ¡Te vi en el BOSQUE AÑIL!"
+        ],
+        "outtro": [
+          "Hay otros tipos de PKMN",
+          "además de los del bosque!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "youngster",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "down",
+        "money": 165,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Hola! ¡Me gustan los pantalones cortos! ¡Son cómodos y fáciles de llevar!"
+        ],
+        "outtro": [
+          "¿Guardas PKMN en el PC?",
+          "¡Cada caja tiene capacidad para 20 PKMN!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "bugCatcher",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "down",
+        "money": 90,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¿Eres entrenador? ¡A pelear!"
+        ],
+        "outtro": [
+          "Si una CAJA del PC se llena,",
+          "¡cambia a otra CAJA!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "youngster",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "left",
+        "money": 210,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Ey! ¡Tú no llevas pantalones cortos!"
+        ],
+        "outtro": [
+          "¡Yo siempre llevo pantalones cortos, hasta en invierno!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "left",
+        "money": 150,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "Esa mirada que me has echado...",
+          "¡me resulta muy intrigante!"
+        ],
+        "outtro": [
+          "¡Evita peleas sin que te vean!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "bugCatcher",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "right",
+        "money": 110,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Ven a pelear contra mi nuevo PKMN!"
+        ],
+        "outtro": [
+          "¡Los PKMN entrenados son más fuertes que los salvajes!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "up",
+        "money": 210,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Uy! ¿Me has tocado?"
+        ],
+        "outtro": [
+          "La RUTA 4 está al pie del MONTE LUNA."
+        ],
+        "pokemon": []
+      }
+    ],
+    "sourceFile": "route-3.ts"
+  },
+  "viridian-city-pokemon-acadamy": {
+    "id": "viridian-city-pokemon-acadamy",
+    "name": "Antigua Casa de Jonny",
+    "imageFile": "viridian-city-pokemon-acadamy.png",
+    "height": 8,
+    "width": 8,
+    "trainers": [],
+    "sourceFile": "viridian-city-acadamy.ts"
+  },
+  "viridian-city-gym": {
+    "id": "viridian-city-gym",
+    "name": "Gimnasio de Soto Lezkairu",
+    "imageFile": "viridian-city-gym.png",
+    "height": 18,
+    "width": 20,
+    "trainers": [],
+    "sourceFile": "viridian-city-gym.ts"
+  },
+  "veridian-city-npc-house": {
+    "id": "veridian-city-npc-house",
+    "name": "Viridian City NPC House",
+    "imageFile": "viridian-city-npc-house.png",
+    "height": 8,
+    "width": 8,
+    "trainers": [],
+    "sourceFile": "viridian-city-npc-house.ts"
+  },
+  "viridian-city-poke-mart": {
+    "id": "viridian-city-poke-mart",
+    "name": "Tienda del Soto",
+    "imageFile": "viridian-city-poke-mart.png",
+    "height": 8,
+    "width": 8,
+    "trainers": [],
+    "sourceFile": "viridian-city-poke-mart.ts"
+  },
+  "viridian-city": {
+    "id": "viridian-city",
+    "name": "SOTO LEZKAIRU",
+    "imageFile": "viridian-city.png",
+    "height": 36,
+    "width": 40,
+    "trainers": [
+      {
+        "npcKey": "cueBall",
+        "pos": {
+          "x": 12,
+          "y": 20
+        },
+        "facing": "down",
+        "money": 80,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Hemos montado nuestra propia preboda!",
+          "¡Con vino barato y sin protocolo!",
+          "¡Demuestra que mereces el bueno!"
+        ],
+        "outtro": [
+          "...igual el vino caro tampoco está tan mal."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 4
+          }
+        ]
+      },
+      {
+        "npcKey": "jrTrainerFemale",
+        "pos": {
+          "x": 26,
+          "y": 24
+        },
+        "facing": "left",
+        "money": 100,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Nosotros también queremos brindar!",
+          "¡Pero solo si nos ganas!"
+        ],
+        "outtro": [
+          "¡Felicidades! ¡Brindamos juntos el 8 de agosto!"
+        ],
+        "pokemon": [
+          {
+            "id": 41,
+            "level": 5
+          }
+        ]
+      },
+      {
+        "npcKey": "teamRocketGrunt",
+        "pos": {
+          "x": 11,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 200,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Con este vino seremos los reyes de la fiesta!",
+          "¡No te metas en nuestros asuntos!"
+        ],
+        "outtro": [
+          "¡Maldición! Nos retiramos... pero volveremos por el anís."
+        ],
+        "pokemon": [
+          {
+            "id": 33,
+            "level": 5
+          },
+          {
+            "id": 52,
+            "level": 4
+          }
+        ]
+      },
+      {
+        "npcKey": "gentleman",
+        "pos": {
+          "x": 27,
+          "y": 22
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "Joven, el vino tinto cura... y anima.",
+          "Toma una botella para el camino.",
+          "¡Salud!"
+        ],
+        "pokemon": [
+          {
+            "id": 1,
+            "level": 1
+          }
+        ]
+      },
+      {
+        "npcKey": "rocker",
+        "pos": {
+          "x": 18,
+          "y": 8
+        },
+        "facing": "right",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "¡El equipo de sonido ya está enchufado!",
+          "¡En cuanto lleguen los novios, esto se lía!"
+        ],
+        "pokemon": [
+          {
+            "id": 25,
+            "level": 1
+          }
+        ]
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 9,
+          "y": 4
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "Llegué la primera. Esta silla ya tiene dueña.",
+          "¡A ver si venís más tarde!"
+        ],
+        "pokemon": [
+          {
+            "id": 35,
+            "level": 3
+          }
+        ]
+      },
+      {
+        "npcKey": "sailor",
+        "pos": {
+          "x": 14,
+          "y": 20
+        },
+        "facing": "left",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "¡Quieto! ¡Esto es para las fotos del álbum!",
+          "¡La luz aquí es perfecta!"
+        ],
+        "pokemon": [
+          {
+            "id": 54,
+            "level": 5
+          }
+        ]
+      },
+      {
+        "npcKey": "fisher",
+        "pos": {
+          "x": 15,
+          "y": 30
+        },
+        "facing": "down",
+        "money": 60,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡No sé dónde es la preboda!",
+          "¡Y encima tú te has metido en mi camino!"
+        ],
+        "outtro": [
+          "Gracias... Creo que es por aquí."
+        ],
+        "pokemon": [
+          {
+            "id": 118,
+            "level": 5
+          },
+          {
+            "id": 129,
+            "level": 4
+          }
+        ]
+      }
+    ],
+    "sourceFile": "viridian-city.ts"
+  },
+  "viridian-forrest": {
+    "id": "viridian-forrest",
+    "name": "EL BOSQUECILLO",
+    "imageFile": "viridian-forrest.png",
+    "height": 48,
+    "width": 34,
+    "trainers": [
+      {
+        "npcKey": "bugCatcher",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "left",
+        "money": 60,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Detente, invitado de la boda!",
+          "¡Primero debes combatir!"
+        ],
+        "outtro": [
+          "¡Qué batalla tan emocionante!",
+          "¡Sigue tu camino, valiente!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "bugCatcher",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "left",
+        "money": 70,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Los insectos son los mejores!",
+          "¡Protegen el bosque de la boda!"
+        ],
+        "outtro": [
+          "¡Bien luchado!",
+          "¡Disfruta la celebración!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "bugCatcher",
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "facing": "left",
+        "money": 60,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Nadie pasa sin combatir!",
+          "¡Así lo dice la ley del bosque!"
+        ],
+        "outtro": [
+          "¡Felicidades a los novios!",
+          "¡Que sean muy felices!"
+        ],
+        "pokemon": []
+      },
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 8,
+          "y": 10
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "¡Corre, que la barra libre se acaba!"
+        ],
+        "pokemon": [
+          {
+            "id": 16,
+            "level": 4
+          }
+        ]
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 20,
+          "y": 38
+        },
+        "facing": "right",
+        "money": 0,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "¡El DJ ya está calentando! ¡Mueve las piernas!"
+        ],
+        "pokemon": [
+          {
+            "id": 35,
+            "level": 4
+          }
+        ]
+      },
+      {
+        "npcKey": "teamRocketGrunt",
+        "pos": {
+          "x": 16,
+          "y": 6
+        },
+        "facing": "down",
+        "money": 150,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Teníamos un plan perfecto!",
+          "¡Queríamos los Pokémon de la boda!",
+          "...pero nos llevamos este anís de mientras."
+        ],
+        "outtro": [
+          "¡Que disfrutes de la preboda, crío!"
+        ],
+        "pokemon": [
+          {
+            "id": 52,
+            "level": 7
+          },
+          {
+            "id": 41,
+            "level": 6
+          }
+        ]
+      },
+      {
+        "npcKey": "hiker",
+        "pos": {
+          "x": 7,
+          "y": 3
+        },
+        "facing": "right",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "¡Este bosque lleva directo a VILLAMAYOR!",
+          "Sigue hacia el norte y no te metas en la hierba alta.",
+          "¡Los bichos aquí pican fuerte!"
+        ],
+        "pokemon": [
+          {
+            "id": 74,
+            "level": 7
+          }
+        ]
+      },
+      {
+        "npcKey": "pokeManiac",
+        "pos": {
+          "x": 21,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 120,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Llevo tres días leyendo el menú del banquete!",
+          "¡Nadie merece ese chuletón más que yo!",
+          "¡Demuestra que tú sí lo mereces!"
+        ],
+        "outtro": [
+          "Vale, vale... tú te lo ganas más que yo."
+        ],
+        "pokemon": [
+          {
+            "id": 46,
+            "level": 8
+          },
+          {
+            "id": 48,
+            "level": 7
+          }
+        ]
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 5,
+          "y": 22
+        },
+        "facing": "left",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [],
+        "outtro": [
+          "¿Has visto a mis padres?",
+          "Se llaman Juan y María...",
+          "¡Llevan corbata de lunares los dos!"
+        ],
+        "pokemon": [
+          {
+            "id": 10,
+            "level": 5
+          }
+        ]
+      }
+    ],
+    "sourceFile": "viridian-forrest.ts"
+  }
+}
