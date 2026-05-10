@@ -2,6 +2,7 @@ import image from "../assets/map/viridian-city-gym.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 import music from "../assets/music/maps/pokemon-gym.mp3";
+import { tamer } from "../app/npcs";
 
 const viridianCityGym: MapType = {
   name: "Gimnasio de Soto Lezkairu",
@@ -101,6 +102,34 @@ const viridianCityGym: MapType = {
     16: [7],
     17: [1],
   },
+  // Trainers para "viridian-city-gym"
+trainers: [
+  {
+  npc: tamer,
+  pokemon: [{ id: 19, level: 2 }],
+  facing: Direction.Down,
+  pos: { x: 3, y: 2 },
+  intro: [
+
+  ],
+  outtro: [
+    "No tienes regalo para los novios?",
+    "Puedes llevarte este pokemon.",
+    "Tan feo como inútil"
+  ],
+  money: 0,
+  persistent: true,
+  sightRange: 0,
+}
+],
+  gifts: [
+    {
+      pokemonId: 129,
+      level: 5,
+      pos: { x: 2, y: 2 },
+      questId: "viridian-city-gym-gift-2-2",
+    },
+  ],
 };
 
 export default viridianCityGym;

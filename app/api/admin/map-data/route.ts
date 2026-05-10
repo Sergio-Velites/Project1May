@@ -26,7 +26,12 @@ type OverrideKey =
   | 'pokemonCenter'
   | 'pc'
   | 'store'
-  | 'recoverLocation';
+  | 'recoverLocation'
+  | 'maps'
+  | 'teleports'
+  | 'exits'
+  | 'exitReturnMap'
+  | 'exitReturnPos';
 
 const OVERRIDE_KEYS: OverrideKey[] = [
   'texts',
@@ -38,6 +43,11 @@ const OVERRIDE_KEYS: OverrideKey[] = [
   'pc',
   'store',
   'recoverLocation',
+  'maps',
+  'teleports',
+  'exits',
+  'exitReturnMap',
+  'exitReturnPos',
 ];
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {

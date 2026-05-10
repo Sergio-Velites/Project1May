@@ -9,6 +9,7 @@ import {
   misty,
   sabrina,
   sergioNpc,
+  tamer,
 } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/pewter-city-gym.png";
@@ -55,6 +56,7 @@ const pewterCityGym: MapType = {
   // La bodega CASTILLO DE MONJARDÍN ha reunido a los 8 antiguos rivales
   // de la pareja en el orden clásico de gimnasios. Hay que derrotarlos
   // a todos para llegar a Sergio y Marta al fondo de la bodega.
+// Trainers para "pewter-city-gym"
 // Trainers para "pewter-city-gym"
 // Trainers para "pewter-city-gym"
 trainers: [
@@ -216,6 +218,8 @@ trainers: [
     "Y esta vez tú brindas con nosotros."
   ],
   money: 2800,
+  persistent: true,
+  sightRange: 0,
   postGame: {
         message: [
           "¡Toma la INSIGNIA DEL VINO!",
@@ -242,7 +246,8 @@ trainers: [
     "Y prepárate para bailar hasta el amanecer."
   ],
   money: 3000,
-
+  persistent: true,
+  sightRange: 0,
 }
 ],
 };

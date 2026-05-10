@@ -119,189 +119,125 @@ const route3: MapType = {
   },
   encounters: getEncounterData("kanto-route-3-area"),
   exitReturnMap: MapId.PewterCity,
-  trainers: [
-    {
-      npc: lass,
-      pokemon: [
-        {
-          id: 16,
-          level: 9,
-        },
-        {
-          id: 16,
-          level: 9,
-        },
-      ],
-      facing: Direction.Left,
-      intro: ["¿Me has mirado, verdad?"],
-      outtro: ["¡Deja de mirarme si no quieres pelea!"],
-      money: 135,
-      pos: {
-        x: 16,
-        y: 27,
-      },
-    },
-    {
-      npc: bugCatcher,
-      pokemon: [
-        {
-          id: 10,
-          level: 10,
-        },
-        {
-          id: 10,
-          level: 10,
-        },
-        {
-          id: 10,
-          level: 10,
-        },
-      ],
-      facing: Direction.Right,
-      intro: ["¡Ey! ¡Te vi en el BOSQUE AÑIL!"],
-      outtro: [
-        "Hay otros tipos de PKMN",
-        "además de los del bosque!",
-      ],
-      money: 100,
-      pos: {
-        x: 10,
-        y: 24,
-      },
-    },
-    {
-      npc: youngster,
-      pokemon: [
-        {
-          id: 19,
-          level: 11,
-        },
-        {
-          id: 23,
-          level: 11,
-        },
-      ],
-      facing: Direction.Down,
-      intro: ["¡Hola! ¡Me gustan los pantalones cortos! ¡Son cómodos y fáciles de llevar!"],
-      outtro: [
-        "¿Guardas PKMN en el PC?",
-        "¡Cada caja tiene capacidad para 20 PKMN!",
-      ],
-      money: 165,
-      pos: {
-        x: 14,
-        y: 22,
-      },
-    },
-    {
-      npc: bugCatcher,
-      pokemon: [
-        {
-          id: 13,
-          level: 9,
-        },
-        {
-          id: 14,
-          level: 9,
-        },
-        {
-          id: 10,
-          level: 9,
-        },
-        {
-          id: 11,
-          level: 9,
-        },
-      ],
-      facing: Direction.Down,
-      intro: ["¿Eres entrenador? ¡A pelear!"],
-      outtro: [
-        "Si una CAJA del PC se llena,",
-        "¡cambia a otra CAJA!",
-      ],
-      money: 90,
-      pos: {
-        x: 19,
-        y: 23,
-      },
-    },
-    {
-      npc: youngster,
-      pokemon: [
-        {
-          id: 21,
-          level: 14,
-        },
-      ],
-      facing: Direction.Left,
-      intro: ["¡Ey! ¡Tú no llevas pantalones cortos!"],
-      outtro: ["¡Yo siempre llevo pantalones cortos, hasta en invierno!"],
-      money: 210,
-      pos: {
-        x: 22,
-        y: 27,
-      },
-    },
-    {
-      npc: lass,
-      pokemon: [
-        {
-          id: 19,
-          level: 10,
-        },
-        {
-          id: 32,
-          level: 10,
-        },
-      ],
-      facing: Direction.Left,
-      intro: ["Esa mirada que me has echado...", "¡me resulta muy intrigante!"],
-      outtro: ["¡Evita peleas sin que te vean!"],
-      money: 150,
-      pos: {
-        x: 23,
-        y: 22,
-      },
-    },
-    {
-      npc: bugCatcher,
-      pokemon: [
-        {
-          id: 10,
-          level: 11,
-        },
-        {
-          id: 11,
-          level: 11,
-        },
-      ],
-      facing: Direction.Right,
-      intro: ["¡Ven a pelear contra mi nuevo PKMN!"],
-      outtro: ["¡Los PKMN entrenados son más fuertes que los salvajes!"],
-      money: 110,
-      pos: {
-        x: 24,
-        y: 24,
-      },
-    },
-    {
-      npc: lass,
-      pokemon: [
-        {
-          id: 39,
-          level: 14,
-        },
-      ],
-      facing: Direction.Up,
-      intro: ["¡Uy! ¿Me has tocado?"],
-      outtro: ["La RUTA 4 está al pie del MONTE LUNA."],
-      money: 210,
-      pos: {
-        x: 33,
-        y: 28,
-      },
-    },
+// Trainers para "route-3"
+trainers: [
+  {
+  npc: lass,
+  pokemon: [],
+  facing: Direction.Left,
+  pos: { x: 22, y: 27 },
+  intro: [
+    "¿Me has mirado, verdad?"
   ],
+  outtro: [
+    "¡Deja de mirarme si no quieres pelea!"
+  ],
+  money: 135,
+
+},
+  {
+  npc: bugCatcher,
+  pokemon: [],
+  facing: Direction.Right,
+  pos: { x: 24, y: 27 },
+  intro: [
+    "¡Ey! ¡Te vi en el BOSQUE AÑIL!"
+  ],
+  outtro: [
+    "Hay otros tipos de PKMN",
+    "además de los del bosque!"
+  ],
+  money: 100,
+
+},
+  {
+  npc: youngster,
+  pokemon: [],
+  facing: Direction.Down,
+  pos: { x: 21, y: 22 },
+  intro: [
+    "¡Hola! ¡Me gustan los pantalones cortos! ¡Son cómodos y fáciles de llevar!"
+  ],
+  outtro: [
+    "¿Guardas PKMN en el PC?",
+    "¡Cada caja tiene capacidad para 20 PKMN!"
+  ],
+  money: 165,
+
+},
+  {
+  npc: bugCatcher,
+  pokemon: [],
+  facing: Direction.Down,
+  pos: { x: 15, y: 22 },
+  intro: [
+    "¿Eres entrenador? ¡A pelear!"
+  ],
+  outtro: [
+    "Si una CAJA del PC se llena,",
+    "¡cambia a otra CAJA!"
+  ],
+  money: 90,
+
+},
+  {
+  npc: youngster,
+  pokemon: [],
+  facing: Direction.Left,
+  pos: { x: 27, y: 23 },
+  intro: [
+    "¡Ey! ¡Tú no llevas pantalones cortos!"
+  ],
+  outtro: [
+    "¡Yo siempre llevo pantalones cortos, hasta en invierno!"
+  ],
+  money: 210,
+
+},
+  {
+  npc: lass,
+  pokemon: [],
+  facing: Direction.Left,
+  pos: { x: 14, y: 26 },
+  intro: [
+    "Esa mirada que me has echado...",
+    "¡me resulta muy intrigante!"
+  ],
+  outtro: [
+    "¡Evita peleas sin que te vean!"
+  ],
+  money: 150,
+
+},
+  {
+  npc: bugCatcher,
+  pokemon: [],
+  facing: Direction.Right,
+  pos: { x: 10, y: 24 },
+  intro: [
+    "¡Ven a pelear contra mi nuevo PKMN!"
+  ],
+  outtro: [
+    "¡Los PKMN entrenados son más fuertes que los salvajes!"
+  ],
+  money: 110,
+
+},
+  {
+  npc: lass,
+  pokemon: [],
+  facing: Direction.Up,
+  pos: { x: 18, y: 24 },
+  intro: [
+    "¡Uy! ¿Me has tocado?"
+  ],
+  outtro: [
+    "La RUTA 4 está al pie del MONTE LUNA."
+  ],
+  money: 210,
+
+}
+],
 };
 
 export default route3;

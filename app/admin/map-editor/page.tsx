@@ -45,14 +45,30 @@ interface MapEntry {
   pc?: { x: number; y: number } | null;
   store?: { x: number; y: number } | null;
   recoverLocation?: { x: number; y: number } | null;
+  // Portales entre mapas
+  maps?: Record<string, Record<string, string>>;
+  teleports?: Record<string, Record<string, { map: string; pos: { x: number; y: number } }>>;
+  exits?: Record<string, number[]>;
+  exitReturnMap?: string | null;
+  exitReturnPos?: { x: number; y: number } | null;
   sourceFile: string;
 }
 
 type MapData = Record<string, MapEntry>;
 
-type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'texts' | 'items' | 'gifts' | 'spots';
+type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'texts' | 'items' | 'gifts' | 'spots' | 'portals';
 
 type SpotKey = 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation';
+
+type PortalKind = 'door' | 'teleport' | 'exit';
+
+interface PortalEntry {
+  kind: PortalKind;
+  pos: { x: number; y: number };
+  // Para door y teleport: MapId destino. Para teleport: pos destino. Para exit: nada.
+  destMap?: string;
+  destPos?: { x: number; y: number };
+}
 
 interface ItemEntry { itemKey: string; pos: { x: number; y: number }; hidden?: boolean; }
 interface GiftEntry { pokemonId: number; level: number; pos: { x: number; y: number }; questId: string; }
@@ -238,9 +254,126 @@ function exportGiftsTS(gifts: GiftEntry[]): string {
   return `gifts: [\n${lines.join('\n')}\n  ],`;
 }
 
-function exportSpotTS(field: string, pos: { x: number; y: number } | null | undefined): string {
-  if (!pos) return `${field}: undefined,`;
+function exportSpotTS(field: string, pos: { x: number; y: number } | null | undefined): string {  if (!pos) return `${field}: undefined,`;
   return `${field}: { x: ${pos.x}, y: ${pos.y} },`;
+}
+
+// ── Portales: flatten/nest entre el shape de MapType y un array plano editable ──
+
+function flattenPortals(m: MapEntry): PortalEntry[] {
+  const out: PortalEntry[] = [];
+  // maps: Record<row, Record<col, MapId>>
+  if (m.maps) {
+    for (const [r, cols] of Object.entries(m.maps)) {
+      for (const [c, dest] of Object.entries(cols ?? {})) {
+        out.push({
+          kind: 'door',
+          pos: { x: parseInt(c, 10), y: parseInt(r, 10) },
+          destMap: String(dest),
+        });
+      }
+    }
+  }
+  // teleports: Record<row, Record<col, { map, pos }>>
+  if (m.teleports) {
+    for (const [r, cols] of Object.entries(m.teleports)) {
+      for (const [c, dest] of Object.entries(cols ?? {})) {
+        out.push({
+          kind: 'teleport',
+          pos: { x: parseInt(c, 10), y: parseInt(r, 10) },
+          destMap: dest.map,
+          destPos: dest.pos,
+        });
+      }
+    }
+  }
+  // exits: Record<row, number[]>
+  if (m.exits) {
+    for (const [r, cols] of Object.entries(m.exits)) {
+      for (const c of cols) {
+        out.push({ kind: 'exit', pos: { x: c, y: parseInt(r, 10) } });
+      }
+    }
+  }
+  return out;
+}
+
+function nestPortals(portals: PortalEntry[]): {
+  maps: Record<string, Record<string, string>>;
+  teleports: Record<string, Record<string, { map: string; pos: { x: number; y: number } }>>;
+  exits: Record<string, number[]>;
+} {
+  const maps: Record<string, Record<string, string>> = {};
+  const teleports: Record<string, Record<string, { map: string; pos: { x: number; y: number } }>> = {};
+  const exits: Record<string, number[]> = {};
+  for (const p of portals) {
+    const r = String(p.pos.y);
+    const c = String(p.pos.x);
+    if (p.kind === 'door' && p.destMap) {
+      (maps[r] ??= {})[c] = p.destMap;
+    } else if (p.kind === 'teleport' && p.destMap && p.destPos) {
+      (teleports[r] ??= {})[c] = { map: p.destMap, pos: p.destPos };
+    } else if (p.kind === 'exit') {
+      (exits[r] ??= []).push(p.pos.x);
+    }
+  }
+  for (const r of Object.keys(exits)) exits[r].sort((a, b) => a - b);
+  return { maps, teleports, exits };
+}
+
+function exportPortalsTS(portals: PortalEntry[], exitReturnMap: string | null, exitReturnPos: { x: number; y: number } | null): string {
+  const { maps, teleports, exits } = nestPortals(portals);
+
+  const fmtRowColMap = (
+    obj: Record<string, Record<string, unknown>>,
+    valueFmt: (v: unknown) => string,
+    key: string,
+  ): string => {
+    const rows = Object.keys(obj).map((k) => parseInt(k, 10)).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b);
+    if (rows.length === 0) return `${key}: {},`;
+    const rowLines = rows.map((r) => {
+      const cols = Object.keys(obj[String(r)]).map((k) => parseInt(k, 10)).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b);
+      const colLines = cols.map((c) => `      ${c}: ${valueFmt(obj[String(r)][String(c)])},`);
+      return `    ${r}: {\n${colLines.join('\n')}\n    },`;
+    });
+    return `${key}: {\n${rowLines.join('\n')}\n  },`;
+  };
+
+  const mapsTS = fmtRowColMap(
+    maps as Record<string, Record<string, unknown>>,
+    (v) => `MapId.${pascalCaseFromMapId(String(v))}`,
+    'maps',
+  );
+  const teleportsTS = fmtRowColMap(
+    teleports as unknown as Record<string, Record<string, unknown>>,
+    (v) => {
+      const t = v as { map: string; pos: { x: number; y: number } };
+      return `{ map: MapId.${pascalCaseFromMapId(t.map)}, pos: { x: ${t.pos.x}, y: ${t.pos.y} } }`;
+    },
+    'teleports',
+  );
+  const exitRows = Object.keys(exits).map((k) => parseInt(k, 10)).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b);
+  const exitsTS = exitRows.length === 0
+    ? 'exits: {},'
+    : `exits: {\n${exitRows.map((r) => `    ${r}: [${exits[String(r)].join(', ')}],`).join('\n')}\n  },`;
+
+  const erm = exitReturnMap
+    ? `exitReturnMap: MapId.${pascalCaseFromMapId(exitReturnMap)},`
+    : `exitReturnMap: undefined,`;
+  const erp = exitReturnPos
+    ? `exitReturnPos: { x: ${exitReturnPos.x}, y: ${exitReturnPos.y} },`
+    : `exitReturnPos: undefined,`;
+
+  return [mapsTS, teleportsTS, exitsTS, erm, erp].join('\n');
+}
+
+// Heurística: convierte "pewter-city-gym" → "PewterCityGym" para el enum MapId
+function pascalCaseFromMapId(id: string): string {
+  return id
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+    .join('');
 }
 
 // ── Constantes UI ─────────────────────────────────────────────────────────
@@ -294,6 +427,12 @@ export default function MapEditor() {
   const [storePos, setStorePos] = useState<{ x: number; y: number } | null>(null);
   const [recoverLocation, setRecoverLocation] = useState<{ x: number; y: number } | null>(null);
   const [activeSpot, setActiveSpot] = useState<SpotKey>('pokemonCenter');
+  // Portales
+  const [portals, setPortals] = useState<PortalEntry[]>([]);
+  const [exitReturnMap, setExitReturnMap] = useState<string | null>(null);
+  const [exitReturnPos, setExitReturnPos] = useState<{ x: number; y: number } | null>(null);
+  const [activePortalKind, setActivePortalKind] = useState<PortalKind>('door');
+  const [selectedPortalIdx, setSelectedPortalIdx] = useState<number | null>(null);
   const [itemTypeKeys, setItemTypeKeys] = useState<string[]>([]);
   const [editMode, setEditMode] = useState<EditMode>('npc');
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
@@ -345,6 +484,10 @@ export default function MapEditor() {
     setPcPos(m.pc ?? null);
     setStorePos(m.store ?? null);
     setRecoverLocation(m.recoverLocation ?? null);
+    setPortals(flattenPortals(m));
+    setExitReturnMap(m.exitReturnMap ?? null);
+    setExitReturnPos(m.exitReturnPos ?? null);
+    setSelectedPortalIdx(null);
   }
 
   // ── Cambiar mapa ──────────────────────────────────────────────────────
@@ -381,6 +524,17 @@ export default function MapEditor() {
             pc: pcPos,
             store: storePos,
             recoverLocation,
+            // Portales (todo en uno: persistimos el shape MapType nativo)
+            ...(() => {
+              const { maps, teleports, exits } = nestPortals(portals);
+              return {
+                maps,
+                teleports,
+                exits,
+                exitReturnMap,
+                exitReturnPos,
+              };
+            })(),
           },
         }),
       });
@@ -406,23 +560,31 @@ export default function MapEditor() {
       setSaveFlash(true);
       setTimeout(() => setSaveFlash(false), 1500);
       // Actualizar cache local
-      setMapData((d) => ({
-        ...d,
-        [selectedMapId]: {
-          ...d[selectedMapId],
-          trainers,
-          walls,
-          fences,
-          grass,
-          texts,
-          items,
-          gifts,
-          pokemonCenter,
-          pc: pcPos,
-          store: storePos,
-          recoverLocation,
-        },
-      }));
+      setMapData((d) => {
+        const { maps, teleports, exits } = nestPortals(portals);
+        return {
+          ...d,
+          [selectedMapId]: {
+            ...d[selectedMapId],
+            trainers,
+            walls,
+            fences,
+            grass,
+            texts,
+            items,
+            gifts,
+            pokemonCenter,
+            pc: pcPos,
+            store: storePos,
+            recoverLocation,
+            maps,
+            teleports,
+            exits,
+            exitReturnMap,
+            exitReturnPos,
+          },
+        };
+      });
     } catch (e) {
       setError(`Error de red al guardar: ${String(e)}`);
       alert(`Error de red al guardar: ${String(e)}`);
@@ -478,6 +640,11 @@ export default function MapEditor() {
     navigator.clipboard.writeText(parts.join('\n')).then(() => alert('¡Spots copiados!'));
   }
 
+  function doExportPortals() {
+    const ts = exportPortalsTS(portals, exitReturnMap, exitReturnPos);
+    navigator.clipboard.writeText(ts).then(() => alert('¡Portals copiados!'));
+  }
+
   // ── Importar .ts ──────────────────────────────────────────────────────
   // Lee un archivo .ts (de game-src/src/maps/*.ts) y reemplaza por completo
   // el estado local del mapa (trainers, walls, fences, grass, texts, items,
@@ -523,6 +690,15 @@ export default function MapEditor() {
       setPcPos(parsed.pc);
       setStorePos(parsed.store);
       setRecoverLocation(parsed.recoverLocation);
+      setPortals(flattenPortals({
+        ...currentMap!,
+        maps: parsed.maps,
+        teleports: parsed.teleports,
+        exits: parsed.exits,
+      } as MapEntry));
+      setExitReturnMap(parsed.exitReturnMap);
+      setExitReturnPos(parsed.exitReturnPos);
+      setSelectedPortalIdx(null);
       setSelectedIdx(null);
       setDirty(true);
     } catch (err) {
@@ -838,6 +1014,52 @@ export default function MapEditor() {
       setDirty(true);
       return;
     }
+    if (editMode === 'portals') {
+      const idx = portals.findIndex((p) => p.pos.x === tile.x && p.pos.y === tile.y);
+      if (idx !== -1) {
+        // Seleccionar para editar en panel
+        setSelectedPortalIdx(idx);
+        return;
+      }
+      // Crear nuevo portal del tipo activo
+      const mapIds = Object.keys(mapData).sort();
+      if (activePortalKind === 'door') {
+        const dest = window.prompt(
+          `Crear PUERTA en (${tile.x}, ${tile.y}).\n\nMapId destino:\n\n${mapIds.join('\n')}`,
+          mapIds[0] ?? '',
+        );
+        if (!dest || !mapData[dest]) {
+          if (dest) alert(`MapId desconocido: ${dest}`);
+          return;
+        }
+        setPortals((p) => [...p, { kind: 'door', pos: { x: tile.x, y: tile.y }, destMap: dest }]);
+        setDirty(true);
+      } else if (activePortalKind === 'teleport') {
+        const dest = window.prompt(`Crear TELEPORT en (${tile.x}, ${tile.y}).\n\nMapId destino:`, mapIds[0] ?? '');
+        if (!dest || !mapData[dest]) {
+          if (dest) alert(`MapId desconocido: ${dest}`);
+          return;
+        }
+        const xs = window.prompt('Posición destino X:', '0');
+        const ys = window.prompt('Posición destino Y:', '0');
+        if (xs === null || ys === null) return;
+        const dx = parseInt(xs, 10);
+        const dy = parseInt(ys, 10);
+        if (Number.isNaN(dx) || Number.isNaN(dy)) { alert('Posición destino inválida'); return; }
+        setPortals((p) => [...p, {
+          kind: 'teleport',
+          pos: { x: tile.x, y: tile.y },
+          destMap: dest,
+          destPos: { x: dx, y: dy },
+        }]);
+        setDirty(true);
+      } else {
+        // exit
+        setPortals((p) => [...p, { kind: 'exit', pos: { x: tile.x, y: tile.y } }]);
+        setDirty(true);
+      }
+      return;
+    }
   }
 
   // ── Right click → eliminar NPC ────────────────────────────────────────
@@ -904,7 +1126,7 @@ export default function MapEditor() {
 
         {/* Modo edición */}
         <div style={{ display: 'flex', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
-          {(['npc', 'walls', 'fences', 'grass', 'texts', 'items', 'gifts', 'spots'] as EditMode[]).map((m) => {
+          {(['npc', 'walls', 'fences', 'grass', 'texts', 'items', 'gifts', 'spots', 'portals'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
               npc: '#5050b0',
               walls: '#7a3030',
@@ -914,6 +1136,7 @@ export default function MapEditor() {
               items: '#5a3a7a',
               gifts: '#7a3a5a',
               spots: '#5a7a30',
+              portals: '#7a3a3a',
             };
             return (
               <button
@@ -1010,6 +1233,11 @@ export default function MapEditor() {
         {editMode === 'spots' && (
           <button onClick={doExportSpots} style={{ padding: '4px 12px', background: '#1a2a1a', border: '1px solid #5a7a30', borderRadius: 4, color: '#ccff88', cursor: 'pointer', fontSize: 12 }}>
             📍 Spots
+          </button>
+        )}
+        {editMode === 'portals' && (
+          <button onClick={doExportPortals} style={{ padding: '4px 12px', background: '#2a1a1a', border: '1px solid #7a3a3a', borderRadius: 4, color: '#ffaa88', cursor: 'pointer', fontSize: 12 }}>
+            🚪 Portals
           </button>
         )}
 
@@ -1271,6 +1499,38 @@ export default function MapEditor() {
                 </div>
               ) : null)}
 
+              {/* Portales overlay */}
+              {portals.map((p, i) => {
+                const colors = { door: '#88ff88', teleport: '#cc88ff', exit: '#88ccff' } as const;
+                const emojis = { door: '🚪', teleport: '🌀', exit: '↪️' } as const;
+                const isSel = editMode === 'portals' && selectedPortalIdx === i;
+                const c = colors[p.kind];
+                return (
+                  <div
+                    key={`pt-${i}`}
+                    title={`${p.kind} (${p.pos.x},${p.pos.y})${p.destMap ? ` → ${p.destMap}` : ''}`}
+                    style={{
+                      position: 'absolute',
+                      left: p.pos.x * zoom,
+                      top: p.pos.y * zoom,
+                      width: zoom,
+                      height: zoom,
+                      background: isSel ? `${c}aa` : `${c}33`,
+                      border: isSel ? `2px solid ${c}` : `1px dashed ${c}`,
+                      pointerEvents: 'none',
+                      boxSizing: 'border-box',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: Math.max(10, zoom * 0.45),
+                      textShadow: '0 0 2px #000',
+                    }}
+                  >
+                    {emojis[p.kind]}
+                  </div>
+                );
+              })}
+
               {/* NPCs */}
               {trainers.map((t, idx) => {
                 const isSelected = idx === selectedIdx;
@@ -1443,6 +1703,29 @@ export default function MapEditor() {
                   else if (k === 'pc') setPcPos(null);
                   else if (k === 'store') setStorePos(null);
                   else setRecoverLocation(null);
+                  setDirty(true);
+                }}
+                sourceFile={currentMap?.sourceFile}
+              />
+            ) : editMode === 'portals' ? (
+              <PortalsInspector
+                portals={portals}
+                selectedIdx={selectedPortalIdx}
+                setSelectedIdx={setSelectedPortalIdx}
+                activePortalKind={activePortalKind}
+                setActivePortalKind={setActivePortalKind}
+                exitReturnMap={exitReturnMap}
+                setExitReturnMap={(v) => { setExitReturnMap(v); setDirty(true); }}
+                exitReturnPos={exitReturnPos}
+                setExitReturnPos={(v) => { setExitReturnPos(v); setDirty(true); }}
+                mapIds={Object.keys(mapData).sort()}
+                onUpdate={(idx, patch) => {
+                  setPortals((ps) => ps.map((p, i) => i === idx ? { ...p, ...patch } : p));
+                  setDirty(true);
+                }}
+                onDelete={(idx) => {
+                  setPortals((ps) => ps.filter((_, i) => i !== idx));
+                  setSelectedPortalIdx(null);
                   setDirty(true);
                 }}
                 sourceFile={currentMap?.sourceFile}
@@ -1786,6 +2069,207 @@ function SpotsInspector({
         ))}
       </div>
       <div style={{ marginTop: 16, padding: 12, background: '#1a1530', border: '1px solid #5a3a3a', borderRadius: 4, fontSize: 11, color: '#ff9999' }}>
+        ⚠️ Pega el bloque exportado en <code>{sourceFile ?? '*.ts'}</code> dentro del objeto del mapa.
+      </div>
+    </div>
+  );
+}
+
+// ── Portals Inspector ─────────────────────────────────────────────────────
+
+function PortalsInspector({
+  portals, selectedIdx, setSelectedIdx,
+  activePortalKind, setActivePortalKind,
+  exitReturnMap, setExitReturnMap,
+  exitReturnPos, setExitReturnPos,
+  mapIds, onUpdate, onDelete, sourceFile,
+}: {
+  portals: PortalEntry[];
+  selectedIdx: number | null;
+  setSelectedIdx: (i: number | null) => void;
+  activePortalKind: PortalKind;
+  setActivePortalKind: (k: PortalKind) => void;
+  exitReturnMap: string | null;
+  setExitReturnMap: (v: string | null) => void;
+  exitReturnPos: { x: number; y: number } | null;
+  setExitReturnPos: (v: { x: number; y: number } | null) => void;
+  mapIds: string[];
+  onUpdate: (idx: number, patch: Partial<PortalEntry>) => void;
+  onDelete: (idx: number) => void;
+  sourceFile?: string;
+}) {
+  const sel = selectedIdx !== null ? portals[selectedIdx] : null;
+  const KIND_INFO: Record<PortalKind, { label: string; emoji: string; color: string; help: string }> = {
+    door: { label: 'Puerta (maps)', emoji: '🚪', color: '#88ff88', help: 'Pisar el tile cambia al MapId destino.' },
+    teleport: { label: 'Teleport', emoji: '🌀', color: '#cc88ff', help: 'Pisar lleva al mapa+pos exacta indicados.' },
+    exit: { label: 'Salida (exits)', emoji: '↪️', color: '#88ccff', help: 'Pisar vuelve al exitReturnMap+exitReturnPos.' },
+  };
+  return (
+    <div style={{ color: '#ccc', fontSize: 13, lineHeight: 1.6 }}>
+      <div style={{ fontSize: 32, marginBottom: 8, textAlign: 'center' }}>🚪</div>
+      <p style={{ color: '#ffaa88', fontWeight: 700, marginBottom: 8 }}>Modo Portales activo</p>
+      <p style={{ color: '#aaa', fontSize: 11, marginBottom: 12 }}>
+        Selecciona el tipo activo y haz click en un tile vacío para crear. Click en un portal para editarlo.
+      </p>
+
+      {/* Selector tipo activo */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 14 }}>
+        {(['door', 'teleport', 'exit'] as PortalKind[]).map((k) => {
+          const info = KIND_INFO[k];
+          const active = activePortalKind === k;
+          return (
+            <button
+              key={k}
+              onClick={() => setActivePortalKind(k)}
+              style={{
+                flex: 1,
+                padding: '6px 4px',
+                background: active ? `${info.color}33` : '#0f0f1a',
+                border: `2px solid ${active ? info.color : '#2a2a4a'}`,
+                borderRadius: 4,
+                color: active ? info.color : '#888',
+                cursor: 'pointer',
+                fontSize: 11,
+                fontWeight: 700,
+              }}
+              title={info.help}
+            >
+              {info.emoji} {info.label.split(' ')[0]}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Editor del seleccionado */}
+      {sel && (
+        <div style={{ padding: 10, background: '#0f0f1a', border: `2px solid ${KIND_INFO[sel.kind].color}`, borderRadius: 4, marginBottom: 14 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <strong style={{ color: KIND_INFO[sel.kind].color, fontSize: 12 }}>
+              {KIND_INFO[sel.kind].emoji} {KIND_INFO[sel.kind].label} ({sel.pos.x},{sel.pos.y})
+            </strong>
+            <button
+              onClick={() => onDelete(selectedIdx!)}
+              style={{ background: 'transparent', border: '1px solid #7a3a3a', color: '#ff8888', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', fontSize: 11 }}
+            >
+              Eliminar
+            </button>
+          </div>
+          {(sel.kind === 'door' || sel.kind === 'teleport') && (
+            <div style={{ marginBottom: 8 }}>
+              <label style={{ fontSize: 11, color: '#888' }}>MapId destino:</label>
+              <select
+                value={sel.destMap ?? ''}
+                onChange={(e) => onUpdate(selectedIdx!, { destMap: e.target.value })}
+                style={{ ...inputStyle, width: '100%', marginTop: 4 }}
+              >
+                {mapIds.map((m) => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </div>
+          )}
+          {sel.kind === 'teleport' && (
+            <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 11, color: '#888' }}>Dest X:</label>
+                <input
+                  type="number"
+                  value={sel.destPos?.x ?? 0}
+                  onChange={(e) => onUpdate(selectedIdx!, { destPos: { x: parseInt(e.target.value, 10) || 0, y: sel.destPos?.y ?? 0 } })}
+                  style={{ ...inputStyle, width: '100%', marginTop: 4 }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 11, color: '#888' }}>Dest Y:</label>
+                <input
+                  type="number"
+                  value={sel.destPos?.y ?? 0}
+                  onChange={(e) => onUpdate(selectedIdx!, { destPos: { x: sel.destPos?.x ?? 0, y: parseInt(e.target.value, 10) || 0 } })}
+                  style={{ ...inputStyle, width: '100%', marginTop: 4 }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Lista de portales */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>Portales en este mapa ({portals.length}):</div>
+        <div style={{ maxHeight: 180, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {portals.length === 0 && <div style={{ color: '#555', fontSize: 11, textAlign: 'center', padding: 8 }}>Ninguno</div>}
+          {portals.map((p, i) => {
+            const info = KIND_INFO[p.kind];
+            const active = selectedIdx === i;
+            return (
+              <div
+                key={i}
+                onClick={() => setSelectedIdx(i)}
+                style={{
+                  padding: '4px 8px',
+                  background: active ? `${info.color}22` : '#0f0f1a',
+                  border: `1px solid ${active ? info.color : '#2a2a4a'}`,
+                  borderRadius: 3,
+                  cursor: 'pointer',
+                  fontSize: 11,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <span>{info.emoji}</span>
+                <span style={{ color: info.color, fontWeight: 600 }}>({p.pos.x},{p.pos.y})</span>
+                {p.destMap && <span style={{ color: '#aaa' }}>→ {p.destMap}{p.destPos ? ` (${p.destPos.x},${p.destPos.y})` : ''}</span>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* exitReturnMap / exitReturnPos */}
+      <div style={{ padding: 10, background: '#0f0f1a', border: '1px solid #2a2a4a', borderRadius: 4, marginBottom: 12 }}>
+        <div style={{ fontSize: 11, color: '#88ccff', fontWeight: 700, marginBottom: 6 }}>
+          ↪️ Destino de los <code>exits</code>
+        </div>
+        <label style={{ fontSize: 11, color: '#888' }}>exitReturnMap:</label>
+        <select
+          value={exitReturnMap ?? ''}
+          onChange={(e) => setExitReturnMap(e.target.value || null)}
+          style={{ ...inputStyle, width: '100%', marginTop: 4, marginBottom: 8 }}
+        >
+          <option value="">— ninguno —</option>
+          {mapIds.map((m) => <option key={m} value={m}>{m}</option>)}
+        </select>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ fontSize: 11, color: '#888' }}>X:</label>
+            <input
+              type="number"
+              value={exitReturnPos?.x ?? 0}
+              onChange={(e) => setExitReturnPos({ x: parseInt(e.target.value, 10) || 0, y: exitReturnPos?.y ?? 0 })}
+              style={{ ...inputStyle, width: '100%', marginTop: 4 }}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ fontSize: 11, color: '#888' }}>Y:</label>
+            <input
+              type="number"
+              value={exitReturnPos?.y ?? 0}
+              onChange={(e) => setExitReturnPos({ x: exitReturnPos?.x ?? 0, y: parseInt(e.target.value, 10) || 0 })}
+              style={{ ...inputStyle, width: '100%', marginTop: 4 }}
+            />
+          </div>
+          {exitReturnPos && (
+            <button
+              onClick={() => setExitReturnPos(null)}
+              style={{ alignSelf: 'flex-end', background: 'transparent', border: '1px solid #5a5a7a', color: '#888', borderRadius: 4, padding: '2px 6px', cursor: 'pointer', fontSize: 10 }}
+              title="Limpiar"
+            >
+              ×
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div style={{ padding: 10, background: '#1a1530', border: '1px solid #5a3a3a', borderRadius: 4, fontSize: 11, color: '#ff9999' }}>
         ⚠️ Pega el bloque exportado en <code>{sourceFile ?? '*.ts'}</code> dentro del objeto del mapa.
       </div>
     </div>

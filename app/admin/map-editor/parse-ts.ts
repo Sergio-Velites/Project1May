@@ -43,6 +43,11 @@ export interface ParsedMap {
   pc: { x: number; y: number } | null;
   store: { x: number; y: number } | null;
   recoverLocation: { x: number; y: number } | null;
+  maps: Record<string, Record<string, string>>;
+  teleports: Record<string, Record<string, { map: string; pos: { x: number; y: number } }>>;
+  exits: Record<string, number[]>;
+  exitReturnMap: string | null;
+  exitReturnPos: { x: number; y: number } | null;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────
@@ -396,5 +401,96 @@ export function parseMapTS(tsText: string): ParsedMap {
     pc: parsePos(tsText, 'pc'),
     store: parsePos(tsText, 'store'),
     recoverLocation: parsePos(tsText, 'recoverLocation'),
+    maps: parseMapIdRowCol(tsText),
+    teleports: parseTeleportsField(tsText),
+    exits: parseRowColMap(tsText, 'exits'),
+    exitReturnMap: parseEnumValue(tsText, 'exitReturnMap'),
+    exitReturnPos: parsePos(tsText, 'exitReturnPos'),
   };
+}
+
+// ── Parsers de portales ─────────────────────────────────────────────────
+
+// Convierte "PalletTownHouseA1F" → "pallet-town-house-a-1f" (kebab + minúsculas) coincidiendo con el id
+function mapIdEnumToKebab(name: string): string {
+  return name
+    // separar antes de mayúsculas o dígitos precedidos por letra
+    .replace(/([a-z])([A-Z0-9])/g, '$1-$2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase();
+}
+
+function parseEnumValue(tsText: string, key: string): string | null {
+  const re = new RegExp(`(?<![\\w])${key}\\s*:\\s*MapId\\.([A-Za-z0-9_]+)`);
+  const m = tsText.match(re);
+  if (!m) return null;
+  return mapIdEnumToKebab(m[1]);
+}
+
+function parseMapIdRowCol(tsText: string): Record<string, Record<string, string>> {
+  const m = tsText.match(/(?<![\w])maps\s*:\s*\{/);
+  if (!m || m.index === undefined) return {};
+  const blockStart = tsText.indexOf('{', m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, blockStart);
+  if (!blk) return {};
+
+  const result: Record<string, Record<string, string>> = {};
+  const inner = blk.text.slice(1, -1);
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    if (!numMatch) { i++; continue; }
+    const rowKey = numMatch[1];
+    i += numMatch[0].length - 1;
+    const subBlk = findBalancedBlock(inner, i);
+    if (!subBlk) break;
+    const rowInner = subBlk.text.slice(1, -1);
+    const cols: Record<string, string> = {};
+    const colRe = /(-?\d+)\s*:\s*MapId\.([A-Za-z0-9_]+)/g;
+    let cm: RegExpExecArray | null;
+    while ((cm = colRe.exec(rowInner)) !== null) {
+      cols[cm[1]] = mapIdEnumToKebab(cm[2]);
+    }
+    if (Object.keys(cols).length > 0) result[rowKey] = cols;
+    i = subBlk.end + 1;
+  }
+  return result;
+}
+
+function parseTeleportsField(tsText: string): Record<string, Record<string, { map: string; pos: { x: number; y: number } }>> {
+  const m = tsText.match(/(?<![\w])teleports\s*:\s*\{/);
+  if (!m || m.index === undefined) return {};
+  const blockStart = tsText.indexOf('{', m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, blockStart);
+  if (!blk) return {};
+
+  const result: Record<string, Record<string, { map: string; pos: { x: number; y: number } }>> = {};
+  const inner = blk.text.slice(1, -1);
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    if (!numMatch) { i++; continue; }
+    const rowKey = numMatch[1];
+    i += numMatch[0].length - 1;
+    const subBlk = findBalancedBlock(inner, i);
+    if (!subBlk) break;
+    const rowInner = subBlk.text.slice(1, -1);
+    const cols: Record<string, { map: string; pos: { x: number; y: number } }> = {};
+    // Cada entrada: <col>: { map: MapId.X, pos: { x: N, y: N } }
+    const colRe = /(-?\d+)\s*:\s*\{\s*map\s*:\s*MapId\.([A-Za-z0-9_]+)\s*,\s*pos\s*:\s*\{\s*x\s*:\s*(\d+)\s*,\s*y\s*:\s*(\d+)\s*,?\s*\}\s*,?\s*\}/g;
+    let cm: RegExpExecArray | null;
+    while ((cm = colRe.exec(rowInner)) !== null) {
+      cols[cm[1]] = {
+        map: mapIdEnumToKebab(cm[2]),
+        pos: { x: parseInt(cm[3], 10), y: parseInt(cm[4], 10) },
+      };
+    }
+    if (Object.keys(cols).length > 0) result[rowKey] = cols;
+    i = subBlk.end + 1;
+  }
+  return result;
 }
