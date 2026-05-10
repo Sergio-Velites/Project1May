@@ -49,6 +49,44 @@ function extractImageFile(tsText) {
   return m ? m[1] : null;
 }
 
+// ── Parser walls / fences / grass / exits ─────────────────────────────────
+// Estos campos tienen estructura `key: { N: [a, b, c], M: [...] }` con claves
+// numéricas. Las convertimos a JSON válido normalizando las claves.
+function parseRowColMap(tsText, key) {
+  const m = tsText.match(new RegExp(`${key}\\s*:\\s*\\{`));
+  if (!m) return {};
+  const start = tsText.indexOf("{", m.index + m[0].length - 1);
+  let depth = 0;
+  let end = start;
+  for (let i = start; i < tsText.length; i++) {
+    if (tsText[i] === "{") depth++;
+    else if (tsText[i] === "}") {
+      depth--;
+      if (depth === 0) { end = i; break; }
+    }
+  }
+  let block = tsText.slice(start, end + 1);
+  // Strip comentarios
+  block = block.replace(/\/\/[^\n]*/g, "");
+  block = block.replace(/\/\*[\s\S]*?\*\//g, "");
+  // Normalizar claves numéricas: `  3:` o `,3:` o `{3:` → `"3":`
+  block = block.replace(/([\s,{])(-?\d+)\s*:/g, '$1"$2":');
+  // Eliminar trailing commas
+  block = block.replace(/,(\s*[}\]])/g, "$1");
+  try {
+    const parsed = JSON.parse(block);
+    const result = {};
+    for (const [k, v] of Object.entries(parsed)) {
+      if (Array.isArray(v) && v.every((n) => typeof n === "number")) {
+        result[k] = v;
+      }
+    }
+    return result;
+  } catch {
+    return {};
+  }
+}
+
 // ── Parsear los trainers del archivo .ts con regex ────────────────────────
 // Extrae el bloque trainers: [...] como texto y lo convierte en objetos planos.
 function parseTrainers(tsText) {
@@ -291,6 +329,9 @@ for (const file of MAP_FILES) {
   // Extraer trainers
   const trainers = parseTrainers(tsText);
 
+  // Extraer walls (campo obligatorio en MapType)
+  const walls = parseRowColMap(tsText, "walls");
+
   // Inferir MapId desde el nombre de archivo .ts
   const mapId = file
     .replace(".ts", "")
@@ -337,11 +378,12 @@ for (const file of MAP_FILES) {
     height,
     width,
     trainers,
+    walls,
     sourceFile: file,
   };
 
   processed++;
-  console.log(`  ✓ ${name} (${resolvedMapId}) — ${trainers.length} NPCs`);
+  console.log(`  ✓ ${name} (${resolvedMapId}) — ${trainers.length} NPCs, ${Object.values(walls).reduce((a, b) => a + b.length, 0)} walls`);
 }
 
 // ── Escribir JSON ─────────────────────────────────────────────────────────

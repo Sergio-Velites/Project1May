@@ -29,10 +29,13 @@ interface MapEntry {
   height: number;
   width: number;
   trainers: Trainer[];
+  walls: Record<string, number[]>;
   sourceFile: string;
 }
 
 type MapData = Record<string, MapEntry>;
+
+type EditMode = 'npc' | 'walls';
 
 // ── NPC Registry ──────────────────────────────────────────────────────────
 
@@ -129,6 +132,20 @@ ${opts.join('\n')}
   return `// Trainers para "${mapId}"\ntrainers: [\n${lines.join(',\n')}\n],`;
 }
 
+// Exporta el bloque walls con formato igual al original .ts.
+function exportWallsTS(walls: Record<string, number[]>): string {
+  const rows = Object.keys(walls)
+    .map((k) => parseInt(k, 10))
+    .filter((n) => !Number.isNaN(n))
+    .sort((a, b) => a - b);
+  if (rows.length === 0) return 'walls: {},';
+  const lines = rows.map((r) => {
+    const cols = (walls[String(r)] ?? []).slice().sort((a, b) => a - b);
+    return `    ${r}: [${cols.join(', ')}],`;
+  });
+  return `walls: {\n${lines.join('\n')}\n  },`;
+}
+
 // ── Constantes UI ─────────────────────────────────────────────────────────
 
 const ZOOM_LEVELS = [16, 24, 32, 48];
@@ -169,9 +186,12 @@ export default function MapEditor() {
   const [mapData, setMapData] = useState<MapData>({});
   const [selectedMapId, setSelectedMapId] = useState<string>('');
   const [trainers, setTrainers] = useState<Trainer[]>([]);
+  const [walls, setWalls] = useState<Record<string, number[]>>({});
+  const [editMode, setEditMode] = useState<EditMode>('npc');
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [zoom, setZoom] = useState(32);
   const [showGrid, setShowGrid] = useState(true);
+  const [showWalls, setShowWalls] = useState(true);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveFlash, setSaveFlash] = useState(false);
@@ -179,6 +199,9 @@ export default function MapEditor() {
   const [error, setError] = useState('');
 
   const dragging = useRef<{ idx: number; startX: number; startY: number } | null>(null);
+  // Pintado de walls por arrastre. mode = el efecto a aplicar a los tiles
+  // por los que se pase (toggle inicial determina add/remove).
+  const wallPaint = useRef<{ active: boolean; mode: 'add' | 'remove'; visited: Set<string> } | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const currentMap = mapData[selectedMapId];
@@ -193,6 +216,7 @@ export default function MapEditor() {
         if (first) {
           setSelectedMapId(first);
           setTrainers(data[first].trainers ?? []);
+          setWalls(data[first].walls ?? {});
         }
       })
       .catch(() => setError('No se pudo cargar map-data.json. Ejecuta: npm run editor:setup'));
@@ -202,6 +226,7 @@ export default function MapEditor() {
   function selectMap(id: string) {
     setSelectedMapId(id);
     setTrainers(mapData[id]?.trainers ?? []);
+    setWalls(mapData[id]?.walls ?? {});
     setSelectedIdx(null);
     setDirty(false);
   }
@@ -213,22 +238,31 @@ export default function MapEditor() {
       await fetch('/api/admin/map-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mapId: selectedMapId, trainers }),
+        body: JSON.stringify({ mapId: selectedMapId, trainers, walls }),
       });
       setDirty(false);
       setSaveFlash(true);
       setTimeout(() => setSaveFlash(false), 1500);
       // Actualizar cache local
-      setMapData((d) => ({ ...d, [selectedMapId]: { ...d[selectedMapId], trainers } }));
+      setMapData((d) => ({
+        ...d,
+        [selectedMapId]: { ...d[selectedMapId], trainers, walls },
+      }));
     } finally {
       setSaving(false);
     }
   }
 
-  // ── Exportar TS ───────────────────────────────────────────────────────
+  // ── Exportar TS (trainers) ────────────────────────────────────────────
   function doExport() {
     const ts = exportTS(trainers, selectedMapId);
-    navigator.clipboard.writeText(ts).then(() => alert('¡Copiado al clipboard! Pégalo en el archivo .ts del mapa.'));
+    navigator.clipboard.writeText(ts).then(() => alert('¡Trainers copiados! Pega el bloque trainers: [...] en el .ts.'));
+  }
+
+  // ── Exportar TS (walls) ───────────────────────────────────────────────
+  function doExportWalls() {
+    const ts = exportWallsTS(walls);
+    navigator.clipboard.writeText(ts).then(() => alert('¡Walls copiadas! Pega el bloque walls: { ... } en el .ts (sustituyendo el bloque walls existente).'));
   }
 
   // ── Añadir NPC ────────────────────────────────────────────────────────
@@ -259,7 +293,37 @@ export default function MapEditor() {
     setDirty(true);
   }
 
-  // ── Actualizar campo del NPC seleccionado ─────────────────────────────
+  // ── Walls ──────────────────────────────────────────────────────────────
+  // hasWall: helper de lectura. setWallAt: helper de escritura inmutable.
+  function setWallAt(
+    src: Record<string, number[]>,
+    x: number,
+    y: number,
+    on: boolean,
+  ): Record<string, number[]> {
+    const key = String(y);
+    const row = src[key] ? [...src[key]] : [];
+    const idx = row.indexOf(x);
+    if (on) {
+      if (idx === -1) row.push(x);
+    } else {
+      if (idx !== -1) row.splice(idx, 1);
+    }
+    const next = { ...src };
+    if (row.length === 0) {
+      delete next[key];
+    } else {
+      row.sort((a, b) => a - b);
+      next[key] = row;
+    }
+    return next;
+  }
+
+  function hasWall(src: Record<string, number[]>, x: number, y: number) {
+    return (src[String(y)] ?? []).includes(x);
+  }
+
+  // ── Actualizar campo del NPC seleccionado ───────────────────────────────
   function updateSelected(patch: Partial<Trainer>) {
     if (selectedIdx === null) return;
     const next = trainers.map((t, i) => (i === selectedIdx ? { ...t, ...patch } : t));
@@ -267,21 +331,22 @@ export default function MapEditor() {
     setDirty(true);
   }
 
-  // ── Drag & drop ───────────────────────────────────────────────────────
+  // ── Drag & drop NPC ────────────────────────────────────────────────────────
   const onPointerDown = useCallback(
     (e: React.PointerEvent, idx: number) => {
+      if (editMode !== 'npc') return;
       e.preventDefault();
       e.stopPropagation();
       setSelectedIdx(idx);
       dragging.current = { idx, startX: e.clientX, startY: e.clientY };
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
     },
-    []
+    [editMode]
   );
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
-      if (!dragging.current || !canvasRef.current) return;
+      if (!canvasRef.current) return;
       const canvas = canvasRef.current;
       const rect = canvas.getBoundingClientRect();
       const scrollLeft = canvas.parentElement?.scrollLeft ?? 0;
@@ -290,35 +355,72 @@ export default function MapEditor() {
       const relY = e.clientY - rect.top + scrollTop;
       const tileX = Math.max(0, Math.min(Math.floor(relX / zoom), (currentMap?.width ?? 20) - 1));
       const tileY = Math.max(0, Math.min(Math.floor(relY / zoom), (currentMap?.height ?? 20) - 1));
+
+      // Walls paint en arrastre
+      if (editMode === 'walls' && wallPaint.current?.active) {
+        const paint = wallPaint.current;
+        const k = `${tileX},${tileY}`;
+        if (!paint.visited.has(k)) {
+          paint.visited.add(k);
+          setWalls((prev) => setWallAt(prev, tileX, tileY, paint.mode === 'add'));
+          setDirty(true);
+        }
+        return;
+      }
+
+      if (editMode !== 'npc' || !dragging.current) return;
       const { idx } = dragging.current;
       setTrainers((prev) =>
         prev.map((t, i) => (i === idx ? { ...t, pos: { x: tileX, y: tileY } } : t))
       );
       setDirty(true);
     },
-    [zoom, currentMap]
+    [zoom, currentMap, editMode]
   );
 
   const onPointerUp = useCallback(() => {
     dragging.current = null;
+    wallPaint.current = null;
   }, []);
 
-  // ── Click en canvas vacío → añadir NPC en ese tile ───────────────────
-  function onCanvasClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (!canvasRef.current) return;
+  // ── Click en canvas ────────────────────────────────────────────────────────
+  function tileFromEvent(e: React.MouseEvent | React.PointerEvent): { x: number; y: number } | null {
+    if (!canvasRef.current) return null;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scrollLeft = canvas.parentElement?.scrollLeft ?? 0;
     const scrollTop = canvas.parentElement?.scrollTop ?? 0;
     const relX = e.clientX - rect.left + scrollLeft;
     const relY = e.clientY - rect.top + scrollTop;
-    const tileX = Math.floor(relX / zoom);
-    const tileY = Math.floor(relY / zoom);
+    return {
+      x: Math.floor(relX / zoom),
+      y: Math.floor(relY / zoom),
+    };
+  }
 
-    // Verificar si hay un NPC en ese tile
-    const hitIdx = trainers.findIndex(
-      (t) => t.pos.x === tileX && t.pos.y === tileY
-    );
+  // En modo walls: pointerdown en canvas inicia pintura.
+  function onCanvasPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    if (editMode !== 'walls') return;
+    const tile = tileFromEvent(e);
+    if (!tile) return;
+    if (
+      tile.x < 0 || tile.y < 0 ||
+      tile.x >= (currentMap?.width ?? 0) ||
+      tile.y >= (currentMap?.height ?? 0)
+    ) return;
+    const currentlyOn = hasWall(walls, tile.x, tile.y);
+    const mode: 'add' | 'remove' = currentlyOn ? 'remove' : 'add';
+    wallPaint.current = { active: true, mode, visited: new Set([`${tile.x},${tile.y}`]) };
+    setWalls((prev) => setWallAt(prev, tile.x, tile.y, mode === 'add'));
+    setDirty(true);
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+  }
+
+  function onCanvasClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (editMode !== 'npc') return;
+    const tile = tileFromEvent(e);
+    if (!tile) return;
+    const hitIdx = trainers.findIndex((t) => t.pos.x === tile.x && t.pos.y === tile.y);
     if (hitIdx >= 0) {
       setSelectedIdx(hitIdx);
     } else {
@@ -382,6 +484,33 @@ export default function MapEditor() {
           Grid
         </label>
 
+        {/* Walls toggle visibilidad */}
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13, color: showWalls ? '#ff8888' : '#555' }}>
+          <input type="checkbox" checked={showWalls} onChange={(e) => setShowWalls(e.target.checked)} style={{ accentColor: '#aa3030' }} />
+          Walls
+        </label>
+
+        {/* Modo edición */}
+        <div style={{ display: 'flex', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
+          {(['npc', 'walls'] as EditMode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => setEditMode(m)}
+              style={{
+                padding: '4px 10px',
+                background: editMode === m ? (m === 'walls' ? '#7a3030' : '#5050b0') : '#1a1a3a',
+                border: 'none',
+                color: editMode === m ? '#fff' : '#888',
+                cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 600,
+              }}
+            >
+              {m === 'npc' ? 'NPCs' : 'Walls'}
+            </button>
+          ))}
+        </div>
+
         <div style={{ flex: 1 }} />
 
         {/* Leyenda */}
@@ -392,7 +521,7 @@ export default function MapEditor() {
         </div>
 
         {/* Botón añadir */}
-        <button onClick={addNpc} style={{ padding: '4px 12px', background: '#2a4a2a', border: '1px solid #4a8a4a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', fontSize: 13 }}>
+        <button onClick={addNpc} disabled={editMode !== 'npc'} style={{ padding: '4px 12px', background: editMode === 'npc' ? '#2a4a2a' : '#1a1a2a', border: '1px solid #4a8a4a', borderRadius: 4, color: editMode === 'npc' ? '#88ff88' : '#444', cursor: editMode === 'npc' ? 'pointer' : 'not-allowed', fontSize: 13 }}>
           + NPC
         </button>
 
@@ -403,7 +532,12 @@ export default function MapEditor() {
 
         {/* Exportar TS */}
         <button onClick={doExport} style={{ padding: '4px 12px', background: '#1a2a3a', border: '1px solid #3a5a7a', borderRadius: 4, color: '#88ccff', cursor: 'pointer', fontSize: 13 }}>
-          📋 Exportar TS
+          📋 Export Trainers
+        </button>
+
+        {/* Exportar Walls */}
+        <button onClick={doExportWalls} style={{ padding: '4px 12px', background: '#2a1a1a', border: '1px solid #7a3a3a', borderRadius: 4, color: '#ff8888', cursor: 'pointer', fontSize: 13 }}>
+          🧱 Export Walls
         </button>
 
         {/* Logout */}
@@ -421,6 +555,7 @@ export default function MapEditor() {
             <div
               ref={canvasRef}
               onClick={onCanvasClick}
+              onPointerDown={onCanvasPointerDown}
               onPointerMove={onPointerMove}
               onPointerUp={onPointerUp}
               style={{
@@ -431,7 +566,8 @@ export default function MapEditor() {
                 backgroundSize: '100% 100%',
                 backgroundRepeat: 'no-repeat',
                 imageRendering: 'pixelated',
-                cursor: 'crosshair',
+                cursor: editMode === 'walls' ? 'cell' : 'crosshair',
+                touchAction: 'none',
                 ...(showGrid ? {
                   backgroundBlendMode: 'normal',
                   outline: 'none',
@@ -449,6 +585,32 @@ export default function MapEditor() {
                   backgroundSize: `${zoom}px ${zoom}px`,
                 }} />
               )}
+
+              {/* Walls overlay (puramente visual, no captura clicks) */}
+              {showWalls && Object.entries(walls).flatMap(([rowKey, cols]) => {
+                const y = parseInt(rowKey, 10);
+                if (Number.isNaN(y)) return [];
+                return cols.map((x) => (
+                  <div
+                    key={`w-${y}-${x}`}
+                    style={{
+                      position: 'absolute',
+                      left: x * zoom,
+                      top: y * zoom,
+                      width: zoom,
+                      height: zoom,
+                      background: editMode === 'walls'
+                        ? 'rgba(255, 60, 60, 0.55)'
+                        : 'rgba(255, 60, 60, 0.22)',
+                      border: editMode === 'walls'
+                        ? '1px solid rgba(255, 80, 80, 0.9)'
+                        : '1px solid rgba(255, 80, 80, 0.4)',
+                      pointerEvents: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                ));
+              })}
 
               {/* NPCs */}
               {trainers.map((t, idx) => {
@@ -470,7 +632,7 @@ export default function MapEditor() {
                       top: t.pos.y * zoom,
                       width: zoom,
                       height: zoom,
-                      cursor: 'grab',
+                      cursor: editMode === 'walls' ? 'cell' : 'grab',
                       zIndex: isSelected ? 100 : 10,
                       border: `2px solid ${isSelected ? '#ffffff' : borderColor}`,
                       borderRadius: 2,
@@ -479,6 +641,10 @@ export default function MapEditor() {
                       overflow: 'hidden',
                       background: isSelected ? 'rgba(255,255,255,0.08)' : 'transparent',
                       transition: 'box-shadow 0.1s',
+                      // En modo walls los NPCs no capturan clicks: el canvas
+                      // recibe pointerdown directo y se pinta el wall debajo.
+                      pointerEvents: editMode === 'walls' ? 'none' : 'auto',
+                      opacity: editMode === 'walls' ? 0.6 : 1,
                     }}
                   >
                     {/* Sprite */}
@@ -515,13 +681,32 @@ export default function MapEditor() {
           {/* Header inspector */}
           <div style={{ padding: '12px 16px', borderBottom: '1px solid #2a2a4a' }}>
             <div style={{ fontSize: 11, color: '#666', textTransform: 'uppercase', letterSpacing: 1 }}>
-              Inspector — {currentMap ? `${currentMap.name} · ${trainers.length} NPCs` : 'sin mapa'}
+              Inspector — {currentMap
+                ? `${currentMap.name} · ${trainers.length} NPCs · ${Object.values(walls).reduce((a, b) => a + b.length, 0)} walls`
+                : 'sin mapa'}
             </div>
           </div>
 
           {/* Contenido inspector */}
           <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
-            {selected === null ? (
+            {editMode === 'walls' ? (
+              <div style={{ color: '#ccc', fontSize: 13, lineHeight: 1.6 }}>
+                <div style={{ fontSize: 32, marginBottom: 8, textAlign: 'center' }}>🧱</div>
+                <p style={{ color: '#ff8888', fontWeight: 700, marginBottom: 12 }}>Modo Walls activo</p>
+                <ul style={{ paddingLeft: 18, color: '#aaa', fontSize: 12 }}>
+                  <li>Click izquierdo: añadir/quitar pared</li>
+                  <li>Arrastra para pintar varias casillas</li>
+                  <li>El primer click decide si añade o quita</li>
+                </ul>
+                <div style={{ marginTop: 16, padding: 12, background: '#1a1530', border: '1px solid #5a3a3a', borderRadius: 4, fontSize: 11, color: '#ff9999' }}>
+                  ⚠️ Al guardar se persisten en Supabase. Para que el juego use estos walls debes pegar el bloque
+                  exportado <code>walls: {'{'}...{'}'}</code> en el archivo <code>{currentMap?.sourceFile ?? '*.ts'}</code> del juego.
+                </div>
+                <div style={{ marginTop: 12, fontSize: 11, color: '#777' }}>
+                  Total walls: <span style={{ color: '#ff8888', fontWeight: 700 }}>{Object.values(walls).reduce((a, b) => a + b.length, 0)}</span>
+                </div>
+              </div>
+            ) : selected === null ? (
               <div style={{ color: '#444', fontSize: 13, textAlign: 'center', marginTop: 40 }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>👆</div>
                 Click en un NPC para editarlo<br />
