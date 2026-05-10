@@ -188,7 +188,10 @@
     "pokemonCenter": null,
     "pc": null,
     "store": null,
-    "recoverLocation": null,
+    "recoverLocation": {
+      "x": 0,
+      "y": 6
+    },
     "sourceFile": "house-a-2f.ts"
   },
   "pallet-town-house-b": {
@@ -313,8 +316,7 @@
       "3": [
         6,
         7,
-        8,
-        9
+        8
       ],
       "6": [
         0,
@@ -358,7 +360,10 @@
     "pokemonCenter": null,
     "pc": null,
     "store": null,
-    "recoverLocation": null,
+    "recoverLocation": {
+      "x": 1,
+      "y": 1
+    },
     "sourceFile": "lab.ts"
   },
   "mt-moon-1f": {
@@ -2174,31 +2179,278 @@
       {
         "npcKey": "brock",
         "pos": {
-          "x": 3,
-          "y": 8
+          "x": 4,
+          "y": 9
         },
         "facing": "right",
-        "money": 300,
+        "money": 200,
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
         "intro": [
           "¡Eh, espera!",
-          "¡Esta bodega es solo para los que demuestren su valor!",
-          "¡Derrótame primero!"
+          "Soy BROCK, el primer rival de SERGIO.",
+          "Hoy custodio la puerta de la bodega.",
+          "¡Demuéstrame que mereces brindar con los novios!"
         ],
         "outtro": [
-          "Bien... pero dentro te esperan Sergio y Marta.",
-          "¡No podrás con ellos!"
+          "Roca dura... pero el vino la rompe.",
+          "Adelante, te esperan más rivales."
         ],
         "pokemon": [
           {
-            "id": 72,
-            "level": 10
+            "id": 74,
+            "level": 12
           },
           {
-            "id": 54,
-            "level": 10
+            "id": 95,
+            "level": 14
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "misty",
+        "pos": {
+          "x": 6,
+          "y": 8
+        },
+        "facing": "left",
+        "money": 400,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡Vaya, otro invitado curioso!",
+          "Soy MISTY. Vine por el cava, me quedé por la fiesta.",
+          "Pero antes de seguir... ¡vamos a divertirnos!"
+        ],
+        "outtro": [
+          "¡Bien jugado! Brindemos luego con espumoso."
+        ],
+        "pokemon": [
+          {
+            "id": 120,
+            "level": 14
+          },
+          {
+            "id": 121,
+            "level": 17
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "ltSurge",
+        "pos": {
+          "x": 3,
+          "y": 7
+        },
+        "facing": "right",
+        "money": 800,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡EH, RECLUTA!",
+          "Soy el TENIENTE SURGE.",
+          "Aquí no se entra sin ELECTRIZAR el ambiente.",
+          "¡EN GUARDIA!"
+        ],
+        "outtro": [
+          "¡JA! Buen voltaje el tuyo.",
+          "Que SERGIO y MARTA tengan mil años de chispa."
+        ],
+        "pokemon": [
+          {
+            "id": 100,
+            "level": 18
+          },
+          {
+            "id": 25,
+            "level": 18
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "erica",
+        "pos": {
+          "x": 6,
+          "y": 6
+        },
+        "facing": "left",
+        "money": 1000,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "Mmm... el aroma del vino me adormece.",
+          "Soy ERICA. He traído flores para la boda.",
+          "Pero me apetece un combate... ¿te animas?"
+        ],
+        "outtro": [
+          "Qué elegancia.",
+          "Brindo por los novios... y por ti."
+        ],
+        "pokemon": [
+          {
+            "id": 71,
+            "level": 20
+          },
+          {
+            "id": 114,
+            "level": 20
+          },
+          {
+            "id": 45,
+            "level": 22
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "koga",
+        "pos": {
+          "x": 3,
+          "y": 5
+        },
+        "facing": "right",
+        "money": 1200,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "FUFUFU... un intruso.",
+          "Soy KOGA. Solo los dignos pasan al fondo.",
+          "Demuestra tu temple ante mis venenos."
+        ],
+        "outtro": [
+          "Hábil... muy hábil.",
+          "Que el brindis purifique mi derrota."
+        ],
+        "pokemon": [
+          {
+            "id": 109,
+            "level": 21
+          },
+          {
+            "id": 89,
+            "level": 21
+          },
+          {
+            "id": 49,
+            "level": 23
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "sabrina",
+        "pos": {
+          "x": 6,
+          "y": 4
+        },
+        "facing": "left",
+        "money": 1400,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "Te estaba esperando.",
+          "Soy SABRINA. Vi tu llegada en mi mente.",
+          "Y también vi este combate..."
+        ],
+        "outtro": [
+          "El futuro era más amable de lo que predije.",
+          "Adelante. SERGIO y MARTA aguardan."
+        ],
+        "pokemon": [
+          {
+            "id": 64,
+            "level": 23
+          },
+          {
+            "id": 65,
+            "level": 25
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "blaine",
+        "pos": {
+          "x": 3,
+          "y": 3
+        },
+        "facing": "right",
+        "money": 1700,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "¡JA! ¿Vienes a quemarte las manos?",
+          "Soy BLAINE. Aquí dentro hace calor.",
+          "¡Probemos si tu fuego brilla más que el mío!"
+        ],
+        "outtro": [
+          "¡Apagaste mi fuego!",
+          "Que la pasión de los novios arda como tú."
+        ],
+        "pokemon": [
+          {
+            "id": 58,
+            "level": 24
+          },
+          {
+            "id": 78,
+            "level": 25
+          },
+          {
+            "id": 126,
+            "level": 27
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "giovanni",
+        "pos": {
+          "x": 6,
+          "y": 2
+        },
+        "facing": "left",
+        "money": 2500,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "intro": [
+          "Vaya, vaya... has llegado lejos.",
+          "Soy GIOVANNI. El último obstáculo.",
+          "Si me derrotas, tendrás el honor de retar a los novios.",
+          "Si no... volverás por donde viniste."
+        ],
+        "outtro": [
+          "Impresionante.",
+          "SERGIO y MARTA eligieron bien a sus invitados.",
+          "Adelante. Es tu día."
+        ],
+        "pokemon": [
+          {
+            "id": 51,
+            "level": 25
+          },
+          {
+            "id": 31,
+            "level": 27
+          },
+          {
+            "id": 34,
+            "level": 27
+          },
+          {
+            "id": 53,
+            "level": 30
           }
         ],
         "postGame": null
@@ -2210,15 +2462,15 @@
           "y": 1
         },
         "facing": "down",
-        "money": 1400,
+        "money": 2800,
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
         "intro": [
-          "¡Te lo advertimos!",
-          "Aquí entre barricas solo se habla de vino.",
-          "...y de Pokémon.",
-          "¡Demuestra que mereces brindar con nosotros!"
+          "¡Lo lograste! Llegaste hasta nosotros.",
+          "Soy SERGIO. Hoy me caso con MARTA.",
+          "Pero antes... ¡un último brindis con combate!",
+          "¡Demuestra que mereces estar en nuestra boda!"
         ],
         "outtro": [
           "¡Bien hecho!",
@@ -2228,11 +2480,11 @@
         "pokemon": [
           {
             "id": 58,
-            "level": 14
+            "level": 28
           },
           {
             "id": 77,
-            "level": 12
+            "level": 28
           }
         ],
         "postGame": "{\n        message: [\n          \"¡Toma la INSIGNIA DEL VINO!\",\n          \"Es el símbolo de que mereces brindar.\",\n          \"¡Úsala bien, y que el vino fluya!\",\n        ],\n        items: [ItemType.BoulderBadge, ItemType.Tm34],\n      }"
@@ -2244,27 +2496,29 @@
           "y": 1
         },
         "facing": "down",
-        "money": 1600,
+        "money": 3000,
         "persistent": false,
         "isOnline": false,
         "hideCondition": null,
         "intro": [
-          "¡Yo soy Marta!",
-          "¡Y no te lo voy a poner fácil!",
-          "¡No todo en la boda es vino y flores!"
+          "¡Yo soy MARTA!",
+          "Y no te creas que SERGIO se lleva todo el mérito.",
+          "¡No todo en la boda es vino y flores!",
+          "¡Te toca el último combate!"
         ],
         "outtro": [
           "¡Increíble! ¡Enhorabuena!",
-          "El 8 de agosto... trae buen vino."
+          "El 8 de agosto... trae buen vino.",
+          "Y prepárate para bailar hasta el amanecer."
         ],
         "pokemon": [
           {
             "id": 12,
-            "level": 16
+            "level": 28
           },
           {
             "id": 36,
-            "level": 14
+            "level": 30
           }
         ],
         "postGame": null
@@ -2285,34 +2539,66 @@
       ],
       "1": [
         0,
+        1,
+        2,
+        7,
+        8,
         9
       ],
       "2": [
         0,
+        1,
+        2,
+        7,
+        8,
         9
       ],
       "3": [
         0,
+        1,
+        2,
+        7,
+        8,
         9
       ],
       "4": [
         0,
+        1,
+        2,
+        7,
+        8,
         9
       ],
       "5": [
         0,
+        1,
+        2,
+        7,
+        8,
         9
       ],
       "6": [
         0,
+        1,
+        2,
+        7,
+        8,
         9
       ],
       "7": [
         0,
+        1,
+        2,
+        7,
+        8,
         9
       ],
       "8": [
         0,
+        1,
+        2,
+        7,
+        8,
         9
       ],
       "9": [

@@ -58,63 +58,73 @@ function applyOverridesToBase(
 }
 
 export async function GET() {
+  let stage = 'init';
   try {
+    stage = 'readBundledData';
     const base = readBundledData();
 
+    stage = 'getSupabase';
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      // Sin credenciales devolvemos solo lo bundleado (no es error fatal).
+      console.warn('[map-data][GET] Sin NEXT_PUBLIC_SUPABASE_URL/KEY — devolviendo solo base bundleada');
+      return NextResponse.json(base);
+    }
     const supabase = getSupabase();
-    // Intento 1: con overrides. Si la columna no existe (migración 004 no
-    // aplicada), reintentamos sin ella para no devolver 500.
-    let rows: Array<Record<string, unknown>> | null = null;
-    let res = await supabase
+
+    stage = 'select(overrides)';
+    let rows: Array<Record<string, unknown>> = [];
+    const res = await supabase
       .from('map_editor_data')
       .select('map_id, trainers, walls, overrides');
 
     if (res.error && /column .*overrides.* does not exist/i.test(res.error.message)) {
+      stage = 'select(fallback)';
       const fallback = await supabase
         .from('map_editor_data')
         .select('map_id, trainers, walls');
       if (fallback.error) {
-        return NextResponse.json(
-          { error: `supabase select: ${fallback.error.message}` },
-          { status: 500 },
-        );
+        console.error('[map-data][GET] fallback error:', fallback.error);
+        // Aún devolvemos los datos bundleados para que el editor cargue.
+        return NextResponse.json(base);
       }
       rows = (fallback.data ?? []) as Array<Record<string, unknown>>;
     } else if (res.error) {
-      return NextResponse.json(
-        { error: `supabase select: ${res.error.message}` },
-        { status: 500 },
-      );
+      console.error('[map-data][GET] select error:', res.error);
+      // No devolvemos 500 para no romper el editor: solo bundle.
+      return NextResponse.json(base);
     } else {
       rows = (res.data ?? []) as Array<Record<string, unknown>>;
     }
 
-    if (rows) {
-      for (const row of rows) {
-        const mapId = row.map_id as string;
-        if (!base[mapId]) continue;
-        const target = base[mapId] as Record<string, unknown>;
+    stage = 'apply rows';
+    for (const row of rows) {
+      const mapId = row.map_id as string;
+      if (!mapId || !base[mapId]) continue;
+      const target = base[mapId] as Record<string, unknown>;
 
-        if (row.trainers !== null && row.trainers !== undefined) {
-          target.trainers = row.trainers;
+      if (row.trainers !== null && row.trainers !== undefined) {
+        target.trainers = row.trainers;
+      }
+      if (row.walls !== null && row.walls !== undefined) {
+        if (
+          typeof row.walls === 'object' &&
+          Object.keys(row.walls as object).length > 0
+        ) {
+          target.walls = row.walls;
         }
-        if (row.walls !== null && row.walls !== undefined) {
-          if (
-            typeof row.walls === 'object' &&
-            Object.keys(row.walls as object).length > 0
-          ) {
-            target.walls = row.walls;
-          }
-        }
-        if (row.overrides !== null && row.overrides !== undefined) {
-          applyOverridesToBase(target, row.overrides);
-        }
+      }
+      if (row.overrides !== null && row.overrides !== undefined) {
+        applyOverridesToBase(target, row.overrides);
       }
     }
 
     return NextResponse.json(base);
   } catch (e) {
-    return NextResponse.json({ error: String(e) }, { status: 500 });
+    console.error(`[map-data][GET] crash en ${stage}:`, e);
+    return NextResponse.json(
+      { error: `${stage}: ${e instanceof Error ? e.message : String(e)}` },
+      { status: 500 },
+    );
   }
 }
 
