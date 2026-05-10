@@ -352,7 +352,7 @@ export default function MapEditor() {
   async function save() {
     setSaving(true);
     try {
-      await fetch('/api/admin/map-data', {
+      const res = await fetch('/api/admin/map-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -377,6 +377,24 @@ export default function MapEditor() {
           },
         }),
       });
+      if (!res.ok) {
+        let body: { error?: string; hint?: string } = {};
+        try {
+          body = await res.json();
+        } catch {
+          /* respuesta no JSON */
+        }
+        const msg = body.error ?? `HTTP ${res.status}`;
+        const hint = body.hint ? `\n\n${body.hint}` : '';
+        setError(`Error al guardar: ${msg}${hint}`);
+        alert(`Error al guardar: ${msg}${hint}`);
+        return;
+      }
+      const json = (await res.json().catch(() => ({}))) as { warning?: string };
+      if (json.warning) {
+        alert(`⚠️ ${json.warning}`);
+      }
+      setError('');
       setDirty(false);
       setSaveFlash(true);
       setTimeout(() => setSaveFlash(false), 1500);
@@ -398,6 +416,9 @@ export default function MapEditor() {
           recoverLocation,
         },
       }));
+    } catch (e) {
+      setError(`Error de red al guardar: ${String(e)}`);
+      alert(`Error de red al guardar: ${String(e)}`);
     } finally {
       setSaving(false);
     }

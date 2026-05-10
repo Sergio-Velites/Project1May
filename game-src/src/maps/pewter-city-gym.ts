@@ -63,7 +63,7 @@ const pewterCityGym: MapType = {
         { id: 74, level: 12 },
         { id: 95, level: 14 },
       ],
-      facing: Direction.Up,
+      facing: Direction.Right,
       pos: { x: 4, y: 9 },
       intro: [
         "¡Eh, espera!",

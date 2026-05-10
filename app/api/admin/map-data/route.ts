@@ -62,14 +62,38 @@ export async function GET() {
     const base = readBundledData();
 
     const supabase = getSupabase();
-    const { data: rows } = await supabase
+    // Intento 1: con overrides. Si la columna no existe (migración 004 no
+    // aplicada), reintentamos sin ella para no devolver 500.
+    let rows: Array<Record<string, unknown>> | null = null;
+    let res = await supabase
       .from('map_editor_data')
       .select('map_id, trainers, walls, overrides');
 
+    if (res.error && /column .*overrides.* does not exist/i.test(res.error.message)) {
+      const fallback = await supabase
+        .from('map_editor_data')
+        .select('map_id, trainers, walls');
+      if (fallback.error) {
+        return NextResponse.json(
+          { error: `supabase select: ${fallback.error.message}` },
+          { status: 500 },
+        );
+      }
+      rows = (fallback.data ?? []) as Array<Record<string, unknown>>;
+    } else if (res.error) {
+      return NextResponse.json(
+        { error: `supabase select: ${res.error.message}` },
+        { status: 500 },
+      );
+    } else {
+      rows = (res.data ?? []) as Array<Record<string, unknown>>;
+    }
+
     if (rows) {
       for (const row of rows) {
-        if (!base[row.map_id]) continue;
-        const target = base[row.map_id] as Record<string, unknown>;
+        const mapId = row.map_id as string;
+        if (!base[mapId]) continue;
+        const target = base[mapId] as Record<string, unknown>;
 
         if (row.trainers !== null && row.trainers !== undefined) {
           target.trainers = row.trainers;
@@ -109,11 +133,40 @@ export async function POST(request: Request) {
 
     const supabase = getSupabase();
 
-    const { data: existing } = await supabase
-      .from('map_editor_data')
-      .select('trainers, walls, overrides')
-      .eq('map_id', mapId)
-      .maybeSingle();
+    // Intento de leer fila existente con overrides; si la columna no existe
+    // hacemos fallback sin overrides para no romper.
+    let existing: { trainers?: unknown; walls?: unknown; overrides?: unknown } | null = null;
+    let overridesColumnAvailable = true;
+
+    {
+      const { data, error } = await supabase
+        .from('map_editor_data')
+        .select('trainers, walls, overrides')
+        .eq('map_id', mapId)
+        .maybeSingle();
+      if (error && /column .*overrides.* does not exist/i.test(error.message)) {
+        overridesColumnAvailable = false;
+        const fb = await supabase
+          .from('map_editor_data')
+          .select('trainers, walls')
+          .eq('map_id', mapId)
+          .maybeSingle();
+        if (fb.error) {
+          return NextResponse.json(
+            { error: `supabase select: ${fb.error.message}` },
+            { status: 500 },
+          );
+        }
+        existing = (fb.data ?? null) as typeof existing;
+      } else if (error) {
+        return NextResponse.json(
+          { error: `supabase select: ${error.message}` },
+          { status: 500 },
+        );
+      } else {
+        existing = (data ?? null) as typeof existing;
+      }
+    }
 
     // Merge parcial de overrides: las claves enviadas sustituyen, las no
     // enviadas conservan su valor anterior. Para borrar una clave concreta
@@ -140,17 +193,32 @@ export async function POST(request: Request) {
       map_id: mapId,
       trainers: trainers !== undefined ? trainers : existing?.trainers ?? [],
       walls: walls !== undefined ? walls : existing?.walls ?? {},
-      overrides: mergedOverrides,
       updated_at: new Date().toISOString(),
     };
+    if (overridesColumnAvailable) {
+      payload.overrides = mergedOverrides;
+    }
 
     const { error } = await supabase.from('map_editor_data').upsert(payload);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: `supabase upsert: ${error.message}`,
+          hint: !overridesColumnAvailable
+            ? 'La columna `overrides` no existe en Supabase. Aplica la migración supabase/migrations/004_map_editor_overrides.sql en el SQL Editor del Dashboard.'
+            : undefined,
+        },
+        { status: 500 },
+      );
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      ...(overridesColumnAvailable
+        ? {}
+        : { warning: 'Overrides no persistidos: aplica la migración 004_map_editor_overrides.sql en Supabase.' }),
+    });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
   }
