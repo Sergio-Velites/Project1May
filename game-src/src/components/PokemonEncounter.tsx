@@ -63,7 +63,6 @@ import getXp from "../app/xp-helper";
 import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp } from "../app/level-helper";
 import MoveSelect from "./MoveSelect";
 import catchesPokemon from "../app/pokeball-helper";
-import { getMoveAnimGroup, AnimGroup } from "../app/move-animations";
 import { MoveAnimation } from "./MoveAnimation";
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
@@ -585,7 +584,7 @@ const PokemonEncounter = () => {
   const [alertText, setAlertText] = useState<string | null>(null);
   const [clickableNotice, setClickableNotice] = useState<string | null>(null);
   const [moveAnim, setMoveAnim] = useState<{
-    group: AnimGroup;
+    moveId: string;
     target: "enemy" | "player";
     damageClass: string;
   } | null>(null);
@@ -1316,7 +1315,8 @@ const PokemonEncounter = () => {
 
   const processMoveResult = (
     result: MoveResult,
-    isAttacking: boolean
+    isAttacking: boolean,
+    moveId?: string
   ): { us: PokemonInstance; them: PokemonEncounterType } => {
     const {
       us,
@@ -1331,12 +1331,12 @@ const PokemonEncounter = () => {
       statusApply,
     } = result;
     if (isAttacking) {
-      const moveDataAnim = getMoveMetadata(moveName);
-      if (moveDataAnim) {
+      if (moveId) {
+        const moveDataAnim = getMoveMetadata(moveId);
         setMoveAnim({
-          group: getMoveAnimGroup(moveDataAnim.type, moveDataAnim.damageClass),
+          moveId,
           target: "enemy",
-          damageClass: moveDataAnim.damageClass,
+          damageClass: moveDataAnim?.damageClass ?? "physical",
         });
       }
       setAlertText(
@@ -1405,12 +1405,12 @@ const PokemonEncounter = () => {
     }
 
     if (!isAttacking) {
-      const moveDataAnim = getMoveMetadata(moveName);
-      if (moveDataAnim) {
+      if (moveId) {
+        const moveDataAnim = getMoveMetadata(moveId);
         setMoveAnim({
-          group: getMoveAnimGroup(moveDataAnim.type, moveDataAnim.damageClass),
+          moveId,
           target: "player",
-          damageClass: moveDataAnim.damageClass,
+          damageClass: moveDataAnim?.damageClass ?? "physical",
         });
       }
       setAlertText(
@@ -1645,7 +1645,8 @@ const PokemonEncounter = () => {
                 lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
                 isTargetSleeping: playerStatusRef.current?.type === "sleep",
               }),
-              false
+              false,
+              enemyMove.id
             );
             setTimeout(() => {
               if (usNew.hp <= 0) setStage(24);
@@ -1660,7 +1661,8 @@ const PokemonEncounter = () => {
             lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
             isTargetSleeping: enemyStatusRef.current?.type === "sleep",
           }),
-          true
+          true,
+          attackId
         );
         setTimeout(() => {
           if (them.hp <= 0) {
@@ -1678,7 +1680,8 @@ const PokemonEncounter = () => {
             } else {
               const { us: usNew } = processMoveResult(
                 processMove(us, them, enemyMove.id, false, stagesSnapshot),
-                false
+                false,
+                enemyMove.id
               );
               setTimeout(() => {
                 if (usNew.hp <= 0) setStage(24);
@@ -1710,7 +1713,8 @@ const PokemonEncounter = () => {
                 lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
                 isTargetSleeping: enemyStatusRef.current?.type === "sleep",
               }),
-              true
+              true,
+              attackId
             );
             setTimeout(() => {
               if (enemyAft.hp <= 0) setStage(20);
@@ -1726,7 +1730,8 @@ const PokemonEncounter = () => {
             lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
             isTargetSleeping: playerStatusRef.current?.type === "sleep",
           }),
-          false
+          false,
+          enemyMove.id
         );
         setTimeout(() => {
           // BUG FIX: if the enemy self-destructed, it has 0 HP — player wins
@@ -1750,7 +1755,8 @@ const PokemonEncounter = () => {
                   lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
                   isTargetSleeping: enemyStatusRef.current?.type === "sleep",
                 }),
-                true
+                true,
+                attackId
               );
               setTimeout(() => {
                 if (themAfterAttack.hp <= 0) setStage(20);
@@ -1841,8 +1847,9 @@ const PokemonEncounter = () => {
                   </ChangeEnemyPokemon>
                 </AttackRight>
                 <MoveAnimation
-                  group={moveAnim?.group ?? null}
+                  moveId={moveAnim?.moveId ?? null}
                   active={stage === 15 && moveAnim?.target === "enemy"}
+                  fromDirection="left"
                 />
               </ImageContainer>
             </Row>
@@ -1856,8 +1863,9 @@ const PokemonEncounter = () => {
                   </ChangePokemon>
                 </AttackLeft>
                 <MoveAnimation
-                  group={moveAnim?.group ?? null}
+                  moveId={moveAnim?.moveId ?? null}
                   active={stage === 18 && moveAnim?.target === "player"}
+                  fromDirection="right"
                 />
               </ImageContainer>
               <RightInfoSection

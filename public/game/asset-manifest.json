@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/game/static/css/main.1ac78ea6.css",
-    "main.js": "/game/static/js/main.c58a9dc2.js",
+    "main.js": "/game/static/js/main.fb9cf8e1.js",
     "static/media/pewter-city.mp3": "/game/static/media/pewter-city.dbfe2794208a91f807e7.mp3",
     "static/media/mt-moon.mp3": "/game/static/media/mt-moon.d3c96e8c603b742504e6.mp3",
     "static/media/intro.mp4": "/game/static/media/intro.635c67d841e2fe0b7a4e.mp4",
@@ -28,11 +28,11 @@
     "static/media/route-1.png": "/game/static/media/route-1.b5306ff1a7701c4ec057.png",
     "static/media/route-22.png": "/game/static/media/route-22.3c8362605c65014ec130.png",
     "static/media/Pokemon-GB.ttf": "/game/static/media/Pokemon-GB.6211ee48ea626f34681e.ttf",
-    "static/media/pewter-city-gym.png": "/game/static/media/pewter-city-gym.bd92d4d662044dbea662.png",
+    "static/media/pewter-city-gym.png": "/game/static/media/pewter-city-gym.6692cc749ba781d6f0f6.png",
     "index.html": "/game/index.html"
   },
   "entrypoints": [
     "static/css/main.1ac78ea6.css",
-    "static/js/main.c58a9dc2.js"
+    "static/js/main.fb9cf8e1.js"
   ]
 }
