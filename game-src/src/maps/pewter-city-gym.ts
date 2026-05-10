@@ -1,4 +1,4 @@
-import { martaNpc, sailor, sergioNpc } from "../app/npcs";
+import { brock, martaNpc, sailor, sergioNpc } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/pewter-city-gym.png";
 import music from "../assets/music/maps/pokemon-gym.mp3";
@@ -43,7 +43,7 @@ walls: {
 // Trainers para "pewter-city-gym"
 trainers: [
   {
-  npc: sailor,
+  npc: brock,
   pokemon: [{ id: 72, level: 10 }, { id: 54, level: 10 }],
   facing: Direction.Right,
   pos: { x: 3, y: 8 },
