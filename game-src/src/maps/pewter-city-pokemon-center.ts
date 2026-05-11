@@ -40,8 +40,8 @@ const pewterCityPokemonCenter: MapType = {
   grass: {},
   exitReturnMap: MapId.PewterCity,
   exitReturnPos: {
-    x: 12,
-    y: 29,
+    x: 13,
+    y: 26,
   },
   pokemonCenter: {
     x: 3,
