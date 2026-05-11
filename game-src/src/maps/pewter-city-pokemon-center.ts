@@ -52,8 +52,8 @@ const pewterCityPokemonCenter: MapType = {
     y: 3,
   },
   onlineBattleNpc: {
-    x: 10,
-    y: 1,
+    x: 8,
+    y: 3,
   },
 // Trainers para "pewter-city-pokemon-center"
  trainers: [
