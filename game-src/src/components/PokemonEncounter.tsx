@@ -617,6 +617,15 @@ const PokemonEncounter = () => {
   const transformedId    = currentTransform?.id    ?? null;
   const transformedMoves = currentTransform?.moves  ?? [];
 
+  // Transformación del ENEMIGO — estado local (NO Redux) para evitar que
+  // los dispatches subsiguientes sobreescriban el id transformado.
+  const [enemyTransformedId, setEnemyTransformedId] = useState<number | null>(null);
+  const [enemyTransformedMoves, setEnemyTransformedMoves] = useState<string[]>([]);
+  const enemyTransformedIdRef   = useRef<number | null>(null);
+  const enemyTransformedMovesRef = useRef<string[]>([]);
+  useEffect(() => { enemyTransformedIdRef.current   = enemyTransformedId;   }, [enemyTransformedId]);
+  useEffect(() => { enemyTransformedMovesRef.current = enemyTransformedMoves; }, [enemyTransformedMoves]);
+
   // Condiciones de estado en combate (no se persisten en Redux)
   type BattleStatus = { type: "poison" | "badly-poisoned" | "burn" | "paralysis" | "sleep" | "freeze"; turns: number };
   const [playerStatus, setPlayerStatus] = useState<BattleStatus | null>(null);
@@ -783,6 +792,10 @@ const PokemonEncounter = () => {
       lastPhysicalDamageRef.current = 0;
       enemyFlinchRef.current  = false;
       playerFlinchRef.current = false;
+      setEnemyTransformedId(null);
+      setEnemyTransformedMoves([]);
+      enemyTransformedIdRef.current   = null;
+      enemyTransformedMovesRef.current = [];
       setMoveAnim(null);
       setStage(0);
       // Register enemy as SEEN in Pokédex
@@ -1235,8 +1248,12 @@ const PokemonEncounter = () => {
   };
 
   const getRandomEnemyMove = () => {
-    if (!enemy.moves || enemy.moves.length === 0) return "tackle";
-    return enemy.moves[Math.floor(Math.random() * enemy.moves.length)];
+    // Si el rival está transformado, elegir entre los movimientos copiados
+    const moves = enemyTransformedMovesRef.current.length > 0
+      ? enemyTransformedMovesRef.current
+      : enemy.moves;
+    if (!moves || moves.length === 0) return "tackle";
+    return moves[Math.floor(Math.random() * moves.length)];
   };
 
   // ── Helper compartido por processBattle / processEnemyOnlyTurn ──────────
@@ -1656,9 +1673,13 @@ const PokemonEncounter = () => {
         if (missed) {
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival falló!`);
         } else if (isTransform) {
-          // El enemigo se transforma en el pokémon activo del jugador
+          // Guardar transformación en estado local (NO en Redux) para que los
+          // dispatches posteriores no sobreescriban el id transformado.
           const playerMoveIds = active.moves.map((m) => m.id);
-          dispatch(updatePokemonEncounter({ ...them, id: active.id, moves: playerMoveIds }));
+          setEnemyTransformedId(active.id);
+          setEnemyTransformedMoves(playerMoveIds);
+          enemyTransformedIdRef.current   = active.id;
+          enemyTransformedMovesRef.current = playerMoveIds;
           setEnemyStages({ ...playerStages });
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival se transformó!`);
           setStage(19);
@@ -1961,6 +1982,10 @@ const PokemonEncounter = () => {
     if (stage === 46) return trainer?.npc.portrait;
     if (stage === 51) return trainer?.npc.portrait;
     if (stage === 52) return trainer?.npc.portrait;
+    // Si el rival está transformado, mostrar el sprite del pokémon copiado
+    if (enemyTransformedId !== null) {
+      return getPokemonMetadata(enemyTransformedId)?.images.front ?? enemyMetadata.images.front;
+    }
     return enemyMetadata.images.front;
   };
 
