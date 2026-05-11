@@ -718,6 +718,20 @@ const PokemonEncounter = () => {
         encounterPokemon(getPokemonEncounter(newPokemon.id, newPokemon.level))
       );
       setTrainerPokemonIndex(newIndex);
+
+      // Gen I: todos los efectos volátiles desaparecen cuando un Pokémon
+      // abandona el campo — el nuevo empieza limpio.
+      setEnemyTransformedId(null);
+      setEnemyTransformedMoves([]);
+      enemyTransformedIdRef.current    = null;
+      enemyTransformedMovesRef.current = [];
+      setEnemyLeechSeeded(false);
+      enemyLeechSeededRef.current = false;
+      setEnemyStatus(null);
+      enemyStatusRef.current = null;
+      setEnemyStages(DEFAULT_STAGES);
+      enemyFlinchRef.current = false;
+
       throwPokeballAtEnemy(49);
       return;
     }
@@ -1382,7 +1396,13 @@ const PokemonEncounter = () => {
     setPlayerLeechSeeded(false);
     playerLeechSeededRef.current = false;
     playerFlinchRef.current = false;
-    // Reset de la transformación (Transform es por-Pokémon en combate).
+    // Gen I: Transform revierte cuando el Pokémon sale del campo.
+    // Limpiamos la entrada del Pokémon que sale (activePokemonIndex).
+    setTransformedData((prev) => {
+      const next = { ...prev };
+      delete next[activePokemonIndex];
+      return next;
+    });
     // No reseteamos enemyStages: el rival sigue siendo el mismo.
 
     // Cargar el estado persistente del Pokémon que entra.
