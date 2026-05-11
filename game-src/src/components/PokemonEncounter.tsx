@@ -60,7 +60,7 @@ import {
 import useIsMobile from "../app/use-is-mobile";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { MoveMetadata } from "../app/move-metadata";
-import processMove, { MoveResult, StatStages, DEFAULT_STAGES, getStageMult } from "../app/move-helper";
+import processMove, { MoveResult, StatStages, DEFAULT_STAGES, getStageMult, StatusApply } from "../app/move-helper";
 import getXp from "../app/xp-helper";
 import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp } from "../app/level-helper";
 import MoveSelect from "./MoveSelect";
@@ -136,6 +136,17 @@ const Health = styled.div`
   font-size: 3.5cqw;
   margin: 0 2.1cqw;
   margin-top: 0.8cqw;
+`;
+
+const StatusBadge = styled.div<{ $color: string }>`
+  font-family: "PokemonGB";
+  font-size: 2.8cqw;
+  background: ${(p) => p.$color};
+  color: #fff;
+  padding: 0.2cqw 1cqw;
+  margin: 0.5cqw 2.1cqw 0;
+  display: inline-block;
+  letter-spacing: 0.05em;
 `;
 
 const flashing = keyframes`
@@ -1354,6 +1365,7 @@ const PokemonEncounter = () => {
 
     if (checkSkipTurn(false)) {
       // Rival salta turno
+      setMoveAnim(null);
       setStage(18);
       setTimeout(() => {
         setAlertText(null);
@@ -1502,7 +1514,7 @@ const PokemonEncounter = () => {
 
   // ── Helper: aplica una condición de estado y muestra el mensaje ───────────
   const applyStatus = (
-    statusApply: { status: string; target: "attacker" | "defender" },
+    statusApply: StatusApply,
     isAttacking: boolean
   ): boolean => {
     const STATUS_MSG: Record<string, string> = {
@@ -1824,11 +1836,13 @@ const PokemonEncounter = () => {
     if (activeMovesFirst) {
       if (checkSkipTurn(true)) {
         // Jugador salta turno — mostrar mensaje, luego ataca el rival
+        setMoveAnim(null);
         setStage(15);
         setTimeout(() => {
           setAlertText(null);
           if (checkSkipTurn(false)) {
             // Ambos saltan
+            setMoveAnim(null);
             setStage(18);
             setTimeout(() => {
               setAlertText(null);
@@ -1867,6 +1881,7 @@ const PokemonEncounter = () => {
           } else {
             if (checkSkipTurn(false)) {
               // Rival salta turno
+              setMoveAnim(null);
               setStage(18);
               setTimeout(() => {
                 setAlertText(null);
@@ -1892,11 +1907,13 @@ const PokemonEncounter = () => {
     else {
       if (checkSkipTurn(false)) {
         // Rival salta turno — mostrar mensaje, luego ataca el jugador
+        setMoveAnim(null);
         setStage(18);
         setTimeout(() => {
           setAlertText(null);
           if (checkSkipTurn(true)) {
             // Ambos saltan
+            setMoveAnim(null);
             setStage(15);
             setTimeout(() => {
               setAlertText(null);
@@ -1939,6 +1956,7 @@ const PokemonEncounter = () => {
           } else {
             if (checkSkipTurn(true)) {
               // Jugador salta turno
+              setMoveAnim(null);
               setStage(15);
               setTimeout(() => {
                 setAlertText(null);
@@ -2037,6 +2055,18 @@ const PokemonEncounter = () => {
                     maxHealth={enemyStats.hp}
                   />
                 </HealthBarContainer>
+                {enemyStatus && (() => {
+                  const STATUS_LABEL: Record<string, [string, string]> = {
+                    sleep: ["SLP", "#7070c0"],
+                    freeze: ["FRZ", "#60a0d0"],
+                    paralysis: ["PAR", "#c0a000"],
+                    burn: ["BRN", "#c04020"],
+                    poison: ["PSN", "#a040a0"],
+                    "badly-poisoned": ["TOX", "#800080"],
+                  };
+                  const [label, color] = STATUS_LABEL[enemyStatus.type] ?? ["???", "#888"];
+                  return <StatusBadge $color={color}>{label}</StatusBadge>;
+                })()}
                 <Corner src={corner} />
               </LeftInfoSection>
               <ImageContainer $flashing={stage === 17 && moveAnim?.damageClass !== "status"}>
@@ -2086,6 +2116,18 @@ const PokemonEncounter = () => {
                     maxHealth={activeStats.hp}
                   />
                 </HealthBarContainer>
+                {playerStatus && (() => {
+                  const STATUS_LABEL: Record<string, [string, string]> = {
+                    sleep: ["SLP", "#7070c0"],
+                    freeze: ["FRZ", "#60a0d0"],
+                    paralysis: ["PAR", "#c0a000"],
+                    burn: ["BRN", "#c04020"],
+                    poison: ["PSN", "#a040a0"],
+                    "badly-poisoned": ["TOX", "#800080"],
+                  };
+                  const [label, color] = STATUS_LABEL[playerStatus.type] ?? ["???", "#888"];
+                  return <StatusBadge $color={color}>{label}</StatusBadge>;
+                })()}
                 <Health>{`${active.hp}/${activeStats.hp}`}</Health>
                 <CornerContainer>
                   <CornerRight src={corner} />

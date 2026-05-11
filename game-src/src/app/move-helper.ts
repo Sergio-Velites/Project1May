@@ -318,11 +318,12 @@ const processMove = (
 
   // ── Rest: cura HP completo + aplica sueño 2 turnos (Gen I) ─────────────────
   if (move === "rest") {
+    // target: "attacker" → cuando isAttacking=true afecta al jugador, cuando false afecta al rival
     const sleepApply: StatusApply = { status: "sleep", target: "attacker", force: true, fixedTurns: 2 };
     if (isAttacking) {
       return { ...defaultReturn, isBuff: true, us: { ...usAfterPP, hp: ourStats.hp }, statusApply: sleepApply };
     }
-    return { ...defaultReturn, isBuff: true, them: { ...them, hp: theirStats.hp }, statusApply: { ...sleepApply, target: "defender" } };
+    return { ...defaultReturn, isBuff: true, them: { ...them, hp: theirStats.hp }, statusApply: sleepApply };
   }
 
   // ── Curación (Recover, Softboiled, Milk Drink) ───────────────────────────
