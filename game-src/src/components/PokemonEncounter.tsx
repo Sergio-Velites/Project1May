@@ -1750,12 +1750,18 @@ const PokemonEncounter = () => {
     let newThemHp = currentThem.hp;
     let hasMsg    = false;
 
+    // Cuando Ditto está transformado, currentUs tiene el ID del rival (no el de Ditto).
+    // Usar siempre el ID original de active para stats y dispatch.
+    const trueUsId = transformedId !== null ? active.id : currentUs.id;
+    const dispatchUs = (hp: number) =>
+      dispatch(updatePokemon(transformedId !== null ? { ...active, hp } : { ...currentUs, hp }));
+
     if (pStatus && (pStatus.type === "poison" || pStatus.type === "badly-poisoned" || pStatus.type === "burn")) {
-      const maxHp  = getPokemonStats(currentUs.id, currentUs.level).hp;
+      const maxHp  = getPokemonStats(trueUsId, currentUs.level).hp;
       const counter = pStatus.type === "badly-poisoned" ? pStatus.turns : 1;
       const dmg    = Math.max(1, Math.floor(maxHp * counter / 16));
       newUsHp      = Math.max(0, newUsHp - dmg);
-      dispatch(updatePokemon({ ...currentUs, hp: newUsHp }));
+      dispatchUs(newUsHp);
       if (pStatus.type === "badly-poisoned") {
         const upd = { ...pStatus, turns: pStatus.turns + 1 };
         setPlayerStatus(upd);
@@ -1789,19 +1795,19 @@ const PokemonEncounter = () => {
     if (enemyLeechSeededRef.current && newThemHp > 0) {
       const seedDmg = Math.max(1, Math.floor(getPokemonStats(currentThem.id, currentThem.level).hp / 16));
       newThemHp     = Math.max(0, newThemHp - seedDmg);
-      newUsHp       = Math.min(getPokemonStats(currentUs.id, currentUs.level).hp, newUsHp + seedDmg);
+      newUsHp       = Math.min(getPokemonStats(trueUsId, currentUs.level).hp, newUsHp + seedDmg);
       dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
-      dispatch(updatePokemon({ ...currentUs, hp: newUsHp }));
+      dispatchUs(newUsHp);
       setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival pierde PS por Drenadoras!`);
       hasMsg = true;
     }
 
     // Drenadoras en el jugador: le quita PS y cura al enemigo
     if (playerLeechSeededRef.current && newUsHp > 0) {
-      const seedDmg = Math.max(1, Math.floor(getPokemonStats(currentUs.id, currentUs.level).hp / 16));
+      const seedDmg = Math.max(1, Math.floor(getPokemonStats(trueUsId, currentUs.level).hp / 16));
       newUsHp       = Math.max(0, newUsHp - seedDmg);
       newThemHp     = Math.min(getPokemonStats(currentThem.id, currentThem.level).hp, newThemHp + seedDmg);
-      dispatch(updatePokemon({ ...currentUs, hp: newUsHp }));
+      dispatchUs(newUsHp);
       dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
       setAlertText(`¡${activeMetadata.name.toUpperCase()} pierde PS por Drenadoras!`);
       hasMsg = true;
