@@ -2,7 +2,7 @@ import viridianCityImage from "../assets/map/viridian-city.png";
 import { MapId, MapType } from "./map-types";
 import { cueBall, fisher, gentleman, jrTrainerFemale, lass, rocker, sailor, teamRocketGrunt } from "../app/npcs";
 import { Direction } from "../state/state-types";
-import music from "../assets/music/maps/pewter-city.mp3";
+import music from "../assets/music/maps/pallet-town.mp3";
 import getEncounterData from "./get-location-data";
 
 const viridianCity: MapType = {

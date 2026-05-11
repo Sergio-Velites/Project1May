@@ -1432,8 +1432,11 @@ const PokemonEncounter = () => {
     if (activeMove.priority > enemyMove.priority) return true;
     if (activeMove.priority < enemyMove.priority) return false;
     // Apply speed stat stages for priority calculation (Gen I)
-    const playerSpeed = activeStats.speed * getStageMult(playerStages.speed);
-    const enemySpeed  = enemyStats.speed  * getStageMult(enemyStages.speed);
+    // Paralysis reduces speed by 50% (Gen I mechanic)
+    const paralysisMult = (s: typeof playerStatusRef.current) =>
+      s?.type === "paralysis" ? 0.5 : 1.0;
+    const playerSpeed = activeStats.speed * getStageMult(playerStages.speed) * paralysisMult(playerStatusRef.current);
+    const enemySpeed  = enemyStats.speed  * getStageMult(enemyStages.speed)  * paralysisMult(enemyStatusRef.current);
     if (playerSpeed > enemySpeed) return true;
     if (playerSpeed < enemySpeed) return false;
     // Speed tie: random (Gen I)
@@ -1536,12 +1539,13 @@ const PokemonEncounter = () => {
     }
 
     const currentStatus = affectsPlayer ? playerStatusRef.current : enemyStatusRef.current;
-    if (currentStatus) return false; // ya tiene un estado: no se puede aplicar otro
+    if (currentStatus && !statusApply.force) return false; // ya tiene estado; Rest puede forzar
 
     type BT = { type: "poison"|"badly-poisoned"|"burn"|"paralysis"|"sleep"|"freeze"; turns: number };
     const newStatus: BT = {
       type: statusApply.status as BT["type"],
-      turns: statusApply.status === "sleep"          ? 1 + Math.floor(Math.random() * 5)
+      turns: statusApply.fixedTurns !== undefined  ? statusApply.fixedTurns
+           : statusApply.status === "sleep"          ? 1 + Math.floor(Math.random() * 7)
            : statusApply.status === "badly-poisoned" ? 1
            : 0,
     };
@@ -1673,15 +1677,6 @@ const PokemonEncounter = () => {
         const movedUsed = getMoveMetadata(result.moveName) ?? getMoveMetadata("pound");
         if (movedUsed && movedUsed.damageClass === "physical" && us.hp < active.hp) {
           lastPhysicalDamageRef.current = active.hp - us.hp;
-        }
-
-        // Leech Seed del jugador: el rival drena al jugador si tiene seed
-        if (playerLeechSeededRef.current && us.hp > 0) {
-          const seedDmg = Math.max(1, Math.floor(getPokemonStats(us.id, us.level).hp / 16));
-          const newPlayerHp = Math.max(0, us.hp - seedDmg);
-          const newEnemyHp  = Math.min(getPokemonStats(them.id, them.level).hp, them.hp + seedDmg);
-          dispatch(updatePokemon({ ...(transformedId !== null ? { ...active, hp: us.hp } : us), hp: newPlayerHp }));
-          dispatch(updatePokemonEncounter({ ...them, hp: newEnemyHp }));
         }
 
         // Registrar flinch del jugador si el rival le golpea con flinch

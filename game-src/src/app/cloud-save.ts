@@ -48,8 +48,12 @@ export const isWebAuthnAvailable = (): boolean => {
 
 // ---- Low-level helpers ----
 
-const callEdge = (endpoint: string, body: unknown) =>
-  fetch(`${SUPABASE_URL}/functions/v1/${endpoint}`, {
+const EDGE_TIMEOUT_MS = 8000;
+
+const callEdge = (endpoint: string, body: unknown) => {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), EDGE_TIMEOUT_MS);
+  return fetch(`${SUPABASE_URL}/functions/v1/${endpoint}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -57,7 +61,9 @@ const callEdge = (endpoint: string, body: unknown) =>
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
     },
     body: JSON.stringify(body),
-  });
+    signal: ctrl.signal,
+  }).finally(() => clearTimeout(timer));
+};
 
 const base64urlToBuffer = (base64url: string): ArrayBuffer => {
   const base64 = base64url.replace(/-/g, "+").replace(/_/g, "/");
@@ -90,6 +96,8 @@ export const saveToCloud = async (
 
 export const loadFromCloud = async (userId: string): Promise<unknown | null> => {
   if (!SUPABASE_URL) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), EDGE_TIMEOUT_MS);
   try {
     const res = await fetch(
       `${SUPABASE_URL}/functions/v1/load-game?userId=${userId}`,
@@ -98,12 +106,15 @@ export const loadFromCloud = async (userId: string): Promise<unknown | null> => 
           apikey: SUPABASE_ANON_KEY,
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
+        signal: ctrl.signal,
       }
     );
+    clearTimeout(timer);
     if (!res.ok) return null;
     const { gameState } = await res.json();
     return gameState ?? null;
   } catch {
+    clearTimeout(timer);
     return null;
   }
 };
@@ -120,6 +131,8 @@ export const listPlayers = async (
   excludeUserId?: string | null
 ): Promise<PlayerEntry[]> => {
   if (!SUPABASE_URL) return [];
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), EDGE_TIMEOUT_MS);
   try {
     const qs = excludeUserId
       ? `?excludeUserId=${encodeURIComponent(excludeUserId)}`
@@ -129,7 +142,9 @@ export const listPlayers = async (
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       },
+      signal: ctrl.signal,
     });
+    clearTimeout(timer);
     if (!res.ok) return [];
     const { players } = await res.json();
     if (!Array.isArray(players)) return [];
@@ -144,6 +159,7 @@ export const listPlayers = async (
         p.playerId !== excludeUserId
     );
   } catch {
+    clearTimeout(timer);
     return [];
   }
 };

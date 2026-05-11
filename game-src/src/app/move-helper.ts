@@ -59,16 +59,16 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
 
   // Lower enemy speed
   "string-shot":   { stat: "speed",   target: "defender", delta: -2 },
-  // Confusión → penalización especial (simplificado, sin estado real)
-  "confuse-ray":   { stat: "special", target: "defender", delta: -1 },
-  "supersonic":    { stat: "special", target: "defender", delta: -1 },
-  "disable":       { stat: "attack",  target: "defender", delta: -1 },
+  // Confusión: en Gen I es estado volátil; aproximamos como -2 accuracy
+  "confuse-ray":   { stat: "accuracy", target: "defender", delta: -2 },
+  "supersonic":    { stat: "accuracy", target: "defender", delta: -2 },
+  // disable: en Gen I bloquea 1 movimiento aleatorio; implementación completa pendiente
 
   // Raise own attack
   "sharpen":       { stat: "attack",  target: "attacker", delta: +1 },
   "meditate":      { stat: "attack",  target: "attacker", delta: +1 },
   "swords-dance":  { stat: "attack",  target: "attacker", delta: +2 },
-  "focus-energy":  { stat: "attack",  target: "attacker", delta: +1 },
+  // focus-energy: bug Gen I — reduce crits a ÷4 en lugar de ×4; implementado como no-op
 
   // Raise own defense
   "harden":        { stat: "defense", target: "attacker", delta: +1 },
@@ -103,6 +103,8 @@ export type StatusType =
 export interface StatusApply {
   status: StatusType;
   target: "attacker" | "defender";
+  force?: boolean;      // si true, sobreescribe estado existente (Rest)
+  fixedTurns?: number;  // si se indica, usa este número en lugar del aleatorio
 }
 
 /** Movimientos que aplican una condición de estado como efecto principal o secundario */
@@ -177,11 +179,11 @@ const HEAL_FRACTION: Record<string, number> = {
   "recover":    0.5,
   "softboiled": 0.5,
   "milk-drink": 0.5,
-  "rest":       1.0, // curación total (omitimos el sueño por simplicidad)
+  // rest se maneja como caso especial (cura + aplica sueño 2 turnos)
 };
 
 /** Movimientos sin efecto visible en combate */
-const NO_EFFECT_MOVES = new Set(["splash", "teleport", "bide"]);
+const NO_EFFECT_MOVES = new Set(["splash", "teleport", "bide", "disable", "focus-energy"]);
 
 // ── MoveResult ───────────────────────────────────────────────────────────────
 
@@ -314,7 +316,16 @@ const processMove = (
     return { ...defaultReturn, us: { ...usAfterPP, hp: 0 } };
   }
 
-  // ── Curación (Recover, Rest) ──────────────────────────────────────────────
+  // ── Rest: cura HP completo + aplica sueño 2 turnos (Gen I) ─────────────────
+  if (move === "rest") {
+    const sleepApply: StatusApply = { status: "sleep", target: "attacker", force: true, fixedTurns: 2 };
+    if (isAttacking) {
+      return { ...defaultReturn, isBuff: true, us: { ...usAfterPP, hp: ourStats.hp }, statusApply: sleepApply };
+    }
+    return { ...defaultReturn, isBuff: true, them: { ...them, hp: theirStats.hp }, statusApply: { ...sleepApply, target: "defender" } };
+  }
+
+  // ── Curación (Recover, Softboiled, Milk Drink) ───────────────────────────
   const healFraction = HEAL_FRACTION[move];
   if (healFraction !== undefined) {
     if (isAttacking) {
