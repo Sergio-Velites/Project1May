@@ -59,9 +59,7 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
 
   // Lower enemy speed
   "string-shot":   { stat: "speed",   target: "defender", delta: -2 },
-  // Confusión → penalización especial (simplificado, sin estado real)
-  "confuse-ray":   { stat: "special", target: "defender", delta: -1 },
-  "supersonic":    { stat: "special", target: "defender", delta: -1 },
+  // confuse-ray y supersonic → ahora en STATUS_APPLY_TABLE como "confusion"
   "disable":       { stat: "attack",  target: "defender", delta: -1 },
 
   // Raise own attack
@@ -101,7 +99,8 @@ export type StatusType =
   | "leech-seed";  // leech-seed es un estado especial que drena HP cada turno
 
 export interface StatusApply {
-  status: StatusType;
+  // "confusion" es estado volátil gestionado en PokemonEncounter, no en StatusType
+  status: StatusType | "confusion";
   target: "attacker" | "defender";
 }
 
@@ -135,6 +134,14 @@ const STATUS_APPLY_TABLE: Record<string, StatusApply> = {
   "blizzard":      { status: "freeze",    target: "defender" },
   "ice-beam":      { status: "freeze",    target: "defender" },
   "ice-punch":     { status: "freeze",    target: "defender" },
+  // Parálisis pura — faltaba
+  "glare":         { status: "paralysis", target: "defender" },
+  // Confusión: movimientos puros (sin daño) y efectos secundarios (Gen I)
+  "confuse-ray":   { status: "confusion", target: "defender" },
+  "supersonic":    { status: "confusion", target: "defender" },
+  "psybeam":       { status: "confusion", target: "defender" },
+  "confusion":     { status: "confusion", target: "defender" },
+  "dizzy-punch":   { status: "confusion", target: "defender" },
 };
 
 /** Probabilidad del efecto secundario de estado para movimientos de daño */
@@ -155,6 +162,10 @@ const SECONDARY_STATUS_CHANCE: Record<string, number> = {
   "blizzard":      0.10,
   "ice-beam":      0.10,
   "ice-punch":     0.10,
+  // Efectos secundarios de confusión en movimientos de daño (Gen I)
+  "psybeam":       0.10,
+  "confusion":     0.10,
+  "dizzy-punch":   0.20,
 };
 
 // ── Movimientos de efecto especial ──────────────────────────────────────────
@@ -191,6 +202,12 @@ export interface MoveContext {
   lastPhysicalDamageTaken: number;
   /** ¿El objetivo está dormido? (para Dream Eater) */
   isTargetSleeping: boolean;
+  /**
+   * Estado del ATACANTE (no del defensor).
+   * Gen I: "burn" reduce el Ataque físico a la mitad al calcular daño.
+   * Gen I: "paralysis" reduce la Velocidad a la cuarta parte para prioridad.
+   */
+  attackerStatus?: string | null;
 }
 
 export interface MoveResult {
@@ -394,7 +411,9 @@ const processMove = (
     const rawDef = moveMetadata.damageClass === "physical" ? theirStats.defense : theirStats.specialDefense;
     const atkStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? myStages.attack    : myStages.special);
     const defStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? theirStages.defense : theirStages.special);
-    const attack  = rawAtk * getStageMult(atkStage);
+    // Gen I: la quemadura reduce el Ataque físico a la mitad
+    const burnMult = (context?.attackerStatus === "burn" && moveMetadata.damageClass === "physical") ? 0.5 : 1;
+    const attack  = rawAtk * getStageMult(atkStage) * burnMult;
     const defense = rawDef * getStageMult(defStage);
 
     const stab           = ourMetadata.types.includes(moveMetadata.type) ? 1.5 : 1;
@@ -458,7 +477,9 @@ const processMove = (
   const rawDef = moveMetadata.damageClass === "physical" ? ourStats.defense     : ourStats.specialDefense;
   const atkStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? theirStages.attack    : theirStages.special);
   const defStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? myStages.defense      : myStages.special);
-  const attack  = rawAtk * getStageMult(atkStage);
+  // Gen I: la quemadura del rival reduce su Ataque físico a la mitad
+  const enemyBurnMult = (context?.attackerStatus === "burn" && moveMetadata.damageClass === "physical") ? 0.5 : 1;
+  const attack  = rawAtk * getStageMult(atkStage) * enemyBurnMult;
   const defense = rawDef * getStageMult(defStage);
 
   const stab           = theirMetadata.types.includes(moveMetadata.type) ? 1.5 : 1;

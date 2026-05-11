@@ -636,6 +636,16 @@ const PokemonEncounter = () => {
   useEffect(() => { playerStatusRef.current = playerStatus; }, [playerStatus]);
   useEffect(() => { enemyStatusRef.current = enemyStatus; }, [enemyStatus]);
 
+  // Confusión — estado VOLÁTIL (desaparece al cambiar de Pokémon, no persiste entre combates)
+  // Dura 1-4 turnos. Cada turno: 50% chance de atacarse a sí mismo (typeless, Atk físico).
+  type ConfusionState = { turns: number };
+  const [playerConfusion, setPlayerConfusion] = useState<ConfusionState | null>(null);
+  const [enemyConfusion, setEnemyConfusion] = useState<ConfusionState | null>(null);
+  const playerConfusionRef = useRef<ConfusionState | null>(null);
+  const enemyConfusionRef  = useRef<ConfusionState | null>(null);
+  useEffect(() => { playerConfusionRef.current = playerConfusion; }, [playerConfusion]);
+  useEffect(() => { enemyConfusionRef.current  = enemyConfusion;  }, [enemyConfusion]);
+
   // Leech Seed (puede coexistir con otros estados — se guarda por separado)
   const [playerLeechSeeded, setPlayerLeechSeeded] = useState(false);
   const [enemyLeechSeeded, setEnemyLeechSeeded] = useState(false);
@@ -731,6 +741,9 @@ const PokemonEncounter = () => {
       enemyStatusRef.current = null;
       setEnemyStages(DEFAULT_STAGES);
       enemyFlinchRef.current = false;
+      // Confusión del rival también es volátil
+      setEnemyConfusion(null);
+      enemyConfusionRef.current = null;
 
       throwPokeballAtEnemy(49);
       return;
@@ -806,6 +819,10 @@ const PokemonEncounter = () => {
       lastPhysicalDamageRef.current = 0;
       enemyFlinchRef.current  = false;
       playerFlinchRef.current = false;
+      setPlayerConfusion(null);
+      setEnemyConfusion(null);
+      playerConfusionRef.current = null;
+      enemyConfusionRef.current  = null;
       setEnemyTransformedId(null);
       setEnemyTransformedMoves([]);
       enemyTransformedIdRef.current   = null;
@@ -1335,6 +1352,55 @@ const PokemonEncounter = () => {
     return false;
   };
 
+  // ── Helper: comprobar confusión antes del ataque ─────────────────────────
+  // Devuelve true si el combatiente se golpea a sí mismo (y no puede atacar).
+  // Gen I: 50% de chance. Daño = fórmula normal con Atk del confundido vs su propia Def,
+  //        tipo normal (sin STAB, sin efectividad de tipo), sin crit.
+  const checkConfusion = (isPlayer: boolean): boolean => {
+    const conf = isPlayer ? playerConfusionRef.current : enemyConfusionRef.current;
+    if (!conf) return false;
+
+    const newTurns = conf.turns - 1;
+    const setConf = isPlayer
+      ? (v: ConfusionState | null) => { setPlayerConfusion(v); playerConfusionRef.current = v; }
+      : (v: ConfusionState | null) => { setEnemyConfusion(v);  enemyConfusionRef.current  = v; };
+
+    if (newTurns <= 0) {
+      setConf(null);
+      const cname = isPlayer ? activeMetadata.name.toUpperCase() : enemyMetadata.name.toUpperCase() + " rival";
+      setAlertText(`¡${cname} se recuperó de la confusión!`);
+      return false; // se desconfundí, puede atacar este turno
+    }
+    setConf({ turns: newTurns });
+
+    // 50% se golpea a sí mismo
+    if (Math.random() < 0.5) {
+      const cname = isPlayer ? activeMetadata.name.toUpperCase() : enemyMetadata.name.toUpperCase() + " rival";
+      setAlertText(`¡${cname} está confundido! ¡Se golpeó a sí mismo!`);
+      // Daño de auto-confusión: Atk físico del confundido vs su propia Def, nivel, sin multiplicadores
+      if (isPlayer && active) {
+        const selfAtk = activeStats.attack;
+        const selfDef = activeStats.defense;
+        const selfDmg = Math.max(1, Math.floor(
+          (Math.floor(((2 * active.level) / 5 + 2) * 40 * (selfAtk / selfDef)) / 50 + 2)
+        ));
+        const newHp = Math.max(0, active.hp - selfDmg);
+        dispatch(updatePokemon({ ...active, hp: newHp }));
+      } else if (!isPlayer && enemy) {
+        const { attack: eAtk, defense: eDef } = enemyStats;
+        const selfDmg = Math.max(1, Math.floor(
+          (Math.floor(((2 * enemy.level) / 5 + 2) * 40 * (eAtk / eDef)) / 50 + 2)
+        ));
+        const newHp = Math.max(0, enemy.hp - selfDmg);
+        dispatch(updatePokemonEncounter({ ...enemy, hp: newHp }));
+      }
+      return true; // no ataca
+    }
+    const cname = isPlayer ? activeMetadata.name.toUpperCase() : enemyMetadata.name.toUpperCase() + " rival";
+    setAlertText(`¡${cname} está confundido!`);
+    return false; // confundido pero ataca igual este turno
+  };
+
   // ── Turno solo del rival ────────────────────────────────────────────────
   // Se invoca cuando el jugador "consume turno" sin atacar:
   //   · Cambio de Pokémon en combate.
@@ -1362,10 +1428,23 @@ const PokemonEncounter = () => {
       return;
     }
 
+    // Comprobar confusión del rival antes de que ataque
+    if (checkConfusion(false)) {
+      setStage(18);
+      setTimeout(() => {
+        setAlertText(null);
+        // Si el auto-daño de confusión dejó al rival KO
+        if (enemy.hp <= 0) { setStage(20); return; }
+        applyEndOfTurnStatus(currentActive, enemy);
+      }, ATTACK_ANIMATION + 1000);
+      return;
+    }
+
     const { us } = processMoveResult(
       processMove(currentActive, enemy, enemyMove.id, false, stagesSnapshot, {
         lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
         isTargetSleeping: playerStatusRef.current?.type === "sleep",
+        attackerStatus: enemyStatusRef.current?.type ?? null,
       }),
       false,
       enemyMove.id
@@ -1403,6 +1482,9 @@ const PokemonEncounter = () => {
       delete next[activePokemonIndex];
       return next;
     });
+    // Gen I: confusión es volátil — desaparece al cambiar de Pokémon.
+    setPlayerConfusion(null);
+    playerConfusionRef.current = null;
     // No reseteamos enemyStages: el rival sigue siendo el mismo.
 
     // Cargar el estado persistente del Pokémon que entra.
@@ -1431,9 +1513,11 @@ const PokemonEncounter = () => {
   ) => {
     if (activeMove.priority > enemyMove.priority) return true;
     if (activeMove.priority < enemyMove.priority) return false;
-    // Apply speed stat stages for priority calculation (Gen I)
-    const playerSpeed = activeStats.speed * getStageMult(playerStages.speed);
-    const enemySpeed  = enemyStats.speed  * getStageMult(enemyStages.speed);
+    // Gen I: Paralysis reduce la velocidad a la cuarta parte para calcular prioridad de turno.
+    const playerParaMult = playerStatusRef.current?.type === "paralysis" ? 0.25 : 1;
+    const enemyParaMult  = enemyStatusRef.current?.type  === "paralysis" ? 0.25 : 1;
+    const playerSpeed = activeStats.speed * getStageMult(playerStages.speed) * playerParaMult;
+    const enemySpeed  = enemyStats.speed  * getStageMult(enemyStages.speed)  * enemyParaMult;
     if (playerSpeed > enemySpeed) return true;
     if (playerSpeed < enemySpeed) return false;
     // Speed tie: random (Gen I)
@@ -1537,6 +1621,23 @@ const PokemonEncounter = () => {
 
     const currentStatus = affectsPlayer ? playerStatusRef.current : enemyStatusRef.current;
     if (currentStatus) return false; // ya tiene un estado: no se puede aplicar otro
+
+    // Confusión — estado volátil separado, puede coexistir con estados no-volátiles
+    if (statusApply.status === "confusion") {
+      const alreadyConfused = affectsPlayer ? playerConfusionRef.current : enemyConfusionRef.current;
+      if (alreadyConfused) return false;
+      const turns = 1 + Math.floor(Math.random() * 4); // 1-4 turnos (Gen I)
+      const confState = { turns };
+      if (affectsPlayer) {
+        setPlayerConfusion(confState);
+        playerConfusionRef.current = confState;
+      } else {
+        setEnemyConfusion(confState);
+        enemyConfusionRef.current = confState;
+      }
+      setAlertText(`¡${targetName} quedó confundido!`);
+      return true;
+    }
 
     type BT = { type: "poison"|"badly-poisoned"|"burn"|"paralysis"|"sleep"|"freeze"; turns: number };
     const newStatus: BT = {
@@ -1844,6 +1945,7 @@ const PokemonEncounter = () => {
               processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot, {
                 lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
                 isTargetSleeping: playerStatusRef.current?.type === "sleep",
+                attackerStatus: enemyStatusRef.current?.type ?? null,
               }),
               false,
               enemyMove.id
@@ -1854,12 +1956,40 @@ const PokemonEncounter = () => {
             }, ATTACK_ANIMATION + 1000);
           }
         }, ATTACK_ANIMATION);
+      } else if (checkConfusion(true)) {
+        // Jugador en confusión — se golpea a sí mismo o muestra mensaje
+        setStage(15);
+        setTimeout(() => {
+          setAlertText(null);
+          // Si el auto-daño dejó al jugador KO
+          const currentActiveNow = pokemon[activePokemonIndex];
+          if (!currentActiveNow || currentActiveNow.hp <= 0) { setStage(24); return; }
+          if (checkSkipTurn(false)) {
+            setStage(18);
+            setTimeout(() => { setAlertText(null); applyEndOfTurnStatus(currentActiveNow, enemy); }, ATTACK_ANIMATION);
+          } else {
+            const { us: usNew } = processMoveResult(
+              processMove(currentActiveNow, enemy, enemyMove.id, false, stagesSnapshot, {
+                lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+                isTargetSleeping: playerStatusRef.current?.type === "sleep",
+                attackerStatus: enemyStatusRef.current?.type ?? null,
+              }),
+              false,
+              enemyMove.id
+            );
+            setTimeout(() => {
+              if (usNew.hp <= 0) setStage(24);
+              else applyEndOfTurnStatus(usNew, enemy);
+            }, ATTACK_ANIMATION + 1000);
+          }
+        }, ATTACK_ANIMATION + 1000);
       } else {
         // Jugador ataca normalmente
         const { us, them } = processMoveResult(
           processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
             lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
             isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+            attackerStatus: playerStatusRef.current?.type ?? null,
           }),
           true,
           attackId
@@ -1877,9 +2007,21 @@ const PokemonEncounter = () => {
                 setAlertText(null);
                 applyEndOfTurnStatus(us, them);
               }, ATTACK_ANIMATION);
+            } else if (checkConfusion(false)) {
+              // Rival confundido
+              setStage(18);
+              setTimeout(() => {
+                setAlertText(null);
+                if (enemy.hp <= 0) { setStage(20); return; }
+                applyEndOfTurnStatus(us, them);
+              }, ATTACK_ANIMATION + 1000);
             } else {
               const { us: usNew } = processMoveResult(
-                processMove(us, them, enemyMove.id, false, stagesSnapshot),
+                processMove(us, them, enemyMove.id, false, stagesSnapshot, {
+                  lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+                  isTargetSleeping: playerStatusRef.current?.type === "sleep",
+                  attackerStatus: enemyStatusRef.current?.type ?? null,
+                }),
                 false,
                 enemyMove.id
               );
@@ -1907,11 +2049,20 @@ const PokemonEncounter = () => {
               setAlertText(null);
               applyEndOfTurnStatus(effectivePlayer, enemy);
             }, ATTACK_ANIMATION);
+          } else if (checkConfusion(true)) {
+            setStage(15);
+            setTimeout(() => {
+              setAlertText(null);
+              const cur = pokemon[activePokemonIndex];
+              if (!cur || cur.hp <= 0) { setStage(24); return; }
+              applyEndOfTurnStatus(cur, enemy);
+            }, ATTACK_ANIMATION + 1000);
           } else {
             const { us: playerAft, them: enemyAft } = processMoveResult(
               processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
                 lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
                 isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+                attackerStatus: playerStatusRef.current?.type ?? null,
               }),
               true,
               attackId
@@ -1923,12 +2074,47 @@ const PokemonEncounter = () => {
             }, ATTACK_ANIMATION + 1000);
           }
         }, ATTACK_ANIMATION);
+      } else if (checkConfusion(false)) {
+        // Rival confundido antes de atacar primero
+        setStage(18);
+        setTimeout(() => {
+          setAlertText(null);
+          if (enemy.hp <= 0) { setStage(20); return; }
+          if (checkSkipTurn(true)) {
+            setStage(15);
+            setTimeout(() => { setAlertText(null); applyEndOfTurnStatus(effectivePlayer, enemy); }, ATTACK_ANIMATION);
+          } else if (checkConfusion(true)) {
+            setStage(15);
+            setTimeout(() => {
+              setAlertText(null);
+              const cur = pokemon[activePokemonIndex];
+              if (!cur || cur.hp <= 0) { setStage(24); return; }
+              applyEndOfTurnStatus(cur, enemy);
+            }, ATTACK_ANIMATION + 1000);
+          } else {
+            const { us: playerAft, them: enemyAft } = processMoveResult(
+              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
+                lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+                isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+                attackerStatus: playerStatusRef.current?.type ?? null,
+              }),
+              true,
+              attackId
+            );
+            setTimeout(() => {
+              if (enemyAft.hp <= 0) setStage(20);
+              else if (playerAft.hp <= 0) setStage(24);
+              else applyEndOfTurnStatus(playerAft, enemyAft);
+            }, ATTACK_ANIMATION + 1000);
+          }
+        }, ATTACK_ANIMATION + 1000);
       } else {
         // Rival ataca normalmente
         const { us, them } = processMoveResult(
           processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot, {
             lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
             isTargetSleeping: playerStatusRef.current?.type === "sleep",
+            attackerStatus: enemyStatusRef.current?.type ?? null,
           }),
           false,
           enemyMove.id
@@ -1949,11 +2135,20 @@ const PokemonEncounter = () => {
                 setAlertText(null);
                 applyEndOfTurnStatus(us, them);
               }, ATTACK_ANIMATION);
+            } else if (checkConfusion(true)) {
+              setStage(15);
+              setTimeout(() => {
+                setAlertText(null);
+                const cur = pokemon[activePokemonIndex];
+                if (!cur || cur.hp <= 0) { setStage(24); return; }
+                applyEndOfTurnStatus(cur, them);
+              }, ATTACK_ANIMATION + 1000);
             } else {
               const { us: playerAfterAttack, them: themAfterAttack } = processMoveResult(
                 processMove(us, them, attackId, true, stagesSnapshot, {
                   lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
                   isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+                  attackerStatus: playerStatusRef.current?.type ?? null,
                 }),
                 true,
                 attackId
