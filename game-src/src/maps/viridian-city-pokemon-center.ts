@@ -52,14 +52,14 @@ const viridianCityPokemonCenter: MapType = {
   },
   onlineBattleNpc: {
     x: 8,
-    y: 3,
+    y: 2,
   },
   trainers: [
     {
       npc: scientist,
       pokemon: [{ id: 1, level: 1 }],
       facing: Direction.Down,
-      pos: { x: 8, y: 3 },
+      pos: { x: 8, y: 1 },
       intro: [],
       outtro: [],
       money: 0,

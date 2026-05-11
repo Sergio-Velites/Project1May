@@ -51,23 +51,23 @@ const pewterCityPokemonCenter: MapType = {
     x: 13,
     y: 3,
   },
-  onlineBattleNpc: {
+    onlineBattleNpc: {
     x: 8,
-    y: 3,
+    y: 2,
   },
-// Trainers para "pewter-city-pokemon-center"
- trainers: [
+  trainers: [
     {
       npc: scientist,
       pokemon: [{ id: 1, level: 1 }],
       facing: Direction.Down,
-      pos: { x: 8, y: 3 },
+      pos: { x: 8, y: 1 },
       intro: [],
       outtro: [],
       money: 0,
       isOnline: true,
     },
   ],
+
 };
 
 export default pewterCityPokemonCenter;

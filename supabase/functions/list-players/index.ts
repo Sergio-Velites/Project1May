@@ -8,19 +8,20 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const excludeUserId = url.searchParams.get("excludeUserId");
 
+
     const { data, error } = await db
       .from("saves")
-      .select("player_id, game_state, updated_at")
+      .select("user_id, game_state, updated_at")
       .order("updated_at", { ascending: false });
     if (error) throw error;
 
     const players = (data ?? [])
-      .map((row: { player_id: string; game_state: unknown }) => {
+      .map((row: { user_id: string; game_state: unknown }) => {
         const gs = row.game_state as { name?: string; pokemon?: unknown[] } | null;
         const rawName = (gs?.name ?? "").toString().trim();
         const pokemonCount = Array.isArray(gs?.pokemon) ? gs!.pokemon!.length : 0;
         return {
-          playerId: row.player_id,
+          playerId: row.user_id,
           name: rawName || "Invitado",
           pokemonCount,
         };
