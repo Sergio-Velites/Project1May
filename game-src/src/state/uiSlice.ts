@@ -331,6 +331,7 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.evolution !== null ||
   state.ui.pokeballCardId !== null ||
   state.ui.academyPokeballOpen ||
+  state.ui.onlineBattleMenu ||
   state.ui.mapGiftPending !== null;
 
 export const selectStartMenuSubOpen = (state: RootState) =>

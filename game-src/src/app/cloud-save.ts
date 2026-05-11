@@ -116,10 +116,15 @@ export interface PlayerEntry {
   pokemonCount: number;
 }
 
-export const listPlayers = async (): Promise<PlayerEntry[]> => {
+export const listPlayers = async (
+  excludeUserId?: string | null
+): Promise<PlayerEntry[]> => {
   if (!SUPABASE_URL) return [];
   try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/list-players`, {
+    const qs = excludeUserId
+      ? `?excludeUserId=${encodeURIComponent(excludeUserId)}`
+      : "";
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/list-players${qs}`, {
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
@@ -127,7 +132,17 @@ export const listPlayers = async (): Promise<PlayerEntry[]> => {
     });
     if (!res.ok) return [];
     const { players } = await res.json();
-    return (players ?? []) as PlayerEntry[];
+    if (!Array.isArray(players)) return [];
+    // Salvaguarda extra en cliente (por si una versión antigua del backend
+    // no filtra correctamente).
+    return (players as PlayerEntry[]).filter(
+      (p) =>
+        !!p &&
+        typeof p.playerId === "string" &&
+        typeof p.name === "string" &&
+        (p.pokemonCount ?? 0) > 0 &&
+        p.playerId !== excludeUserId
+    );
   } catch {
     return [];
   }

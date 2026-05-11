@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import Frame from "./Frame";
@@ -14,7 +14,12 @@ import {
   hideOnlineBattleMenu,
   selectOnlineBattleMenu,
 } from "../state/uiSlice";
-import { listPlayers, loadFromCloud, PlayerEntry } from "../app/cloud-save";
+import {
+  getCurrentUserId,
+  listPlayers,
+  loadFromCloud,
+  PlayerEntry,
+} from "../app/cloud-save";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
 import { rival } from "../app/npcs";
 import { Direction } from "../state/state-types";
@@ -66,6 +71,9 @@ const OnlineBattleMenu = () => {
   const [stage, setStage] = useState<Stage>("greeting");
   const [players, setPlayers] = useState<PlayerEntry[]>([]);
   const [selected, setSelected] = useState<PlayerEntry | null>(null);
+  // Guard atómico para evitar que dos useEffect/listeners disparen dos
+  // veces el combate (doble A o re-render durante loadFromCloud).
+  const battleStartedRef = useRef(false);
 
   // Reset state on open
   useEffect(() => {
@@ -73,13 +81,16 @@ const OnlineBattleMenu = () => {
       setStage("greeting");
       setPlayers([]);
       setSelected(null);
+      battleStartedRef.current = false;
     }
   }, [show]);
 
   // Fetch players when entering loading stage
   useEffect(() => {
     if (stage !== "loading") return;
-    listPlayers().then((result) => {
+    let cancelled = false;
+    listPlayers(getCurrentUserId()).then((result) => {
+      if (cancelled) return;
       if (result.length === 0) {
         setStage("empty");
       } else {
@@ -87,22 +98,37 @@ const OnlineBattleMenu = () => {
         setStage("select");
       }
     });
+    return () => {
+      cancelled = true;
+    };
   }, [stage]);
 
   // Load battle data when a player is selected and confirmed
   useEffect(() => {
     if (stage !== "loading-battle" || !selected) return;
+    let cancelled = false;
     loadFromCloud(selected.playerId).then((gameState) => {
+      if (cancelled) return;
       if (!gameState) {
         setStage("error");
         return;
       }
       const gs = gameState as { pokemon?: { id: number; level: number }[] };
-      const opponentPokemon = gs.pokemon ?? [];
+      const opponentPokemon = (gs.pokemon ?? []).filter(
+        (p) =>
+          p &&
+          typeof p.id === "number" &&
+          typeof p.level === "number" &&
+          p.level > 0
+      );
       if (opponentPokemon.length === 0) {
         setStage("no-pokemon");
         return;
       }
+      // Guard contra doble inicio de combate.
+      if (battleStartedRef.current) return;
+      battleStartedRef.current = true;
+
       const fakeTrainer: TrainerType = {
         npc: rival,
         pokemon: opponentPokemon.map((p) => ({ id: p.id, level: p.level })),
@@ -113,16 +139,23 @@ const OnlineBattleMenu = () => {
         pos: map.onlineBattleNpc ?? { x: 10, y: 2 },
         isOnline: true,
       };
+      // Cerrar este menú primero para liberar el control y que
+      // PokemonEncounter / TrainerEncounter tomen el relevo limpiamente.
       dispatch(hideOnlineBattleMenu());
-      dispatch(encounterTrainer(fakeTrainer));
+      setStage("done");
+      // Encadenar en el siguiente tick para que el unmount de este
+      // overlay (z-index 150) no se solape con la animación de entrada.
       setTimeout(() => {
+        dispatch(encounterTrainer(fakeTrainer));
         const first = opponentPokemon[0];
         dispatch(
           encounterPokemon(getPokemonEncounter(first.id, first.level))
         );
-      }, 300);
-      setStage("done");
+      }, 50);
     });
+    return () => {
+      cancelled = true;
+    };
   }, [stage, selected, map.onlineBattleNpc, dispatch]);
 
   // A-button handler for text stages
