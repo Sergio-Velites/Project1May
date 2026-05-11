@@ -54,8 +54,7 @@ const TYPE_ES: Record<string, string> = {
   normal: "NORMAL",   fire: "FUEGO",   water: "AGUA",    electric: "ELÉCT.",
   grass: "PLANTA",    ice: "HIELO",    fighting: "LUCHA", poison: "VENENO",
   ground: "TIERRA",   flying: "VOLAD.", psychic: "PSÍQUI.", bug: "BICHO",
-  rock: "ROCA",       ghost: "FANTAS.", dragon: "DRAGÓN",  dark: "SINIS.",
-  steel: "ACERO",     fairy: "HADA",
+  rock: "ROCA",       ghost: "FANTAS.", dragon: "DRAGÓN",
 };
 
 const TOTAL = 151;

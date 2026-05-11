@@ -1,14 +1,10 @@
 import { superNerd, teamRocketGrunt } from "../app/npcs";
+import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/mt-moon-2f.png";
 import music from "../assets/music/maps/mt-moon.mp3";
 import { Direction } from "../state/state-types";
 import getEncounterData from "./get-location-data";
 import { MapId, MapType } from "./map-types";
-
-// TODO Add propper exit
-// TODO Add propper start
-// TODO Add items
-// TODO Add fossils (You want the HELIX FOSSIL? (yes no) on the right... You want the DOME FOSSIL? (yes no) on the left...
 
 const mtMoon2f: MapType = {
   name: "Monte Luna de Miel 2F",
@@ -272,6 +268,16 @@ const mtMoon2f: MapType = {
         x: 12,
         y: 8,
       },
+    },
+  ],
+  items: [
+    {
+      item: ItemType.HelixFossil,
+      pos: { x: 27, y: 28 },
+    },
+    {
+      item: ItemType.DomeFossil,
+      pos: { x: 21, y: 28 },
     },
   ],
 };

@@ -6,7 +6,9 @@ Deno.serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const excludeUserId = url.searchParams.get("excludeUserId");
+    const rawExclude = url.searchParams.get("excludeUserId");
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const excludeUserId = rawExclude && UUID_RE.test(rawExclude) ? rawExclude : null;
 
 
     const { data, error } = await db

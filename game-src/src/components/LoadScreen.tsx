@@ -135,10 +135,11 @@ const LoadScreen = () => {
         : playAs
         ? "play_as"
         : null;
-      // UUID v4 simple validation
+      // UUID v4 simple validation — impersonation only in non-production
       if (
         target &&
         mode &&
+        process.env.NODE_ENV !== "production" &&
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
           target
         )
