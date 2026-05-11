@@ -85,7 +85,8 @@ const OnlineBattleMenu = () => {
     }
   }, [show]);
 
-  // Fetch players when entering loading stage
+
+  // Fetch players when entering loading stage, y congelar la lista al pasar a 'select'
   useEffect(() => {
     if (stage !== "loading") return;
     let cancelled = false;
@@ -94,6 +95,7 @@ const OnlineBattleMenu = () => {
       if (result.length === 0) {
         setStage("empty");
       } else {
+        // Congelar la lista de jugadores: no actualizar más hasta salir del menú
         setPlayers(result);
         setStage("select");
       }
@@ -101,7 +103,17 @@ const OnlineBattleMenu = () => {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
+
+  // Al cerrar el menú, limpiar la lista congelada
+  useEffect(() => {
+    if (!show) {
+      setPlayers([]);
+      setSelected(null);
+      battleStartedRef.current = false;
+    }
+  }, [show]);
 
   // Load battle data when a player is selected and confirmed
   useEffect(() => {
