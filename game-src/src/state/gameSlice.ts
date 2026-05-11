@@ -7,7 +7,7 @@ import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
-import { canWalk, isFence, isItem, isTrainer, isWall } from "../app/map-helper";
+import { canWalk, isFence, isGift, isItem, isTrainer, isWall } from "../app/map-helper";
 import {
   Direction,
   GameState,
@@ -53,7 +53,7 @@ export const gameSlice = createSlice({
       state.direction = Direction.Left;
       if (state.pos.x === 0) return;
       if (
-        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers)
+        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests)
       )
         return;
       state.pos.x -= 1;
@@ -63,7 +63,7 @@ export const gameSlice = createSlice({
       const map = mapData[state.map];
       if (state.pos.x === map.width - 1) return;
       if (
-        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers)
+        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests)
       )
         return;
       state.pos.x += 1;
@@ -72,7 +72,7 @@ export const gameSlice = createSlice({
       state.direction = Direction.Up;
       if (state.pos.y === 0) return;
       if (
-        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers)
+        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests)
       )
         return;
       state.pos.y -= 1;
@@ -99,6 +99,7 @@ export const gameSlice = createSlice({
         )
       )
         return;
+      if (isGift(map.gifts, state.pos.x, state.pos.y + 1, state.completedQuests)) return;
       state.pos.y += 1;
     },
     setPos: (state, action: PayloadAction<PosType>) => {

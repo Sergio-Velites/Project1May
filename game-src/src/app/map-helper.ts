@@ -1,5 +1,5 @@
 import mapData from "../maps/map-data";
-import { MapId, MapItemType, TrainerType } from "../maps/map-types";
+import { MapId, MapItemType, SimpleGiftType, TrainerType } from "../maps/map-types";
 import { Direction, PosType } from "../state/state-types";
 import { TRAINER_VISION } from "./constants";
 
@@ -63,15 +63,37 @@ export const isItem = (
   );
 };
 
+// Pokéballs-regalo declarativas. Bloquean el paso mientras no se haya
+// completado la quest asociada (es decir, mientras el regalo no se haya
+// recogido). El estado vive en `completedQuests` (no en `collectedItems`).
+export const isGift = (
+  gifts: SimpleGiftType[] | undefined,
+  x: number,
+  y: number,
+  completedQuests: string[]
+): boolean => {
+  return (
+    !!gifts &&
+    gifts.some(
+      (gift) =>
+        gift.pos.x === x &&
+        gift.pos.y === y &&
+        !completedQuests.includes(gift.questId)
+    )
+  );
+};
+
 export const canWalk = (
   x: number,
   y: number,
   mapId: MapId,
   collectedItems: string[],
-  defeatedTrainers: string[] = []
+  defeatedTrainers: string[] = [],
+  completedQuests: string[] = []
 ) => {
   const map = mapData[mapId];
   if (isItem(map.items, x, y, collectedItems, mapId)) return false;
+  if (isGift(map.gifts, x, y, completedQuests)) return false;
   if (isWall(map.walls, x, y)) return false;
   if (isFence(map.fences, x, y)) return false;
   const activeTrainers = (map.trainers ?? []).filter(
