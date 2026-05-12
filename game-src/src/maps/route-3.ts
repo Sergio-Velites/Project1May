@@ -129,7 +129,7 @@ const route3: MapType = {
 trainers: [
   {
   npc: lass,
-  pokemon: [{ id: 16, level: 9 }, { id: 19, level: 9 }],
+  pokemon: [{ id: 16, level: 13 }, { id: 19, level: 13 }],
   facing: Direction.Left,
   pos: { x: 22, y: 27 },
   intro: [
@@ -145,7 +145,7 @@ trainers: [
 },
   {
   npc: bugCatcher,
-  pokemon: [{ id: 10, level: 10 }, { id: 13, level: 10 }],
+  pokemon: [{ id: 10, level: 14 }, { id: 13, level: 14 }],
   facing: Direction.Right,
   pos: { x: 24, y: 27 },
   intro: [
@@ -161,7 +161,7 @@ trainers: [
 },
   {
   npc: youngster,
-  pokemon: [{ id: 19, level: 9 }, { id: 19, level: 9 }, { id: 19, level: 9 }],
+  pokemon: [{ id: 19, level: 13 }, { id: 19, level: 13 }, { id: 19, level: 13 }],
   facing: Direction.Down,
   pos: { x: 21, y: 22 },
   intro: [
@@ -177,7 +177,7 @@ trainers: [
 },
   {
   npc: bugCatcher,
-  pokemon: [{ id: 10, level: 11 }, { id: 11, level: 11 }],
+  pokemon: [{ id: 10, level: 14 }, { id: 11, level: 14 }],
   facing: Direction.Down,
   pos: { x: 15, y: 22 },
   intro: [
@@ -193,7 +193,7 @@ trainers: [
 },
   {
   npc: youngster,
-  pokemon: [{ id: 21, level: 11 }, { id: 19, level: 11 }],
+  pokemon: [{ id: 21, level: 15 }, { id: 19, level: 15 }],
   facing: Direction.Left,
   pos: { x: 27, y: 23 },
   intro: [
@@ -209,7 +209,7 @@ trainers: [
 },
   {
   npc: lass,
-  pokemon: [{ id: 39, level: 10 }, { id: 16, level: 10 }],
+  pokemon: [{ id: 39, level: 14 }, { id: 16, level: 14 }],
   facing: Direction.Left,
   pos: { x: 14, y: 26 },
   intro: [
@@ -226,7 +226,7 @@ trainers: [
 },
   {
   npc: bugCatcher,
-  pokemon: [{ id: 13, level: 9 }, { id: 14, level: 9 }],
+  pokemon: [{ id: 13, level: 14 }, { id: 14, level: 14 }],
   facing: Direction.Right,
   pos: { x: 10, y: 24 },
   intro: [
@@ -242,7 +242,7 @@ trainers: [
 },
   {
   npc: lass,
-  pokemon: [{ id: 19, level: 10 }, { id: 29, level: 10 }],
+  pokemon: [{ id: 19, level: 14 }, { id: 29, level: 14 }],
   facing: Direction.Up,
   pos: { x: 18, y: 24 },
   intro: [

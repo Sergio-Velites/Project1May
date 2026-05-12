@@ -148,7 +148,7 @@ const viridianCity: MapType = {
   trainers: [
     {
       npc: cueBall,
-      pokemon: [{ id: 19, level: 4 }],
+      pokemon: [{ id: 19, level: 6 }],
       facing: Direction.Down,
       pos: { x: 12, y: 20 },
       intro: [
@@ -161,7 +161,7 @@ const viridianCity: MapType = {
     },
     {
       npc: jrTrainerFemale,
-      pokemon: [{ id: 41, level: 5 }],
+      pokemon: [{ id: 41, level: 7 }],
       facing: Direction.Left,
       pos: { x: 26, y: 24 },
       intro: [
@@ -173,7 +173,7 @@ const viridianCity: MapType = {
     },
     {
       npc: teamRocketGrunt,
-      pokemon: [{ id: 33, level: 5 }, { id: 52, level: 4 }],
+      pokemon: [{ id: 33, level: 7 }, { id: 52, level: 6 }],
       facing: Direction.Down,
       pos: { x: 11, y: 11 },
       intro: [
@@ -242,7 +242,7 @@ const viridianCity: MapType = {
     // Invitado perdido — combatible
     {
       npc: fisher,
-      pokemon: [{ id: 118, level: 5 }, { id: 129, level: 4 }],
+      pokemon: [{ id: 118, level: 7 }, { id: 129, level: 6 }],
       facing: Direction.Down,
       pos: { x: 15, y: 30 },
       intro: [

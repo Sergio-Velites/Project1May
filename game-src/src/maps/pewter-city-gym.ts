@@ -62,7 +62,7 @@ walls: {
 trainers: [
   {
   npc: brock,
-  pokemon: [{ id: 74, level: 12 }, { id: 95, level: 14 }],
+  pokemon: [{ id: 74, level: 15 }, { id: 95, level: 17 }],
   facing: Direction.Right,
   pos: { x: 4, y: 9 },
   intro: [
@@ -82,7 +82,7 @@ trainers: [
 },
   {
   npc: misty,
-  pokemon: [{ id: 120, level: 14 }, { id: 121, level: 17 }],
+  pokemon: [{ id: 120, level: 16 }, { id: 121, level: 18 }],
   facing: Direction.Left,
   pos: { x: 6, y: 8 },
   intro: [
@@ -98,7 +98,7 @@ trainers: [
 },
   {
   npc: ltSurge,
-  pokemon: [{ id: 100, level: 18 }, { id: 25, level: 18 }],
+  pokemon: [{ id: 100, level: 17 }, { id: 25, level: 17 }],
   facing: Direction.Right,
   pos: { x: 3, y: 7 },
   intro: [
@@ -116,7 +116,7 @@ trainers: [
 },
   {
   npc: erica,
-  pokemon: [{ id: 71, level: 20 }, { id: 114, level: 20 }, { id: 45, level: 22 }],
+  pokemon: [{ id: 71, level: 17 }, { id: 114, level: 17 }, { id: 45, level: 18 }],
   facing: Direction.Left,
   pos: { x: 6, y: 6 },
   intro: [
@@ -133,7 +133,7 @@ trainers: [
 },
   {
   npc: koga,
-  pokemon: [{ id: 109, level: 21 }, { id: 89, level: 21 }, { id: 49, level: 23 }],
+  pokemon: [{ id: 109, level: 18 }, { id: 89, level: 18 }, { id: 49, level: 19 }],
   facing: Direction.Right,
   pos: { x: 3, y: 5 },
   intro: [
@@ -150,7 +150,7 @@ trainers: [
 },
   {
   npc: sabrina,
-  pokemon: [{ id: 64, level: 23 }, { id: 65, level: 25 }],
+  pokemon: [{ id: 64, level: 18 }, { id: 65, level: 19 }],
   facing: Direction.Left,
   pos: { x: 6, y: 4 },
   intro: [
@@ -167,7 +167,7 @@ trainers: [
 },
   {
   npc: blaine,
-  pokemon: [{ id: 58, level: 24 }, { id: 78, level: 25 }, { id: 126, level: 27 }],
+  pokemon: [{ id: 58, level: 19 }, { id: 78, level: 19 }, { id: 126, level: 20 }],
   facing: Direction.Right,
   pos: { x: 3, y: 3 },
   intro: [
@@ -184,7 +184,7 @@ trainers: [
 },
   {
   npc: giovanni,
-  pokemon: [{ id: 51, level: 25 }, { id: 31, level: 27 }, { id: 34, level: 27 }, { id: 53, level: 30 }],
+  pokemon: [{ id: 51, level: 19 }, { id: 31, level: 20 }, { id: 34, level: 20 }, { id: 53, level: 21 }],
   facing: Direction.Left,
   pos: { x: 6, y: 2 },
   intro: [
@@ -203,7 +203,7 @@ trainers: [
 },
   {
   npc: sergioNpc,
-  pokemon: [{ id: 58, level: 28 }, { id: 77, level: 28 }],
+  pokemon: [{ id: 58, level: 21 }, { id: 77, level: 21 }],
   facing: Direction.Down,
   pos: { x: 4, y: 1 },
   intro: [
@@ -231,7 +231,7 @@ trainers: [
 },
   {
   npc: martaNpc,
-  pokemon: [{ id: 12, level: 28 }, { id: 36, level: 30 }],
+  pokemon: [{ id: 12, level: 22 }, { id: 36, level: 23 }],
   facing: Direction.Down,
   pos: { x: 5, y: 1 },
   intro: [

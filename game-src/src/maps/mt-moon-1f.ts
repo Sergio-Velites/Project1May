@@ -116,11 +116,11 @@ const mtMoon1f: MapType = {
       pokemon: [
         {
           id: 13, // Weedle
-          level: 11,
+          level: 15,
         },
         {
           id: 14, // Kakuna
-          level: 11,
+          level: 15,
         },
       ],
       facing: Direction.Down,
@@ -143,7 +143,7 @@ const mtMoon1f: MapType = {
       pokemon: [
         {
           id: 35, // Clefairy
-          level: 14,
+          level: 18,
         },
       ],
       facing: Direction.Down,
@@ -166,11 +166,11 @@ const mtMoon1f: MapType = {
       pokemon: [
         {
           id: 81, // Magnemite
-          level: 11,
+          level: 15,
         },
         {
           id: 100, // Voltorb
-          level: 11,
+          level: 15,
         },
       ],
       facing: Direction.Up,
@@ -193,15 +193,15 @@ const mtMoon1f: MapType = {
       pokemon: [
         {
           id: 10, // Caterpie
-          level: 11,
+          level: 15,
         },
         {
           id: 11, // Metapod
-          level: 11,
+          level: 15,
         },
         {
           id: 10, // Caterpie
-          level: 11,
+          level: 15,
         },
       ],
       facing: Direction.Right,
@@ -224,11 +224,11 @@ const mtMoon1f: MapType = {
       pokemon: [
         {
           id: 43, // Oddish
-          level: 11,
+          level: 16,
         },
         {
           id: 69, // Bellspout
-          level: 11,
+          level: 16,
         },
       ],
       facing: Direction.Down,
@@ -251,15 +251,15 @@ const mtMoon1f: MapType = {
       pokemon: [
         {
           id: 74, // Geodude
-          level: 10,
+          level: 14,
         },
         {
           id: 74, // Geodude
-          level: 10,
+          level: 14,
         },
         {
           id: 95, // Onix
-          level: 10,
+          level: 15,
         },
       ],
       facing: Direction.Down,
@@ -283,15 +283,15 @@ const mtMoon1f: MapType = {
       pokemon: [
         {
           id: 19, // Rattata
-          level: 10,
+          level: 14,
         },
         {
           id: 19, // Rattata
-          level: 10,
+          level: 14,
         },
         {
           id: 41, // Zubat
-          level: 10,
+          level: 15,
         },
       ],
       facing: Direction.Right,

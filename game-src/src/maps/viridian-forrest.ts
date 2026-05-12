@@ -192,7 +192,7 @@ const viridianForrest: MapType = {
       pokemon: [
         {
           id: 13,
-          level: 9,
+          level: 12,
         },
       ],
       intro: ["¡Detente, invitado de la boda!", "¡Primero debes combatir!"],
@@ -209,15 +209,15 @@ const viridianForrest: MapType = {
       pokemon: [
         {
           id: 13,
-          level: 7,
+          level: 10,
         },
         {
           id: 14,
-          level: 7,
+          level: 10,
         },
         {
           id: 13,
-          level: 7,
+          level: 10,
         },
       ],
       intro: ["¡Los insectos son los mejores!", "¡Protegen el bosque de la boda!"],
@@ -234,11 +234,11 @@ const viridianForrest: MapType = {
       pokemon: [
         {
           id: 13,
-          level: 6,
+          level: 9,
         },
         {
           id: 10,
-          level: 6,
+          level: 9,
         },
       ],
       intro: ["¡Nadie pasa sin combatir!", "¡Así lo dice la ley del bosque!"],
@@ -270,7 +270,7 @@ const viridianForrest: MapType = {
     {
       npc: teamRocketGrunt,
       facing: Direction.Down,
-      pokemon: [{ id: 52, level: 7 }, { id: 41, level: 6 }],
+      pokemon: [{ id: 52, level: 10 }, { id: 41, level: 9 }],
       intro: [
         "¡Teníamos un plan perfecto!",
         "¡Queríamos los Pokémon de la boda!",
@@ -298,7 +298,7 @@ const viridianForrest: MapType = {
     // Fan de la boda — combatible, quiere demostrar que merece el banquete
     {
       npc: pokeManiac,
-      pokemon: [{ id: 46, level: 8 }, { id: 48, level: 7 }],
+      pokemon: [{ id: 46, level: 11 }, { id: 48, level: 10 }],
       facing: Direction.Down,
       pos: { x: 21, y: 11 },
       intro: [

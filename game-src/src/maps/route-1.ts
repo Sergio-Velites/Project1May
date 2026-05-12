@@ -80,7 +80,7 @@ const route1: MapType = {
   trainers: [
     {
       npc: youngster,
-      pokemon: [{ id: 21, level: 3 }],
+      pokemon: [{ id: 21, level: 4 }],
       facing: Direction.Left,
       pos: { x: 14, y: 18 },
       intro: [
@@ -116,7 +116,7 @@ const route1: MapType = {
     // Pescador — invitado de la cuñada, despistado
     {
       npc: fisher,
-      pokemon: [{ id: 129, level: 5 }, { id: 118, level: 4 }],
+      pokemon: [{ id: 129, level: 6 }, { id: 118, level: 5 }],
       facing: Direction.Left,
       pos: { x: 13, y: 26 },
       intro: [
@@ -129,7 +129,7 @@ const route1: MapType = {
     // Marinero — llega en nombre del padrino
     {
       npc: sailor,
-      pokemon: [{ id: 72, level: 6 }, { id: 54, level: 5 }],
+      pokemon: [{ id: 72, level: 7 }, { id: 54, level: 7 }],
       facing: Direction.Down,
       pos: { x: 6, y: 16 },
       intro: [

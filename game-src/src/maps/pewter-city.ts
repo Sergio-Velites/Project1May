@@ -142,7 +142,7 @@ walls: {
     // Rival de la boda — invitado del novio, combatible
     {
       npc: jrTrainerMale,
-      pokemon: [{ id: 23, level: 12 }, { id: 27, level: 11 }],
+      pokemon: [{ id: 23, level: 14 }, { id: 27, level: 13 }],
       facing: Direction.Left,
       pos: { x: 25, y: 10 },
       intro: [
@@ -171,7 +171,7 @@ walls: {
     // Investigador de la bodega — combatible, lleva muestras de terroir
     {
       npc: scientist,
-      pokemon: [{ id: 100, level: 13 }, { id: 101, level: 12 }],
+      pokemon: [{ id: 100, level: 15 }, { id: 101, level: 14 }],
       facing: Direction.Down,
       pos: { x: 18, y: 22 },
       intro: [

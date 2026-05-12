@@ -135,15 +135,15 @@ const mtMoon2f: MapType = {
       pokemon: [
         {
           id: 27, // Sandshrew
-          level: 11,
+          level: 17,
         },
         {
           id: 19, // Rattata
-          level: 11,
+          level: 17,
         },
         {
           id: 41, // Zubat
-          level: 11,
+          level: 17,
         },
       ],
       facing: Direction.Down,
@@ -166,11 +166,11 @@ const mtMoon2f: MapType = {
       pokemon: [
         {
           id: 41, // Zubat
-          level: 12,
+          level: 18,
         },
         {
           id: 23, // Ekans
-          level: 12,
+          level: 18,
         },
       ],
       facing: Direction.Up,
@@ -193,7 +193,7 @@ const mtMoon2f: MapType = {
       pokemon: [
         {
           id: 20, // Raticate
-          level: 16,
+          level: 22,
         },
       ],
       facing: Direction.Left,
@@ -216,11 +216,11 @@ const mtMoon2f: MapType = {
       pokemon: [
         {
           id: 19, // Rattata
-          level: 13,
+          level: 19,
         },
         {
           id: 41, // Zubat
-          level: 13,
+          level: 19,
         },
       ],
       facing: Direction.Down,
@@ -243,15 +243,15 @@ const mtMoon2f: MapType = {
       pokemon: [
         {
           id: 88, // Grimer
-          level: 12,
+          level: 18,
         },
         {
           id: 100, // Voltorb
-          level: 12,
+          level: 18,
         },
         {
           id: 109, // Koffing
-          level: 12,
+          level: 19,
         },
       ],
       facing: Direction.Right,
