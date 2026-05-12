@@ -641,36 +641,44 @@ for (const file of MAP_FILES) {
     .replace(/^-/, "");
 
   // Mapear el ID a la imagen conocida
-  // Intentamos buscar qué MapId corresponde a este archivo
-  // (buscamos el valor del enum que coincida con el nombre del archivo)
-  const mapIdM = tsText.match(/MapId\.(\w+)\s*=\s*"([^"]+)"/g);
-  let resolvedMapId = null;
-  
-  // Buscar en el texto si referencia su propio MapId
-  // Alternativa: buscar en map-types.ts
+  // Resolver MapId: primero por slug exacto (filename), luego por imagen.
+  // Priorizar slug evita que mapas que comparten imagen (ej. route-2-gate y
+  // route-2-gate-north) reciban el mismo ID.
   const mapTypesText = fs.readFileSync(path.join(MAP_DIR, "map-types.ts"), "utf-8");
   const enumMatches = [...mapTypesText.matchAll(/(\w+)\s*=\s*"([^"]+)"/g)];
+  const slug = file.replace(".ts", "");
+  let resolvedMapId = null;
 
-  // Intentar mapear por nombre de imagen
+  // 1. Match exacto por slug (nombre del archivo sin .ts)
   for (const [, , val] of enumMatches) {
-    if (MAP_ID_TO_IMAGE[val] === imageFile) {
+    if (val === slug) {
       resolvedMapId = val;
       break;
     }
   }
 
-  // Si no encontramos por imagen, usar el nombre del archivo .ts como MapId heurístico
+  // 2. Match por equivalencia normalizada del slug
   if (!resolvedMapId) {
-    const slug = file.replace(".ts", "");
-    // Buscar un MapId cuyo valor contenga el slug
     for (const [, , val] of enumMatches) {
       if (val.replace(/-/g, "") === slug.replace(/-/g, "")) {
         resolvedMapId = val;
         break;
       }
     }
-    if (!resolvedMapId) resolvedMapId = slug;
   }
+
+  // 3. Fallback: match por imagen (puede colisionar si comparten PNG)
+  if (!resolvedMapId) {
+    for (const [, , val] of enumMatches) {
+      if (MAP_ID_TO_IMAGE[val] === imageFile) {
+        resolvedMapId = val;
+        break;
+      }
+    }
+  }
+
+  // 4. Último recurso: usar el slug directamente
+  if (!resolvedMapId) resolvedMapId = slug;
 
   mapData[resolvedMapId] = {
     id: resolvedMapId,
