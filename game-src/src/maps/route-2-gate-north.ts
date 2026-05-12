@@ -24,10 +24,10 @@ const route2GateNorth: MapType = {
   text: {},
   
 
-  maps: {},
+maps: {},
 teleports: {
     0: {
-      5: { map: MapId.Route2, pos: { x: 2, y: 12 } },
+      5: { map: MapId.Route2, pos: { x: 3, y: 10 } },
     },
   },
 exits: {

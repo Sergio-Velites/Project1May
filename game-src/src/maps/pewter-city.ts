@@ -107,43 +107,11 @@ text: {
       },
     },
   },
-  maps: {
-    7: {
-      14: MapId.PewterCityMuseum1f,
-    },
-    13: {
-      29: MapId.PewterCityNpcB,
-    },
-    16: {
-      39: MapId.Route3,
-    },
-    17: {
-      16: MapId.PewterCityGym,
-      23: MapId.PewterCityPokeMart,
-      39: MapId.Route3,
-    },
-    18: {
-      39: MapId.Route3,
-    },
-    19: {
-      39: MapId.Route3,
-    },
-    25: {
-      13: MapId.PewterCityPokemonCenter,
-    },
-    29: {
-      7: MapId.PewterCityNpcA,
-    },
-  },
+
   recoverLocation: { x: 13, y: 26 },
-  exits: {
-    35: [18, 19],
-  },
-  exitReturnPos: {
-    x: 5,
-    y: 1,
-  },
-  exitReturnMap: MapId.Route2GateNorth,
+
+
+
   trainers: [
     // Catador local — decorativo, vigila la entrada a la Bodega
     {
@@ -228,6 +196,43 @@ text: {
       questId: "pewter-city-gift-29-33",
     },
   ],
+  maps: {
+    7: {
+      14: MapId.PewterCityMuseum1f,
+    },
+    13: {
+      29: MapId.PewterCityNpcB,
+    },
+    16: {
+      39: MapId.Route3,
+    },
+    17: {
+      16: MapId.PewterCityGym,
+      23: MapId.PewterCityPokeMart,
+      39: MapId.Route3,
+    },
+    18: {
+      39: MapId.Route3,
+    },
+    19: {
+      39: MapId.Route3,
+    },
+    25: {
+      13: MapId.PewterCityPokemonCenter,
+    },
+    29: {
+      7: MapId.PewterCityNpcA,
+    },
+  },
+teleports: {
+    35: {
+      18: { map: MapId.Route2, pos: { x: 8, y: 0 } },
+      19: { map: MapId.Route2, pos: { x: 9, y: 0 } },
+    },
+  },
+exits: {},
+exitReturnMap: MapId.Route2GateNorth,
+exitReturnPos: { x: 5, y: 1 },
 };
 
 export default pewterCity;
