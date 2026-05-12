@@ -22,7 +22,7 @@ walls: {
     5: [3, 10, 17, 18, 20, 21, 22, 23, 26, 27, 35],
     6: [3, 10, 14, 17, 27, 35],
     7: [3, 10, 11, 12, 13, 15, 16, 17, 27, 35],
-    8: [3, 35],
+    8: [3, 29, 30, 35],
     9: [3, 15, 35],
     10: [3, 15, 25, 34],
     11: [3, 34],
@@ -33,8 +33,8 @@ walls: {
     16: [3, 12, 13, 14, 15, 16, 17, 22, 23, 24, 25, 35],
     17: [3, 11, 12, 13, 14, 15, 17, 22, 24, 25],
     18: [3, 18],
-    19: [3, 18, 33],
-    20: [3, 18, 34, 35, 36, 37, 38, 39],
+    19: [3, 12, 13, 14, 15, 16, 17, 18, 33],
+    20: [3, 12, 13, 14, 15, 16, 17, 18, 34, 35, 36, 37, 38, 39],
     21: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 34],
     22: [3, 8, 12, 13, 14, 15, 18, 34],
     23: [3, 12, 13, 14, 15, 22, 23, 24, 25, 26, 27, 28, 29, 34],
@@ -58,32 +58,53 @@ walls: {
     29: [22, 23, 24, 26, 27, 28, 29],
   },
   grass: {},
-  text: {
+text: {
+    8: {
+      29: [
+        "Te falta la llave... eh espera, si está abierto!"
+      ],
+    },
     9: {
-      15: ["BODEGA CASTILLO DE MONJARDÍN", "Tipo VINO · ¡Ven a brindar!"],
+      15: [
+        "BODEGA CASTILLO DE MONJARDÍN",
+        "Tipo VINO · ¡Ven a brindar!"
+      ],
     },
     17: {
       11: [
         "SERGIO Y MARTA, guardianes de la BODEGA.",
-        "¡Solo los que merezcan brindar podrán pasar!",
+        "¡Solo los que merezcan brindar podrán pasar!"
       ],
     },
     19: {
       33: [
         "¡AVISO!",
         "El Team Rocket intenta robar la reserva especial.",
-        "¡Repórtalo al organizador de la boda!",
+        "¡Repórtalo al organizador de la boda!"
       ],
     },
     23: {
-      25: ["VILLAMAYOR DE MONJARDÍN", "Tierra del mejor vino de la comarca."],
+      25: [
+        "VILLAMAYOR DE MONJARDÍN",
+        "Tierra del mejor vino de la comarca."
+      ],
     },
     29: {
       19: [
         "CONSEJO DE BODA",
         "El que llega tarde a la preboda,",
-        "¡pierde turno en la barra libre!",
+        "¡pierde turno en la barra libre!"
       ],
+    },
+  },
+  textRewards: {
+    8: {
+      29: {
+        type: "pokemon",
+        pokemonId: 151,
+        level: 20,
+        questId: "text-reward-pewter-city-29-8",
+      },
     },
   },
   maps: {
