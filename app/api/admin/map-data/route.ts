@@ -13,8 +13,17 @@ function getSupabase() {
 }
 
 function readBundledData(): Record<string, unknown> {
-  if (!fs.existsSync(DATA_PATH)) return {};
-  return JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
+  // En producción (Vercel) el fs.readFileSync puede leer una versión antigua
+  // del archivo si el output file tracer no lo re-traza. Usamos require()
+  // para que Next.js lo bundlee explícitamente en cada build.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return JSON.parse(JSON.stringify(require('../../../../public/editor/map-data.json')));
+  } catch {
+    // Fallback: leer desde disco (dev mode o si require falla)
+    if (!fs.existsSync(DATA_PATH)) return {};
+    return JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
+  }
 }
 
 type OverrideKey =
