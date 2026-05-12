@@ -2,7 +2,7 @@ import image from "../assets/map/route-22.png";
 import { MapId, MapType } from "./map-types";
 
 import getEncounterData from "./get-location-data";
-import { rival } from "../app/npcs";
+import { lass, rival, youngster } from "../app/npcs";
 import { Direction } from "../state/state-types";
 
 const route22: MapType = {
@@ -69,7 +69,7 @@ const route22: MapType = {
     10: [16, 17, 18, 19, 20, 21, 30, 31, 32, 33],
     11: [16, 17, 18, 19, 20, 21, 30, 31, 32, 33],
   },
-  encounters: getEncounterData("kanto-route-12-area"),
+  encounters: getEncounterData("kanto-route-22-area"),
   exitReturnMap: MapId.ViridianCity,
   exitReturnPos: {
     x: 1,
@@ -81,11 +81,11 @@ const route22: MapType = {
       pokemon: [
         {
           id: 16,
-          level: 9,
+          level: 11,
         },
         {
           id: 1,
-          level: 8,
+          level: 10,
         },
       ],
       facing: Direction.Right,
@@ -102,6 +102,39 @@ const route22: MapType = {
         x: 25,
         y: 5,
       },
+    },
+    // Invitado musculoso — quiere ganarse su puesto en el banquete
+    {
+      npc: youngster,
+      pokemon: [
+        { id: 32, level: 8 },
+        { id: 21, level: 9 },
+      ],
+      facing: Direction.Right,
+      intro: [
+        "¡Yo también voy a la preboda!",
+        "¡Pero como solo hay un sitio libre en la mesa,",
+        "¡tendrás que ganártelo!",
+      ],
+      outtro: ["Está bien... disfruta del banquete."],
+      money: 160,
+      pos: { x: 15, y: 11 },
+    },
+    // Guardiana del acceso al lago — entrenadora decorativa
+    {
+      npc: lass,
+      pokemon: [
+        { id: 29, level: 8 },
+        { id: 19, level: 8 },
+      ],
+      facing: Direction.Down,
+      intro: [
+        "Este camino lleva al lago de los novios.",
+        "¡Nadie que no sepa luchar puede cruzarlo!",
+      ],
+      outtro: ["¡Bonito equipo! Te han guardado sitio en el banquete."],
+      money: 120,
+      pos: { x: 8, y: 8 },
     },
   ],
 };

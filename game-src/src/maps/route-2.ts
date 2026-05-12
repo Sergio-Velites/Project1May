@@ -1,6 +1,8 @@
 import image from "../assets/map/route-2.png";
 import music from "../assets/music/maps/route-1.mp3";
 import getEncounterData from "./get-location-data";
+import { bugCatcher, jrTrainerMale, lass, youngster } from "../app/npcs";
+import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 
 const route2: MapType = {
@@ -135,6 +137,63 @@ const route2: MapType = {
   },
   encounters: getEncounterData("kanto-route-2-south-towards-viridian-city"),
   exitReturnMap: MapId.ViridianCity,
+  trainers: [
+    // Invitada madrugadora — sale a entrenar antes de la preboda
+    {
+      npc: lass,
+      pokemon: [{ id: 16, level: 7 }, { id: 19, level: 7 }],
+      facing: Direction.Right,
+      pos: { x: 7, y: 62 },
+      intro: [
+        "¡Salí a pasear y me perdí!",
+        "¡Pero mientras espero, voy a entrenar!",
+      ],
+      outtro: ["La BODEGA CASTILLO DE MONJARDÍN está al norte. ¡No te pierdas tú también!"],
+      money: 105,
+    },
+    // Joven de las corbatas — en camino al soto
+    {
+      npc: youngster,
+      pokemon: [{ id: 19, level: 8 }, { id: 21, level: 8 }],
+      facing: Direction.Down,
+      pos: { x: 8, y: 50 },
+      intro: [
+        "¡Ey! ¡Un entrenador en la ruta!",
+        "¡Me aburro mucho caminando solo!",
+        "¡Vamos a combatir!",
+      ],
+      outtro: ["¡Buen combate! Ahora el camino se me hace más corto."],
+      money: 140,
+    },
+    // Cazabichos — recogiendo insectos del bosque cercano
+    {
+      npc: bugCatcher,
+      pokemon: [{ id: 13, level: 9 }, { id: 14, level: 9 }],
+      facing: Direction.Left,
+      pos: { x: 6, y: 35 },
+      intro: [
+        "¡Cuidado con pisar los bichos!",
+        "¡Son mis guerreros de la boda!",
+        "¡A ver si puedes con ellos!",
+      ],
+      outtro: ["¡Sorprendente! Sigue al norte, el bosque te espera."],
+      money: 110,
+    },
+    // Joven entrenador — guardián del camino al bosquecillo
+    {
+      npc: jrTrainerMale,
+      pokemon: [{ id: 32, level: 10 }, { id: 23, level: 10 }],
+      facing: Direction.Down,
+      pos: { x: 7, y: 20 },
+      intro: [
+        "¡Alto! Este camino lleva al BOSQUECILLO.",
+        "¡Solo los entrenadores preparados siguen adelante!",
+        "¡Demuéstrame que estás listo!",
+      ],
+      outtro: ["¡Impresionante! El BOSQUECILLO te espera. Ten cuidado con los ZUBAT."],
+      money: 200,
+    },
+  ],
 };
 
 export default route2;
