@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import Frame from "./Frame";
-import Menu, { MenuItemType } from "./Menu";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import {
@@ -24,8 +23,11 @@ import getPokemonEncounter from "../app/pokemon-encounter-helper";
 import { rival } from "../app/npcs";
 import { Direction } from "../state/state-types";
 import { TrainerType } from "../maps/map-types";
+import Arrow from "./Arrow";
 
-// ---- Styled components ----
+// Cuántos jugadores se ven a la vez en la lista (incluyendo "Salir").
+// Si hay más, se muestran indicadores de scroll ▲/▼.
+const VISIBLE_ROWS = 7;
 
 const Overlay = styled.div`
   position: absolute;
@@ -49,7 +51,40 @@ const TextContainer = styled.div`
   }
 `;
 
-// ---- Types ----
+// Posicionado igual que el menú Start: pegado a la derecha,
+// centrado verticalmente.
+const ListContainer = styled.div`
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  background: var(--bg);
+  z-index: 100;
+`;
+
+const RowDiv = styled.div`
+  display: flex;
+  align-items: center;
+  position: relative;
+  white-space: nowrap;
+`;
+
+const ArrowSlot = styled.div`
+  width: 4cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ScrollIndicator = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2cqw;
+  font-family: "PokemonGB";
+  font-size: 2cqw;
+  color: black;
+`;
 
 type Stage =
   | "greeting"
@@ -61,7 +96,9 @@ type Stage =
   | "error"
   | "done";
 
-// ---- Component ----
+type RowItem =
+  | { kind: "player"; player: PlayerEntry }
+  | { kind: "exit" };
 
 const OnlineBattleMenu = () => {
   const dispatch = useDispatch();
@@ -70,27 +107,37 @@ const OnlineBattleMenu = () => {
 
   const [stage, setStage] = useState<Stage>("greeting");
   const [players, setPlayers] = useState<PlayerEntry[]>([]);
-  const [selected, setSelected] = useState<PlayerEntry | null>(null);
-  // Ref sincrónico de la selección para evitar race conditions entre el
-  // setState y el useEffect que dispara loadFromCloud. Siempre se establece
-  // en el mismo tick que setStage("loading-battle").
-  const selectedPlayerRef = useRef<PlayerEntry | null>(null);
-  // Guard atómico para evitar que dos useEffect/listeners disparen dos
-  // veces el combate (doble A o re-render durante loadFromCloud).
+
+  // Selección por playerId (no por índice). Inmune a cambios en players[],
+  // a re-renders intermedios y a cualquier closure obsoleto. La ref se
+  // actualiza síncronamente en el handler de A, antes de cualquier setState.
+  const selectedIdRef = useRef<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const battleStartedRef = useRef(false);
 
-  // Reset state on open
+  // Cursor (índice global sobre `rows`) y desplazamiento de scroll
+  const [cursor, setCursor] = useState(0);
+  const [scrollOffset, setScrollOffset] = useState(0);
+
+  // Reset al abrir/cerrar
   useEffect(() => {
     if (show) {
       setStage("greeting");
       setPlayers([]);
-      setSelected(null);
+      setCursor(0);
+      setScrollOffset(0);
+      selectedIdRef.current = null;
+      setSelectedId(null);
+      battleStartedRef.current = false;
+    } else {
+      setPlayers([]);
+      selectedIdRef.current = null;
+      setSelectedId(null);
       battleStartedRef.current = false;
     }
   }, [show]);
 
-
-  // Fetch players when entering loading stage, y congelar la lista al pasar a 'select'
+  // Fetch de la lista al entrar en stage "loading"
   useEffect(() => {
     if (stage !== "loading") return;
     let cancelled = false;
@@ -99,36 +146,33 @@ const OnlineBattleMenu = () => {
       if (result.length === 0) {
         setStage("empty");
       } else {
-        // Congelar la lista de jugadores: no actualizar más hasta salir del menú
         setPlayers(result);
+        setCursor(0);
+        setScrollOffset(0);
         setStage("select");
       }
     });
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
 
-  // Al cerrar el menú, limpiar la lista congelada
-  useEffect(() => {
-    if (!show) {
-      setPlayers([]);
-      setSelected(null);
-      battleStartedRef.current = false;
-    }
-  }, [show]);
-
-  // Load battle data when a player is selected and confirmed
+  // Carga del oponente y arranque del combate
   useEffect(() => {
     if (stage !== "loading-battle") return;
-    // Usar ref para evitar race condition: la ref se establece síncronamente
-    // en el mismo tick que setStage("loading-battle"), así que siempre tiene
-    // el jugador correcto aunque el estado de React aún no haya propagado.
-    const playerToLoad = selectedPlayerRef.current;
-    if (!playerToLoad) return;
+    const idToLoad = selectedIdRef.current;
+    if (!idToLoad) {
+      setStage("error");
+      return;
+    }
+    // Resolver el jugador por ID — nunca por índice
+    const playerToLoad = players.find((p) => p.playerId === idToLoad);
+    if (!playerToLoad) {
+      setStage("error");
+      return;
+    }
     let cancelled = false;
-    loadFromCloud(playerToLoad.playerId).then((gameState) => {
+    loadFromCloud(idToLoad).then((gameState) => {
       if (cancelled) return;
       if (!gameState) {
         setStage("error");
@@ -146,7 +190,6 @@ const OnlineBattleMenu = () => {
         setStage("no-pokemon");
         return;
       }
-      // Guard contra doble inicio de combate.
       if (battleStartedRef.current) return;
       battleStartedRef.current = true;
 
@@ -161,12 +204,8 @@ const OnlineBattleMenu = () => {
         isOnline: true,
         playerName: playerToLoad.name,
       };
-      // Cerrar este menú primero para liberar el control y que
-      // PokemonEncounter / TrainerEncounter tomen el relevo limpiamente.
       dispatch(hideOnlineBattleMenu());
       setStage("done");
-      // Encadenar en el siguiente tick para que el unmount de este
-      // overlay (z-index 150) no se solape con la animación de entrada.
       setTimeout(() => {
         dispatch(encounterTrainer(fakeTrainer));
         const first = opponentPokemon[0];
@@ -178,30 +217,76 @@ const OnlineBattleMenu = () => {
     return () => {
       cancelled = true;
     };
-  }, [stage, map.onlineBattleNpc, dispatch]);
+  }, [stage, map.onlineBattleNpc, dispatch, players]);
 
-  // A-button handler for text stages
+  // Filas: jugadores + opción "Salir"
+  const rows: RowItem[] =
+    stage === "select"
+      ? [
+          ...players.map((p): RowItem => ({ kind: "player", player: p })),
+          { kind: "exit" } as RowItem,
+        ]
+      : [];
+  const totalRows = rows.length;
+
+  useEvent(Event.Up, () => {
+    if (!show || stage !== "select") return;
+    setCursor((c) => {
+      if (c === 0) return 0;
+      const next = c - 1;
+      setScrollOffset((s) => (next < s ? next : s));
+      return next;
+    });
+  });
+
+  useEvent(Event.Down, () => {
+    if (!show || stage !== "select") return;
+    setCursor((c) => {
+      if (c >= totalRows - 1) return c;
+      const next = c + 1;
+      setScrollOffset((s) =>
+        next >= s + VISIBLE_ROWS ? next - VISIBLE_ROWS + 1 : s
+      );
+      return next;
+    });
+  });
+
   useEvent(Event.A, () => {
     if (!show) return;
-    if (stage === "greeting") setStage("loading");
-    if (stage === "empty") {
-      dispatch(hideOnlineBattleMenu());
-      setStage("greeting");
+    if (stage === "greeting") {
+      setStage("loading");
+      return;
     }
-    if (stage === "error" || stage === "no-pokemon") {
+    if (stage === "empty" || stage === "error" || stage === "no-pokemon") {
       dispatch(hideOnlineBattleMenu());
       setStage("greeting");
+      return;
+    }
+    if (stage === "select") {
+      const row = rows[cursor];
+      if (!row) return;
+      if (row.kind === "exit") {
+        dispatch(hideOnlineBattleMenu());
+        setStage("greeting");
+        return;
+      }
+      // Fijar el ID síncronamente ANTES de cualquier setState.
+      const id = row.player.playerId;
+      selectedIdRef.current = id;
+      setSelectedId(id);
+      setStage("loading-battle");
     }
   });
 
-  // B-button handler — cancel
   useEvent(Event.B, () => {
     if (!show) return;
-    if (stage === "greeting" || stage === "empty" || stage === "error" || stage === "no-pokemon") {
-      dispatch(hideOnlineBattleMenu());
-      setStage("greeting");
-    }
-    if (stage === "select") {
+    if (
+      stage === "greeting" ||
+      stage === "empty" ||
+      stage === "error" ||
+      stage === "no-pokemon" ||
+      stage === "select"
+    ) {
       dispatch(hideOnlineBattleMenu());
       setStage("greeting");
     }
@@ -209,19 +294,12 @@ const OnlineBattleMenu = () => {
 
   if (!show) return null;
 
-  // ---- Player list menu items ----
-  const menuItems: MenuItemType[] = players.map((p) => ({
-    label: `${p.name} (${p.pokemonCount})`,
-    action: () => {
-      // Establecer ref síncronamente ANTES de setState para garantizar que
-      // el useEffect de loading-battle lea el jugador correcto.
-      selectedPlayerRef.current = p;
-      setSelected(p);
-      setStage("loading-battle");
-    },
-  }));
+  // Resolver el nombre del jugador seleccionado por ID (nunca por índice)
+  const selectedPlayer =
+    selectedId !== null
+      ? players.find((p) => p.playerId === selectedId)
+      : null;
 
-  // Texto como string puro para que Frame use su path con <h1 fontFamily="PokemonGB">
   const frameText =
     stage === "greeting"
       ? "¡Hola! ¿Quieres combatir con el equipo Pokémon de otro invitado?"
@@ -230,34 +308,67 @@ const OnlineBattleMenu = () => {
       : stage === "empty"
       ? "No hay otros invitados en el juego todavía."
       : stage === "loading-battle"
-      ? `Cargando datos de ${selected?.name ?? ""}...`
+      ? `Cargando datos de ${selectedPlayer?.name ?? "..."}...`
       : stage === "no-pokemon"
-      ? `${selected?.name ?? "Este invitado"} aún no tiene equipo Pokémon. ¡Dile que juegue más!`
+      ? `${selectedPlayer?.name ?? "Este invitado"} aún no tiene equipo Pokémon. ¡Dile que juegue más!`
       : stage === "error"
       ? "No se pudo cargar la partida del invitado. Inténtalo de nuevo."
       : "";
 
-  // ---- Render ----
+  const visibleRows = rows.slice(scrollOffset, scrollOffset + VISIBLE_ROWS);
+  const hasMoreAbove = scrollOffset > 0;
+  const hasMoreBelow = scrollOffset + VISIBLE_ROWS < totalRows;
+
   return (
     <Overlay>
-      {/* Player selection menu */}
       {stage === "select" && (
-        <Menu
-          show={true}
-          menuItems={menuItems}
-          close={() => {
-            dispatch(hideOnlineBattleMenu());
-            setStage("greeting");
-          }}
-          bottom="20%"
-          right="0"
-        />
+        <ListContainer>
+          <ul
+            className="framed buttons"
+            style={{ width: "100%", paddingRight: "0", margin: 0 }}
+          >
+            {hasMoreAbove && (
+              <li style={{ listStyle: "none" }}>
+                <ScrollIndicator>▲</ScrollIndicator>
+              </li>
+            )}
+            {visibleRows.map((row, visIdx) => {
+              const globalIdx = scrollOffset + visIdx;
+              const isActive = globalIdx === cursor;
+              const label =
+                row.kind === "exit"
+                  ? "Salir"
+                  : `${row.player.name} (${row.player.pokemonCount})`;
+              return (
+                <li
+                  key={row.kind === "exit" ? "__exit__" : row.player.playerId}
+                  style={{ position: "relative" }}
+                >
+                  <RowDiv>
+                    <ArrowSlot>
+                      <Arrow menu show={isActive} />
+                    </ArrowSlot>
+                    <span style={{ paddingRight: "1cqw" }}>{label}</span>
+                  </RowDiv>
+                </li>
+              );
+            })}
+            {hasMoreBelow && (
+              <li style={{ listStyle: "none" }}>
+                <ScrollIndicator>▼</ScrollIndicator>
+              </li>
+            )}
+          </ul>
+        </ListContainer>
       )}
 
-      {/* Text box */}
       {stage !== "select" && stage !== "done" && (
         <TextContainer>
-          <Frame wide tall flashing={["greeting", "empty", "error", "no-pokemon"].includes(stage)}>
+          <Frame
+            wide
+            tall
+            flashing={["greeting", "empty", "error", "no-pokemon"].includes(stage)}
+          >
             {frameText}
           </Frame>
         </TextContainer>
