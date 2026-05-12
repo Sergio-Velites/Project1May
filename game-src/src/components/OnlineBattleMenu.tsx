@@ -119,6 +119,10 @@ const OnlineBattleMenu = () => {
   const [cursor, setCursor] = useState(0);
   const [scrollOffset, setScrollOffset] = useState(0);
 
+  // Protección contra pulsaciones accidentales: se activa 1 s después
+  // de que la lista esté visible.
+  const selectReadyRef = useRef(false);
+
   // Reset al abrir/cerrar
   useEffect(() => {
     if (show) {
@@ -129,11 +133,13 @@ const OnlineBattleMenu = () => {
       selectedIdRef.current = null;
       setSelectedId(null);
       battleStartedRef.current = false;
+      selectReadyRef.current = false;
     } else {
       setPlayers([]);
       selectedIdRef.current = null;
       setSelectedId(null);
       battleStartedRef.current = false;
+      selectReadyRef.current = false;
     }
   }, [show]);
 
@@ -149,7 +155,11 @@ const OnlineBattleMenu = () => {
         setPlayers(result);
         setCursor(0);
         setScrollOffset(0);
+        selectReadyRef.current = false;
         setStage("select");
+        setTimeout(() => {
+          selectReadyRef.current = true;
+        }, 1000);
       }
     });
     return () => {
@@ -263,6 +273,7 @@ const OnlineBattleMenu = () => {
       return;
     }
     if (stage === "select") {
+      if (!selectReadyRef.current) return;
       const row = rows[cursor];
       if (!row) return;
       if (row.kind === "exit") {
@@ -348,7 +359,7 @@ const OnlineBattleMenu = () => {
                     <ArrowSlot>
                       <Arrow menu show={isActive} />
                     </ArrowSlot>
-                    <span style={{ paddingRight: "1cqw" }}>{label}</span>
+                    <span style={{ paddingRight: "1cqw", fontFamily: "PokemonGB", fontSize: "2cqw" }}>{label}</span>
                   </RowDiv>
                 </li>
               );
