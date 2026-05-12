@@ -123,20 +123,9 @@ const route2: MapType = {
       5: ["RUTA 2: Ciudad Añil - Ciudad Plateada"],
     },
   },
-  maps: {
-    43: {
-      3: MapId.Route2Gate,
-    },
-  },
-  exits: {
-    71: [7, 8, 9],
-  },
-  exitReturnPos: {
-    x: 18,
-    y: 1,
-  },
+
   encounters: getEncounterData("kanto-route-2-south-towards-viridian-city"),
-  exitReturnMap: MapId.ViridianCity,
+ 
 // Trainers para "route-2"
 // Trainers para "route-2"
 trainers: [
@@ -204,6 +193,25 @@ trainers: [
 
 }
 ],
+maps: {
+    0: {
+      8: MapId.PewterCity,
+      9: MapId.PewterCity,
+    },
+    43: {
+      3: MapId.Route2gate,
+    },
+  },
+teleports: {
+    11: {
+      3: { map: MapId.Route2GateNorth, pos: { x: 1, y: 1 } },
+    },
+  },
+exits: {
+    71: [7, 8, 9],
+  },
+exitReturnMap: MapId.ViridianCity,
+exitReturnPos: { x: 18, y: 1 },
 };
 
 export default route2;

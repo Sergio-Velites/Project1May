@@ -196,7 +196,7 @@ text: {
       questId: "pewter-city-gift-29-33",
     },
   ],
-  maps: {
+maps: {
     7: {
       14: MapId.PewterCityMuseum1f,
     },
@@ -226,12 +226,12 @@ text: {
   },
 teleports: {
     35: {
-      18: { map: MapId.Route2, pos: { x: 8, y: 0 } },
-      19: { map: MapId.Route2, pos: { x: 9, y: 0 } },
+      18: { map: MapId.Route2, pos: { x: 8, y: 1 } },
+      19: { map: MapId.Route2, pos: { x: 9, y: 1 } },
     },
   },
 exits: {},
-exitReturnMap: MapId.Route2GateNorth,
+exitReturnMap: MapId.Route2,
 exitReturnPos: { x: 5, y: 1 },
 };
 
