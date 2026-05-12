@@ -6,7 +6,7 @@ import { selectStartMenu } from "../state/uiSlice";
 import useIsMobile from "../app/use-is-mobile";
 import { selectActivePokemon } from "../state/gameSlice";
 import Frame from "./Frame";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useMoveMetadata, { getMoveMetadata } from "../app/use-move-metadata";
 
 const Stats = styled.div`
@@ -53,6 +53,12 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
   const activePokemon = useSelector(selectActivePokemon);
 
   const [active, setActive] = useState(0);
+  const [noPpNotice, setNoPpNotice] = useState<string | null>(null);
+
+  // Limpiar el aviso cuando el menú se cierra
+  useEffect(() => {
+    if (!show) setNoPpNotice(null);
+  }, [show]);
 
   const displayMoves = overrideMoves ?? activePokemon.moves;
   const move = useMoveMetadata(displayMoves[Math.min(active, displayMoves.length - 1)]?.id ?? activePokemon.moves[0].id);
@@ -62,19 +68,23 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
       <Menu
         tight
         noExitOption
-        disabled={startMenuOpen}
+        disabled={startMenuOpen || noPpNotice !== null}
         padd={4}
         padding={isMobile ? "100px" : "40vw"}
         show={show}
         menuItems={displayMoves.map((m) => {
           const ppEmpty = m.pp <= 0;
           const item: MenuItemType = {
-            // Marcar visualmente los movimientos sin PP
-            label: ppEmpty
-              ? `${getMoveMetadata(m.id).name} --`
-              : getMoveMetadata(m.id).name,
-            // Gen I: seleccionar un movimiento sin PP usa Forcejeo en su lugar
-            action: () => select(ppEmpty ? "struggle" : m.id),
+            label: getMoveMetadata(m.id).name,
+            action: () => {
+              if (ppEmpty) {
+                // Mostrar aviso y NO seleccionar el movimiento
+                setNoPpNotice("¡No quedan PP de\nese movimiento!");
+                setTimeout(() => setNoPpNotice(null), 1500);
+              } else {
+                select(m.id);
+              }
+            },
           };
           return item;
         })}
@@ -83,7 +93,7 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
         right="0"
         setHovered={(index) => setActive(index)}
       />
-      {show && move && (
+      {show && move && !noPpNotice && (
         <Stats>
           <Frame>
             <StatsRow>Type/</StatsRow>
@@ -91,6 +101,15 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
             <StatsRow
               style={{ textAlign: "right" }}
             >{`${displayMoves[Math.min(active, displayMoves.length - 1)]?.pp ?? 0}/${move.pp}`}</StatsRow>
+          </Frame>
+        </Stats>
+      )}
+      {show && noPpNotice && (
+        <Stats>
+          <Frame>
+            {noPpNotice.split("\n").map((line, i) => (
+              <StatsRow key={i} style={{ textAlign: "center" }}>{line}</StatsRow>
+            ))}
           </Frame>
         </Stats>
       )}
