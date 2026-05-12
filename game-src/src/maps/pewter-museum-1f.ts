@@ -25,15 +25,32 @@ const pewterMuseum1f: MapType = {
   },
   fences: {},
   grass: {},
-  text: {
+text: {
     3: {
-      2: [arodactyl, "FÓSIL DE AERODACTYL", "Un PKMN primitivo y muy raro."],
+      2: [
+        "FÓSIL DE AERODACTYL",
+        "Un PKMN primitivo y muy raro. parece que se mueve"
+      ],
     },
     4: {
-      11: ["¡Tómate tu tiempo para mirar!"],
+      11: [
+        "¡Tómate tu tiempo para mirar!"
+      ],
     },
     6: {
-      2: [kabutops, "FÓSIL DE KABUTOPS", "Un PKMN primitivo y muy raro."],
+      2: [
+        "Hay como movidas pero no se muy bien que son"
+      ],
+    },
+  },
+  textRewards: {
+    3: {
+      2: {
+        type: "pokemon",
+        pokemonId: 142,
+        level: 20,
+        questId: "text-reward-pewter-city-museum-1f-2-3",
+      },
     },
   },
   maps: {

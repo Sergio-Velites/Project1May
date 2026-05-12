@@ -134,40 +134,44 @@ const viridianForrest: MapType = {
     42: [1, 2, 3, 4, 5, 28, 29, 30, 31, 32],
     43: [1, 2, 3, 4, 5, 28, 29, 30, 31, 32],
   },
-  text: {
-    45: {
-      18: [
-        "CONSEJOS DE ENTRENADOR",
-        "Debilita a los PKMN antes de intentar capturarlos.",
-        "Con vida, ¡pueden escapar!",
-      ],
-    },
-    32: {
-      16: ["¡Para el VENENO usa ANTIDOTO!", "¡Cómpralo en cualquier PKMART!"],
-    },
-    40: {
-      24: [
-        "CONSEJOS DE ENTRENADOR",
-        "Si quieres evitar combates,",
-        "¡mantente alejado de la hierba alta!",
+text: {
+    1: {
+      2: [
+        "SALIENDO DEL BOSQUECILLO",
+        "VILLAMAYOR DE MONJARDÍN ADELANTE"
       ],
     },
     17: {
       26: [
-        "CONSEJOS DE ENTRENADOR",
-        "Contacta al PROF. OAK por PC para que",
-        "¡evalúe tu POKEDÉX!",
+        "CONSEJOS DE ENTRENADOR. Toma más anís"
       ],
     },
-    42: {
+    24: {
       4: [
+        "En memoria a Juanito. Cisne de la TAKONERA"
+      ],
+    },
+    32: {
+      16: [
+        "¡Para el VENENO usa Pacharás Basarana! No cura pero tendrás una muerte más dulce"
+      ],
+    },
+    40: {
+      24: [
+        "CONSEJOS DE ENTRENADOR. Come menos, bebea más"
+      ],
+    },
+    45: {
+      18: [
+        "CONSEJOS DE ENTRENADOR. Evita los chistes de Fernando"
+      ],
+    },
+    47: {
+      5: [
         "CONSEJOS DE ENTRENADOR",
         "¡No robes PKMN a otros entrenadores!",
-        "¡Captura solo PKMN salvajes!",
+        "¡Captura solo PKMN salvajes!"
       ],
-    },
-    1: {
-      2: ["SALIENDO DEL BOSQUECILLO", "VILLAMAYOR DE MONJARDÍN ADELANTE"],
     },
   },
   maps: {

@@ -1,3 +1,4 @@
+import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/pewter-museum-2f.png";
 import { MapId, MapType } from "./map-types";
 
@@ -21,12 +22,26 @@ const pewterMuseum2f: MapType = {
   },
   fences: {},
   grass: {},
-  text: {
+text: {
     2: {
-      11: ["TRANSBORDADOR ESPACIAL COLUMBIA"],
+      11: [
+        "Esta claro que te aburres agusto. Anda toma"
+      ],
     },
     5: {
-      2: ["Meteorito caído en el Monte Luna", "(\u00bfPIEDRA LUNAR?"],
+      2: [
+        "Mas movidas raras sin sentio... que haces aquí?"
+      ],
+    },
+  },
+  textRewards: {
+    2: {
+      11: {
+        type: "item",
+        itemKey: ItemType.RareCandy,
+        amount: 100,
+        questId: "text-reward-pewter-city-museum-2f-11-2",
+      },
     },
   },
   maps: {},
