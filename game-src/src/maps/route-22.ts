@@ -75,68 +75,60 @@ const route22: MapType = {
     x: 1,
     y: 16,
   },
-  trainers: [
-    {
-      npc: rival,
-      pokemon: [
-        {
-          id: 16,
-          level: 11,
-        },
-        {
-          id: 1,
-          level: 10,
-        },
-      ],
-      facing: Direction.Right,
-      intro: [
-        "¡Ey!",
-        "¿Vas a la LIGA PKMN?",
-        "¡Ni lo sueñes! ¡Seguro que no tienes ninguna MEDALLA!",
-        "¡El guardia no te dejará pasar!",
-        "Por cierto, ¿tus PKMN se han hecho más fuertes?",
-      ],
-      outtro: ["¡Vaya suerte la tuya!"],
-      money: 280,
-      pos: {
-        x: 25,
-        y: 5,
-      },
-    },
-    // Invitado musculoso — quiere ganarse su puesto en el banquete
-    {
-      npc: youngster,
-      pokemon: [
-        { id: 32, level: 8 },
-        { id: 21, level: 9 },
-      ],
-      facing: Direction.Right,
-      intro: [
-        "¡Yo también voy a la preboda!",
-        "¡Pero como solo hay un sitio libre en la mesa,",
-        "¡tendrás que ganártelo!",
-      ],
-      outtro: ["Está bien... disfruta del banquete."],
-      money: 160,
-      pos: { x: 15, y: 11 },
-    },
-    // Guardiana del acceso al lago — entrenadora decorativa
-    {
-      npc: lass,
-      pokemon: [
-        { id: 29, level: 8 },
-        { id: 19, level: 8 },
-      ],
-      facing: Direction.Down,
-      intro: [
-        "Este camino lleva al lago de los novios.",
-        "¡Nadie que no sepa luchar puede cruzarlo!",
-      ],
-      outtro: ["¡Bonito equipo! Te han guardado sitio en el banquete."],
-      money: 120,
-      pos: { x: 8, y: 8 },
-    },
+// Trainers para "route-22"
+trainers: [
+  {
+  npc: rival,
+  pokemon: [],
+  facing: Direction.Right,
+  pos: { x: 26, y: 5 },
+  intro: [
+    "¡Ey!",
+    "¿Vas a la LIGA PKMN?",
+    "¡Ni lo sueñes! ¡Seguro que no tienes ninguna MEDALLA!",
+    "¡El guardia no te dejará pasar!",
+    "Por cierto, ¿tus PKMN se han hecho más fuertes?",
+    "Pero que dices de una boda?"
   ],
+  outtro: [
+    "¡Vaya suerte la tuya!",
+        "Con lo tajao que parece que vas"
+  ],
+  money: 280,
+  persistent: true,
+},
+  {
+  npc: youngster,
+  pokemon: [{ id: 32, level: 8 }, { id: 21, level: 9 }],
+  facing: Direction.Right,
+  pos: { x: 16, y: 11 },
+  intro: [
+    "¡Yo también voy a la preboda!",
+    "¡Pero como solo hay un sitio libre en la mesa,",
+    "¡tendrás que ganártelo!"
+  ],
+  outtro: [
+    "Está bien... disfruta del banquete."
+  ],
+  money: 160,
+  persistent: true,
+},
+  {
+  npc: lass,
+  pokemon: [{ id: 29, level: 8 }, { id: 19, level: 8 }],
+  facing: Direction.Down,
+  pos: { x: 9, y: 6 },
+  intro: [
+    "Este camino lleva al lago de los novios.",
+    "¡Nadie que no sepa luchar puede cruzarlo!"
+  ],
+  outtro: [
+    "¡Bonito equipo! Te han guardado sitio en el banquete."
+  ],
+  money: 120,
+  persistent: true,
+}
+],
 };
 
 export default route22;

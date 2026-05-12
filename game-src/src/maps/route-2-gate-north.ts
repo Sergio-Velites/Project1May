@@ -22,19 +22,19 @@ const route2GateNorth: MapType = {
   fences: {},
   grass: {},
   text: {},
-  maps: {
+  
+
+  maps: {},
+teleports: {
     0: {
-      5: MapId.PewterCity,
+      5: { map: MapId.Route2, pos: { x: 2, y: 12 } },
     },
   },
-  exits: {
+exits: {
     7: [4, 5],
   },
-  exitReturnPos: {
-    x: 1,
-    y: 1,
-  },
-  exitReturnMap: MapId.ViridianForrest,
+exitReturnMap: MapId.ViridianForrest,
+exitReturnPos: { x: 1, y: 1 },
 };
 
 export default route2GateNorth;

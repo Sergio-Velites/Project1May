@@ -145,114 +145,131 @@ const viridianCity: MapType = {
     x: 11,
     y: 1,
   },
-  trainers: [
-    {
-      npc: cueBall,
-      pokemon: [{ id: 19, level: 6 }],
-      facing: Direction.Down,
-      pos: { x: 12, y: 20 },
-      intro: [
-        "¡Hemos montado nuestra propia preboda!",
-        "¡Con vino barato y sin protocolo!",
-        "¡Demuestra que mereces el bueno!",
-      ],
-      outtro: ["...igual el vino caro tampoco está tan mal."],
-      money: 80,
-    },
-    {
-      npc: jrTrainerFemale,
-      pokemon: [{ id: 41, level: 7 }],
-      facing: Direction.Left,
-      pos: { x: 26, y: 24 },
-      intro: [
-        "¡Nosotros también queremos brindar!",
-        "¡Pero solo si nos ganas!",
-      ],
-      outtro: ["¡Felicidades! ¡Brindamos juntos el 8 de agosto!"],
-      money: 100,
-    },
-    {
-      npc: teamRocketGrunt,
-      pokemon: [{ id: 33, level: 7 }, { id: 52, level: 6 }],
-      facing: Direction.Down,
-      pos: { x: 11, y: 11 },
-      intro: [
-        "¡Con este vino seremos los reyes de la fiesta!",
-        "¡No te metas en nuestros asuntos!",
-      ],
-      outtro: ["¡Maldición! Nos retiramos... pero volveremos por el anís."],
-      money: 200,
-    },
-    {
-      npc: gentleman,
-      pokemon: [{ id: 1, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 27, y: 22 },
-      persistent: true,
-      intro: [],
-      outtro: [
-        "Joven, el vino tinto cura... y anima.",
-        "Toma una botella para el camino.",
-        "¡Salud!",
-      ],
-      money: 0,
-    },
-    // DJ preparando el equipo — decorativo
-    {
-      npc: rocker,
-      pokemon: [{ id: 25, level: 1 }],
-      facing: Direction.Right,
-      pos: { x: 18, y: 8 },
-      persistent: true,
-      intro: [],
-      outtro: [
-        "¡El equipo de sonido ya está enchufado!",
-        "¡En cuanto lleguen los novios, esto se lía!",
-      ],
-      money: 0,
-    },
-    // Invitada madrugadora — ya está sentada reservando sitio
-    {
-      npc: lass,
-      pokemon: [{ id: 35, level: 3 }],
-      facing: Direction.Down,
-      pos: { x: 9, y: 4 },
-      persistent: true,
-      intro: [],
-      outtro: [
-        "Llegué la primera. Esta silla ya tiene dueña.",
-        "¡A ver si venís más tarde!",
-      ],
-      money: 0,
-    },
-    // Fotógrafo — moviéndose por el soto buscando el ángulo perfecto
-    {
-      npc: sailor,
-      pokemon: [{ id: 54, level: 5 }],
-      facing: Direction.Left,
-      pos: { x: 14, y: 20 },
-      persistent: true,
-      intro: [],
-      outtro: [
-        "¡Quieto! ¡Esto es para las fotos del álbum!",
-        "¡La luz aquí es perfecta!",
-      ],
-      money: 0,
-    },
-    // Invitado perdido — combatible
-    {
-      npc: fisher,
-      pokemon: [{ id: 118, level: 7 }, { id: 129, level: 6 }],
-      facing: Direction.Down,
-      pos: { x: 15, y: 30 },
-      intro: [
-        "¡No sé dónde es la preboda!",
-        "¡Y encima tú te has metido en mi camino!",
-      ],
-      outtro: ["Gracias... Creo que es por aquí."],
-      money: 60,
-    },
+// Trainers para "viridian-city"
+trainers: [
+  {
+  npc: cueBall,
+  pokemon: [{ id: 19, level: 6 }],
+  facing: Direction.Down,
+  pos: { x: 12, y: 20 },
+  intro: [
+    "¡Hemos montado nuestra propia preboda!",
+    "¡Con vino barato y sin protocolo!",
+    "¡Demuestra que mereces el bueno!"
   ],
+  outtro: [
+    "...igual el vino caro tampoco está tan mal."
+  ],
+  money: 80,
+  persistent: true,
+},
+  {
+  npc: jrTrainerFemale,
+  pokemon: [{ id: 41, level: 7 }],
+  facing: Direction.Right,
+  pos: { x: 26, y: 24 },
+  intro: [
+    "¡Nosotros también queremos brindar!",
+    "¡Pero solo si nos ganas!"
+  ],
+  outtro: [
+    "¡Felicidades! ¡Brindamos juntos el 8 de agosto!"
+  ],
+  money: 100,
+  persistent: true,
+},
+  {
+  npc: teamRocketGrunt,
+  pokemon: [{ id: 33, level: 7 }, { id: 52, level: 6 }],
+  facing: Direction.Down,
+  pos: { x: 19, y: 12 },
+  intro: [
+    "¡Con este vino seremos los reyes de la fiesta!",
+    "¡No te metas en nuestros asuntos!"
+  ],
+  outtro: [
+    "¡Maldición! Nos retiramos... pero volveremos por el anís."
+  ],
+  money: 200,
+  persistent: true,
+},
+  {
+  npc: gentleman,
+  pokemon: [{ id: 1, level: 1 }],
+  facing: Direction.Down,
+  pos: { x: 27, y: 22 },
+  intro: [
+
+  ],
+  outtro: [
+    "Joven, el vino tinto cura... y anima.",
+    "Toma una botella para el camino.",
+    "¡Salud!"
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: rocker,
+  pokemon: [{ id: 25, level: 1 }],
+  facing: Direction.Right,
+  pos: { x: 18, y: 8 },
+  intro: [
+
+  ],
+  outtro: [
+    "¡El equipo de sonido ya está enchufado!",
+    "¡En cuanto lleguen los novios, esto se lía!"
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: lass,
+  pokemon: [{ id: 35, level: 3 }],
+  facing: Direction.Left,
+  pos: { x: 9, y: 4 },
+  intro: [
+
+  ],
+  outtro: [
+    "Llegué la primera. Esta silla ya tiene dueña.",
+    "¡A ver si venís más tarde!"
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: sailor,
+  pokemon: [{ id: 54, level: 5 }],
+  facing: Direction.Left,
+  pos: { x: 20, y: 21 },
+  intro: [
+
+  ],
+  outtro: [
+    "¡Quieto! ¡Esto es para las fotos del álbum!",
+    "¡La luz aquí es perfecta!"
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: fisher,
+  pokemon: [{ id: 118, level: 7 }, { id: 129, level: 6 }],
+  facing: Direction.Down,
+  pos: { x: 15, y: 30 },
+  intro: [
+    "¡No sé dónde es la preboda!",
+    "¡Y encima tú te has metido en mi camino!"
+  ],
+  outtro: [
+    "Gracias... Creo que es por aquí."
+  ],
+  money: 60,
+  persistent: true,
+}
+],
 };
 
 export default viridianCity;

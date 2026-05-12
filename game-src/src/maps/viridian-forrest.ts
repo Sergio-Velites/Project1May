@@ -169,8 +169,8 @@ text: {
     47: {
       5: [
         "CONSEJOS DE ENTRENADOR",
-        "¡No robes PKMN a otros entrenadores!",
-        "¡Captura solo PKMN salvajes!"
+        "¡No robes vino!",
+        "¡compártelo!"
       ],
     },
   },
@@ -189,146 +189,149 @@ text: {
     y: 1,
   },
   exitReturnMap: MapId.Route2Gate,
-  trainers: [
-    {
-      npc: bugCatcher,
-      facing: Direction.Left,
-      pokemon: [
-        {
-          id: 13,
-          level: 12,
-        },
-      ],
-      intro: ["¡Detente, invitado de la boda!", "¡Primero debes combatir!"],
-      outtro: ["¡Qué batalla tan emocionante!", "¡Sigue tu camino, valiente!"],
-      money: 60,
-      pos: {
-        x: 2,
-        y: 18,
-      },
-    },
-    {
-      npc: bugCatcher,
-      facing: Direction.Left,
-      pokemon: [
-        {
-          id: 13,
-          level: 10,
-        },
-        {
-          id: 14,
-          level: 10,
-        },
-        {
-          id: 13,
-          level: 10,
-        },
-      ],
-      intro: ["¡Los insectos son los mejores!", "¡Protegen el bosque de la boda!"],
-      outtro: ["¡Bien luchado!", "¡Disfruta la celebración!"],
-      money: 70,
-      pos: {
-        x: 29,
-        y: 19,
-      },
-    },
-    {
-      npc: bugCatcher,
-      facing: Direction.Left,
-      pokemon: [
-        {
-          id: 13,
-          level: 9,
-        },
-        {
-          id: 10,
-          level: 9,
-        },
-      ],
-      intro: ["¡Nadie pasa sin combatir!", "¡Así lo dice la ley del bosque!"],
-      outtro: ["¡Felicidades a los novios!", "¡Que sean muy felices!"],
-      money: 60,
-      pos: {
-        x: 30,
-        y: 33,
-      },
-    },
-    {
-      npc: beauty,
-      facing: Direction.Down,
-      pokemon: [{ id: 16, level: 4 }],
-      intro: [],
-      outtro: ["¡Corre, que la barra libre se acaba!"],
-      money: 0,
-      pos: { x: 8, y: 10 },
-    },
-    {
-      npc: lass,
-      facing: Direction.Right,
-      pokemon: [{ id: 35, level: 4 }],
-      intro: [],
-      outtro: ["¡El DJ ya está calentando! ¡Mueve las piernas!"],
-      money: 0,
-      pos: { x: 20, y: 38 },
-    },
-    {
-      npc: teamRocketGrunt,
-      facing: Direction.Down,
-      pokemon: [{ id: 52, level: 10 }, { id: 41, level: 9 }],
-      intro: [
-        "¡Teníamos un plan perfecto!",
-        "¡Queríamos los Pokémon de la boda!",
-        "...pero nos llevamos este anís de mientras.",
-      ],
-      outtro: ["¡Que disfrutes de la preboda, crío!"],
-      money: 150,
-      pos: { x: 16, y: 6 },
-    },
-    // Senderista con mapa — decorativo, da orientación
-    {
-      npc: hiker,
-      pokemon: [{ id: 74, level: 7 }],
-      facing: Direction.Right,
-      pos: { x: 7, y: 3 },
-      persistent: true,
-      intro: [],
-      outtro: [
-        "¡Este bosque lleva directo a VILLAMAYOR!",
-        "Sigue hacia el norte y no te metas en la hierba alta.",
-        "¡Los bichos aquí pican fuerte!",
-      ],
-      money: 0,
-    },
-    // Fan de la boda — combatible, quiere demostrar que merece el banquete
-    {
-      npc: pokeManiac,
-      pokemon: [{ id: 46, level: 11 }, { id: 48, level: 10 }],
-      facing: Direction.Down,
-      pos: { x: 21, y: 11 },
-      intro: [
-        "¡Llevo tres días leyendo el menú del banquete!",
-        "¡Nadie merece ese chuletón más que yo!",
-        "¡Demuestra que tú sí lo mereces!",
-      ],
-      outtro: ["Vale, vale... tú te lo ganas más que yo."],
-      money: 120,
-    },
-    // Niño perdido — decorativo, lleva buscando a sus padres desde la entrada
-    {
-      npc: lass,
-      pokemon: [{ id: 10, level: 5 }],
-      facing: Direction.Left,
-      pos: { x: 5, y: 22 },
-      persistent: true,
-      intro: [],
-      outtro: [
-        "¿Has visto a mis padres?",
-        "Se llaman Juan y María...",
-        "¡Llevan corbata de lunares los dos!",
-      ],
-      money: 0,
-    },
+// Trainers para "viridian-forrest"
+trainers: [
+  {
+  npc: bugCatcher,
+  pokemon: [],
+  facing: Direction.Left,
+  pos: { x: 29, y: 19 },
+  intro: [
+    "¡Detente, invitado de la boda!",
+    "¡Primero debes combatir!"
   ],
+  outtro: [
+    "¡Qué batalla tan emocionante!",
+    "¡Sigue tu camino, valiente!"
+  ],
+  money: 60,
+
+},
+  {
+  npc: bugCatcher,
+  pokemon: [],
+  facing: Direction.Left,
+  pos: { x: 28, y: 33 },
+  intro: [
+    "¡Los insectos son los mejores!",
+    "¡Protegen el bosque de la boda!"
+  ],
+  outtro: [
+    "¡Bien luchado!",
+    "¡Disfruta la celebración!"
+  ],
+  money: 70,
+
+},
+  {
+  npc: bugCatcher,
+  pokemon: [],
+  facing: Direction.Left,
+  pos: { x: 2, y: 19 },
+  intro: [
+    "¡Nadie pasa sin combatir!",
+    "¡Así lo dice la ley del bosque!"
+  ],
+  outtro: [
+    "¡Felicidades a los novios!",
+    "¡Que sean muy felices!"
+  ],
+  money: 60,
+
+},
+  {
+  npc: beauty,
+  pokemon: [{ id: 16, level: 4 }],
+  facing: Direction.Down,
+  pos: { x: 25, y: 8 },
+  intro: [
+
+  ],
+  outtro: [
+    "¡Corre, que la barra libre se acaba!"
+  ],
+  money: 0,
+
+},
+  {
+  npc: lass,
+  pokemon: [{ id: 35, level: 4 }],
+  facing: Direction.Right,
+  pos: { x: 20, y: 38 },
+  intro: [
+
+  ],
+  outtro: [
+    "¡El DJ ya está calentando! ¡Mueve las piernas!"
+  ],
+  money: 0,
+
+},
+  {
+  npc: teamRocketGrunt,
+  pokemon: [{ id: 52, level: 10 }, { id: 41, level: 9 }],
+  facing: Direction.Down,
+  pos: { x: 16, y: 6 },
+  intro: [
+    "¡Teníamos un plan perfecto!",
+    "¡Queríamos los Pokémon de la boda!",
+    "...pero nos llevamos este anís de mientras."
+  ],
+  outtro: [
+    "¡Que disfrutes de la preboda, crío!"
+  ],
+  money: 150,
+
+},
+  {
+  npc: hiker,
+  pokemon: [{ id: 74, level: 7 }],
+  facing: Direction.Right,
+  pos: { x: 6, y: 3 },
+  intro: [
+
+  ],
+  outtro: [
+    "¡Este bosque lleva directo a VILLAMAYOR!",
+    "Sigue hacia el norte y no te metas en la hierba alta.",
+    "¡Los bichos aquí pican fuerte!"
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: pokeManiac,
+  pokemon: [{ id: 46, level: 11 }, { id: 48, level: 10 }],
+  facing: Direction.Down,
+  pos: { x: 13, y: 11 },
+  intro: [
+    "¡Llevo tres días leyendo el menú del banquete!",
+    "¡Nadie merece ese chuletón más que yo!",
+    "¡Demuestra que tú sí lo mereces!"
+  ],
+  outtro: [
+    "Vale, vale... tú te lo ganas más que yo."
+  ],
+  money: 120,
+
+},
+  {
+  npc: lass,
+  pokemon: [{ id: 10, level: 5 }],
+  facing: Direction.Left,
+  pos: { x: 5, y: 22 },
+  intro: [
+
+  ],
+  outtro: [
+    "¿Has visto a mis padres?",
+    "Se llaman Juan y María...",
+    "¡Llevan corbata de lunares los dos!"
+  ],
+  money: 0,
+  persistent: true,
+}
+],
   items: [
     {
       item: ItemType.PokeBall,
