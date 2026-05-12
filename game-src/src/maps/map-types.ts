@@ -109,6 +109,24 @@ export interface MapItemType {
 }
 
 /**
+ * Recompensa opcional asociada a un tile de texto (map.textRewards[y][x]).
+ * Cuando el jugador lee el texto completo se le ofrece el premio.
+ * Una vez aceptado, `questId` se añade a `completedQuests` y el texto
+ * queda bloqueado permanentemente.
+ */
+export interface TextReward {
+  type: "pokemon" | "item";
+  /** Solo si type === "pokemon" */
+  pokemonId?: number;
+  level?: number;
+  /** Solo si type === "item" */
+  itemKey?: ItemType;
+  amount?: number;
+  /** ID único de quest. Se recomienda el formato: "text-reward-<mapId>-<x>-<y>" */
+  questId: string;
+}
+
+/**
  * Pokéball-regalo declarativa colocada desde el editor de mapas.
  * Al pulsar A en su posición, el jugador recibe el pokémon (si tiene hueco)
  * y la pokéball desaparece persistiendo el estado vía `completeQuest(questId)`.
@@ -134,6 +152,8 @@ export interface MapType {
   start: PosType;
   walls: Record<number, number[]>;
   text: Record<number, Record<number, string[]>>;
+  /** Recompensas opcionales ligadas a tiles de texto. Mismo sistema de coordenadas que `text`. */
+  textRewards?: Record<number, Record<number, TextReward>>;
   maps: Record<number, Record<number, MapId>>;
   teleports?: Record<number, Record<number, MapWithPos>>;
   exits: Record<number, number[]>;

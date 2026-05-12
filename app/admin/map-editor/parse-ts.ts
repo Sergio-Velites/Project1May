@@ -31,11 +31,21 @@ export interface ParsedGift {
   questId: string;
 }
 
+export interface ParsedTextReward {
+  type: 'pokemon' | 'item';
+  pokemonId?: number;
+  level?: number;
+  itemKey?: string;
+  amount?: number;
+  questId: string;
+}
+
 export interface ParsedMap {
   walls: Record<string, number[]>;
   fences: Record<string, number[]>;
   grass: Record<string, number[]>;
   texts: Record<string, Record<string, string[]>>;
+  textRewards: Record<string, Record<string, ParsedTextReward>>;
   items: ParsedItem[];
   gifts: ParsedGift[];
   trainers: ParsedTrainer[];
@@ -388,12 +398,76 @@ function parseTrainers(tsText: string): ParsedTrainer[] {
 
 // ── API pública ──────────────────────────────────────────────────────────
 
+function parseTextRewardsField(tsText: string): Record<string, Record<string, ParsedTextReward>> {
+  const m = tsText.match(/(?<![\w])textRewards\s*:\s*\{/);
+  if (!m || m.index === undefined) return {};
+  const blockStart = tsText.indexOf('{', m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, blockStart);
+  if (!blk) return {};
+
+  const result: Record<string, Record<string, ParsedTextReward>> = {};
+  const inner = blk.text.slice(1, -1);
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    if (!numMatch) { i++; continue; }
+    const rowKey = numMatch[1];
+    i += numMatch[0].length - 1;
+    const subBlk = findBalancedBlock(inner, i);
+    if (!subBlk) break;
+
+    const rowInner = subBlk.text.slice(1, -1);
+    const cols: Record<string, ParsedTextReward> = {};
+    let j = 0;
+    while (j < rowInner.length) {
+      while (j < rowInner.length && /\s|,/.test(rowInner[j])) j++;
+      if (j >= rowInner.length) break;
+      const colMatch = rowInner.slice(j).match(/^(-?\d+)\s*:\s*\{/);
+      if (!colMatch) { j++; continue; }
+      const colKey = colMatch[1];
+      j += colMatch[0].length - 1;
+      const objBlk = findBalancedBlock(rowInner, j);
+      if (!objBlk) break;
+      const obj = objBlk.text;
+
+      const typeM = obj.match(/type\s*:\s*["']?(pokemon|item)["']?/);
+      const questM = obj.match(/questId\s*:\s*["']([^"']+)["']/);
+      if (!typeM || !questM) { j = objBlk.end + 1; continue; }
+
+      const reward: ParsedTextReward = {
+        type: typeM[1] as 'pokemon' | 'item',
+        questId: questM[1],
+      };
+      if (reward.type === 'pokemon') {
+        const pid = obj.match(/pokemonId\s*:\s*(\d+)/);
+        const lvl = obj.match(/level\s*:\s*(\d+)/);
+        if (pid) reward.pokemonId = parseInt(pid[1], 10);
+        if (lvl) reward.level = parseInt(lvl[1], 10);
+      } else {
+        const ik = obj.match(/itemKey\s*:\s*ItemType\.(\w+)/);
+        const amt = obj.match(/amount\s*:\s*(\d+)/);
+        if (ik) reward.itemKey = ik[1];
+        if (amt) reward.amount = parseInt(amt[1], 10);
+      }
+      cols[colKey] = reward;
+      j = objBlk.end + 1;
+    }
+    result[rowKey] = cols;
+    i = subBlk.end + 1;
+  }
+  return result;
+}
+
+
 export function parseMapTS(tsText: string): ParsedMap {
   return {
     walls: parseRowColMap(tsText, 'walls'),
     fences: parseRowColMap(tsText, 'fences'),
     grass: parseRowColMap(tsText, 'grass'),
     texts: parseTextField(tsText),
+    textRewards: parseTextRewardsField(tsText),
     items: parseItemsField(tsText),
     gifts: parseGiftsField(tsText),
     trainers: parseTrainers(tsText),

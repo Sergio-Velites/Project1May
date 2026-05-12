@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { ItemType } from "../app/use-item-data";
 import { Direction } from "./state-types";
-import { SimpleGiftType } from "../maps/map-types";
+import { SimpleGiftType, TextReward } from "../maps/map-types";
 
 interface TextThenActionType {
   text: string[];
@@ -53,6 +53,7 @@ interface UiState {
   academyPokeballOpen: boolean;
   onlineBattleMenu: boolean;
   mapGiftPending: SimpleGiftType | null;
+  textRewardPending: TextReward | null;
   // Counter incrementado cada vez que el jugador consume su turno de combate
   // sin atacar (cambio de Pokémon o uso de objeto). PokemonEncounter lo
   // observa para encadenar el ataque del rival inmediatamente después.
@@ -84,6 +85,7 @@ const initialState: UiState = {
   academyPokeballOpen: false,
   onlineBattleMenu: false,
   mapGiftPending: null,
+  textRewardPending: null,
   playerTurnTick: 0,
 };
 
@@ -230,6 +232,12 @@ export const uiSlice = createSlice({
     closeMapGift: (state) => {
       state.mapGiftPending = null;
     },
+    openTextReward: (state, action: PayloadAction<TextReward>) => {
+      state.textRewardPending = action.payload;
+    },
+    closeTextReward: (state) => {
+      state.textRewardPending = null;
+    },
     incrementPlayerTurnTick: (state) => {
       state.playerTurnTick += 1;
     },
@@ -280,6 +288,8 @@ export const {
   hideOnlineBattleMenu,
   openMapGift,
   closeMapGift,
+  openTextReward,
+  closeTextReward,
   incrementPlayerTurnTick,
 } = uiSlice.actions;
 
@@ -332,7 +342,8 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.pokeballCardId !== null ||
   state.ui.academyPokeballOpen ||
   state.ui.onlineBattleMenu ||
-  state.ui.mapGiftPending !== null;
+  state.ui.mapGiftPending !== null ||
+  state.ui.textRewardPending !== null;
 
 export const selectStartMenuSubOpen = (state: RootState) =>
   state.ui.itemsMenu || state.ui.playerMenu;
@@ -368,6 +379,9 @@ export const selectOnlineBattleMenu = (state: RootState) =>
 
 export const selectMapGiftPending = (state: RootState) =>
   state.ui.mapGiftPending;
+
+export const selectTextRewardPending = (state: RootState) =>
+  state.ui.textRewardPending;
 
 export const selectPlayerTurnTick = (state: RootState) =>
   state.ui.playerTurnTick;

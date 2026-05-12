@@ -5,8 +5,9 @@ import {
   selectPos,
   selectMap,
   selectMapId,
+  selectCompletedQuests,
 } from "../state/gameSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useEvent from "../app/use-event";
 import emitter, { Event } from "../app/emitter";
 import {
@@ -14,6 +15,7 @@ import {
   selectMenuOpen,
   selectText,
   showText,
+  openTextReward,
 } from "../state/uiSlice";
 import { Direction } from "../state/state-types";
 import { useActiveMapQuests } from "../app/use-quests";
@@ -89,7 +91,12 @@ const Text = () => {
   const menuOpen = useSelector(selectMenuOpen);
   const text = useSelector(selectText);
   const mapId = useSelector(selectMapId);
+  const completedQuests = useSelector(selectCompletedQuests);
   const quests = useActiveMapQuests(mapId);
+
+  // Guarda el tile que originó el texto actual (solo para tiles de mapa).
+  // Se usa al cerrar el último frame para comprobar si hay recompensa pendiente.
+  const currentTextTileRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     setLiveIndex(0);
@@ -106,8 +113,17 @@ const Text = () => {
     // Reading text
     if (text) {
       if (textIndex === text.length - 1) {
+        const tile = currentTextTileRef.current;
+        currentTextTileRef.current = null;
         setTextIndex(0);
         dispatch(hideText());
+        // Comprobar si el tile tiene recompensa pendiente
+        if (tile) {
+          const reward = map.textRewards?.[tile.y]?.[tile.x];
+          if (reward && !completedQuests.includes(reward.questId)) {
+            dispatch(openTextReward(reward));
+          }
+        }
       } else {
         setTextIndex((prev) => prev + 1);
       }
@@ -147,6 +163,11 @@ const Text = () => {
 
     // Open new textbox
     if (map.text[y] && map.text[y][x] && map.text[y][x].length > 0) {
+      // Si este tile tiene recompensa y ya fue tomada, no volver a abrir
+      const reward = map.textRewards?.[y]?.[x];
+      if (reward && completedQuests.includes(reward.questId)) return;
+
+      currentTextTileRef.current = { x, y };
       emitter.emit(Event.StopMoving);
       dispatch(showText(map.text[y][x]));
     }

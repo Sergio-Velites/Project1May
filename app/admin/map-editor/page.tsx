@@ -72,6 +72,14 @@ interface PortalEntry {
 
 interface ItemEntry { itemKey: string; pos: { x: number; y: number }; hidden?: boolean; }
 interface GiftEntry { pokemonId: number; level: number; pos: { x: number; y: number }; questId: string; }
+interface TextRewardEntry {
+  type: 'pokemon' | 'item';
+  pokemonId?: number;
+  level?: number;
+  itemKey?: string;
+  amount?: number;
+  questId: string;
+}
 
 // ── NPC Registry ──────────────────────────────────────────────────────────
 
@@ -258,6 +266,37 @@ function exportSpotTS(field: string, pos: { x: number; y: number } | null | unde
   return `${field}: { x: ${pos.x}, y: ${pos.y} },`;
 }
 
+function exportTextRewardsTS(textRewards: Record<string, Record<string, TextRewardEntry>>): string {
+  const rows = Object.keys(textRewards)
+    .map((k) => parseInt(k, 10))
+    .filter((n) => !Number.isNaN(n))
+    .sort((a, b) => a - b);
+  if (rows.length === 0) return '';
+  const rowLines = rows.map((r) => {
+    const cols = Object.keys(textRewards[String(r)] ?? {})
+      .map((k) => parseInt(k, 10))
+      .filter((n) => !Number.isNaN(n))
+      .sort((a, b) => a - b);
+    const colLines = cols.map((c) => {
+      const rw = textRewards[String(r)][String(c)];
+      const lines: string[] = [`      ${c}: {`, `        type: "${rw.type}",`];
+      if (rw.type === 'pokemon') {
+        if (rw.pokemonId !== undefined) lines.push(`        pokemonId: ${rw.pokemonId},`);
+        if (rw.level !== undefined) lines.push(`        level: ${rw.level},`);
+      } else {
+        if (rw.itemKey) lines.push(`        itemKey: ItemType.${rw.itemKey},`);
+        if (rw.amount !== undefined && rw.amount !== 1) lines.push(`        amount: ${rw.amount},`);
+      }
+      lines.push(`        questId: "${escapeTSString(rw.questId)}",`);
+      lines.push(`      },`);
+      return lines.join('\n');
+    });
+    return `    ${r}: {\n${colLines.join('\n')}\n    },`;
+  });
+  return `textRewards: {\n${rowLines.join('\n')}\n  },`;
+}
+
+
 // ── Portales: flatten/nest entre el shape de MapType y un array plano editable ──
 
 function flattenPortals(m: MapEntry): PortalEntry[] {
@@ -420,6 +459,7 @@ export default function MapEditor() {
   const [fences, setFences] = useState<Record<string, number[]>>({});
   const [grass, setGrass] = useState<Record<string, number[]>>({});
   const [texts, setTexts] = useState<Record<string, Record<string, string[]>>>({});
+  const [textRewards, setTextRewards] = useState<Record<string, Record<string, TextRewardEntry>>>({});
   const [items, setItems] = useState<ItemEntry[]>([]);
   const [gifts, setGifts] = useState<GiftEntry[]>([]);
   const [pokemonCenter, setPokemonCenter] = useState<{ x: number; y: number } | null>(null);
@@ -485,6 +525,7 @@ export default function MapEditor() {
     setFences(m.fences ?? {});
     setGrass(m.grass ?? {});
     setTexts(m.texts ?? {});
+    setTextRewards((m as MapEntry & { textRewards?: Record<string, Record<string, TextRewardEntry>> }).textRewards ?? {});
     setItems(m.items ?? []);
     setGifts(m.gifts ?? []);
     setPokemonCenter(m.pokemonCenter ?? null);
@@ -520,7 +561,7 @@ export default function MapEditor() {
             fences,
             grass,
             texts,
-            // items y gifts: convertir a formato MapType (item: ItemType, hidden) o (gifts entries)
+            textRewards,
             items: items.map((it) => ({
               itemKey: it.itemKey,
               pos: it.pos,
@@ -624,7 +665,9 @@ export default function MapEditor() {
 
   function doExportTexts() {
     const ts = exportTextsTS(texts);
-    navigator.clipboard.writeText(ts).then(() => alert('¡Texts copiados!'));
+    const rewards = exportTextRewardsTS(textRewards);
+    const combined = rewards ? `${ts}\n  ${rewards}` : ts;
+    navigator.clipboard.writeText(combined).then(() => alert('¡Texts + rewards copiados!'));
   }
 
   function doExportItems() {
@@ -691,6 +734,7 @@ export default function MapEditor() {
       setFences(parsed.fences);
       setGrass(parsed.grass);
       setTexts(parsed.texts);
+      setTextRewards(parsed.textRewards ?? {});
       setItems(parsed.items);
       setGifts(parsed.gifts);
       setPokemonCenter(parsed.pokemonCenter);
@@ -899,6 +943,19 @@ export default function MapEditor() {
         next[newRow] = { ...(next[newRow] ?? {}), [newCol]: lines };
         return next;
       });
+      // Arrastrar también la recompensa si la hay
+      setTextRewards((prev) => {
+        const reward = prev[oldRow]?.[oldCol];
+        if (!reward) return prev;
+        if (prev[newRow]?.[newCol]) return prev; // destino ocupado
+        const next = { ...prev };
+        const oldRowObj = { ...(next[oldRow] ?? {}) };
+        delete oldRowObj[oldCol];
+        if (Object.keys(oldRowObj).length === 0) delete next[oldRow];
+        else next[oldRow] = oldRowObj;
+        next[newRow] = { ...(next[newRow] ?? {}), [newCol]: reward };
+        return next;
+      });
       drag.row = tileY;
       drag.col = tileX;
       drag.moved = true;
@@ -973,10 +1030,20 @@ export default function MapEditor() {
         initial,
       );
       if (input === null) return;
+      // ── Actualizar texto ──
       setTexts((prev) => {
         const nextRow = { ...(prev[rowKey] ?? {}) };
         if (input.trim() === '') {
           delete nextRow[colKey];
+          // Si se borra el texto, borrar también la recompensa asociada
+          setTextRewards((pr) => {
+            const nr = { ...(pr[rowKey] ?? {}) };
+            delete nr[colKey];
+            const n = { ...pr };
+            if (Object.keys(nr).length === 0) delete n[rowKey];
+            else n[rowKey] = nr;
+            return n;
+          });
         } else {
           nextRow[colKey] = input.split('\n').map((s) => s.trim()).filter((s) => s.length > 0);
         }
@@ -986,6 +1053,68 @@ export default function MapEditor() {
         return next;
       });
       setDirty(true);
+      // ── Configurar recompensa (solo si hay texto) ──
+      if (input.trim() !== '') {
+        const existingReward = textRewards[rowKey]?.[colKey];
+        const rewardChoice = window.prompt(
+          `Recompensa en (${tile.x}, ${tile.y}):\n` +
+          `  "pokemon" → dar un Pokémon\n` +
+          `  "item"    → dar un objeto\n` +
+          `  "-"       → quitar recompensa\n` +
+          `  [Cancelar]→ dejar como está\n` +
+          `\nActual: ${existingReward ? `${existingReward.type} (${existingReward.questId})` : 'ninguna'}`,
+          existingReward ? existingReward.type : '-',
+        );
+        if (rewardChoice === null) return; // cancelar → no tocar recompensa
+        if (rewardChoice.trim() === '-' || rewardChoice.trim() === '') {
+          // Quitar recompensa
+          setTextRewards((pr) => {
+            const nr = { ...(pr[rowKey] ?? {}) };
+            delete nr[colKey];
+            const n = { ...pr };
+            if (Object.keys(nr).length === 0) delete n[rowKey];
+            else n[rowKey] = nr;
+            return n;
+          });
+          setDirty(true);
+        } else if (rewardChoice.trim() === 'item') {
+          const itemKey = window.prompt('ItemType del objeto (ej. Potion, PokeBall, Tm12):', existingReward?.itemKey ?? 'Potion');
+          if (!itemKey) return;
+          if (!itemTypeKeys.includes(itemKey.trim())) {
+            alert(`ItemType inválido: ${itemKey}. Disponibles: ${itemTypeKeys.slice(0, 12).join(', ')}…`);
+            return;
+          }
+          const amountStr = window.prompt('Cantidad (por defecto 1):', String(existingReward?.amount ?? 1));
+          const amount = parseInt(amountStr ?? '1', 10) || 1;
+          const defaultQuestId = `text-reward-${selectedMapId}-${tile.x}-${tile.y}`;
+          const questId = window.prompt('questId único (dejar para usar automático):', existingReward?.questId ?? defaultQuestId);
+          if (!questId) return;
+          const newReward: TextRewardEntry = { type: 'item', itemKey: itemKey.trim(), amount, questId: questId.trim() };
+          setTextRewards((pr) => {
+            const nr = { ...(pr[rowKey] ?? {}), [colKey]: newReward };
+            return { ...pr, [rowKey]: nr };
+          });
+          setDirty(true);
+        } else if (rewardChoice.trim() === 'pokemon') {
+          const pidStr = window.prompt('ID del Pokémon (1-151):', String(existingReward?.pokemonId ?? 1));
+          const pokemonId = parseInt(pidStr ?? '1', 10);
+          if (!pokemonId || pokemonId < 1 || pokemonId > 251) {
+            alert('ID de Pokémon inválido (1-251).');
+            return;
+          }
+          const lvlStr = window.prompt('Nivel:', String(existingReward?.level ?? 5));
+          const level = parseInt(lvlStr ?? '5', 10) || 5;
+          const defaultQuestId = `text-reward-${selectedMapId}-${tile.x}-${tile.y}`;
+          const questId = window.prompt('questId único:', existingReward?.questId ?? defaultQuestId);
+          if (!questId) return;
+          const newReward: TextRewardEntry = { type: 'pokemon', pokemonId, level, questId: questId.trim() };
+          setTextRewards((pr) => {
+            const nr = { ...(pr[rowKey] ?? {}), [colKey]: newReward };
+            return { ...pr, [rowKey]: nr };
+          });
+          setDirty(true);
+        }
+      }
       return;
     }
     if (editMode === 'items') {
@@ -1448,10 +1577,13 @@ export default function MapEditor() {
                   const y = parseInt(rowKey, 10);
                   const x = parseInt(colKey, 10);
                   if (Number.isNaN(y) || Number.isNaN(x)) return null;
+                  const hasReward = !!textRewards[rowKey]?.[colKey];
+                  const rewardEntry = textRewards[rowKey]?.[colKey];
+                  const rewardIcon = rewardEntry?.type === 'pokemon' ? '⭐' : rewardEntry?.type === 'item' ? '📦' : '';
                   return (
                     <div
                       key={`t-${y}-${x}`}
-                      title={cols[colKey].join('\n')}
+                      title={cols[colKey].join('\n') + (rewardEntry ? `\n[Recompensa: ${rewardEntry.type}${rewardEntry.type === 'item' ? ` ${rewardEntry.itemKey}` : ` #${rewardEntry.pokemonId} lv${rewardEntry.level}`}]` : '')}
                       onPointerDown={editMode === 'texts' ? (e) => onEntityPointerDown(e, { kind: 'text', row: y, col: x }) : undefined}
                       style={{
                         position: 'absolute',
@@ -1460,11 +1592,11 @@ export default function MapEditor() {
                         width: zoom,
                         height: zoom,
                         background: editMode === 'texts'
-                          ? 'rgba(80, 160, 255, 0.45)'
-                          : 'rgba(80, 160, 255, 0.18)',
+                          ? (hasReward ? 'rgba(255, 200, 80, 0.45)' : 'rgba(80, 160, 255, 0.45)')
+                          : (hasReward ? 'rgba(255, 200, 80, 0.22)' : 'rgba(80, 160, 255, 0.18)'),
                         border: editMode === 'texts'
-                          ? '1px solid rgba(120, 180, 255, 0.95)'
-                          : '1px dashed rgba(120, 180, 255, 0.4)',
+                          ? (hasReward ? '1px solid rgba(255, 220, 80, 0.95)' : '1px solid rgba(120, 180, 255, 0.95)')
+                          : (hasReward ? '1px dashed rgba(255, 200, 80, 0.5)' : '1px dashed rgba(120, 180, 255, 0.4)'),
                         pointerEvents: editMode === 'texts' ? 'auto' : 'none',
                         cursor: editMode === 'texts' ? 'grab' : 'default',
                         boxSizing: 'border-box',
@@ -1472,12 +1604,12 @@ export default function MapEditor() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontSize: Math.max(10, zoom * 0.4),
-                        color: '#88ccff',
+                        color: hasReward ? '#ffdd88' : '#88ccff',
                         textShadow: '0 0 2px #000',
                         touchAction: 'none',
                       }}
                     >
-                      💬
+                      {hasReward ? rewardIcon : '💬'}
                     </div>
                   );
                 }).filter(Boolean)
@@ -1743,9 +1875,9 @@ export default function MapEditor() {
                 title="Modo Texts"
                 color="#88ccff"
                 lines={[
-                  'Click en una casilla → abre prompt',
-                  'Una línea por mensaje, vacío para borrar',
-                  'Aparece al pulsar A en esa casilla',
+                  'Click en una casilla → texto + recompensa',
+                  'Recompensa: pokemon ⭐ o item 📦 (se bloquea al tomar)',
+                  'Sin recompensa → texto siempre visible 💬',
                 ]}
                 count={Object.values(texts).reduce((a, m) => a + Object.keys(m).length, 0)}
                 countLabel="textos"

@@ -41,6 +41,7 @@ import AcademyPokeball from "./AcademyPokeball";
 import AcademyPokeballModal from "./AcademyPokeballModal";
 import MapGift from "./MapGift";
 import MapGiftModal from "./MapGiftModal";
+import TextRewardModal from "./TextRewardModal";
 import OnlineBattleNpc from "./OnlineBattleNpc";
 import OnlineBattleMenu from "./OnlineBattleMenu";
 import { selectPokedexOpen, hidePokedex } from "../state/uiSlice";
@@ -157,6 +158,7 @@ const Game = () => {
       <LabPokeballModal />
       <AcademyPokeballModal />
       <MapGiftModal />
+      <TextRewardModal />
       {pokedexOpen && <Pokedex onClose={() => dispatch(hidePokedex())} />}
       <LoadScreen />
       <TitleScreen />
