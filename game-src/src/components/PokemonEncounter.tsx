@@ -60,7 +60,7 @@ import {
 import useIsMobile from "../app/use-is-mobile";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { MoveMetadata } from "../app/move-metadata";
-import processMove, { MoveResult, StatStages, DEFAULT_STAGES, getStageMult, StatusApply, isSelfTargetingStatusMove } from "../app/move-helper";
+import processMove, { MoveResult, StatStages, DEFAULT_STAGES, getStageMult, StatusApply, isSelfTargetingStatusMove, CHARGE_MOVES, INVULNERABLE_MOVES, CHARGE_MESSAGE } from "../app/move-helper";
 import getXp from "../app/xp-helper";
 import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp } from "../app/level-helper";
 import MoveSelect from "./MoveSelect";
@@ -672,8 +672,52 @@ const PokemonEncounter = () => {
   const enemyFlinchRef  = useRef(false);
   const playerFlinchRef = useRef(false);
 
-  const isInBattle = !!enemy && !!active && !!enemyMetadata && !!activeMetadata;
+  // ── Nuevos estados de combate Gen I ─────────────────────────────────────
 
+  // Confusión: número de turnos restantes (0 = no confuso)
+  const playerConfusionTurnsRef = useRef(0);
+  const enemyConfusionTurnsRef  = useRef(0);
+
+  // Reflect y Light Screen: número de turnos restantes (0 = inactivo)
+  const playerReflectRef      = useRef(0);
+  const enemyReflectRef       = useRef(0);
+  const playerLightScreenRef  = useRef(0);
+  const enemyLightScreenRef   = useRef(0);
+
+  // Mist: flag de protección contra stat changes del rival
+  const playerMistRef = useRef(false);
+  const enemyMistRef  = useRef(false);
+
+  // Último move usado por el rival (para Mirror Move y Disable)
+  const lastEnemyMoveRef = useRef<string | null>(null);
+
+  // Disable: move inhabilitado del rival + turnos restantes
+  const enemyDisabledMoveRef  = useRef<string | null>(null);
+  const enemyDisabledTurnsRef = useRef(0);
+
+  // Movimientos de 2 turnos (Solar Beam, Razor Wind, Sky Attack, Skull Bash)
+  // y de invulnerabilidad (Dig, Fly): almacena el move pendiente de ejecutar
+  const playerChargingMoveRef  = useRef<string | null>(null);
+  const enemyChargingMoveRef   = useRef<string | null>(null);
+  const playerInvulnerableRef  = useRef(false);
+  const enemyInvulnerableRef   = useRef(false);
+
+  // Bide: número de turnos acumulando daño + daño acumulado
+  const playerBideTurnsRef  = useRef(0);   // 0 = inactivo
+  const playerBideDmgRef    = useRef(0);
+  const enemyBideTurnsRef   = useRef(0);
+  const enemyBideDmgRef     = useRef(0);
+
+  // Thrash / Petal Dance: número de turnos restantes de furia
+  const playerThrashTurnsRef = useRef(0);   // 0 = inactivo
+  const playerThrashMoveRef  = useRef<string | null>(null);
+  const enemyThrashTurnsRef  = useRef(0);
+  const enemyThrashMoveRef   = useRef<string | null>(null);
+
+  // Conversion: tipo convertido del jugador (null = tipo original)
+  const playerConvertedTypeRef = useRef<string | null>(null);
+
+  const isInBattle = !!enemy && !!active && !!enemyMetadata && !!activeMetadata;
   const isTrainer = !!trainer;
   const isThrowingEnemyPokeball = stage >= 34 && stage <= 38 && isTrainer;
 
@@ -831,6 +875,31 @@ const PokemonEncounter = () => {
       setEnemyTransformedMoves([]);
       enemyTransformedIdRef.current   = null;
       enemyTransformedMovesRef.current = [];
+      // Resetear nuevos estados Gen I
+      playerConfusionTurnsRef.current = 0;
+      enemyConfusionTurnsRef.current  = 0;
+      playerReflectRef.current = 0;
+      enemyReflectRef.current  = 0;
+      playerLightScreenRef.current = 0;
+      enemyLightScreenRef.current  = 0;
+      playerMistRef.current = false;
+      enemyMistRef.current  = false;
+      lastEnemyMoveRef.current = null;
+      enemyDisabledMoveRef.current  = null;
+      enemyDisabledTurnsRef.current = 0;
+      playerChargingMoveRef.current = null;
+      enemyChargingMoveRef.current  = null;
+      playerInvulnerableRef.current = false;
+      enemyInvulnerableRef.current  = false;
+      playerBideTurnsRef.current = 0;
+      playerBideDmgRef.current   = 0;
+      enemyBideTurnsRef.current  = 0;
+      enemyBideDmgRef.current    = 0;
+      playerThrashTurnsRef.current = 0;
+      playerThrashMoveRef.current  = null;
+      enemyThrashTurnsRef.current  = 0;
+      enemyThrashMoveRef.current   = null;
+      playerConvertedTypeRef.current = null;
       setMoveAnim(null);
       setStage(0);
       // Register enemy as SEEN in Pokédex
@@ -1287,18 +1356,31 @@ const PokemonEncounter = () => {
   };
 
   const getRandomEnemyMove = () => {
+    // Si el rival está en Bide, usar bide
+    if (enemyBideTurnsRef.current > 0) return "bide";
+    // Si el rival está en Trashing, continuar con ese move
+    if (enemyThrashTurnsRef.current > 0 && enemyThrashMoveRef.current) return enemyThrashMoveRef.current;
+    // Si el rival está cargando (2-turno), ejecutar el move pendiente
+    if (enemyChargingMoveRef.current) {
+      const move = enemyChargingMoveRef.current;
+      enemyChargingMoveRef.current = null;
+      return move;
+    }
     // Si el rival está transformado, elegir entre los movimientos copiados
     const moves = enemyTransformedMovesRef.current.length > 0
       ? enemyTransformedMovesRef.current
       : enemy.moves;
     if (!moves || moves.length === 0) return "tackle";
-    return moves[Math.floor(Math.random() * moves.length)];
+    // Filtrar el movimiento inhabilitado por Disable
+    const disabledMove = enemyDisabledMoveRef.current;
+    const available = disabledMove ? moves.filter((m: string) => m !== disabledMove) : moves;
+    const pool = available.length > 0 ? available : moves;
+    return pool[Math.floor(Math.random() * pool.length)];
   };
 
   // ── Helper compartido por processBattle / processEnemyOnlyTurn ──────────
-  // Comprueba si un combatiente debe saltarse su turno por estado/flinch.
-  // Consume el flinch al comprobarlo y devuelve un mensaje de alerta cuando
-  // procede. Devuelve `true` si el combatiente NO puede actuar este turno.
+  // Comprueba si un combatiente debe saltarse su turno por estado/flinch/confusión.
+  // Devuelve `true` si el combatiente NO puede actuar este turno.
   const checkSkipTurn = (isPlayer: boolean): boolean => {
     if (isPlayer && playerFlinchRef.current) {
       playerFlinchRef.current = false;
@@ -1308,6 +1390,39 @@ const PokemonEncounter = () => {
     if (!isPlayer && enemyFlinchRef.current) {
       enemyFlinchRef.current = false;
       return true;
+    }
+
+    // ── Confusión ─────────────────────────────────────────────────────────
+    const confusionTurns = isPlayer ? playerConfusionTurnsRef.current : enemyConfusionTurnsRef.current;
+    if (confusionTurns > 0) {
+      const newTurns = confusionTurns - 1;
+      if (isPlayer) playerConfusionTurnsRef.current = newTurns;
+      else enemyConfusionTurnsRef.current = newTurns;
+
+      if (newTurns <= 0) {
+        const nm = isPlayer ? activeMetadata.name.toUpperCase() : enemyMetadata.name.toUpperCase();
+        setAlertText(`¡${nm} superó la confusión!`);
+        return false;
+      }
+      // 50% de probabilidad de golpearse a sí mismo
+      if (Math.random() < 0.5) {
+        // Autogolpe: poder 40, Normal, físico, sin STAB ni tipo, sin stage
+        if (isPlayer && active && enemy) {
+          const playerStats = getPokemonStats(active.id, active.level);
+          const selfDmg = Math.max(1, Math.floor(
+            (Math.floor((2 * active.level / 5 + 2) * 40 * (playerStats.attack / playerStats.defense)) / 50) + 2
+          ));
+          dispatch(updatePokemon({ ...active, hp: Math.max(0, active.hp - selfDmg) }));
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} se golpeó por la confusión!`);
+        } else if (!isPlayer && enemy && active) {
+          const enemyStats2 = getPokemonStats(enemy.id, enemy.level);
+          const selfDmg = Math.max(1, Math.floor(
+            (Math.floor((2 * enemy.level / 5 + 2) * 40 * (enemyStats2.attack / enemyStats2.defense)) / 50) + 2
+          ));
+          dispatch(updatePokemonEncounter({ ...enemy, hp: Math.max(0, enemy.hp - selfDmg) }));
+        }
+        return true;
+      }
     }
 
     const status = isPlayer
@@ -1604,6 +1719,13 @@ const PokemonEncounter = () => {
       statChange,
       isTransform,
       statusApply,
+      confuse,
+      isHaze,
+      isMist,
+      fieldEffect,
+      isConversion,
+      isBide,
+      isDisable,
     } = result;
     if (isAttacking) {
       if (moveId) {
@@ -1661,8 +1783,63 @@ const PokemonEncounter = () => {
           setPlayerStages({ ...enemyStages });
           setAlertText(`¡${activeMetadata.name.toUpperCase()} se transformó!`);
           setStage(17);
+        } else if (isBide) {
+          // Bide: iniciar acumulación
+          playerBideTurnsRef.current = 2;
+          playerBideDmgRef.current = 0;
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} aguanta el ataque!`);
+          setStage(17);
+        } else if (isDisable) {
+          // Disable: inhabilitar último move usado por el rival
+          if (lastEnemyMoveRef.current) {
+            enemyDisabledMoveRef.current = lastEnemyMoveRef.current;
+            enemyDisabledTurnsRef.current = 1 + Math.floor(Math.random() * 8);
+            setAlertText(`¡El movimiento del rival quedó inhabilitado!`);
+          } else {
+            setAlertText(`¡${activeMetadata.name.toUpperCase()} falló!`);
+          }
+          setStage(17);
+        } else if (isHaze) {
+          setPlayerStages(DEFAULT_STAGES);
+          setEnemyStages(DEFAULT_STAGES);
+          setAlertText(`¡Se eliminaron todos los cambios de estadísticas!`);
+          setStage(17);
+        } else if (isMist) {
+          playerMistRef.current = true;
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} está envuelto en Niebla!`);
+          setStage(17);
+        } else if (fieldEffect === "reflect") {
+          playerReflectRef.current = 5;
+          setAlertText(`¡Aparece REFLEJO alrededor de ${activeMetadata.name.toUpperCase()}!`);
+          setStage(17);
+        } else if (fieldEffect === "light-screen") {
+          playerLightScreenRef.current = 5;
+          setAlertText(`¡Aparece PANTALLA LUZ alrededor de ${activeMetadata.name.toUpperCase()}!`);
+          setStage(17);
+        } else if (isConversion) {
+          // Elegir tipo aleatorio de los moves del jugador
+          const pMoves = transformedId !== null ? transformedMoves : active.moves;
+          if (pMoves.length > 0) {
+            const pickedMove = pMoves[Math.floor(Math.random() * pMoves.length)];
+            const pickedType = getMoveMetadata(typeof pickedMove === "string" ? pickedMove : pickedMove.id)?.type ?? "Normal";
+            playerConvertedTypeRef.current = pickedType;
+            setAlertText(`¡${activeMetadata.name.toUpperCase()} cambió a tipo ${pickedType.toUpperCase()}!`);
+          }
+          setStage(17);
+        } else if (confuse) {
+          // Confusión al rival
+          if (!enemyStatus || enemyStatus.type !== "sleep") {
+            enemyConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 4);
+            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival quedó confundido!`);
+          }
+          setStage(17);
         } else if (statChange) {
-          applyStatChange(statChange, isAttacking);
+          // Aplicar Mist: si el rival tiene Mist activo y el cambio va al rival, ignorarlo
+          if (statChange.target === "defender" && enemyMistRef.current) {
+            setAlertText(`¡Pero Niebla lo protegió!`);
+          } else {
+            applyStatChange(statChange, isAttacking);
+          }
           setStage(17);
         } else if (critical) {
           setAlertText(`¡Golpe crítico!`);
@@ -1733,8 +1910,46 @@ const PokemonEncounter = () => {
           setEnemyStages({ ...playerStages });
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival se transformó!`);
           setStage(19);
+        } else if (isBide) {
+          enemyBideTurnsRef.current = 2;
+          enemyBideDmgRef.current = 0;
+          setStage(19);
+        } else if (isDisable) {
+          // Disable del rival: inhabilita el último movimiento del jugador
+          if (active.moves.length > 0) {
+            const lastPlayerMove = active.moves[Math.floor(Math.random() * active.moves.length)].id;
+            // No tenemos un "último move del jugador" ref simple aquí, inhabilitar aleatorio
+            setAlertText(`¡Tu movimiento quedó inhabilitado!`);
+          }
+          setStage(19);
+        } else if (isHaze) {
+          setPlayerStages(DEFAULT_STAGES);
+          setEnemyStages(DEFAULT_STAGES);
+          setAlertText(`¡Se eliminaron todos los cambios de estadísticas!`);
+          setStage(19);
+        } else if (isMist) {
+          enemyMistRef.current = true;
+          setStage(19);
+        } else if (fieldEffect === "reflect") {
+          enemyReflectRef.current = 5;
+          setStage(19);
+        } else if (fieldEffect === "light-screen") {
+          enemyLightScreenRef.current = 5;
+          setStage(19);
+        } else if (isConversion) {
+          setStage(19);
+        } else if (confuse) {
+          // Confusión al jugador
+          playerConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 4);
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} quedó confundido!`);
+          setStage(19);
         } else if (statChange) {
-          applyStatChange(statChange, isAttacking);
+          // Aplicar Mist: si el jugador tiene Mist activo y el cambio va al jugador, ignorarlo
+          if (statChange.target === "defender" && playerMistRef.current) {
+            setAlertText(`¡Pero Niebla protegió a ${activeMetadata.name.toUpperCase()}!`);
+          } else {
+            applyStatChange(statChange, isAttacking);
+          }
           setStage(19);
         } else if (critical) {
           setAlertText(`¡Golpe crítico!`);
@@ -1849,8 +2064,170 @@ const PokemonEncounter = () => {
   };
 
   const processBattle = (attackId: string) => {
+    // ── Pre-proceso: movimientos especiales de estado ──────────────────────
+
+    // Bide del jugador: acumular daño en lugar de atacar
+    if (playerBideTurnsRef.current > 0) {
+      playerBideTurnsRef.current -= 1;
+      if (playerBideTurnsRef.current > 0) {
+        // Turno de acumulación: el jugador solo aguanta
+        setAlertText(`¡${active.id ? activeMetadata.name.toUpperCase() : "?"} aguanta el ataque!`);
+        setStage(15);
+        setTimeout(() => {
+          setAlertText(null);
+          // Hacer que el rival ataque igual
+          const enemyMoveIdBide = getRandomEnemyMove();
+          const enemyMoveBide = getMoveMetadata(enemyMoveIdBide);
+          const stagesSnap = { us: playerStages, them: enemyStages };
+          const effPlayer = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
+          if (!checkSkipTurn(false)) {
+            const { us: usB } = processMoveResult(
+              processMove(effPlayer, enemy, enemyMoveIdBide, false, stagesSnap, {
+                lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+                isTargetSleeping: playerStatusRef.current?.type === "sleep",
+              }),
+              false,
+              enemyMoveIdBide
+            );
+            // Acumular daño recibido por Bide
+            if (usB.hp < active.hp) {
+              playerBideDmgRef.current += active.hp - usB.hp;
+            }
+            lastEnemyMoveRef.current = enemyMoveIdBide;
+            setTimeout(() => {
+              if (usB.hp <= 0) setStage(24);
+              else applyEndOfTurnStatus(usB, enemy);
+            }, ATTACK_ANIMATION + 1000);
+          } else {
+            applyEndOfTurnStatus(effPlayer, enemy);
+          }
+        }, ATTACK_ANIMATION);
+        return;
+      } else {
+        // Turno de liberación: atacar con el doble del daño acumulado
+        const bideDmg = playerBideDmgRef.current * 2 || 1;
+        playerBideDmgRef.current = 0;
+        setAlertText(`¡${activeMetadata.name.toUpperCase()} liberó energía!`);
+        setStage(15);
+        setTimeout(() => {
+          const newEnemyHp = Math.max(0, enemy.hp - bideDmg);
+          dispatch(updatePokemonEncounter({ ...enemy, hp: newEnemyHp }));
+          setAlertText(null);
+          const effPlayer2 = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
+          if (newEnemyHp <= 0) {
+            setStage(20);
+          } else {
+            applyEndOfTurnStatus(effPlayer2, { ...enemy, hp: newEnemyHp });
+          }
+        }, ATTACK_ANIMATION + 1000);
+        return;
+      }
+    }
+
+    // Thrash del jugador: forzar movimiento
+    if (playerThrashTurnsRef.current > 0 && playerThrashMoveRef.current) {
+      attackId = playerThrashMoveRef.current;
+      playerThrashTurnsRef.current -= 1;
+      if (playerThrashTurnsRef.current <= 0) {
+        // Último turno: aplicar confusión al terminar
+        playerThrashMoveRef.current = null;
+        playerConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 3);
+      }
+    } else if ((attackId === "thrash" || attackId === "petal-dance") && playerThrashTurnsRef.current === 0) {
+      // Inicio de Thrash: 2-3 turnos
+      const turns = 2 + Math.floor(Math.random() * 2);
+      playerThrashTurnsRef.current = turns - 1;
+      playerThrashMoveRef.current = attackId;
+    }
+
+    // Movimiento de carga del jugador (turno 1): mostrar mensaje de carga
+    if (CHARGE_MOVES.has(attackId) && !playerChargingMoveRef.current) {
+      const chargeMsg = CHARGE_MESSAGE[attackId]?.replace("{user}", activeMetadata.name.toUpperCase()) ?? `¡${activeMetadata.name.toUpperCase()} está cargando!`;
+      playerChargingMoveRef.current = attackId;
+      // En Dig/Fly: invulnerable mientras carga
+      if (INVULNERABLE_MOVES.has(attackId)) playerInvulnerableRef.current = true;
+      setAlertText(chargeMsg);
+      setStage(15);
+      setTimeout(() => {
+        setAlertText(null);
+        // Rival ataca durante la carga (a menos que sea invulnerable)
+        const enemyMoveIdC = getRandomEnemyMove();
+        const stagesSnapC = { us: playerStages, them: enemyStages };
+        const effPlayerC = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
+        if (!checkSkipTurn(false) && !playerInvulnerableRef.current) {
+          const { us: usC } = processMoveResult(
+            processMove(effPlayerC, enemy, enemyMoveIdC, false, stagesSnapC, {
+              lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+              isTargetSleeping: playerStatusRef.current?.type === "sleep",
+            }),
+            false,
+            enemyMoveIdC
+          );
+          lastEnemyMoveRef.current = enemyMoveIdC;
+          setTimeout(() => {
+            if (usC.hp <= 0) {
+              playerChargingMoveRef.current = null;
+              playerInvulnerableRef.current = false;
+              setStage(24);
+            } else applyEndOfTurnStatus(usC, enemy);
+          }, ATTACK_ANIMATION + 1000);
+        } else {
+          applyEndOfTurnStatus(effPlayerC, enemy);
+        }
+      }, ATTACK_ANIMATION);
+      return;
+    } else if (playerChargingMoveRef.current && playerChargingMoveRef.current === attackId) {
+      // Turno 2: ejecutar move (atacar normalmente, la invulnerabilidad acaba)
+      playerChargingMoveRef.current = null;
+      playerInvulnerableRef.current = false;
+    }
+
+    // Mirror Move del jugador: copiar último move del rival
+    if (attackId === "mirror-move") {
+      if (lastEnemyMoveRef.current) {
+        attackId = lastEnemyMoveRef.current;
+      } else {
+        setAlertText(`¡${activeMetadata.name.toUpperCase()} falló!`);
+        setStage(15);
+        setTimeout(() => setAlertText(null), ATTACK_ANIMATION + 1000);
+        return;
+      }
+    }
+
+    // Decrement Disable counter del rival
+    if (enemyDisabledTurnsRef.current > 0) {
+      enemyDisabledTurnsRef.current -= 1;
+      if (enemyDisabledTurnsRef.current <= 0) {
+        enemyDisabledMoveRef.current = null;
+      }
+    }
+
     const activeMove = getMoveMetadata(attackId);
-    const enemyMove  = getMoveMetadata(getRandomEnemyMove());
+    const enemyMoveId = getRandomEnemyMove();
+    const enemyMove  = getMoveMetadata(enemyMoveId);
+    // Registrar el move del rival para Mirror Move
+    lastEnemyMoveRef.current = enemyMoveId;
+
+    // Iniciar Thrash del rival si es su primer turno usándolo
+    if ((enemyMoveId === "thrash" || enemyMoveId === "petal-dance") && enemyThrashTurnsRef.current === 0) {
+      const turns = 2 + Math.floor(Math.random() * 2);
+      enemyThrashTurnsRef.current = turns - 1;
+      enemyThrashMoveRef.current = enemyMoveId;
+    } else if (enemyThrashTurnsRef.current > 0) {
+      enemyThrashTurnsRef.current -= 1;
+      if (enemyThrashTurnsRef.current <= 0) {
+        enemyThrashMoveRef.current = null;
+        enemyConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 3);
+      }
+    }
+
+    // Iniciar carga del rival para moves de 2 turnos
+    if (CHARGE_MOVES.has(enemyMoveId) && !enemyChargingMoveRef.current) {
+      enemyChargingMoveRef.current = enemyMoveId;
+      if (INVULNERABLE_MOVES.has(enemyMoveId)) enemyInvulnerableRef.current = true;
+    } else if (enemyChargingMoveRef.current) {
+      enemyInvulnerableRef.current = false;
+    }
 
     const activeMovesFirst = getActiveMovesFirst(activeMove, enemyMove);
     const stagesSnapshot   = { us: playerStages, them: enemyStages };

@@ -59,10 +59,7 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
 
   // Lower enemy speed
   "string-shot":   { stat: "speed",   target: "defender", delta: -2 },
-  // Confusión: en Gen I es estado volátil; aproximamos como -2 accuracy
-  "confuse-ray":   { stat: "accuracy", target: "defender", delta: -2 },
-  "supersonic":    { stat: "accuracy", target: "defender", delta: -2 },
-  // disable: en Gen I bloquea 1 movimiento aleatorio; implementación completa pendiente
+  // disable: en Gen I bloquea 1 movimiento aleatorio; gestionado en PokemonEncounter
 
   // Raise own attack
   "sharpen":       { stat: "attack",  target: "attacker", delta: +1 },
@@ -183,7 +180,29 @@ const HEAL_FRACTION: Record<string, number> = {
 };
 
 /** Movimientos sin efecto visible en combate */
-const NO_EFFECT_MOVES = new Set(["splash", "teleport", "bide", "disable", "focus-energy"]);
+const NO_EFFECT_MOVES = new Set(["splash", "teleport", "focus-energy"]);
+
+/** Movimientos que causan confusión (estado volátil real — gestionado en PokemonEncounter) */
+export const CONFUSE_MOVES = new Set(["confuse-ray", "supersonic"]);
+
+/** Movimientos de carga de 2 turnos — T1: cargar, T2: atacar (gestionado en PokemonEncounter) */
+export const CHARGE_MOVES = new Set(["solar-beam", "razor-wind", "sky-attack", "skull-bash"]);
+
+/** Movimientos de invulnerabilidad de 2 turnos — T1: desaparecer, T2: atacar */
+export const INVULNERABLE_MOVES = new Set(["dig", "fly"]);
+
+/** Mensaje de carga por movimiento */
+export const CHARGE_MESSAGE: Record<string, string> = {
+  "solar-beam":  "¡{user} absorbió la luz solar!",
+  "razor-wind":  "¡{user} generó un corte de viento!",
+  "sky-attack":  "¡{user} está concentrándose!",
+  "skull-bash":  "¡{user} agachó la cabeza!",
+  "dig":         "¡{user} se hundió bajo tierra!",
+  "fly":         "¡{user} voló hacia el cielo!",
+};
+
+export const isChargeMove = (moveId: string) => CHARGE_MOVES.has(moveId);
+export const isInvulnerableMove = (moveId: string) => INVULNERABLE_MOVES.has(moveId);
 
 /**
  * Devuelve `true` si el movimiento es un cambio de stat que afecta al
@@ -220,6 +239,14 @@ export interface MoveResult {
   statusApply?: StatusApply;  // present when a status condition is applied
   drainHeal?: number;         // >0: usuario cura X PS; <0: recoil (pierde X PS)
   flinch?: boolean;           // true: el objetivo no puede actuar ese turno
+  // ── Nuevos efectos ──────────────────────────────────────────
+  confuse?: boolean;          // true: el objetivo queda confundido
+  isHaze?: boolean;           // true: resetear todos los stages
+  isMist?: boolean;           // true: activar Velo en el usuario
+  fieldEffect?: "reflect" | "light-screen"; // activa pantalla de campo
+  isConversion?: boolean;     // true: cambiar tipo al de uno de los moves
+  isBide?: boolean;           // true: el usuario entra en modo Bide
+  isDisable?: boolean;        // true: inhabilitar último move del rival
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -307,10 +334,53 @@ const processMove = (
     const dmg = Math.max(1, Math.floor(us.hp / 2));
     return { ...defaultReturn, us: { ...usAfterPP, hp: Math.max(0, us.hp - dmg) } };
   }
-  // ── Sin efecto (Splash, Teleport, Bide) ──────────────────────────────────
+  // ── Sin efecto (Splash, Teleport) ──────────────────────────────────────
   if (NO_EFFECT_MOVES.has(move)) {
     return defaultReturn;
   }
+
+  // ── Confusión (estado volátil — procesado en PokemonEncounter) ──────────
+  if (CONFUSE_MOVES.has(move)) {
+    return { ...defaultReturn, isDebuff: true, confuse: true };
+  }
+
+  // ── Reflect / Light Screen ───────────────────────────────────────────────
+  if (move === "reflect") {
+    return { ...defaultReturn, isBuff: true, fieldEffect: "reflect" };
+  }
+  if (move === "light-screen") {
+    return { ...defaultReturn, isBuff: true, fieldEffect: "light-screen" };
+  }
+
+  // ── Haze — resetear todos los stages ────────────────────────────────────
+  if (move === "haze") {
+    return { ...defaultReturn, isDebuff: true, isHaze: true };
+  }
+
+  // ── Mist — proteger contra cambios de stats del rival ───────────────────
+  if (move === "mist") {
+    return { ...defaultReturn, isBuff: true, isMist: true };
+  }
+
+  // ── Conversion — cambiar tipo al de uno de los moves del usuario ─────────
+  if (move === "conversion") {
+    return { ...defaultReturn, isBuff: true, isConversion: true };
+  }
+
+  // ── Bide — acumular daño y liberarlo al tercer turno ────────────────────
+  if (move === "bide") {
+    return { ...defaultReturn, isBide: true };
+  }
+
+  // ── Disable — inhabilitar el último move usado por el rival ─────────────
+  if (move === "disable") {
+    return { ...defaultReturn, isDebuff: true, isDisable: true };
+  }
+
+  // ── Movimientos de 2 turnos (Solar Beam, Razor Wind, Sky Attack, Skull Bash)
+  // y de invulnerabilidad (Dig, Fly) — el componente gestiona el 2º turno.
+  // En el 1º turno no hacen daño; el componente los intercepta antes de llegar aquí.
+  // Si llegan aquí es porque es el 2º turno → ejecutar normalmente como daño estándar.
 
   // ── OHKO (Guillotine, Horn Drill, Fissure) ────────────────────────────────
   // En Gen I también falla si el defensor tiene mayor nivel que el atacante

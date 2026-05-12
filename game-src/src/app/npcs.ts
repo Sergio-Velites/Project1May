@@ -601,7 +601,7 @@ export const rival = {
 export const beauty = {
   canBattle: true,
   canWalk: true,
-  name: "Beauty",
+  name: "Bella",
   portrait: beautyPortrait,
   sprites: {
     down: beautyDown,
@@ -620,7 +620,7 @@ export const beauty = {
 export const birdKeeper = {
   canBattle: true,
   canWalk: true,
-  name: "Bird Keeper",
+  name: "Ornitólogo",
   portrait: birdKeeperPortrait,
   sprites: {
     down: birdKeeperDown,
@@ -639,7 +639,7 @@ export const birdKeeper = {
 export const blackBelt = {
   canBattle: true,
   canWalk: true,
-  name: "Black Belt",
+  name: "Karateka",
   portrait: blackBeltPortrait,
   sprites: {
     down: blackBeltDown,
@@ -658,7 +658,7 @@ export const blackBelt = {
 export const bugCatcher = {
   canBattle: true,
   canWalk: true,
-  name: "Bug Catcher",
+  name: "Cazabichos",
   portrait: bugCatcherPortrait,
   sprites: {
     down: bugCatcherDown,
@@ -677,7 +677,7 @@ export const bugCatcher = {
 export const burglar = {
   canBattle: true,
   canWalk: true,
-  name: "Burglar",
+  name: "Ladrón",
   portrait: burglarPortrait,
   sprites: {
     down: burglarDown,
@@ -696,7 +696,7 @@ export const burglar = {
 export const channeler = {
   canBattle: true,
   canWalk: true,
-  name: "Channeler",
+  name: "Exorcista",
   portrait: channelerPortrait,
   sprites: {
     down: channelerDown,
@@ -715,7 +715,7 @@ export const channeler = {
 export const aceTrainerMale = {
   canBattle: true,
   canWalk: true,
-  name: "Ace Trainer",
+  name: "Entrenador guay",
   portrait: aceTrainerMalePortrait,
   sprites: {
     down: aceTrainerMaleDown,
@@ -734,7 +734,7 @@ export const aceTrainerMale = {
 export const aceTrainerFemale = {
   canBattle: true,
   canWalk: true,
-  name: "Ace Trainer",
+  name: "Entrenadora guay",
   portrait: aceTrainerFemalePortrait,
   sprites: {
     down: aceTrainerFemaleDown,
@@ -753,7 +753,7 @@ export const aceTrainerFemale = {
 export const cueBall = {
   canBattle: true,
   canWalk: true,
-  name: "Cue Ball",
+  name: "Calvo",
   portrait: cueBallPortrait,
   sprites: {
     down: cueBallDown,
@@ -772,7 +772,7 @@ export const cueBall = {
 export const engineer = {
   canBattle: true,
   canWalk: true,
-  name: "Engineer",
+  name: "Mecánico",
   portrait: engineerPortrait,
   sprites: {
     down: engineerDown,
@@ -791,7 +791,7 @@ export const engineer = {
 export const fisher = {
   canBattle: true,
   canWalk: true,
-  name: "Fisher",
+  name: "Pescador",
   portrait: fisherPortrait,
   sprites: {
     down: fisherDown,
@@ -810,7 +810,7 @@ export const fisher = {
 export const gambler = {
   canBattle: true,
   canWalk: true,
-  name: "Gambler",
+  name: "Jugador",
   portrait: gamblerPortrait,
   sprites: {
     down: gamblerDown,
@@ -829,7 +829,7 @@ export const gambler = {
 export const gentleman = {
   canBattle: true,
   canWalk: true,
-  name: "Gentleman",
+  name: "Caballero",
   portrait: gentlemanPortrait,
   sprites: {
     down: gentlemanDown,
@@ -848,7 +848,7 @@ export const gentleman = {
 export const hiker = {
   canBattle: true,
   canWalk: true,
-  name: "Hiker",
+  name: "Montañero",
   portrait: hikerPortrait,
   sprites: {
     down: hikerDown,
@@ -867,7 +867,7 @@ export const hiker = {
 export const jrTrainerMale = {
   canBattle: true,
   canWalk: true,
-  name: "Jr Trainer",
+  name: "Joven Entrenador",
   portrait: jrTrainerMalePortrait,
   sprites: {
     down: jrTrainerMaleDown,
@@ -886,7 +886,7 @@ export const jrTrainerMale = {
 export const jrTrainerFemale = {
   canBattle: true,
   canWalk: true,
-  name: "Jr Trainer",
+  name: "Joven Entrenadora",
   portrait: jrTrainerFemalePortrait,
   sprites: {
     down: jrTrainerFemaleDown,
@@ -905,7 +905,7 @@ export const jrTrainerFemale = {
 export const juggler = {
   canBattle: true,
   canWalk: true,
-  name: "Juggler",
+  name: "Malabarista",
   portrait: jugglerPortrait,
   sprites: {
     down: jugglerDown,
@@ -924,7 +924,7 @@ export const juggler = {
 export const lass = {
   canBattle: true,
   canWalk: true,
-  name: "Lass",
+  name: "Chica",
   portrait: lassPortrait,
   sprites: {
     down: lassDown,
@@ -943,7 +943,7 @@ export const lass = {
 export const pokeManiac = {
   canBattle: true,
   canWalk: true,
-  name: "Poke Maniac",
+  name: "Pokémaníaco",
   portrait: pokeManiacPortrait,
   sprites: {
     down: pokeManiacDown,
@@ -962,7 +962,7 @@ export const pokeManiac = {
 export const psychic = {
   canBattle: true,
   canWalk: true,
-  name: "Psychic",
+  name: "Médium",
   portrait: psychicPortrait,
   sprites: {
     down: psychicDown,
@@ -981,7 +981,7 @@ export const psychic = {
 export const rocker = {
   canBattle: true,
   canWalk: true,
-  name: "Rocker",
+  name: "Rockero",
   portrait: rockerPortrait,
   sprites: {
     down: rockerDown,
@@ -1000,7 +1000,7 @@ export const rocker = {
 export const teamRocketGrunt = {
   canBattle: true,
   canWalk: true,
-  name: "Team Rocket Grunt",
+  name: "Agente Rocket",
   portrait: teamRocketGruntPortrait,
   sprites: {
     down: teamRocketGruntDown,
@@ -1019,7 +1019,7 @@ export const teamRocketGrunt = {
 export const sailor = {
   canBattle: true,
   canWalk: true,
-  name: "Sailor",
+  name: "Marinero",
   portrait: sailorPortrait,
   sprites: {
     down: sailorDown,
@@ -1038,7 +1038,7 @@ export const sailor = {
 export const scientist = {
   canBattle: true,
   canWalk: true,
-  name: "Scientist",
+  name: "Científico",
   portrait: scientistPortrait,
   sprites: {
     down: scientistDown,
@@ -1057,7 +1057,7 @@ export const scientist = {
 export const superNerd = {
   canBattle: true,
   canWalk: true,
-  name: "Super Nerd",
+  name: "Supernecio",
   portrait: superNerdPortrait,
   sprites: {
     down: superNerdDown,
@@ -1076,7 +1076,7 @@ export const superNerd = {
 export const swimmer = {
   canBattle: true,
   canWalk: true,
-  name: "Swimmer",
+  name: "Nadador",
   portrait: swimmerPortrait,
   sprites: {
     down: swimmerDown,
@@ -1095,7 +1095,7 @@ export const swimmer = {
 export const tamer = {
   canBattle: true,
   canWalk: true,
-  name: "Tamer",
+  name: "Domador",
   portrait: tamerPortrait,
   sprites: {
     down: tamerDown,
@@ -1114,7 +1114,7 @@ export const tamer = {
 export const youngster = {
   canBattle: true,
   canWalk: true,
-  name: "Youngster",
+  name: "Joven",
   portrait: youngsterPortrait,
   sprites: {
     down: youngsterDown,
@@ -1133,7 +1133,7 @@ export const youngster = {
 export const biker = {
   canBattle: true,
   canWalk: true,
-  name: "Biker",
+  name: "Motorista",
   portrait: bikerPortrait,
   sprites: {
     down: bikerDown,
