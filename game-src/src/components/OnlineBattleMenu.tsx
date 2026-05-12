@@ -71,6 +71,10 @@ const OnlineBattleMenu = () => {
   const [stage, setStage] = useState<Stage>("greeting");
   const [players, setPlayers] = useState<PlayerEntry[]>([]);
   const [selected, setSelected] = useState<PlayerEntry | null>(null);
+  // Ref sincrónico de la selección para evitar race conditions entre el
+  // setState y el useEffect que dispara loadFromCloud. Siempre se establece
+  // en el mismo tick que setStage("loading-battle").
+  const selectedPlayerRef = useRef<PlayerEntry | null>(null);
   // Guard atómico para evitar que dos useEffect/listeners disparen dos
   // veces el combate (doble A o re-render durante loadFromCloud).
   const battleStartedRef = useRef(false);
@@ -117,9 +121,14 @@ const OnlineBattleMenu = () => {
 
   // Load battle data when a player is selected and confirmed
   useEffect(() => {
-    if (stage !== "loading-battle" || !selected) return;
+    if (stage !== "loading-battle") return;
+    // Usar ref para evitar race condition: la ref se establece síncronamente
+    // en el mismo tick que setStage("loading-battle"), así que siempre tiene
+    // el jugador correcto aunque el estado de React aún no haya propagado.
+    const playerToLoad = selectedPlayerRef.current;
+    if (!playerToLoad) return;
     let cancelled = false;
-    loadFromCloud(selected.playerId).then((gameState) => {
+    loadFromCloud(playerToLoad.playerId).then((gameState) => {
       if (cancelled) return;
       if (!gameState) {
         setStage("error");
@@ -146,10 +155,11 @@ const OnlineBattleMenu = () => {
         pokemon: opponentPokemon.map((p) => ({ id: p.id, level: p.level })),
         facing: Direction.Down,
         intro: [],
-        outtro: [`¡Bien jugado, ${selected.name}!`],
+        outtro: [`¡Bien jugado, ${playerToLoad.name}!`],
         money: 0,
         pos: map.onlineBattleNpc ?? { x: 10, y: 2 },
         isOnline: true,
+        playerName: playerToLoad.name,
       };
       // Cerrar este menú primero para liberar el control y que
       // PokemonEncounter / TrainerEncounter tomen el relevo limpiamente.
@@ -168,7 +178,7 @@ const OnlineBattleMenu = () => {
     return () => {
       cancelled = true;
     };
-  }, [stage, selected, map.onlineBattleNpc, dispatch]);
+  }, [stage, map.onlineBattleNpc, dispatch]);
 
   // A-button handler for text stages
   useEvent(Event.A, () => {
@@ -203,6 +213,9 @@ const OnlineBattleMenu = () => {
   const menuItems: MenuItemType[] = players.map((p) => ({
     label: `${p.name} (${p.pokemonCount})`,
     action: () => {
+      // Establecer ref síncronamente ANTES de setState para garantizar que
+      // el useEffect de loading-battle lea el jugador correcto.
+      selectedPlayerRef.current = p;
       setSelected(p);
       setStage("loading-battle");
     },

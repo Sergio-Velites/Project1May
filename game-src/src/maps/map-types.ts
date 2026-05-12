@@ -94,6 +94,8 @@ export interface TrainerType {
   persistent?: boolean;
   hideCondition?: "has-pokemon";
   isOnline?: boolean;
+  /** Para batallas online: nombre real del invitado. Se muestra en lugar de "rival" durante el combate. */
+  playerName?: string;
   postGame?: {
     message: string[];
     items?: ItemType[];

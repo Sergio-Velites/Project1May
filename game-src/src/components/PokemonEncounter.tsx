@@ -60,7 +60,7 @@ import {
 import useIsMobile from "../app/use-is-mobile";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { MoveMetadata } from "../app/move-metadata";
-import processMove, { MoveResult, StatStages, DEFAULT_STAGES, getStageMult, StatusApply } from "../app/move-helper";
+import processMove, { MoveResult, StatStages, DEFAULT_STAGES, getStageMult, StatusApply, isSelfTargetingStatusMove } from "../app/move-helper";
 import getXp from "../app/xp-helper";
 import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp } from "../app/level-helper";
 import MoveSelect from "./MoveSelect";
@@ -112,6 +112,7 @@ const RightInfoSection = styled.div`
   align-items: flex-end;
   justify-content: flex-end;
   margin-right: 5%;
+  position: relative;
 `;
 
 const Name = styled.div`
@@ -140,13 +141,22 @@ const Health = styled.div`
 
 const StatusBadge = styled.div<{ $color: string }>`
   font-family: "PokemonGB";
-  font-size: 2.8cqw;
+  font-size: 1.7cqw;
   background: ${(p) => p.$color};
   color: #fff;
-  padding: 0.2cqw 1cqw;
-  margin: 0.5cqw 2.1cqw 0;
-  display: inline-block;
+  padding: 0.15cqw 0.7cqw;
   letter-spacing: 0.05em;
+  position: absolute;
+  bottom: 1.2cqw;
+  left: 0;
+  z-index: 2;
+`;
+
+// Wrapper de alto 0 para que el badge no desplace el layout pero sí sea visible.
+const StatusBadgeWrap = styled.div`
+  height: 0;
+  overflow: visible;
+  position: relative;
 `;
 
 const flashing = keyframes`
@@ -1211,9 +1221,13 @@ const PokemonEncounter = () => {
   const text = () => {
     if (clickableNotice) return clickableNotice;
     if (alertText) return alertText;
+    // Nombre del entrenador rival: para batallas online usa playerName; si no, npc.name
+    const trainerDisplayName = trainer?.playerName
+      ? trainer.playerName.toUpperCase()
+      : trainer?.npc.name.toUpperCase() ?? "RIVAL";
     if (stage === 2) {
       if (isTrainer) {
-        return `¡${trainer?.npc.name.toUpperCase()} quiere combatir!`;
+        return `¡${trainerDisplayName} quiere combatir!`;
       }
       return `¡${enemyMetadata.name.toUpperCase()} salvaje apareció!`;
     }
@@ -1221,7 +1235,7 @@ const PokemonEncounter = () => {
       return `¡Adelante, ${activeMetadata.name.toUpperCase()}!`;
     if (stage === 12) return "¡Escapaste con éxito!";
     if (stage === 20)
-      return `¡${enemyMetadata.name.toUpperCase()} rival se debilitó!`;
+      return `¡${enemyMetadata.name.toUpperCase()} se debilitó!`;
     if (stage === 21) {
       if (!processingMetadata) throw new Error("No processing metadata found");
       return `${processingMetadata.name.toUpperCase()} ganó ${Math.round(
@@ -1259,10 +1273,10 @@ const PokemonEncounter = () => {
     if (stage === 53)
       return `¡El equipo está lleno! ¡${enemyMetadata.name.toUpperCase()} fue enviado al PC!`;
     if (stage === 48 || stage === 49) {
-      return `¡${trainer?.npc.name.toUpperCase()} sacó a ${enemyMetadata.name.toUpperCase()}!`;
+      return `¡${trainerDisplayName} sacó a ${enemyMetadata.name.toUpperCase()}!`;
     }
     if (stage === 50)
-      return `¡${name.toUpperCase()} derrotó a ${trainer?.npc.name.toUpperCase()}!`;
+      return `¡${name.toUpperCase()} derrotó a ${trainerDisplayName}!`;
     if (stage === 51) {
       return trainer?.outtro[outroIndex] || "";
     }
@@ -1594,9 +1608,12 @@ const PokemonEncounter = () => {
     if (isAttacking) {
       if (moveId) {
         const moveDataAnim = getMoveMetadata(moveId);
+        // Fix animación: self-targeting moves (buff propio) animan al usuario,
+        // no al rival. isSelfTargetingStatusMove detecta moves como Agilidad, Amnesia...
+        const animTarget = isSelfTargetingStatusMove(moveId) ? "player" : "enemy";
         setMoveAnim({
           moveId,
-          target: "enemy",
+          target: animTarget,
           damageClass: moveDataAnim?.damageClass ?? "physical",
         });
       }
@@ -1668,14 +1685,20 @@ const PokemonEncounter = () => {
     if (!isAttacking) {
       if (moveId) {
         const moveDataAnim = getMoveMetadata(moveId);
+        // Fix animación: self-targeting moves del rival animan al rival, no al jugador.
+        const animTarget = isSelfTargetingStatusMove(moveId) ? "enemy" : "player";
         setMoveAnim({
           moveId,
-          target: "player",
+          target: animTarget,
           damageClass: moveDataAnim?.damageClass ?? "physical",
         });
       }
+      // Nombre del rival: usar playerName para batallas online si está disponible.
+      const rivalDisplayName = trainer?.playerName
+        ? trainer.playerName.toUpperCase()
+        : `${enemyMetadata.name.toUpperCase()} rival`;
       setAlertText(
-        `¡${enemyMetadata.name.toUpperCase()} rival usó ${moveName.toUpperCase()}!`
+        `¡${rivalDisplayName} usó ${moveName.toUpperCase()}!`
       );
 
       setStage(18);
@@ -2071,11 +2094,12 @@ const PokemonEncounter = () => {
                     "badly-poisoned": ["TOX", "#800080"],
                   };
                   const [label, color] = STATUS_LABEL[enemyStatus.type] ?? ["???", "#888"];
-                  return <StatusBadge $color={color}>{label}</StatusBadge>;
+                  return <StatusBadgeWrap><StatusBadge $color={color}>{label}</StatusBadge></StatusBadgeWrap>;
                 })()}
                 <Corner src={corner} />
               </LeftInfoSection>
-              <ImageContainer $flashing={stage === 17 && moveAnim?.damageClass !== "status"}>
+              {/* Flash en el sprite del rival solo cuando realmente le afecta el movimiento */}
+              <ImageContainer $flashing={(stage === 17 || stage === 19) && moveAnim?.target === "enemy" && moveAnim?.damageClass !== "status"}>
                 <AttackRight $attacking={stage === 18 && moveAnim?.damageClass === "physical"}>
                   <ChangeEnemyPokemon $changing={[46].includes(stage)}>
                     <RightImage src={rightImage()} />
@@ -2083,7 +2107,7 @@ const PokemonEncounter = () => {
                 </AttackRight>
                 <MoveAnimation
                   moveId={moveAnim?.moveId ?? null}
-                  active={stage === 15 && moveAnim?.target === "enemy"}
+                  active={(stage === 15 || stage === 18) && moveAnim?.target === "enemy"}
                   fromDirection="left"
                 />
               </ImageContainer>
@@ -2091,7 +2115,8 @@ const PokemonEncounter = () => {
             <Row
               style={{ opacity: [24, 26, 27, 28].includes(stage) ? "0" : "1" }}
             >
-              <ImageContainer $flashing={stage === 19 && moveAnim?.damageClass !== "status"}>
+              {/* Flash en el sprite del jugador solo cuando realmente le afecta el movimiento */}
+              <ImageContainer $flashing={(stage === 17 || stage === 19) && moveAnim?.target === "player" && moveAnim?.damageClass !== "status"}>
                 <AttackLeft $attacking={stage === 15 && moveAnim?.damageClass === "physical"}>
                   <ChangePokemon $changing={[3, 25].includes(stage)}>
                     <LeftImage src={leftImage()} />
@@ -2099,7 +2124,7 @@ const PokemonEncounter = () => {
                 </AttackLeft>
                 <MoveAnimation
                   moveId={moveAnim?.moveId ?? null}
-                  active={stage === 18 && moveAnim?.target === "player"}
+                  active={(stage === 15 || stage === 18) && moveAnim?.target === "player"}
                   fromDirection="right"
                 />
               </ImageContainer>
@@ -2132,7 +2157,7 @@ const PokemonEncounter = () => {
                     "badly-poisoned": ["TOX", "#800080"],
                   };
                   const [label, color] = STATUS_LABEL[playerStatus.type] ?? ["???", "#888"];
-                  return <StatusBadge $color={color}>{label}</StatusBadge>;
+                  return <StatusBadgeWrap><StatusBadge $color={color}>{label}</StatusBadge></StatusBadgeWrap>;
                 })()}
                 <Health>{`${active.hp}/${activeStats.hp}`}</Health>
                 <CornerContainer>
@@ -2162,7 +2187,15 @@ const PokemonEncounter = () => {
             menuItems={[
               {
                 label: "Luchar",
-                action: () => setStage(14),
+                action: () => {
+                  // Gen I: si todos los PP son 0, usar Forcejeo automáticamente
+                  const movesToCheck = transformedId !== null ? transformedMoves : active.moves;
+                  if (movesToCheck.every((m) => m.pp <= 0)) {
+                    processBattle("struggle");
+                  } else {
+                    setStage(14);
+                  }
+                },
               },
               {
                 pokemon: true,

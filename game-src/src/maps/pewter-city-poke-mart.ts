@@ -39,11 +39,11 @@ const pewterCityPokeMart: MapType = {
   storeItems: [
     ItemType.PokeBall,
     ItemType.Potion,
-    // ItemType.EscapeRope,  TODO Add this
-    // ItemType.Antidote, TODO Add this
-    // ItemType.BurnHeal, TODO Add this
-    // ItemType.Awakening, TODO Add this
-    // ItemType.ParalyzeHeal, TODO Add this
+    ItemType.SuperPotion,
+    ItemType.Antidote,
+    ItemType.FireStone,
+    ItemType.WaterStone,
+    ItemType.ThunderStone,
   ],
 };
 

@@ -67,9 +67,14 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
         padding={isMobile ? "100px" : "40vw"}
         show={show}
         menuItems={displayMoves.map((m) => {
+          const ppEmpty = m.pp <= 0;
           const item: MenuItemType = {
-            label: getMoveMetadata(m.id).name,
-            action: () => select(m.id),
+            // Marcar visualmente los movimientos sin PP
+            label: ppEmpty
+              ? `${getMoveMetadata(m.id).name} --`
+              : getMoveMetadata(m.id).name,
+            // Gen I: seleccionar un movimiento sin PP usa Forcejeo en su lugar
+            action: () => select(ppEmpty ? "struggle" : m.id),
           };
           return item;
         })}

@@ -185,6 +185,16 @@ const HEAL_FRACTION: Record<string, number> = {
 /** Movimientos sin efecto visible en combate */
 const NO_EFFECT_MOVES = new Set(["splash", "teleport", "bide", "disable", "focus-energy"]);
 
+/**
+ * Devuelve `true` si el movimiento es un cambio de stat que afecta al
+ * propio usuario (self-targeting), no al rival. Necesario para que la
+ * animación de combate se muestre en el lado correcto.
+ */
+export const isSelfTargetingStatusMove = (moveId: string): boolean => {
+  const effect = STATUS_MOVE_EFFECTS[moveId];
+  return !!effect && effect.target === "attacker";
+};
+
 // ── MoveResult ───────────────────────────────────────────────────────────────
 
 /** Contexto extra necesario para algunos movimientos especiales */
