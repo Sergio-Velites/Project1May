@@ -1,4 +1,6 @@
+import { pokeManiac } from "../app/npcs";
 import image from "../assets/map/gate-house.png";
+import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 
 const gateHouse: MapType = {
@@ -33,6 +35,32 @@ const gateHouse: MapType = {
     y: 6,
   },
   exitReturnMap: MapId.Route22,
+  gifts: [
+    {
+      pokemonId: 133,
+      level: 15,
+      pos: { x: 9, y: 2 },
+      questId: "gate-house-gift-9-2",
+    },
+  ],
+  // Trainers para "gate-house"
+trainers: [
+  {
+  npc: pokeManiac,
+  pokemon: [{ id: 19, level: 2 }],
+  facing: Direction.Up,
+  pos: { x: 8, y: 2 },
+  intro: [
+
+  ],
+  outtro: [
+    "🎵 Yegare cualquier lugar",
+    "llegaré a cualquier rincón🎵..."
+  ],
+  money: 0,
+  persistent: true,
+}
+],
 };
 
 export default gateHouse;
