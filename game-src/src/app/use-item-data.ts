@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   consumeItem,
   selectPokemon,
+  setPokemonStatus,
   updateSpecificPokemon,
 } from "../state/gameSlice";
 import { getPokemonStats } from "./use-pokemon-stats";
@@ -289,6 +290,27 @@ const useItemData = () => {
               })
             );
             dispatch(consumeItem(ItemType.Potion));
+          })
+        );
+      },
+    },
+    [ItemType.Antidote]: {
+      type: ItemType.Antidote,
+      name: "Antídoto",
+      countable: true,
+      consumable: true,
+      usableInBattle: true,
+      pokeball: false,
+      badge: false,
+      cost: 100,
+      sellPrice: 50,
+      action: () => {
+        dispatch(
+          showActionOnPokemon((index: number) => {
+            const p = pokemon[index];
+            if (!p.status || p.status.type !== "poison") return;
+            dispatch(setPokemonStatus({ index, status: null }));
+            dispatch(consumeItem(ItemType.Antidote));
           })
         );
       },
