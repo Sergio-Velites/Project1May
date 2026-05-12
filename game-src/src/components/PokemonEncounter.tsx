@@ -1733,11 +1733,15 @@ const PokemonEncounter = () => {
         // Fix animación: self-targeting moves (buff propio) animan al usuario,
         // no al rival. isSelfTargetingStatusMove detecta moves como Agilidad, Amnesia...
         const animTarget = isSelfTargetingStatusMove(moveId) ? "player" : "enemy";
-        setMoveAnim({
-          moveId,
-          target: animTarget,
-          damageClass: moveDataAnim?.damageClass ?? "physical",
-        });
+        if (!missed) {
+          setMoveAnim({
+            moveId,
+            target: animTarget,
+            damageClass: moveDataAnim?.damageClass ?? "physical",
+          });
+        } else {
+          setMoveAnim(null);
+        }
       }
       setAlertText(
         `¡${activeMetadata.name.toUpperCase()} usó ${moveName.toUpperCase()}!`
@@ -1864,11 +1868,15 @@ const PokemonEncounter = () => {
         const moveDataAnim = getMoveMetadata(moveId);
         // Fix animación: self-targeting moves del rival animan al rival, no al jugador.
         const animTarget = isSelfTargetingStatusMove(moveId) ? "enemy" : "player";
-        setMoveAnim({
-          moveId,
-          target: animTarget,
-          damageClass: moveDataAnim?.damageClass ?? "physical",
-        });
+        if (!missed) {
+          setMoveAnim({
+            moveId,
+            target: animTarget,
+            damageClass: moveDataAnim?.damageClass ?? "physical",
+          });
+        } else {
+          setMoveAnim(null);
+        }
       }
       // Nombre del rival: usar playerName para batallas online si está disponible.
       const rivalDisplayName = trainer?.playerName
