@@ -764,7 +764,7 @@ export default function MapEditor() {
       pos: { x: 0, y: 0 },
       facing: 'down',
       money: 0,
-      persistent: false,
+      persistent: true,
       isOnline: false,
       hideCondition: null,
       sightRange: null,

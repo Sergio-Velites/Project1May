@@ -49,7 +49,13 @@ const mtMoon3f: MapType = {
 
   fences: {},
   grass: {},
-  text: {},
+text: {
+    3: {
+      27: [
+        "Si has llegado hasta aqúi eres un auténtico friki. Muy bien. Suerte en la vida. Pero ponte a hacer algo con ella. Nos vemos a la vuelta de japón. Besos. Marta & Sergio."
+      ],
+    },
+  },
   maps: {},
   exits: {},
   teleports: {
@@ -124,6 +130,26 @@ const mtMoon3f: MapType = {
   encounters: getEncounterData("mt-moon-b1f"),
   exitReturnMap: MapId.MtMoon1f,
   trainers: [],
+  gifts: [
+    {
+      pokemonId: 144,
+      level: 25,
+      pos: { x: 27, y: 27 },
+      questId: "mt-moon-3f-gift-27-27",
+    },
+    {
+      pokemonId: 145,
+      level: 25,
+      pos: { x: 4, y: 17 },
+      questId: "mt-moon-3f-gift-4-17",
+    },
+    {
+      pokemonId: 146,
+      level: 25,
+      pos: { x: 22, y: 11 },
+      questId: "mt-moon-3f-gift-22-11",
+    },
+  ],
 };
 
 export default mtMoon3f;

@@ -42,7 +42,7 @@ const palletTown: MapType = {
       11: ["Casa de Chun Su. Hoy no hay nadie."],
     },
     9: {
-      7: ["PUEBLO PALETA. El comienzo de todo."],
+      7: ["PUEBLO PALETA. Como tu de paleto."],
     },
     13: {
       13: ["DESTILERÍA DEL PROF. OAK"],
@@ -79,68 +79,79 @@ const palletTown: MapType = {
   grass: {},
   recoverLocation: { x: 5, y: 6 },
   // NPCs del pueblo con los que se puede hablar (no combaten):
-  trainers: [
-    {
-      npc: youngster,
-      pokemon: [{ id: 19, level: 2 }],
-      facing: Direction.Up,
-      pos: { x: 3, y: 7 },
-      intro: [],
-      outtro: [
-        "Hoy noto como un cancaneo por mi cuerpo.",
-        "Parece que algo gordo se avecina!",
-      ],
-      money: 0,
-    },
-    {
-      npc: lass,
-      pokemon: [{ id: 35, level: 3 }],
-      facing: Direction.Down,
-      pos: { x: 15, y: 6 },
-      intro: [],
-      outtro: [
-        "Me voy a poner como el kiko en la preboda.",
-        "Dicen que hay que llegar hasta EL BOSQUECILLO,",
-        "pero merecerá la pena.",
-      ],
-      money: 0,
-    },
-    {
-      npc: teamRocketGrunt,
-      pokemon: [{ id: 19, level: 2 }],
-      facing: Direction.Right,
-      pos: { x: 10, y: 0 },
-      persistent: true,
-      hideCondition: "has-pokemon",
-      intro: [],
-      outtro: [
-        "Viva el vino!",
-        "Hip! ¡Aquí no pasa nadie sin un POKEMON!",
-        "Hip! Habla con el borracho Oak y ",
-        "que te de uno, hip!",
-        "antes de que se los beba todos, hip!",
-      ],
-      
-      money: 0,
-    },
-    {
-      npc: teamRocketGrunt,
-      pokemon: [{ id: 19, level: 2 }],
-      facing: Direction.Left,
-      pos: { x: 11, y: 0 },
-      persistent: true,
-      hideCondition: "has-pokemon",
-      intro: [],
-      outtro: [
-        "Viva el vino!",
-        "Hip! ¡Aquí no pasa nadie sin un POKEMON!",
-        "Hip! Habla con el borracho Oak y ",
-        "que te de uno, hip!",
-        "antes de que se los beba todos, hip!",
-      ],
-      money: 0,
-    },
+// Trainers para "pallet-town"
+// Trainers para "pallet-town"
+trainers: [
+  {
+  npc: youngster,
+  pokemon: [{ id: 19, level: 2 }],
+  facing: Direction.Up,
+  pos: { x: 5, y: 7 },
+  intro: [
+
   ],
+  outtro: [
+    "Hoy noto como un cancaneo por mi cuerpo.",
+    "Parece que algo gordo se avecina!"
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: lass,
+  pokemon: [{ id: 35, level: 3 }],
+  facing: Direction.Down,
+  pos: { x: 15, y: 6 },
+  intro: [
+
+  ],
+  outtro: [
+    "Me voy a poner como el kiko en la preboda.",
+    "Dicen que hay que llegar hasta EL BOSQUECILLO,",
+    "pero merecerá la pena."
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: teamRocketGrunt,
+  pokemon: [{ id: 19, level: 2 }],
+  facing: Direction.Right,
+  pos: { x: 10, y: 0 },
+  intro: [
+
+  ],
+  outtro: [
+    "Viva el vino!",
+    "Hip! ¡Aquí no pasa nadie sin un POKEMON!",
+    "Hip! Habla con el borracho Oak y ",
+    "que te de uno, hip!",
+    "antes de que se los beba todos, hip!"
+  ],
+  money: 0,
+  persistent: true,
+  hideCondition: "has-pokemon",
+},
+  {
+  npc: teamRocketGrunt,
+  pokemon: [{ id: 19, level: 2 }],
+  facing: Direction.Left,
+  pos: { x: 11, y: 0 },
+  intro: [
+
+  ],
+  outtro: [
+    "Viva el vino!",
+    "Hip! ¡Aquí no pasa nadie sin un POKEMON!",
+    "Hip! Habla con el borracho Oak y ",
+    "que te de uno, hip!",
+    "antes de que se los beba todos, hip!"
+  ],
+  money: 0,
+  persistent: true,
+  hideCondition: "has-pokemon",
+}
+],
 };
 
 export default palletTown;

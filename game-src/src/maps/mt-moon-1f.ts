@@ -110,207 +110,123 @@ const mtMoon1f: MapType = {
   },
   exitReturnMap: MapId.Route3,
   encounters: getEncounterData("mt-moon-1f"),
-  trainers: [
-    {
-      npc: bugCatcher,
-      pokemon: [
-        {
-          id: 13, // Weedle
-          level: 15,
-        },
-        {
-          id: 14, // Kakuna
-          level: 15,
-        },
-      ],
-      facing: Direction.Down,
-      intro: [
-        "Hay tipos sospechosos en la cueva.",
-        "¿O serán invitados perdidos?",
-      ],
-      outtro: [
-        "¡Vi al EQUIPO ROCKET cargando",
-        "con cajas de vino del SOTO!",
-      ],
-      money: 110,
-      pos: {
-        x: 7,
-        y: 22,
-      },
-    },
-    {
-      npc: lass,
-      pokemon: [
-        {
-          id: 35, // Clefairy
-          level: 18,
-        },
-      ],
-      facing: Direction.Down,
-      intro: [
-        "Estoy esperando a mis amigos…",
-        "¡Creíamos volver juntos del banquete!",
-      ],
-      outtro: [
-        "Dicen que MARTA y SERGIO ya están",
-        "buscando hoteles en KIOTO.",
-      ],
-      money: 210,
-      pos: {
-        x: 17,
-        y: 23,
-      },
-    },
-    {
-      npc: superNerd,
-      pokemon: [
-        {
-          id: 81, // Magnemite
-          level: 15,
-        },
-        {
-          id: 100, // Voltorb
-          level: 15,
-        },
-      ],
-      facing: Direction.Up,
-      intro: [
-        "¡Eh! ¡No me grites,",
-        "que tengo el cerebro reseco!",
-      ],
-      outtro: [
-        "Necesito PKMN más fuertes",
-        "que mi resaca… imposible.",
-      ],
-      money: 275,
-      pos: {
-        x: 24,
-        y: 31,
-      },
-    },
-    {
-      npc: bugCatcher,
-      pokemon: [
-        {
-          id: 10, // Caterpie
-          level: 15,
-        },
-        {
-          id: 11, // Metapod
-          level: 15,
-        },
-        {
-          id: 10, // Caterpie
-          level: 15,
-        },
-      ],
-      facing: Direction.Right,
-      intro: [
-        "¡Cruza esta cueva y volverás",
-        "a CIUDAD CELESTE de luna de miel!",
-      ],
-      outtro: [
-        "¡Los novios vuelan a JAPÓN!",
-        "¡Yo me vuelvo a la cama!",
-      ],
-      money: 100,
-      pos: {
-        x: 30,
-        y: 27,
-      },
-    },
-    {
-      npc: lass,
-      pokemon: [
-        {
-          id: 43, // Oddish
-          level: 16,
-        },
-        {
-          id: 69, // Bellspout
-          level: 16,
-        },
-      ],
-      facing: Direction.Down,
-      intro: [
-        "¡Madre mía! ¡Esto retumba",
-        "como mi cabeza esta mañana!",
-      ],
-      outtro: [
-        "¿Por dónde se sale?",
-        "¡Yo solo quería un café!",
-      ],
-      money: 165,
-      pos: {
-        x: 30,
-        y: 4,
-      },
-    },
-    {
-      npc: hiker,
-      pokemon: [
-        {
-          id: 74, // Geodude
-          level: 14,
-        },
-        {
-          id: 74, // Geodude
-          level: 14,
-        },
-        {
-          id: 95, // Onix
-          level: 15,
-        },
-      ],
-      facing: Direction.Down,
-      intro: [
-        "¡Anda! ¡Menudo susto!",
-        "Creía que eras el camarero del SOTO",
-        "viniendo a cobrarme los chupitos.",
-      ],
-      outtro: [
-        "¡A vuestra edad ya deberíais",
-        "saber controlar el ANTÍS!",
-      ],
-      money: 150,
-      pos: {
-        x: 5,
-        y: 6,
-      },
-    },
-    {
-      npc: youngster,
-      pokemon: [
-        {
-          id: 19, // Rattata
-          level: 14,
-        },
-        {
-          id: 19, // Rattata
-          level: 14,
-        },
-        {
-          id: 41, // Zubat
-          level: 15,
-        },
-      ],
-      facing: Direction.Right,
-      intro: [
-        "¿Tú también te has perdido",
-        "al volver de la boda?",
-      ],
-      outtro: [
-        "Yo vine a buscar pareja…",
-        "¡pero MARTA y SERGIO ya se llevaron",
-        "toda la suerte para JAPÓN!",
-      ],
-      money: 150,
-      pos: {
-        x: 12,
-        y: 16,
-      },
-    },
+// Trainers para "mt-moon-1f"
+trainers: [
+  {
+  npc: bugCatcher,
+  pokemon: [],
+  facing: Direction.Down,
+  pos: { x: 6, y: 4 },
+  intro: [
+    "Hay tipos sospechosos en la cueva.",
+    "¿O serán invitados perdidos?"
   ],
+  outtro: [
+    "¡Vi al EQUIPO ROCKET cargando",
+    "con cajas de vino de MONJARDÍN!"
+  ],
+  money: 110,
+
+},
+  {
+  npc: lass,
+  pokemon: [],
+  facing: Direction.Down,
+  pos: { x: 4, y: 4 },
+  intro: [
+    "Estoy esperando a mis amigos…",
+    "¡Creíamos volver juntos del banquete!"
+  ],
+  outtro: [
+    "Dicen que MARTA y SERGIO ya están",
+    "buscando hoteles en KIOTO."
+  ],
+  money: 210,
+
+},
+  {
+  npc: superNerd,
+  pokemon: [],
+  facing: Direction.Up,
+  pos: { x: 33, y: 10 },
+  intro: [
+    "¡Eh! ¡No me grites,",
+    "que tengo el cerebro reseco!"
+  ],
+  outtro: [
+    "Necesito PKMN más fuertes",
+    "que mi resaca… imposible."
+  ],
+  money: 275,
+
+},
+  {
+  npc: bugCatcher,
+  pokemon: [],
+  facing: Direction.Right,
+  pos: { x: 13, y: 29 },
+  intro: [
+    "¡Cruza esta cueva y volverás",
+    "a CIUDAD CELESTE de luna de miel!"
+  ],
+  outtro: [
+    "¡Los novios vuelan a JAPÓN!",
+    "¡Yo me vuelvo a la cama!"
+  ],
+  money: 100,
+
+},
+  {
+  npc: lass,
+  pokemon: [],
+  facing: Direction.Down,
+  pos: { x: 14, y: 23 },
+  intro: [
+    "¡Madre mía! ¡Esto retumba",
+    "como mi cabeza esta mañana!"
+  ],
+  outtro: [
+    "¿Por dónde se sale?",
+    "¡Yo solo quería un café!"
+  ],
+  money: 165,
+
+},
+  {
+  npc: hiker,
+  pokemon: [],
+  facing: Direction.Down,
+  pos: { x: 20, y: 14 },
+  intro: [
+    "¡Anda! ¡Menudo susto!",
+    "Creía que eras el camarero del BOSQUECILLO",
+    "viniendo a cobrarme los chupitos."
+  ],
+  outtro: [
+    "¡A vuestra edad ya deberíais",
+    "saber controlar el ANTÍS!"
+  ],
+  money: 150,
+
+},
+  {
+  npc: youngster,
+  pokemon: [],
+  facing: Direction.Right,
+  pos: { x: 8, y: 12 },
+  intro: [
+    "¿Tú también te has perdido",
+    "al volver de la boda?"
+  ],
+  outtro: [
+    "Yo vine a buscar pareja…",
+    "¡pero MARTA y SERGIO ya se llevaron",
+    "toda la suerte para JAPÓN!"
+  ],
+  money: 150,
+
+}
+],
   items: [
     {
       item: ItemType.Tm12,

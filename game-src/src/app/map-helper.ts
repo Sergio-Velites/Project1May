@@ -89,17 +89,26 @@ export const canWalk = (
   mapId: MapId,
   collectedItems: string[],
   defeatedTrainers: string[] = [],
-  completedQuests: string[] = []
+  completedQuests: string[] = [],
+  hasPokemon: boolean = false
 ) => {
   const map = mapData[mapId];
   if (isItem(map.items, x, y, collectedItems, mapId)) return false;
   if (isGift(map.gifts, x, y, completedQuests)) return false;
   if (isWall(map.walls, x, y)) return false;
   if (isFence(map.fences, x, y)) return false;
-  const activeTrainers = (map.trainers ?? []).filter(
-    (t) => !defeatedTrainers.includes(`${mapId}-${t.pos.x}-${t.pos.y}`)
-  );
-  if (isTrainer(activeTrainers, x, y)) return false;
+  // Un trainer bloquea el paso si es visible en el mapa:
+  // - No derrotado → siempre bloquea
+  // - Derrotado + persistent → bloquea salvo que hideCondition esté activa
+  // - Derrotado + no persistent → ha desaparecido del mapa → no bloquea
+  const blockingTrainers = (map.trainers ?? []).filter((t) => {
+    const defeated = defeatedTrainers.includes(`${mapId}-${t.pos.x}-${t.pos.y}`);
+    if (!defeated) return true;
+    if (!t.persistent) return false;
+    if (t.hideCondition === "has-pokemon" && hasPokemon) return false;
+    return true;
+  });
+  if (isTrainer(blockingTrainers, x, y)) return false;
   return true;
 };
 

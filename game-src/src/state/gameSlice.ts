@@ -53,7 +53,7 @@ export const gameSlice = createSlice({
       state.direction = Direction.Left;
       if (state.pos.x === 0) return;
       if (
-        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests)
+        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0)
       )
         return;
       state.pos.x -= 1;
@@ -63,7 +63,7 @@ export const gameSlice = createSlice({
       const map = mapData[state.map];
       if (state.pos.x === map.width - 1) return;
       if (
-        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests)
+        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0)
       )
         return;
       state.pos.x += 1;
@@ -72,7 +72,7 @@ export const gameSlice = createSlice({
       state.direction = Direction.Up;
       if (state.pos.y === 0) return;
       if (
-        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests)
+        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0)
       )
         return;
       state.pos.y -= 1;
@@ -85,10 +85,15 @@ export const gameSlice = createSlice({
         state.jumping = true;
       }
       if (isWall(map.walls, state.pos.x, state.pos.y + 1)) return;
-      const activeTrainersDown = (map.trainers ?? []).filter(
-        (t) => !state.defeatedTrainers.includes(`${state.map}-${t.pos.x}-${t.pos.y}`)
-      );
-      if (isTrainer(activeTrainersDown, state.pos.x, state.pos.y + 1)) return;
+      const hasPokemon = state.pokemon.length > 0;
+      const blockingTrainersDown = (map.trainers ?? []).filter((t) => {
+        const defeated = state.defeatedTrainers.includes(`${state.map}-${t.pos.x}-${t.pos.y}`);
+        if (!defeated) return true;
+        if (!t.persistent) return false;
+        if (t.hideCondition === "has-pokemon" && hasPokemon) return false;
+        return true;
+      });
+      if (isTrainer(blockingTrainersDown, state.pos.x, state.pos.y + 1)) return;
       if (
         isItem(
           map.items,

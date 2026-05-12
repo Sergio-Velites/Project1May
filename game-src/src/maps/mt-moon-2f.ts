@@ -129,147 +129,90 @@ const mtMoon2f: MapType = {
     y: 1,
   },
   exitReturnMap: MapId.MtMoon1f,
-  trainers: [
-    {
-      npc: teamRocketGrunt,
-      pokemon: [
-        {
-          id: 27, // Sandshrew
-          level: 17,
-        },
-        {
-          id: 19, // Rattata
-          level: 17,
-        },
-        {
-          id: 41, // Zubat
-          level: 17,
-        },
-      ],
-      facing: Direction.Down,
-      intro: [
-        "¡El EQUIPO ROCKET nunca falta",
-        "a un saqueo — ni a una boda!",
-      ],
-      outtro: [
-        "¡Maldición! ¡Mis compis siguen",
-        "durmiendo la mona en un rincón!",
-      ],
-      money: 330,
-      pos: {
-        x: 15,
-        y: 22,
-      },
-    },
-    {
-      npc: teamRocketGrunt,
-      pokemon: [
-        {
-          id: 41, // Zubat
-          level: 18,
-        },
-        {
-          id: 23, // Ekans
-          level: 18,
-        },
-      ],
-      facing: Direction.Up,
-      intro: [
-        "¡Estamos buscando los regalos",
-        "de los novios! ¡Lárgate, crío!",
-      ],
-      outtro: [
-        "Si encuentras algún ANTÍS sin abrir,",
-        "¡dánoslo y nos largamos!",
-      ],
-      money: 360,
-      pos: {
-        x: 29,
-        y: 11,
-      },
-    },
-    {
-      npc: teamRocketGrunt,
-      pokemon: [
-        {
-          id: 20, // Raticate
-          level: 22,
-        },
-      ],
-      facing: Direction.Left,
-      intro: [
-        "¡Los críos sin resaca",
-        "no entendéis el sufrimiento adulto!",
-      ],
-      outtro: [
-        "MARTA y SERGIO ya andan haciendo",
-        "las maletas para JAPÓN… ¡y nosotros aquí!",
-      ],
-      money: 390,
-      pos: {
-        x: 29,
-        y: 17,
-      },
-    },
-    {
-      npc: teamRocketGrunt,
-      pokemon: [
-        {
-          id: 19, // Rattata
-          level: 19,
-        },
-        {
-          id: 41, // Zubat
-          level: 19,
-        },
-      ],
-      facing: Direction.Down,
-      intro: [
-        "¡El EQUIPO ROCKET revenderá",
-        "todas las botellas vacías del banquete!",
-      ],
-      outtro: [
-        "¡Me has enfadado!",
-        "¡Ya nos vengaremos en TOKIO!",
-      ],
-      money: 390,
-      pos: {
-        x: 11,
-        y: 16,
-      },
-    },
-    {
-      npc: superNerd,
-      pokemon: [
-        {
-          id: 88, // Grimer
-          level: 18,
-        },
-        {
-          id: 100, // Voltorb
-          level: 18,
-        },
-        {
-          id: 109, // Koffing
-          level: 19,
-        },
-      ],
-      facing: Direction.Right,
-      intro: [
-        "¡Eh, para! ¡Estos sushis caíos",
-        "de la mesa son míos! ¡Los dos!",
-      ],
-      outtro: [
-        "¡Vale, uno cada uno!",
-        "Que los novios se llevan el resto a JAPÓN.",
-      ],
-      money: 300,
-      pos: {
-        x: 12,
-        y: 8,
-      },
-    },
+// Trainers para "mt-moon-2f"
+// Trainers para "mt-moon-2f"
+trainers: [
+  {
+  npc: teamRocketGrunt,
+  pokemon: [],
+  facing: Direction.Down,
+  pos: { x: 12, y: 2 },
+  intro: [
+    "¡El EQUIPO ROCKET nunca falta",
+    "a un saqueo — ni a una boda!"
   ],
+  outtro: [
+    "¡Maldición! ¡Mis compis siguen",
+    "durmiendo la mona en un rincón!"
+  ],
+  money: 330,
+  persistent: true,
+},
+  {
+  npc: teamRocketGrunt,
+  pokemon: [],
+  facing: Direction.Up,
+  pos: { x: 3, y: 8 },
+  intro: [
+    "¡Estamos buscando los regalos",
+    "de los novios! ¡Lárgate, crío!"
+  ],
+  outtro: [
+    "Si encuentras algún ANTÍS sin abrir,",
+    "¡dánoslo y nos largamos!"
+  ],
+  money: 360,
+  persistent: true,
+},
+  {
+  npc: teamRocketGrunt,
+  pokemon: [],
+  facing: Direction.Left,
+  pos: { x: 14, y: 18 },
+  intro: [
+    "¡Los críos sin resaca",
+    "no entendéis el sufrimiento adulto!"
+  ],
+  outtro: [
+    "MARTA y SERGIO ya andan haciendo",
+    "las maletas para JAPÓN… ¡y nosotros aquí!"
+  ],
+  money: 390,
+  persistent: true,
+},
+  {
+  npc: teamRocketGrunt,
+  pokemon: [],
+  facing: Direction.Down,
+  pos: { x: 11, y: 16 },
+  intro: [
+    "¡El EQUIPO ROCKET revenderá",
+    "todas las botellas vacías del banquete!"
+  ],
+  outtro: [
+    "¡Me has enfadado!",
+    "¡Ya nos vengaremos en TOKIO!"
+  ],
+  money: 390,
+  persistent: true,
+},
+  {
+  npc: superNerd,
+  pokemon: [],
+  facing: Direction.Right,
+  pos: { x: 20, y: 14 },
+  intro: [
+    "¡Eh, para! ¡Estos sushis caíos",
+    "de la mesa son míos! ¡Los dos!"
+  ],
+  outtro: [
+    "¡Vale, uno cada uno!",
+    "Que los novios se llevan el resto a JAPÓN."
+  ],
+  money: 300,
+  persistent: true,
+}
+],
   items: [
     {
       item: ItemType.HelixFossil,
