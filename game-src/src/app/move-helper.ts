@@ -273,6 +273,7 @@ export interface MoveResult {
   isBide?: boolean;           // true: el usuario entra en modo Bide
   isDisable?: boolean;        // true: inhabilitar último move del rival
   requiresRecharge?: boolean; // true: el atacante pierde el siguiente turno (Hiperrayo)
+  isNoEffect?: boolean;       // true: el movimiento no hace nada (Salpicadura, etc.)
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -362,7 +363,7 @@ const processMove = (
   }
   // ── Sin efecto (Splash, Teleport) ──────────────────────────────────────
   if (NO_EFFECT_MOVES.has(move)) {
-    return defaultReturn;
+    return { ...defaultReturn, isNoEffect: true };
   }
 
   // ── Confusión (estado volátil — procesado en PokemonEncounter) ──────────

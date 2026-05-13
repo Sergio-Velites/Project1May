@@ -1802,6 +1802,7 @@ const PokemonEncounter = () => {
       isConversion,
       isBide,
       isDisable,
+      isNoEffect,
     } = result;
     if (isAttacking) {
       if (moveId) {
@@ -1857,6 +1858,9 @@ const PokemonEncounter = () => {
 
         if (missed) {
           setAlertText(`¡${activeMetadata.name.toUpperCase()} falló!`);
+        } else if (isNoEffect) {
+          setAlertText(`¡Pero no pasó nada!`);
+          setStage(17);
         } else if (isTransform) {
           // Copiar ID, movimientos (PP:5) y stat stages del rival
           setTransformedData((prev) => ({
@@ -1995,6 +1999,9 @@ const PokemonEncounter = () => {
 
         if (missed) {
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival falló!`);
+        } else if (isNoEffect) {
+          setAlertText(`¡Pero no pasó nada!`);
+          setStage(19);
         } else if (isTransform) {
           // Guardar transformación en estado local (NO en Redux) para que los
           // dispatches posteriores no sobreescriban el id transformado.
