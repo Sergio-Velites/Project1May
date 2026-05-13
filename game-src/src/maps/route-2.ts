@@ -199,7 +199,7 @@ maps: {
       9: MapId.PewterCity,
     },
     43: {
-      3: MapId.Route2gate,
+      3: MapId.Route2Gate,
     },
   },
 teleports: {
