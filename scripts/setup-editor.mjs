@@ -400,7 +400,10 @@ function parseStaticPokemonField(tsText) {
       }
     }
     if (pid && lvl && spr && pos && qid) {
-      result.push({ pokemonId: parseInt(pid[1], 10), level: parseInt(lvl[1], 10), pos, sprite: spr[1], questId: qid[1] });
+      const introArr = parseStringArray(t, "intro");
+      const entry = { pokemonId: parseInt(pid[1], 10), level: parseInt(lvl[1], 10), pos, sprite: spr[1], questId: qid[1] };
+      if (introArr.length > 0) entry.intro = introArr;
+      result.push(entry);
     }
     i = objBlk.end + 1;
   }

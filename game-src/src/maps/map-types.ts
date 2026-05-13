@@ -165,6 +165,8 @@ export interface StaticPokemonType {
   sprite: StaticPokemonSprite;
   /** Se añade a completedQuests al derrotarlo o capturarlo. */
   questId: string;
+  /** Texto que aparece antes de iniciar el combate (opcional). */
+  intro?: string[];
 }
 
 export interface MapWithPos {

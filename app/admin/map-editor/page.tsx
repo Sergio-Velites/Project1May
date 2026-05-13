@@ -73,7 +73,7 @@ interface PortalEntry {
 
 interface ItemEntry { itemKey: string; pos: { x: number; y: number }; hidden?: boolean; }
 interface GiftEntry { pokemonId: number; level: number; pos: { x: number; y: number }; questId: string; }
-interface StaticPokemonEntry { pokemonId: number; level: number; sprite: string; pos: { x: number; y: number }; questId: string; }
+interface StaticPokemonEntry { pokemonId: number; level: number; sprite: string; pos: { x: number; y: number }; questId: string; intro?: string[]; }
 interface TextRewardEntry {
   type: 'pokemon' | 'item';
   pokemonId?: number;
@@ -272,15 +272,21 @@ const STATIC_POKEMON_SPRITES = [
 
 function exportStaticPokemonTS(staticPokemon: StaticPokemonEntry[]): string {
   if (staticPokemon.length === 0) return 'staticPokemon: [],';
-  const lines = staticPokemon.map((sp) => [
-    `    {`,
-    `      pokemonId: ${sp.pokemonId},`,
-    `      level: ${sp.level},`,
-    `      sprite: "${sp.sprite}",`,
-    `      pos: { x: ${sp.pos.x}, y: ${sp.pos.y} },`,
-    `      questId: "${escapeTSString(sp.questId)}",`,
-    `    },`,
-  ].join('\n'));
+  const lines = staticPokemon.map((sp) => {
+    const introLine = sp.intro && sp.intro.length > 0
+      ? `      intro: [${sp.intro.map(l => `"${escapeTSString(l)}"`).join(', ')}],\n`
+      : '';
+    return [
+      `    {`,
+      `      pokemonId: ${sp.pokemonId},`,
+      `      level: ${sp.level},`,
+      `      sprite: "${sp.sprite}",`,
+      `      pos: { x: ${sp.pos.x}, y: ${sp.pos.y} },`,
+      `      questId: "${escapeTSString(sp.questId)}",`,
+      ...(introLine ? [introLine.trimEnd()] : []),
+      `    },`,
+    ].join('\n');
+  });
   return `staticPokemon: [\n${lines.join('\n')}\n  ],`;
 }
 
@@ -1247,7 +1253,7 @@ export default function MapEditor() {
           return;
         }
         if (action.trim() === 'edit') {
-          const pidStr = window.prompt('pokemonId (1-151):', String(sp.pokemonId));
+          const pidStr = window.prompt('pokemonId (1-251):', String(sp.pokemonId));
           if (pidStr === null) return;
           const lvlStr = window.prompt('level (1-100):', String(sp.level));
           if (lvlStr === null) return;
@@ -1255,13 +1261,19 @@ export default function MapEditor() {
           if (spriteStr === null) return;
           const qid = window.prompt('questId:', sp.questId);
           if (qid === null) return;
+          const introRaw = window.prompt(
+            'Intro (líneas separadas por "|", vacío = sin intro):',
+            sp.intro && sp.intro.length > 0 ? sp.intro.join(' | ') : '',
+          );
+          if (introRaw === null) return;
           const pid = parseInt(pidStr, 10);
           const lvl = parseInt(lvlStr, 10);
           if (Number.isNaN(pid) || pid < 1 || pid > 251) { alert('pokemonId inválido'); return; }
           if (Number.isNaN(lvl) || lvl < 1 || lvl > 100) { alert('level inválido'); return; }
           if (!STATIC_POKEMON_SPRITES.includes(spriteStr.trim())) { alert('sprite inválido'); return; }
           if (!qid.trim()) { alert('questId vacío'); return; }
-          setStaticPokemon((p) => p.map((s, i) => i === idx ? { ...s, pokemonId: pid, level: lvl, sprite: spriteStr.trim(), questId: qid.trim() } : s));
+          const intro = introRaw.trim() ? introRaw.split('|').map(s => s.trim()).filter(Boolean) : undefined;
+          setStaticPokemon((p) => p.map((s, i) => i === idx ? { ...s, pokemonId: pid, level: lvl, sprite: spriteStr.trim(), questId: qid.trim(), intro } : s));
           setDirty(true);
         }
       } else {
@@ -1274,13 +1286,16 @@ export default function MapEditor() {
         const defaultQid = `${selectedMapId}-static-${tile.x}-${tile.y}`;
         const qid = window.prompt('questId (único):', defaultQid);
         if (qid === null) return;
+        const introRaw = window.prompt('Intro (líneas separadas por "|", vacío = sin intro):', '');
+        if (introRaw === null) return;
         const pid = parseInt(pidStr, 10);
         const lvl = parseInt(lvlStr, 10);
         if (Number.isNaN(pid) || pid < 1 || pid > 251) { alert('pokemonId inválido'); return; }
         if (Number.isNaN(lvl) || lvl < 1 || lvl > 100) { alert('level inválido'); return; }
         if (!STATIC_POKEMON_SPRITES.includes(spriteStr.trim())) { alert('sprite inválido'); return; }
         if (!qid.trim()) { alert('questId vacío'); return; }
-        setStaticPokemon((p) => [...p, { pokemonId: pid, level: lvl, sprite: spriteStr.trim(), pos: { x: tile.x, y: tile.y }, questId: qid.trim() }]);
+        const intro = introRaw.trim() ? introRaw.split('|').map(s => s.trim()).filter(Boolean) : undefined;
+        setStaticPokemon((p) => [...p, { pokemonId: pid, level: lvl, sprite: spriteStr.trim(), pos: { x: tile.x, y: tile.y }, questId: qid.trim(), intro }]);
         setDirty(true);
       }
       return;

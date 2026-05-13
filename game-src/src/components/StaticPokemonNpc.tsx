@@ -18,7 +18,7 @@ import {
   selectMapId,
   selectPos,
 } from "../state/gameSlice";
-import { selectMenuOpen } from "../state/uiSlice";
+import { selectMenuOpen, showTextThenAction } from "../state/uiSlice";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import { directionModifier } from "../app/map-helper";
@@ -105,12 +105,15 @@ const StaticPokemonNpc = () => {
         (sp) => sp.pos.x === targetX && sp.pos.y === targetY
       );
       if (!target) return;
-      // Lanzar encuentro salvaje — PokemonEncounter lo gestiona igualando a
-      // un encuentro en hierba. Al terminar (victoria/captura) completamos la quest.
       const encounter = getPokemonEncounter(target.pokemonId, target.level);
-      // Embebemos el questId en el encuentro para que PokemonEncounter lo
-      // complete al acabar. Usamos el campo unused `staticQuestId`.
-      dispatch(encounterPokemon({ ...encounter, staticQuestId: target.questId }));
+      const launchBattle = () => {
+        dispatch(encounterPokemon({ ...encounter, staticQuestId: target.questId }));
+      };
+      if (target.intro && target.intro.length > 0) {
+        dispatch(showTextThenAction({ text: target.intro, action: launchBattle }));
+      } else {
+        launchBattle();
+      }
     }, [menuOpen, pos, facing, visible, dispatch])
   );
 

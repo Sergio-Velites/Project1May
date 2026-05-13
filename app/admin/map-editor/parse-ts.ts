@@ -37,6 +37,7 @@ export interface ParsedStaticPokemon {
   pos: { x: number; y: number };
   sprite: string;
   questId: string;
+  intro?: string[];
 }
 
 export interface ParsedTextReward {
@@ -308,7 +309,8 @@ function parseStaticPokemonField(tsText: string): ParsedStaticPokemon[] {
       }
     }
     if (pid && lvl && spr && pos && qid) {
-      result.push({ pokemonId: parseInt(pid[1], 10), level: parseInt(lvl[1], 10), pos, sprite: spr[1], questId: qid[1] });
+      const introArr = parseStringArray(t, 'intro');
+      result.push({ pokemonId: parseInt(pid[1], 10), level: parseInt(lvl[1], 10), pos, sprite: spr[1], questId: qid[1], ...(introArr.length > 0 ? { intro: introArr } : {}) });
     }
     i = objBlk.end + 1;
   }
