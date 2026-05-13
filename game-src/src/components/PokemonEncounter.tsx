@@ -1636,46 +1636,49 @@ const PokemonEncounter = () => {
     isAttacking: boolean
   ) => {
     if (!statChange) return;
-    const { stat, target, delta } = statChange;
-    // 'attacker' cuando isAttacking=true → jugador ; cuando false → enemigo
-    const affectsPlayer =
-      (isAttacking && target === "attacker") ||
-      (!isAttacking && target === "defender");
+    // Normalizar a array para soportar movimientos con múltiples cambios (ej. Danza Dragón)
+    const changes = Array.isArray(statChange) ? statChange : [statChange];
+    for (const { stat, target, delta } of changes) {
+      // 'attacker' cuando isAttacking=true → jugador ; cuando false → enemigo
+      const affectsPlayer =
+        (isAttacking && target === "attacker") ||
+        (!isAttacking && target === "defender");
 
-    const targetName = affectsPlayer
-      ? activeMetadata.name.toUpperCase()
-      : enemyMetadata.name.toUpperCase();
-    const statNameES = STAT_NAMES_ES[stat] ?? stat.toUpperCase();
+      const targetName = affectsPlayer
+        ? activeMetadata.name.toUpperCase()
+        : enemyMetadata.name.toUpperCase();
+      const statNameES = STAT_NAMES_ES[stat] ?? stat.toUpperCase();
 
-    // Verificar límite ±6
-    const currentStage = affectsPlayer
-      ? playerStages[stat as keyof StatStages]
-      : enemyStages[stat as keyof StatStages];
-    if (delta > 0 && currentStage >= 6) {
-      setAlertText(`¡El ${statNameES} de ${targetName} no subirá más!`);
-      return;
-    }
-    if (delta < 0 && currentStage <= -6) {
-      setAlertText(`¡El ${statNameES} de ${targetName} no bajará más!`);
-      return;
-    }
+      // Verificar límite ±6
+      const currentStage = affectsPlayer
+        ? playerStages[stat as keyof StatStages]
+        : enemyStages[stat as keyof StatStages];
+      if (delta > 0 && currentStage >= 6) {
+        setAlertText(`¡El ${statNameES} de ${targetName} no subirá más!`);
+        continue;
+      }
+      if (delta < 0 && currentStage <= -6) {
+        setAlertText(`¡El ${statNameES} de ${targetName} no bajará más!`);
+        continue;
+      }
 
-    const dir = delta > 0 ? "subió" : "bajó";
-    const magnitude = Math.abs(delta) >= 2 ? " mucho" : "";
+      const dir = delta > 0 ? "subió" : "bajó";
+      const magnitude = Math.abs(delta) >= 2 ? " mucho" : "";
 
-    setAlertText(`¡El ${statNameES} de ${targetName}${magnitude} ${dir}!`);
+      setAlertText(`¡El ${statNameES} de ${targetName}${magnitude} ${dir}!`);
 
-    const clamp = (v: number) => Math.max(-6, Math.min(6, v));
-    if (affectsPlayer) {
-      setPlayerStages((prev) => ({
-        ...prev,
-        [stat]: clamp(prev[stat as keyof StatStages] + delta),
-      }));
-    } else {
-      setEnemyStages((prev) => ({
-        ...prev,
-        [stat]: clamp(prev[stat as keyof StatStages] + delta),
-      }));
+      const clamp = (v: number) => Math.max(-6, Math.min(6, v));
+      if (affectsPlayer) {
+        setPlayerStages((prev) => ({
+          ...prev,
+          [stat]: clamp(prev[stat as keyof StatStages] + delta),
+        }));
+      } else {
+        setEnemyStages((prev) => ({
+          ...prev,
+          [stat]: clamp(prev[stat as keyof StatStages] + delta),
+        }));
+      }
     }
   };
 
@@ -1883,7 +1886,8 @@ const PokemonEncounter = () => {
           setStage(17);
         } else if (statChange) {
           // Aplicar Mist: si el rival tiene Mist activo y el cambio va al rival, ignorarlo
-          if (statChange.target === "defender" && enemyMistRef.current) {
+          const firstChange = Array.isArray(statChange) ? statChange[0] : statChange;
+          if (firstChange.target === "defender" && enemyMistRef.current) {
             setAlertText(`¡Pero Niebla lo protegió!`);
           } else {
             applyStatChange(statChange, isAttacking);
@@ -2003,7 +2007,8 @@ const PokemonEncounter = () => {
           setStage(19);
         } else if (statChange) {
           // Aplicar Mist: si el jugador tiene Mist activo y el cambio va al jugador, ignorarlo
-          if (statChange.target === "defender" && playerMistRef.current) {
+          const firstChange = Array.isArray(statChange) ? statChange[0] : statChange;
+          if (firstChange.target === "defender" && playerMistRef.current) {
             setAlertText(`¡Pero Niebla protegió a ${activeMetadata.name.toUpperCase()}!`);
           } else {
             applyStatChange(statChange, isAttacking);

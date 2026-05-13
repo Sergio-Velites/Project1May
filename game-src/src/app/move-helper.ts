@@ -59,7 +59,7 @@ export interface StatChange {
   delta: number;
 }
 
-const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
+const STATUS_MOVE_EFFECTS: Record<string, StatChange | StatChange[]> = {
   // Lower enemy attack
   "growl":         { stat: "attack",  target: "defender", delta: -1 },
 
@@ -101,6 +101,12 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange> = {
   // Raise own special
   "amnesia":       { stat: "special", target: "attacker", delta: +2 },
   "growth":        { stat: "special", target: "attacker", delta: +1 },
+
+  // Multi-stat buffs
+  "dragon-dance":  [
+    { stat: "attack", target: "attacker", delta: +1 },
+    { stat: "speed",  target: "attacker", delta: +1 },
+  ],
 };
 
 // ── Condiciones de estado ────────────────────────────────────────────────────
@@ -228,7 +234,9 @@ export const isInvulnerableMove = (moveId: string) => INVULNERABLE_MOVES.has(mov
  */
 export const isSelfTargetingStatusMove = (moveId: string): boolean => {
   const effect = STATUS_MOVE_EFFECTS[moveId];
-  return !!effect && effect.target === "attacker";
+  if (!effect) return false;
+  const first = Array.isArray(effect) ? effect[0] : effect;
+  return first.target === "attacker";
 };
 
 // ── MoveResult ───────────────────────────────────────────────────────────────
@@ -252,7 +260,7 @@ export interface MoveResult {
   isBuff: boolean;
   isDebuff: boolean;
   isTransform?: boolean;
-  statChange?: StatChange;    // present for status moves with a known effect
+  statChange?: StatChange | StatChange[];  // single or multi-stat change
   statusApply?: StatusApply;  // present when a status condition is applied
   drainHeal?: number;         // >0: usuario cura X PS; <0: recoil (pierde X PS)
   flinch?: boolean;           // true: el objetivo no puede actuar ese turno
@@ -468,10 +476,12 @@ const processMove = (
     // Cambio de estadística (growl, leer, swords-dance…)
     const effect = STATUS_MOVE_EFFECTS[move];
     if (effect) {
+      const isArr = Array.isArray(effect);
+      const firstDelta = isArr ? effect[0].delta : (effect as StatChange).delta;
       return {
         ...defaultReturn,
-        isBuff:    effect.delta > 0,
-        isDebuff:  effect.delta < 0,
+        isBuff:    firstDelta > 0,
+        isDebuff:  firstDelta < 0,
         statChange: effect,
       };
     }
