@@ -678,6 +678,10 @@ const PokemonEncounter = () => {
   // Confusión: número de turnos restantes (0 = no confuso)
   const playerConfusionTurnsRef = useRef(0);
   const enemyConfusionTurnsRef  = useRef(0);
+  // Self-KO por autogolpe en confusión: se activa dentro de checkSkipTurn
+  // y el caller lo comprueba (guardSelfKo) para ir directo a stage 24/20.
+  const playerSelfKoRef = useRef(false);
+  const enemySelfKoRef  = useRef(false);
 
   // Reflect y Light Screen: número de turnos restantes (0 = inactivo)
   const playerReflectRef      = useRef(0);
@@ -894,6 +898,8 @@ const PokemonEncounter = () => {
       // Resetear nuevos estados Gen I
       playerConfusionTurnsRef.current = 0;
       enemyConfusionTurnsRef.current  = 0;
+      playerSelfKoRef.current = false;
+      enemySelfKoRef.current  = false;
       playerReflectRef.current = 0;
       enemyReflectRef.current  = 0;
       playerLightScreenRef.current = 0;
@@ -1404,6 +1410,26 @@ const PokemonEncounter = () => {
     return pool[Math.floor(Math.random() * pool.length)];
   };
 
+  // ── Self-KO por confusión: si checkSkipTurn dejó al combatiente a 0 HP por
+  // autogolpe, el caller debe interrumpir el flujo del turno y disparar el
+  // KO inmediatamente. En Gen I el rival NO llega a atacar después.
+  // Devuelve true si ya disparó setStage; el caller debe `return;`.
+  const guardSelfKo = (): boolean => {
+    if (playerSelfKoRef.current) {
+      playerSelfKoRef.current = false;
+      setAlertText(null);
+      setStage(24);
+      return true;
+    }
+    if (enemySelfKoRef.current) {
+      enemySelfKoRef.current = false;
+      setAlertText(null);
+      setStage(20);
+      return true;
+    }
+    return false;
+  };
+
   // ── Helper compartido por processBattle / processEnemyOnlyTurn ──────────
   // Comprueba si un combatiente debe saltarse su turno por estado/flinch/confusión.
   // Devuelve `true` si el combatiente NO puede actuar este turno.
@@ -1438,14 +1464,19 @@ const PokemonEncounter = () => {
           const selfDmg = Math.max(1, Math.floor(
             (Math.floor((2 * active.level / 5 + 2) * 40 * (playerStats.attack / playerStats.defense)) / 50) + 2
           ));
-          dispatch(updatePokemon({ ...active, hp: Math.max(0, active.hp - selfDmg) }));
+          const newHp = Math.max(0, active.hp - selfDmg);
+          dispatch(updatePokemon({ ...active, hp: newHp }));
           setAlertText(`¡${activeMetadata.name.toUpperCase()} se golpeó por la confusión!`);
+          // Gen I: si el autogolpe lleva a 0 HP, el KO es inmediato. El rival no llega a atacar.
+          if (newHp <= 0) playerSelfKoRef.current = true;
         } else if (!isPlayer && enemy && active) {
           const enemyStats2 = getPokemonStats(enemy.id, enemy.level);
           const selfDmg = Math.max(1, Math.floor(
             (Math.floor((2 * enemy.level / 5 + 2) * 40 * (enemyStats2.attack / enemyStats2.defense)) / 50) + 2
           ));
-          dispatch(updatePokemonEncounter({ ...enemy, hp: Math.max(0, enemy.hp - selfDmg) }));
+          const newHp = Math.max(0, enemy.hp - selfDmg);
+          dispatch(updatePokemonEncounter({ ...enemy, hp: newHp }));
+          if (newHp <= 0) enemySelfKoRef.current = true;
         }
         return true;
       }
@@ -1523,6 +1554,7 @@ const PokemonEncounter = () => {
       setStage(18);
       setTimeout(() => {
         setAlertText(null);
+        if (guardSelfKo()) return;
         applyEndOfTurnStatus(currentActive, enemy);
       }, ATTACK_ANIMATION);
       return;
@@ -1575,6 +1607,9 @@ const PokemonEncounter = () => {
     setPlayerLeechSeeded(false);
     playerLeechSeededRef.current = false;
     playerFlinchRef.current = false;
+    // Gen I: la confusión es estado volátil de combate — se cura al cambiar.
+    playerConfusionTurnsRef.current = 0;
+    playerSelfKoRef.current = false;
     // Gen I: Transform revierte cuando el Pokémon sale del campo.
     // Limpiamos la entrada del Pokémon que sale (activePokemonIndex).
     setTransformedData((prev) => {
@@ -2144,7 +2179,9 @@ const PokemonEncounter = () => {
         const stagesSnapRecharge = { us: playerStages, them: enemyStages };
         const effPlayerRecharge = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
         const isEnemyRechargingR = enemyMoveIdRecharge === "__recharge__";
-        if (!checkSkipTurn(false) && !isEnemyRechargingR) {
+        const enemySkipR = checkSkipTurn(false);
+        if (guardSelfKo()) return;
+        if (!enemySkipR && !isEnemyRechargingR) {
           const { us: usRecharge } = processMoveResult(
             processMove(effPlayerRecharge, enemy, enemyMoveIdRecharge, false, stagesSnapRecharge, {
               lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2190,7 +2227,9 @@ const PokemonEncounter = () => {
         const stagesSnapD = { us: playerStages, them: enemyStages };
         const effPlayerD = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
         const isEnemyRechargingD = enemyMoveIdD === "__recharge__";
-        if (!checkSkipTurn(false) && !isEnemyRechargingD) {
+        const enemySkipD = checkSkipTurn(false);
+        if (guardSelfKo()) return;
+        if (!enemySkipD && !isEnemyRechargingD) {
           const { us: usD } = processMoveResult(
             processMove(effPlayerD, enemy, enemyMoveIdD, false, stagesSnapD, {
               lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2244,7 +2283,9 @@ const PokemonEncounter = () => {
           const isEnemyRechargingBide = enemyMoveIdBide === "__recharge__";
           const stagesSnap = { us: playerStages, them: enemyStages };
           const effPlayer = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
-          if (!checkSkipTurn(false) && !isEnemyRechargingBide) {
+          const enemySkipBide = checkSkipTurn(false);
+          if (guardSelfKo()) return;
+          if (!enemySkipBide && !isEnemyRechargingBide) {
             const { us: usB } = processMoveResult(
               processMove(effPlayer, enemy, enemyMoveIdBide, false, stagesSnap, {
                 lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2329,7 +2370,9 @@ const PokemonEncounter = () => {
         const isEnemyRechargingC = enemyMoveIdC === "__recharge__";
         const stagesSnapC = { us: playerStages, them: enemyStages };
         const effPlayerC = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
-        if (!checkSkipTurn(false) && !playerInvulnerableRef.current && !isEnemyRechargingC) {
+        const enemySkipC = checkSkipTurn(false);
+        if (guardSelfKo()) return;
+        if (!enemySkipC && !playerInvulnerableRef.current && !isEnemyRechargingC) {
           const { us: usC } = processMoveResult(
             processMove(effPlayerC, enemy, enemyMoveIdC, false, stagesSnapC, {
               lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2432,6 +2475,7 @@ const PokemonEncounter = () => {
         setStage(15);
         setTimeout(() => {
           setAlertText(null);
+          if (guardSelfKo()) return;
           if (isEnemyRecharging || checkSkipTurn(false)) {
             // Ambos saltan (o rival recarga)
             if (isEnemyRecharging) {
@@ -2444,6 +2488,7 @@ const PokemonEncounter = () => {
             }
             setTimeout(() => {
               setAlertText(null);
+              if (guardSelfKo()) return;
               applyEndOfTurnStatus(effectivePlayer, enemy);
             }, ATTACK_ANIMATION);
           } else {
@@ -2484,6 +2529,7 @@ const PokemonEncounter = () => {
               if (isEnemyRecharging) setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
               setTimeout(() => {
                 setAlertText(null);
+                if (guardSelfKo()) return;
                 applyEndOfTurnStatus(us, them);
               }, ATTACK_ANIMATION);
             } else {
@@ -2511,12 +2557,14 @@ const PokemonEncounter = () => {
         if (isEnemyRecharging) setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
         setTimeout(() => {
           setAlertText(null);
+          if (guardSelfKo()) return;
           if (checkSkipTurn(true)) {
             // Ambos saltan
             setMoveAnim(null);
             setStage(15);
             setTimeout(() => {
               setAlertText(null);
+              if (guardSelfKo()) return;
               applyEndOfTurnStatus(effectivePlayer, enemy);
             }, ATTACK_ANIMATION);
           } else {
@@ -2560,6 +2608,7 @@ const PokemonEncounter = () => {
               setStage(15);
               setTimeout(() => {
                 setAlertText(null);
+                if (guardSelfKo()) return;
                 applyEndOfTurnStatus(us, them);
               }, ATTACK_ANIMATION);
             } else {
