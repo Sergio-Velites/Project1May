@@ -29,7 +29,18 @@ Deno.serve(async (req) => {
     if (savesError) throw savesError;
 
     // Build index of saves by user_id
-    type SaveRow = { user_id: string; game_state: { pokemon?: unknown[] } | null };
+    type GameStateRsvp = {
+      playerName?: string;
+      companion?: string | null;
+      children?: number;
+      allergies?: string | null;
+      busOutbound?: string;
+      busReturn?: string;
+      preboda?: boolean;
+      attended?: boolean;
+    };
+    type GameState = { name?: string; pokemon?: unknown[]; rsvp?: GameStateRsvp } | null;
+    type SaveRow = { user_id: string; game_state: GameState };
     const savesMap = Object.fromEntries(
       (saves as SaveRow[]).map((s) => [s.user_id, s.game_state])
     );
@@ -41,7 +52,7 @@ Deno.serve(async (req) => {
       companion: string | null;
       children: number;
       allergies: string | null;
-      bus_outbound: boolean;
+      bus_outbound: string;
       bus_return: string;
       preboda: boolean;
       attended: boolean;
@@ -54,26 +65,48 @@ Deno.serve(async (req) => {
     const rsvpEntries = (rsvps as RsvpRow[]).map((r) => ({
       ...r,
       hasRsvp: true,
+      source: "rsvp_table" as const,
       pokemon: savesMap[r.user_id]?.pokemon ?? [],
     }));
 
-    // ── Jugadores sin RSVP (solo tienen partida guardada) ───────────────────
-    type SaveRowFull = { user_id: string; game_state: { name?: string; pokemon?: unknown[] } | null };
-    const savesOnlyEntries = (saves as SaveRowFull[])
+    // ── Jugadores sin fila en rsvp pero con partida guardada ────────────────
+    // Si game_state.rsvp existe, usar esos datos como fuente fiable
+    // (saveToCloud + saveRsvp se llaman en paralelo — uno puede fallar y otro no).
+    const savesOnlyEntries = (saves as SaveRow[])
       .filter((s) => !rsvpUserIds.has(s.user_id))
-      .map((s) => ({
-        user_id: s.user_id,
-        player_name: s.game_state?.name ?? "Desconocido",
-        companion: null,
-        children: 0,
-        allergies: null,
-        bus_outbound: "none",
-        bus_return: "none",
-        preboda: false,
-        attended: null,
-        hasRsvp: false,
-        pokemon: s.game_state?.pokemon ?? [],
-      }));
+      .map((s) => {
+        const gsRsvp = s.game_state?.rsvp;
+        if (gsRsvp) {
+          return {
+            user_id: s.user_id,
+            player_name: gsRsvp.playerName ?? s.game_state?.name ?? "Desconocido",
+            companion: gsRsvp.companion ?? null,
+            children: gsRsvp.children ?? 0,
+            allergies: gsRsvp.allergies ?? null,
+            bus_outbound: gsRsvp.busOutbound ?? "none",
+            bus_return: gsRsvp.busReturn ?? "none",
+            preboda: gsRsvp.preboda ?? false,
+            attended: gsRsvp.attended ?? null,
+            hasRsvp: true,
+            source: "game_state" as const,
+            pokemon: s.game_state?.pokemon ?? [],
+          };
+        }
+        return {
+          user_id: s.user_id,
+          player_name: s.game_state?.name ?? "Desconocido",
+          companion: null,
+          children: 0,
+          allergies: null,
+          bus_outbound: "none",
+          bus_return: "none",
+          preboda: false,
+          attended: null,
+          hasRsvp: false,
+          source: "none" as const,
+          pokemon: s.game_state?.pokemon ?? [],
+        };
+      });
 
     const entries = [...rsvpEntries, ...savesOnlyEntries];
 
