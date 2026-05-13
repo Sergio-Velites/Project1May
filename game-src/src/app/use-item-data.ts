@@ -11,9 +11,12 @@ import {
   learnMove,
   showActionOnPokemon,
   showEvolution,
+  showText,
   throwPokeball,
 } from "../state/uiSlice";
 import { getMoveMetadata } from "./use-move-metadata";
+import { getHpDeltaOnLevelUp, getLearnedMove } from "./level-helper";
+import { getPokemonMetadata } from "./use-pokemon-metadata";
 
 export enum ItemType {
   MasterBall = "master-ball", // DONE
@@ -311,6 +314,50 @@ const useItemData = () => {
             if (!p.status || p.status.type !== "poison") return;
             dispatch(setPokemonStatus({ index, status: null }));
             dispatch(consumeItem(ItemType.Antidote));
+          })
+        );
+      },
+    },
+    [ItemType.RareCandy]: {
+      type: ItemType.RareCandy,
+      name: "Caramelo Raro",
+      countable: true,
+      consumable: true,
+      usableInBattle: false,
+      pokeball: false,
+      badge: false,
+      cost: null,
+      sellPrice: 2500,
+      action: () => {
+        dispatch(
+          showActionOnPokemon((index: number) => {
+            const p = pokemon[index];
+            if (p.level >= 100) {
+              dispatch(showText([`¡${getPokemonMetadata(p.id).name.toUpperCase()} ya está en el nivel máximo!`]));
+              return;
+            }
+            const newLevel = p.level + 1;
+            const hpDelta = getHpDeltaOnLevelUp(p.id, p.level, newLevel);
+            const updatedPokemon = { ...p, level: newLevel, hp: p.hp + hpDelta };
+            dispatch(updateSpecificPokemon({ index, pokemon: updatedPokemon }));
+            dispatch(consumeItem(ItemType.RareCandy));
+            const newMove = getLearnedMove(updatedPokemon);
+            if (newMove && p.moves.length < 4) {
+              dispatch(
+                learnMove({
+                  itemName: "Caramelo Raro",
+                  move: newMove.id,
+                  consume: false,
+                  item: ItemType.RareCandy,
+                })
+              );
+            } else {
+              dispatch(
+                showText([
+                  `¡${getPokemonMetadata(p.id).name.toUpperCase()} subió al nivel ${newLevel}!`,
+                ])
+              );
+            }
           })
         );
       },

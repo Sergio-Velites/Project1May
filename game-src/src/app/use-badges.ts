@@ -7,7 +7,7 @@ const useBadges = () => {
   const itemData = useItemData();
 
   return inventory.filter(
-    (item) => itemData[item.item].badge && item.amount > 0
+    (item) => itemData[item.item]?.badge && item.amount > 0
   );
 };
 
