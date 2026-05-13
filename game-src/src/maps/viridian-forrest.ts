@@ -196,48 +196,43 @@ trainers: [
   pokemon: [],
   facing: Direction.Left,
   pos: { x: 29, y: 19 },
-  intro: [
-    "¡Detente, invitado de la boda!",
-    "¡Primero debes combatir!"
-  ],
+  intro: [],
   outtro: [
-    "¡Qué batalla tan emocionante!",
+    "¡Detente, invitado de la boda!",
+    "¡Corre que llegarás tarde!",
     "¡Sigue tu camino, valiente!"
   ],
-  money: 60,
-
+  money: 0,
+  persistent: true,
 },
   {
   npc: bugCatcher,
   pokemon: [],
   facing: Direction.Left,
   pos: { x: 28, y: 33 },
-  intro: [
-    "¡Los insectos son los mejores!",
-    "¡Protegen el bosque de la boda!"
-  ],
+  intro: [],
   outtro: [
-    "¡Bien luchado!",
+    "¡Los insectos son los mejores!",
+    "¡Protegen el bosque de la boda!",
     "¡Disfruta la celebración!"
   ],
-  money: 70,
-
+  money: 0,
+  persistent: true,
 },
   {
   npc: bugCatcher,
   pokemon: [],
   facing: Direction.Left,
   pos: { x: 2, y: 19 },
-  intro: [
-    "¡Nadie pasa sin combatir!",
-    "¡Así lo dice la ley del bosque!"
-  ],
+  intro: [],
   outtro: [
+    "¡Nadie pasa sin saludar!",
+    "¡Así lo dice la ley del bosque!",
     "¡Felicidades a los novios!",
     "¡Que sean muy felices!"
   ],
-  money: 60,
-
+  money: 0,
+  persistent: true,
 },
   {
   npc: beauty,

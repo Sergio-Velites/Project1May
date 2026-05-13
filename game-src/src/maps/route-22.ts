@@ -82,19 +82,15 @@ trainers: [
   pokemon: [],
   facing: Direction.Right,
   pos: { x: 26, y: 5 },
-  intro: [
+  intro: [],
+  outtro: [
     "¡Ey!",
     "¿Vas a la LIGA PKMN?",
-    "¡Ni lo sueñes! ¡Seguro que no tienes ninguna MEDALLA!",
-    "¡El guardia no te dejará pasar!",
-    "Por cierto, ¿tus PKMN se han hecho más fuertes?",
-    "Pero que dices de una boda?"
+    "¡Ni lo sueñes!",
+    "El guardia no te dejará pasar sin medallas.",
+    "¡Con lo tajao que parece que vas!"
   ],
-  outtro: [
-    "¡Vaya suerte la tuya!",
-        "Con lo tajao que parece que vas"
-  ],
-  money: 280,
+  money: 0,
   persistent: true,
 },
   {

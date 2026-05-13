@@ -87,9 +87,6 @@ export const gameSlice = createSlice({
       if (isWall(map.walls, state.pos.x, state.pos.y + 1)) return;
       const hasPokemon = state.pokemon.length > 0;
       const blockingTrainersDown = (map.trainers ?? []).filter((t) => {
-        const defeated = state.defeatedTrainers.includes(`${state.map}-${t.pos.x}-${t.pos.y}`);
-        if (!defeated) return true;
-        if (!t.persistent) return false;
         if (t.hideCondition === "has-pokemon" && hasPokemon) return false;
         return true;
       });

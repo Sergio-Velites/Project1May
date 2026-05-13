@@ -117,114 +117,107 @@ trainers: [
   pokemon: [],
   facing: Direction.Down,
   pos: { x: 6, y: 4 },
-  intro: [
-    "Hay tipos sospechosos en la cueva.",
-    "¿O serán invitados perdidos?"
-  ],
+  intro: [],
   outtro: [
+    "Hay tipos sospechosos en la cueva.",
+    "¿O serán invitados perdidos?",
     "¡Vi al EQUIPO ROCKET cargando",
     "con cajas de vino de MONJARDÍN!"
   ],
-  money: 110,
-
+  money: 0,
+  persistent: true,
 },
   {
   npc: lass,
   pokemon: [],
   facing: Direction.Down,
   pos: { x: 4, y: 4 },
-  intro: [
-    "Estoy esperando a mis amigos…",
-    "¡Creíamos volver juntos del banquete!"
-  ],
+  intro: [],
   outtro: [
+    "Estoy esperando a mis amigos…",
+    "¡Creíamos volver juntos del banquete!",
     "Dicen que MARTA y SERGIO ya están",
     "buscando hoteles en KIOTO."
   ],
-  money: 210,
-
+  money: 0,
+  persistent: true,
 },
   {
   npc: superNerd,
   pokemon: [],
   facing: Direction.Up,
   pos: { x: 33, y: 10 },
-  intro: [
-    "¡Eh! ¡No me grites,",
-    "que tengo el cerebro reseco!"
-  ],
+  intro: [],
   outtro: [
+    "¡Eh! ¡No me grites,",
+    "que tengo el cerebro reseco!",
     "Necesito PKMN más fuertes",
     "que mi resaca… imposible."
   ],
-  money: 275,
-
+  money: 0,
+  persistent: true,
 },
   {
   npc: bugCatcher,
   pokemon: [],
   facing: Direction.Right,
   pos: { x: 13, y: 29 },
-  intro: [
-    "¡Cruza esta cueva y volverás",
-    "a CIUDAD CELESTE de luna de miel!"
-  ],
+  intro: [],
   outtro: [
+    "¡Cruza esta cueva y volverás",
+    "a CIUDAD CELESTE de luna de miel!",
     "¡Los novios vuelan a JAPÓN!",
     "¡Yo me vuelvo a la cama!"
   ],
-  money: 100,
-
+  money: 0,
+  persistent: true,
 },
   {
   npc: lass,
   pokemon: [],
   facing: Direction.Down,
   pos: { x: 14, y: 23 },
-  intro: [
-    "¡Madre mía! ¡Esto retumba",
-    "como mi cabeza esta mañana!"
-  ],
+  intro: [],
   outtro: [
+    "¡Madre mía! ¡Esto retumba",
+    "como mi cabeza esta mañana!",
     "¿Por dónde se sale?",
     "¡Yo solo quería un café!"
   ],
-  money: 165,
-
+  money: 0,
+  persistent: true,
 },
   {
   npc: hiker,
   pokemon: [],
   facing: Direction.Down,
   pos: { x: 20, y: 14 },
-  intro: [
+  intro: [],
+  outtro: [
     "¡Anda! ¡Menudo susto!",
     "Creía que eras el camarero del BOSQUECILLO",
-    "viniendo a cobrarme los chupitos."
-  ],
-  outtro: [
+    "viniendo a cobrarme los chupitos.",
     "¡A vuestra edad ya deberíais",
     "saber controlar el ANTÍS!"
   ],
-  money: 150,
-
+  money: 0,
+  persistent: true,
 },
   {
   npc: youngster,
   pokemon: [],
   facing: Direction.Right,
   pos: { x: 8, y: 12 },
-  intro: [
-    "¿Tú también te has perdido",
-    "al volver de la boda?"
-  ],
+  intro: [],
   outtro: [
+    "¿Tú también te has perdido",
+    "al volver de la boda?",
     "Yo vine a buscar pareja…",
     "¡pero MARTA y SERGIO ya se llevaron",
     "toda la suerte para JAPÓN!"
   ],
-  money: 150,
-
+  money: 0,
+  persistent: true,
 }
 ],
   items: [

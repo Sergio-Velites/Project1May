@@ -137,15 +137,14 @@ trainers: [
   pokemon: [],
   facing: Direction.Down,
   pos: { x: 12, y: 2 },
-  intro: [
-    "¡El EQUIPO ROCKET nunca falta",
-    "a un saqueo — ni a una boda!"
-  ],
+  intro: [],
   outtro: [
+    "¡El EQUIPO ROCKET nunca falta",
+    "a un saqueo — ni a una boda!",
     "¡Maldición! ¡Mis compis siguen",
     "durmiendo la mona en un rincón!"
   ],
-  money: 330,
+  money: 0,
   persistent: true,
 },
   {
@@ -153,15 +152,14 @@ trainers: [
   pokemon: [],
   facing: Direction.Up,
   pos: { x: 3, y: 8 },
-  intro: [
-    "¡Estamos buscando los regalos",
-    "de los novios! ¡Lárgate, crío!"
-  ],
+  intro: [],
   outtro: [
+    "¡Estamos buscando los regalos",
+    "de los novios! ¡Lárgate, crío!",
     "Si encuentras algún ANTÍS sin abrir,",
     "¡dánoslo y nos largamos!"
   ],
-  money: 360,
+  money: 0,
   persistent: true,
 },
   {
@@ -169,15 +167,14 @@ trainers: [
   pokemon: [],
   facing: Direction.Left,
   pos: { x: 14, y: 18 },
-  intro: [
-    "¡Los críos sin resaca",
-    "no entendéis el sufrimiento adulto!"
-  ],
+  intro: [],
   outtro: [
+    "¡Los críos sin resaca",
+    "no entenéis el sufrimiento adulto!",
     "MARTA y SERGIO ya andan haciendo",
     "las maletas para JAPÓN… ¡y nosotros aquí!"
   ],
-  money: 390,
+  money: 0,
   persistent: true,
 },
   {
@@ -185,15 +182,14 @@ trainers: [
   pokemon: [],
   facing: Direction.Down,
   pos: { x: 11, y: 16 },
-  intro: [
-    "¡El EQUIPO ROCKET revenderá",
-    "todas las botellas vacías del banquete!"
-  ],
+  intro: [],
   outtro: [
+    "¡El EQUIPO ROCKET revenderá",
+    "todas las botellas vacías del banquete!",
     "¡Me has enfadado!",
     "¡Ya nos vengaremos en TOKIO!"
   ],
-  money: 390,
+  money: 0,
   persistent: true,
 },
   {
@@ -201,15 +197,14 @@ trainers: [
   pokemon: [],
   facing: Direction.Right,
   pos: { x: 20, y: 14 },
-  intro: [
-    "¡Eh, para! ¡Estos sushis caíos",
-    "de la mesa son míos! ¡Los dos!"
-  ],
+  intro: [],
   outtro: [
+    "¡Eh, para! ¡Estos sushis caíos",
+    "de la mesa son míos! ¡Los dos!",
     "¡Vale, uno cada uno!",
     "Que los novios se llevan el resto a JAPÓN."
   ],
-  money: 300,
+  money: 0,
   persistent: true,
 }
 ],
