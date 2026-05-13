@@ -65,39 +65,38 @@ const viridianCity: MapType = {
       31, 32, 33, 34, 35,
     ],
   },
-  text: {
-    29: {
-      21: [
-        "¡Bienvenido al SOTO LEZKAIRU!",
-        "Lugar de preboda y celebración.",
+text: {
+    1: {
+      19: [
+        "RUTA 2 · Hacia VILLAMAYOR →"
       ],
     },
-    25: {
-      24: [
-        "En el Soto, el vino corre más que el agua.",
-      ],
-    },
-    19: {
-      30: [
-        "¡Que vivan los novios!",
-        "¡Y que el anís no falte!",
+    7: {
+      27: [
+        "RINCÓN DE PENSAR. Lugar abandonado. Antiguo emplazamiento para quedada de cuadrillas"
       ],
     },
     17: {
       17: [
         "AVISO: Reserva de vino protegida.",
-        "Manos fuera, Team Rocket.",
+        "Manos fuera, Team Rocket."
       ],
     },
-    7: {
-      27: [
-        "Bodega CASTILLO DE MONJARDÍN →",
-        "¡Demuestra que mereces brindar!",
+    19: {
+      30: [
+        "¡Que vivan los novios!",
+        "¡Y que el anís no falte!"
       ],
     },
-    1: {
-      19: [
-        "RUTA 2 · Hacia VILLAMAYOR →",
+    25: {
+      24: [
+        "En el Soto, el vino corre más que el agua."
+      ],
+    },
+    29: {
+      21: [
+        "¡SOTO LEZKAIRU!",
+        "Bienvenido al glamour."
       ],
     },
   },
