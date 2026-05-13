@@ -39,7 +39,13 @@ Deno.serve(async (req) => {
       preboda?: boolean;
       attended?: boolean;
     };
-    type GameState = { name?: string; pokemon?: unknown[]; rsvp?: GameStateRsvp } | null;
+    type GameState = {
+      name?: string;
+      pokemon?: unknown[];
+      rsvp?: GameStateRsvp;
+      map?: string;
+      pos?: { x: number; y: number };
+    } | null;
     type SaveRow = { user_id: string; game_state: GameState };
     const savesMap = Object.fromEntries(
       (saves as SaveRow[]).map((s) => [s.user_id, s.game_state])
@@ -62,21 +68,45 @@ Deno.serve(async (req) => {
 
     const rsvpUserIds = new Set((rsvps as RsvpRow[]).map((r) => r.user_id));
 
-    const rsvpEntries = (rsvps as RsvpRow[]).map((r) => ({
-      ...r,
-      hasRsvp: true,
-      source: "rsvp_table" as const,
-      pokemon: savesMap[r.user_id]?.pokemon ?? [],
-    }));
+    const rsvpEntries = (rsvps as RsvpRow[]).map((r) => {
+      const gs = savesMap[r.user_id];
+      return {
+        ...r,
+        hasRsvp: true,
+        source: "rsvp_table" as const,
+        pokemon: gs?.pokemon ?? [],
+        map: gs?.map ?? null,
+        pos: gs?.pos ?? null,
+      };
+    });
 
     // ── Jugadores sin fila en rsvp pero con partida guardada ────────────────
     // Si game_state.rsvp existe, usar esos datos como fuente fiable
     // (saveToCloud + saveRsvp se llaman en paralelo — uno puede fallar y otro no).
+    // Además, hacemos BACKFILL: si tenemos los datos en game_state, aprovechamos
+    // la lectura para upsertear la fila en la tabla rsvp y autorrepararnos.
+    const backfillPromises: Promise<unknown>[] = [];
     const savesOnlyEntries = (saves as SaveRow[])
       .filter((s) => !rsvpUserIds.has(s.user_id))
       .map((s) => {
         const gsRsvp = s.game_state?.rsvp;
-        if (gsRsvp) {
+        if (gsRsvp && gsRsvp.playerName) {
+          // Backfill: asegurar wedding_user + upsert rsvp para próximas lecturas
+          backfillPromises.push((async () => {
+            const { error: userErr } = await db.from("wedding_users").insert({ id: s.user_id });
+            if (userErr && userErr.code !== "23505") return;
+            await db.rpc("upsert_rsvp", {
+              p_user_id:      s.user_id,
+              p_player_name:  gsRsvp.playerName,
+              p_companion:    gsRsvp.companion ?? null,
+              p_children:     gsRsvp.children ?? 0,
+              p_allergies:    gsRsvp.allergies ?? null,
+              p_bus_outbound: gsRsvp.busOutbound ?? "none",
+              p_bus_return:   gsRsvp.busReturn ?? "none",
+              p_preboda:      gsRsvp.preboda ?? false,
+              p_attended:     gsRsvp.attended ?? true,
+            });
+          })());
           return {
             user_id: s.user_id,
             player_name: gsRsvp.playerName ?? s.game_state?.name ?? "Desconocido",
@@ -90,6 +120,8 @@ Deno.serve(async (req) => {
             hasRsvp: true,
             source: "game_state" as const,
             pokemon: s.game_state?.pokemon ?? [],
+            map: s.game_state?.map ?? null,
+            pos: s.game_state?.pos ?? null,
           };
         }
         return {
@@ -105,8 +137,13 @@ Deno.serve(async (req) => {
           hasRsvp: false,
           source: "none" as const,
           pokemon: s.game_state?.pokemon ?? [],
+          map: s.game_state?.map ?? null,
+          pos: s.game_state?.pos ?? null,
         };
       });
+
+    // Ejecutar backfills en paralelo (best-effort, no bloquea la respuesta).
+    await Promise.allSettled(backfillPromises);
 
     const entries = [...rsvpEntries, ...savesOnlyEntries];
 

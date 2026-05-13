@@ -4,6 +4,7 @@
  * Server Component (Next.js App Router) — sin JS de cliente.
  */
 import ImpersonateButtons from "./ImpersonateButtons";
+import CsvDownload from "./CsvDownload";
 
 const SUPABASE_URL = "https://kplfjrjibjptigvfgdvy.supabase.co";
 const SUPABASE_ANON_KEY =
@@ -28,7 +29,45 @@ interface RSVPEntry {
   attended?: boolean | null;
   hasRsvp?: boolean;
   pokemon: PokemonInst[];
+  map?: string | null;
+  pos?: { x: number; y: number } | null;
 }
+
+// Slug del mapa → nombre legible para mostrar en el panel admin.
+// Mantener sincronizado con el enum MapId de game-src/src/maps/map-types.ts
+const MAP_NAMES: Record<string, string> = {
+  "pallet-town":                   "DESTILERÍA DEL PROF. OAK / Pueblo Paleta",
+  "pallet-town-house-a-1f":        "Casa del jugador (cocina)",
+  "pallet-town-house-a-2f":        "Habitación del jugador",
+  "pallet-town-house-b":           "Casa del rival",
+  "pallet-town-lab":               "Laboratorio del Prof. Oak",
+  "route-1":                       "Ruta 1 · Camino al Soto",
+  "viridian-city":                 "SOTO LEZKAIRU",
+  "viridian-city-gym":             "Gimnasio de SOTO LEZKAIRU",
+  "viridian-city-poke-mart":       "PokeMart de SOTO LEZKAIRU",
+  "viridian-city-pokemon-center":  "Centro Pokémon de SOTO LEZKAIRU",
+  "viridian-city-pokemon-acadamy": "Academia Pokémon",
+  "viridian-city-npc-house":       "Casa NPC de SOTO LEZKAIRU",
+  "route-22":                      "Ruta 22",
+  "gate-house":                    "Caseta de la Guía",
+  "route-2":                       "Ruta 2",
+  "route-2-gate":                  "Caseta sur de la Ruta 2",
+  "viridian-forrest":              "EL BOSQUECILLO",
+  "route-2-gate-north":            "Caseta norte de la Ruta 2",
+  "pewter-city":                   "VILLAMAYOR DE MONJARDÍN",
+  "pewter-city-poke-mart":         "PokeMart de VILLAMAYOR",
+  "pewter-city-pokemon-center":    "Centro Pokémon de VILLAMAYOR",
+  "pewter-city-npc-a":             "Casa NPC A de VILLAMAYOR",
+  "pewter-city-npc-b":             "Casa NPC B de VILLAMAYOR",
+  "pewter-city-gym":               "Bodega CASTILLO DE MONJARDÍN",
+  "pewter-city-museum-1f":         "Museo de VILLAMAYOR (1F)",
+  "pewter-city-museum-2f":         "Museo de VILLAMAYOR (2F)",
+  "route-3":                       "Ruta 3",
+  "route-3-pokemon-center":        "Centro Pokémon de la Ruta 3",
+  "mt-moon-1f":                    "Monte Luna (1F)",
+  "mt-moon-2f":                    "Monte Luna (2F)",
+  "mt-moon-3f":                    "Monte Luna (3F)",
+};
 
 async function fetchRsvps(
   adminKey: string
@@ -314,7 +353,10 @@ export default async function AdminPage() {
         {/* ── Header ── */}
         <div className="admin-header">
           <h1>💒 Wedding RSVPs</h1>
-          <span className="admin-header-meta">{now} · Recarga para actualizar</span>
+          <span className="admin-header-meta" style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
+            <span>{now} · Recarga para actualizar</span>
+            <CsvDownload entries={entries} mapNameLookup={MAP_NAMES} />
+          </span>
         </div>
 
         {/* ── Error panel ── */}
@@ -511,6 +553,25 @@ export default async function AdminPage() {
                           <div className="detail-label">Alergias / restricciones</div>
                           <div className={`detail-value${hasAllergy ? "" : " muted"}`}>
                             {hasAllergy ? e.allergies : "–"}
+                          </div>
+                        </div>
+
+                        {/* Ubicación actual del jugador en el juego */}
+                        <div className="detail-full">
+                          <div className="detail-label">Ubicación actual</div>
+                          <div className={`detail-value${e.map ? "" : " muted"}`}>
+                            {e.map ? (
+                              <>
+                                {MAP_NAMES[e.map] ?? e.map}
+                                {e.pos && (
+                                  <span style={{ color: "#999", fontWeight: 400, marginLeft: "0.4rem", fontSize: "0.78rem" }}>
+                                    ({e.pos.x}, {e.pos.y})
+                                  </span>
+                                )}
+                              </>
+                            ) : (
+                              "Aún no ha empezado a jugar"
+                            )}
                           </div>
                         </div>
 
