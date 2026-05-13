@@ -18,11 +18,27 @@ const viridianCityNpcHouse: MapType = {
     6: [0, 7],
     7: [0, 7],
   },
-  text: {
+text: {
     0: {
       3: [
-        "¿Ya tienes tu invitación de boda?",
-        "¡Dicen que será un día inolvidable!",
+        "No se como acabar con esa plaga... ",
+        "se esconden en las macetas..."
+      ],
+    },
+    1: {
+      0: [
+        "Tanto leerán?"
+      ],
+      1: [
+        "Más y más libros..."
+      ],
+      7: [
+        "Libros de mierda"
+      ],
+    },
+    7: {
+      0: [
+        "Aqui no hay nada..."
       ],
     },
   },
@@ -36,6 +52,15 @@ const viridianCityNpcHouse: MapType = {
     x: 21,
     y: 10,
   },
+  staticPokemon: [
+    {
+      pokemonId: 147,
+      level: 5,
+      sprite: "none",
+      pos: { x: 7, y: 7 },
+      questId: "viridian-city-npc-house-static-7-7",
+    },
+  ],
 };
 
 export default viridianCityNpcHouse;

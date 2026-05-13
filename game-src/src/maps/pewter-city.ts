@@ -188,14 +188,6 @@ text: {
       money: 0,
     },
   ],
-  gifts: [
-    {
-      pokemonId: 143,
-      level: 20,
-      pos: { x: 29, y: 24 },
-      questId: "pewter-city-gift-29-33",
-    },
-  ],
 maps: {
     7: {
       14: MapId.PewterCityMuseum1f,
@@ -233,6 +225,15 @@ teleports: {
 exits: {},
 exitReturnMap: MapId.Route2,
 exitReturnPos: { x: 5, y: 1 },
+staticPokemon: [
+    {
+      pokemonId: 143,
+      level: 20,
+      sprite: "monster-b",
+      pos: { x: 29, y: 24 },
+      questId: "pewter-city-static-29-24",
+    },
+  ],
 };
 
 export default pewterCity;
