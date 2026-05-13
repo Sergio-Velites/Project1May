@@ -1426,6 +1426,7 @@ export default function MapEditor() {
               texts: '#3a5a7a',
               items: '#5a3a7a',
               gifts: '#7a3a5a',
+              'static-pokemon': '#3a7a6a',
               spots: '#5a7a30',
               portals: '#7a3a3a',
             };
