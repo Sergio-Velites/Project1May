@@ -1841,13 +1841,15 @@ const PokemonEncounter = () => {
           setAlertText(`¡${activeMetadata.name.toUpperCase()} aguanta el ataque!`);
           setStage(17);
         } else if (isDisable) {
-          // Disable: inhabilitar último move usado por el rival
-          if (lastEnemyMoveRef.current) {
+          // Disable: inhabilitar último move usado por el rival.
+          // Falla si: el rival aún no ha usado ningún movimiento, o ya hay uno inhabilitado.
+          if (!lastEnemyMoveRef.current || enemyDisabledMoveRef.current !== null) {
+            setAlertText(`¡${activeMetadata.name.toUpperCase()} falló!`);
+          } else {
             enemyDisabledMoveRef.current = lastEnemyMoveRef.current;
             enemyDisabledTurnsRef.current = 1 + Math.floor(Math.random() * 8);
-            setAlertText(`¡El movimiento del rival quedó inhabilitado!`);
-          } else {
-            setAlertText(`¡${activeMetadata.name.toUpperCase()} falló!`);
+            const disabledMeta = getMoveMetadata(lastEnemyMoveRef.current);
+            setAlertText(`¡${disabledMeta?.name?.toUpperCase() ?? "El movimiento"} del rival quedó inhabilitado!`);
           }
           setStage(17);
         } else if (isHaze) {
@@ -1974,14 +1976,15 @@ const PokemonEncounter = () => {
           enemyBideDmgRef.current = 0;
           setStage(19);
         } else if (isDisable) {
-          // Disable del rival: inhabilita el último movimiento del jugador
-          if (lastPlayerMoveRef.current) {
+          // Disable del rival: inhabilita el último movimiento del jugador.
+          // Falla si: el jugador aún no ha usado ningún movimiento, o ya hay uno inhabilitado.
+          if (!lastPlayerMoveRef.current || playerDisabledMoveRef.current !== null) {
+            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival falló!`);
+          } else {
             playerDisabledMoveRef.current = lastPlayerMoveRef.current;
-            playerDisabledTurnsRef.current = 1 + Math.floor(Math.random() * 7); // 1-7 turnos Gen I
+            playerDisabledTurnsRef.current = 1 + Math.floor(Math.random() * 7);
             const disabledMoveMeta = getMoveMetadata(lastPlayerMoveRef.current);
             setAlertText(`¡${disabledMoveMeta?.name?.toUpperCase() ?? "El movimiento"} de ${activeMetadata.name.toUpperCase()} quedó inhabilitado!`);
-          } else {
-            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival falló!`);
           }
           setStage(19);
         } else if (isHaze) {

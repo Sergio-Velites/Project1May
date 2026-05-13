@@ -1,5 +1,4 @@
 // SERVICE WORKER KILL-SWITCH — limpia cachés y se autodesinstala.
-// Ver explicación completa en el commit 88397b5.
 self.addEventListener("install", () => { self.skipWaiting(); });
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
