@@ -12,6 +12,7 @@ import {
   showActionOnPokemon,
   showEvolution,
   showText,
+  showTextThenAction,
   throwPokeball,
 } from "../state/uiSlice";
 import { getMoveMetadata } from "./use-move-metadata";
@@ -342,20 +343,27 @@ const useItemData = () => {
             dispatch(updateSpecificPokemon({ index, pokemon: updatedPokemon }));
             dispatch(consumeItem(ItemType.RareCandy));
             const newMove = getLearnedMove(updatedPokemon);
-            if (newMove && p.moves.length < 4) {
+            const pokemonName = getPokemonMetadata(p.id).name.toUpperCase();
+            if (newMove) {
+              // Mostrar "subió de nivel" y después abrir flujo de aprendizaje
               dispatch(
-                learnMove({
-                  itemName: "Caramelo Raro",
-                  move: newMove.id,
-                  consume: false,
-                  item: ItemType.RareCandy,
+                showTextThenAction({
+                  text: [`¡${pokemonName} subió al nivel ${newLevel}!`],
+                  action: () =>
+                    dispatch(
+                      learnMove({
+                        itemName: "Caramelo Raro",
+                        move: newMove.id,
+                        consume: false,
+                        item: ItemType.RareCandy,
+                        preselectedPokemonIndex: index,
+                      })
+                    ),
                 })
               );
             } else {
               dispatch(
-                showText([
-                  `¡${getPokemonMetadata(p.id).name.toUpperCase()} subió al nivel ${newLevel}!`,
-                ])
+                showText([`¡${pokemonName} subió al nivel ${newLevel}!`])
               );
             }
           })

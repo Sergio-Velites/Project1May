@@ -6,6 +6,23 @@ import { getMoveMetadata } from "./use-move-metadata";
 import { getPokemonMetadata } from "./use-pokemon-metadata";
 import { getPokemonStats } from "./use-pokemon-stats";
 
+// ── Multi-hit distribution (Gen I) ─────────────────────────────────────────
+// Double Slap, Fury Attack, Pin Missile, Barrage, Spike Cannon, Bone Rush:
+// 37.5% → 2 golpes · 37.5% → 3 · 12.5% → 4 · 12.5% → 5
+// Movimientos de golpes fijos (Twineedle, Double Kick): min === max → siempre ese número
+const genIMultiHitCount = (min: number, max: number): number => {
+  if (min === max) return min; // Golpes fijos: Twineedle (2), Double Kick (2)
+  if (min === 2 && max === 5) {
+    const r = Math.random();
+    if (r < 0.375) return 2;
+    if (r < 0.750) return 3;
+    if (r < 0.875) return 4;
+    return 5;
+  }
+  // Fallback uniforme para cualquier otro rango
+  return min + Math.floor(Math.random() * (max - min + 1));
+};
+
 // ── Stat stages (Gen I) ──────────────────────────────────────────────────────
 
 export interface StatStages {
@@ -247,6 +264,7 @@ export interface MoveResult {
   isConversion?: boolean;     // true: cambiar tipo al de uno de los moves
   isBide?: boolean;           // true: el usuario entra en modo Bide
   isDisable?: boolean;        // true: inhabilitar último move del rival
+  requiresRecharge?: boolean; // true: el atacante pierde el siguiente turno (Hiperrayo)
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -503,8 +521,13 @@ const processMove = (
     const { minHits, maxHits } = moveMetadata.meta ?? {};
     const hitCount =
       minHits != null && maxHits != null
-        ? minHits + Math.floor(Math.random() * (maxHits - minHits + 1))
+        ? genIMultiHitCount(minHits, maxHits)
         : 1;
+    // Twineedle: tirar veneno independientemente por cada golpe
+    const twineedlePoison =
+      move === "twineedle" && hitCount > 0
+        ? Array.from({ length: hitCount }).some(() => Math.random() < 0.20)
+        : false;
     const totalDamage = baseDamage * hitCount;
 
     // Autodestrucción / Explosión: el atacante también se debilita
@@ -513,8 +536,10 @@ const processMove = (
     // Efecto secundario de estado (body-slam, thunderbolt, flamethrower…)
     const secEntry = STATUS_APPLY_TABLE[move];
     const secChance = SECONDARY_STATUS_CHANCE[move];
-    const secondaryStatus =
-      secEntry && secChance && Math.random() < secChance ? secEntry : undefined;
+    const secondaryStatus: StatusApply | undefined =
+      move === "twineedle"
+        ? (twineedlePoison ? { status: "poison" as const, target: "defender" as const } : undefined)
+        : secEntry && secChance && Math.random() < secChance ? secEntry : undefined;
 
     // Drain / recoil (meta.drain: 50 = cura 50% daño; -25 = recoil 25% daño)
     const drainPct = moveMetadata.meta?.drain ?? 0;
@@ -541,6 +566,7 @@ const processMove = (
       statusApply: secondaryStatus,
       drainHeal: drainHpDelta,
       flinch,
+      requiresRecharge: move === "hyper-beam" ? true : undefined,
     };
   }
 
@@ -567,8 +593,13 @@ const processMove = (
   const { minHits: eMin, maxHits: eMax } = moveMetadata.meta ?? {};
   const eHits =
     eMin != null && eMax != null
-      ? eMin + Math.floor(Math.random() * (eMax - eMin + 1))
+      ? genIMultiHitCount(eMin, eMax)
       : 1;
+  // Twineedle del rival: veneno por golpe
+  const eTwineedlePoison =
+    move === "twineedle" && eHits > 0
+      ? Array.from({ length: eHits }).some(() => Math.random() < 0.20)
+      : false;
   const eTotalDmg = baseDmg * eHits;
 
   // Autodestrucción / Explosión: el atacante (enemigo) también se debilita
@@ -577,8 +608,10 @@ const processMove = (
   // Efecto secundario de estado cuando el enemigo ataca
   const eSecEntry = STATUS_APPLY_TABLE[move];
   const eSecChance = SECONDARY_STATUS_CHANCE[move];
-  const eSecondaryStatus =
-    eSecEntry && eSecChance && Math.random() < eSecChance ? eSecEntry : undefined;
+  const eSecondaryStatus: StatusApply | undefined =
+    move === "twineedle"
+      ? (eTwineedlePoison ? { status: "poison" as const, target: "defender" as const } : undefined)
+      : eSecEntry && eSecChance && Math.random() < eSecChance ? eSecEntry : undefined;
 
   // Drain / recoil del enemigo
   const eDrainPct = moveMetadata.meta?.drain ?? 0;
@@ -606,6 +639,7 @@ const processMove = (
     statusApply: eSecondaryStatus,
     drainHeal: eDrainHpDelta,
     flinch: eFlinch,
+    requiresRecharge: move === "hyper-beam" ? true : undefined,
   };
 };
 

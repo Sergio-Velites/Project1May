@@ -14,6 +14,9 @@ interface LearningMoveType {
   move: string;
   consume: boolean;
   item: ItemType;
+  /** Cuando se lanza desde RareCandy: índice del pokémon ya seleccionado.
+   *  Si está definido, LearnMove salta las pantallas de selección TM/HM. */
+  preselectedPokemonIndex?: number;
 }
 
 interface ConfimationMenuType {

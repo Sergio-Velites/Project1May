@@ -691,10 +691,19 @@ const PokemonEncounter = () => {
 
   // Último move usado por el rival (para Mirror Move y Disable)
   const lastEnemyMoveRef = useRef<string | null>(null);
+  // Último move usado por el jugador (para Disable del rival)
+  const lastPlayerMoveRef = useRef<string | null>(null);
 
   // Disable: move inhabilitado del rival + turnos restantes
   const enemyDisabledMoveRef  = useRef<string | null>(null);
   const enemyDisabledTurnsRef = useRef(0);
+  // Disable: move inhabilitado del jugador + turnos restantes
+  const playerDisabledMoveRef  = useRef<string | null>(null);
+  const playerDisabledTurnsRef = useRef(0);
+
+  // Hyper Beam: recarga del turno siguiente
+  const playerHyperBeamRechargeRef = useRef(false);
+  const enemyHyperBeamRechargeRef  = useRef(false);
 
   // Movimientos de 2 turnos (Solar Beam, Razor Wind, Sky Attack, Skull Bash)
   // y de invulnerabilidad (Dig, Fly): almacena el move pendiente de ejecutar
@@ -892,8 +901,13 @@ const PokemonEncounter = () => {
       playerMistRef.current = false;
       enemyMistRef.current  = false;
       lastEnemyMoveRef.current = null;
+      lastPlayerMoveRef.current = null;
       enemyDisabledMoveRef.current  = null;
       enemyDisabledTurnsRef.current = 0;
+      playerDisabledMoveRef.current  = null;
+      playerDisabledTurnsRef.current = 0;
+      playerHyperBeamRechargeRef.current = false;
+      enemyHyperBeamRechargeRef.current  = false;
       playerChargingMoveRef.current = null;
       enemyChargingMoveRef.current  = null;
       playerInvulnerableRef.current = false;
@@ -1363,6 +1377,11 @@ const PokemonEncounter = () => {
   };
 
   const getRandomEnemyMove = () => {
+    // Hyper Beam del rival: si está recargando, usa "recharge" (se maneja en checkSkipTurn)
+    if (enemyHyperBeamRechargeRef.current) {
+      enemyHyperBeamRechargeRef.current = false;
+      return "__recharge__"; // señal especial para skip de turno del rival
+    }
     // Si el rival está en Bide, usar bide
     if (enemyBideTurnsRef.current > 0) return "bide";
     // Si el rival está en Trashing, continuar con ese move
@@ -1777,6 +1796,12 @@ const PokemonEncounter = () => {
         // Registrar flinch si el resultado indica que el enemigo flinched
         if (result.flinch) enemyFlinchRef.current = true;
 
+        // Registrar último move del jugador (para Disable del rival)
+        if (moveId) lastPlayerMoveRef.current = moveId;
+
+        // Hyper Beam del jugador: si el rival sigue en pie, activar recarga
+        if (result.requiresRecharge) playerHyperBeamRechargeRef.current = true;
+
         // Aplicar condición de estado ANTES de elegir el mensaje
         const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
 
@@ -1909,6 +1934,9 @@ const PokemonEncounter = () => {
         // Registrar flinch del jugador si el rival le golpea con flinch
         if (result.flinch) playerFlinchRef.current = true;
 
+        // Hyper Beam del rival: si el jugador sigue en pie, activar recarga del rival
+        if (result.requiresRecharge) enemyHyperBeamRechargeRef.current = true;
+
         // Aplicar condición de estado ANTES de elegir el mensaje
         const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
 
@@ -1931,10 +1959,13 @@ const PokemonEncounter = () => {
           setStage(19);
         } else if (isDisable) {
           // Disable del rival: inhabilita el último movimiento del jugador
-          if (active.moves.length > 0) {
-            const lastPlayerMove = active.moves[Math.floor(Math.random() * active.moves.length)].id;
-            // No tenemos un "último move del jugador" ref simple aquí, inhabilitar aleatorio
-            setAlertText(`¡Tu movimiento quedó inhabilitado!`);
+          if (lastPlayerMoveRef.current) {
+            playerDisabledMoveRef.current = lastPlayerMoveRef.current;
+            playerDisabledTurnsRef.current = Math.floor(Math.random() * 7); // 0-6 turnos Gen I
+            const disabledMoveMeta = getMoveMetadata(lastPlayerMoveRef.current);
+            setAlertText(`¡${disabledMoveMeta?.name?.toUpperCase() ?? "El movimiento"} de ${activeMetadata.name.toUpperCase()} quedó inhabilitado!`);
+          } else {
+            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival falló!`);
           }
           setStage(19);
         } else if (isHaze) {
@@ -2081,6 +2112,83 @@ const PokemonEncounter = () => {
   const processBattle = (attackId: string) => {
     // ── Pre-proceso: movimientos especiales de estado ──────────────────────
 
+    // Hyper Beam del jugador: si está recargando, pierde este turno
+    if (playerHyperBeamRechargeRef.current) {
+      playerHyperBeamRechargeRef.current = false;
+      setAlertText(`¡${activeMetadata.name.toUpperCase()} está recargando!`);
+      setStage(15);
+      setTimeout(() => {
+        setAlertText(null);
+        // El rival ataca normalmente durante la recarga
+        const enemyMoveIdRecharge = getRandomEnemyMove();
+        const stagesSnapRecharge = { us: playerStages, them: enemyStages };
+        const effPlayerRecharge = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
+        if (!checkSkipTurn(false) && !enemyHyperBeamRechargeRef.current) {
+          const { us: usRecharge } = processMoveResult(
+            processMove(effPlayerRecharge, enemy, enemyMoveIdRecharge, false, stagesSnapRecharge, {
+              lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+              isTargetSleeping: playerStatusRef.current?.type === "sleep",
+            }),
+            false,
+            enemyMoveIdRecharge
+          );
+          lastEnemyMoveRef.current = enemyMoveIdRecharge;
+          setTimeout(() => {
+            if (usRecharge.hp <= 0) setStage(24);
+            else applyEndOfTurnStatus(usRecharge, enemy);
+          }, ATTACK_ANIMATION + 1000);
+        } else {
+          enemyHyperBeamRechargeRef.current = false;
+          applyEndOfTurnStatus(effPlayerRecharge, enemy);
+        }
+      }, ATTACK_ANIMATION);
+      return;
+    }
+
+    // Disable del jugador: si el movimiento está inhabilitado, falla el turno
+    if (playerDisabledMoveRef.current && attackId === playerDisabledMoveRef.current) {
+      playerDisabledTurnsRef.current -= 1;
+      if (playerDisabledTurnsRef.current <= 0) {
+        playerDisabledMoveRef.current = null;
+        playerDisabledTurnsRef.current = 0;
+      }
+      setAlertText(`¡${activeMetadata.name.toUpperCase()} no puede usar ese movimiento!`);
+      setStage(15);
+      setTimeout(() => {
+        setAlertText(null);
+        const enemyMoveIdD = getRandomEnemyMove();
+        const stagesSnapD = { us: playerStages, them: enemyStages };
+        const effPlayerD = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
+        if (!checkSkipTurn(false)) {
+          const { us: usD } = processMoveResult(
+            processMove(effPlayerD, enemy, enemyMoveIdD, false, stagesSnapD, {
+              lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+              isTargetSleeping: playerStatusRef.current?.type === "sleep",
+            }),
+            false,
+            enemyMoveIdD
+          );
+          lastEnemyMoveRef.current = enemyMoveIdD;
+          setTimeout(() => {
+            if (usD.hp <= 0) setStage(24);
+            else applyEndOfTurnStatus(usD, enemy);
+          }, ATTACK_ANIMATION + 1000);
+        } else {
+          applyEndOfTurnStatus(effPlayerD, enemy);
+        }
+      }, ATTACK_ANIMATION);
+      return;
+    }
+
+    // Decrementar contador de Disable del jugador si está activo
+    if (playerDisabledMoveRef.current && attackId !== playerDisabledMoveRef.current) {
+      playerDisabledTurnsRef.current -= 1;
+      if (playerDisabledTurnsRef.current <= 0) {
+        playerDisabledMoveRef.current = null;
+        playerDisabledTurnsRef.current = 0;
+      }
+    }
+
     // Bide del jugador: acumular daño en lugar de atacar
     if (playerBideTurnsRef.current > 0) {
       playerBideTurnsRef.current -= 1;
@@ -2219,9 +2327,10 @@ const PokemonEncounter = () => {
 
     const activeMove = getMoveMetadata(attackId);
     const enemyMoveId = getRandomEnemyMove();
-    const enemyMove  = getMoveMetadata(enemyMoveId);
-    // Registrar el move del rival para Mirror Move
-    lastEnemyMoveRef.current = enemyMoveId;
+    const isEnemyRecharging = enemyMoveId === "__recharge__";
+    const enemyMove  = isEnemyRecharging ? getMoveMetadata("tackle") : getMoveMetadata(enemyMoveId);
+    // Registrar el move del rival para Mirror Move (no registrar el recharge)
+    if (!isEnemyRecharging) lastEnemyMoveRef.current = enemyMoveId;
 
     // Iniciar Thrash del rival si es su primer turno usándolo
     if ((enemyMoveId === "thrash" || enemyMoveId === "petal-dance") && enemyThrashTurnsRef.current === 0) {
@@ -2261,10 +2370,16 @@ const PokemonEncounter = () => {
         setStage(15);
         setTimeout(() => {
           setAlertText(null);
-          if (checkSkipTurn(false)) {
-            // Ambos saltan
-            setMoveAnim(null);
-            setStage(18);
+          if (isEnemyRecharging || checkSkipTurn(false)) {
+            // Ambos saltan (o rival recarga)
+            if (isEnemyRecharging) {
+              setMoveAnim(null);
+              setStage(18);
+              setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+            } else {
+              setMoveAnim(null);
+              setStage(18);
+            }
             setTimeout(() => {
               setAlertText(null);
               applyEndOfTurnStatus(effectivePlayer, enemy);
@@ -2300,10 +2415,11 @@ const PokemonEncounter = () => {
           } else if (us.hp <= 0) {
             setStage(24);
           } else {
-            if (checkSkipTurn(false)) {
-              // Rival salta turno
+            if (isEnemyRecharging || checkSkipTurn(false)) {
+              // Rival recarga o salta turno
               setMoveAnim(null);
               setStage(18);
+              if (isEnemyRecharging) setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
               setTimeout(() => {
                 setAlertText(null);
                 applyEndOfTurnStatus(us, them);
@@ -2326,10 +2442,11 @@ const PokemonEncounter = () => {
 
     // ── Rival mueve primero ──────────────────────────────────────────────
     else {
-      if (checkSkipTurn(false)) {
-        // Rival salta turno — mostrar mensaje, luego ataca el jugador
+      if (isEnemyRecharging || checkSkipTurn(false)) {
+        // Rival recarga o salta turno — luego ataca el jugador
         setMoveAnim(null);
         setStage(18);
+        if (isEnemyRecharging) setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
         setTimeout(() => {
           setAlertText(null);
           if (checkSkipTurn(true)) {

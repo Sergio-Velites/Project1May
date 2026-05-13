@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { selectLearningMove, stopLearningMove } from "../state/uiSlice";
 import Frame from "../components/Frame";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useEvent from "./use-event";
 import { Event } from "./emitter";
 import useMoveMetadata from "./use-move-metadata";
@@ -38,14 +38,43 @@ const LearnMove = () => {
 
   const [stage, setStage] = useState(0);
   const [pokemonIndex, setPokemonIndex] = useState(0);
+  // Flag para saber si este flujo fue iniciado por RareCandy (ya hay pokémon preseleccionado)
+  const [preselectedHandled, setPreselectedHandled] = useState(false);
 
-  const item = move?.consume ? "TM" : "HM";
+  const item = move?.consume ? "MT" : "MO";
 
   const end = () => {
     setPokemonIndex(0);
     setStage(0);
+    setPreselectedHandled(false);
     dispatch(stopLearningMove());
   };
+
+  // Cuando viene de RareCandy (preselectedPokemonIndex definido): saltar directamente al stage correcto
+  useEffect(() => {
+    if (!move || move.preselectedPokemonIndex === undefined || !moveData || preselectedHandled) return;
+    const idx = move.preselectedPokemonIndex;
+    setPokemonIndex(idx);
+    setPreselectedHandled(true);
+    const p = pokemon[idx];
+    if (!p) return;
+    if (p.moves.length === 4) {
+      // El pokémon tiene 4 moves: ir al flujo "elige cuál olvidar"
+      setStage(3);
+    } else {
+      // El pokémon tiene hueco: aprender directamente
+      dispatch(
+        updateSpecificPokemon({
+          index: idx,
+          pokemon: {
+            ...p,
+            moves: [...p.moves, { id: moveData.id, pp: moveData.pp || 0 }],
+          },
+        })
+      );
+      setStage(7);
+    }
+  }, [move, moveData, preselectedHandled, pokemon, dispatch]);
 
   useEvent(Event.A, () => {
     if (!move) return;
@@ -61,18 +90,18 @@ const LearnMove = () => {
 
   const text = () => {
     if (!moveData) return "";
-    if (stage === 0) return `Booted up ${item}!`;
-    if (stage === 1) return `It contained ${moveData.name.toUpperCase()}!`;
+    if (stage === 0) return `¡${item} cargada!`;
+    if (stage === 1) return `¡Contiene ${moveData.name.toUpperCase()}!`;
     if (stage === 3)
       return `${getPokemonMetadata(
         pokemon[pokemonIndex].id
-      ).name.toUpperCase()} is trying to learn ${moveData.name.toUpperCase()}.`;
-    if (stage === 4) return `But it cannot learn more than 4 moves`;
-    if (stage === 5) return `Choose a move you would like to forget`;
+      ).name.toUpperCase()} intenta aprender ${moveData.name.toUpperCase()}.`;
+    if (stage === 4) return `¡Pero no puede aprender más de 4 movimientos!`;
+    if (stage === 5) return `¿Qué movimiento quieres olvidar?`;
     if (stage === 7)
-      return `${getPokemonMetadata(
+      return `¡${getPokemonMetadata(
         pokemon[pokemonIndex].id
-      ).name.toUpperCase()} learned ${moveData.name.toUpperCase()}!`;
+      ).name.toUpperCase()} aprendió ${moveData.name.toUpperCase()}!`;
   };
 
   return (
@@ -85,7 +114,7 @@ const LearnMove = () => {
       {stage === 2 && (
         <PokemonList
           close={() => end()}
-          text={`Use ${item} on which Pokémon?`}
+          text={`¿En qué Pokémon usar la ${item}?`}
           moveData={moveData ?? undefined}
           clickPokemon={(index: number) => {
             const pokemon_ = pokemon[index];
@@ -101,11 +130,11 @@ const LearnMove = () => {
               }
               dispatch(
                 updateSpecificPokemon({
-                  index: pokemonIndex,
+                  index: index,
                   pokemon: {
-                    ...pokemon[pokemonIndex],
+                    ...pokemon[index],
                     moves: [
-                      ...pokemon[pokemonIndex].moves,
+                      ...pokemon[index].moves,
                       {
                         id: moveData.id,
                         pp: moveData.pp || 0,
