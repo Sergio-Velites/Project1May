@@ -25,7 +25,8 @@ interface RSVPEntry {
   bus_outbound: string;
   bus_return: string;
   preboda: boolean;
-  attended?: boolean;
+  attended?: boolean | null;
+  hasRsvp?: boolean;
   pokemon: PokemonInst[];
 }
 
@@ -79,10 +80,13 @@ export default async function AdminPage() {
 
   const { entries, httpStatus, errorMsg } = await fetchRsvps(adminSecret);
 
-  const totalRsvps     = entries.length;
-  const attendingEntries = entries.filter((e) => e.attended !== false);
+  const rsvpEntries    = entries.filter((e) => e.hasRsvp !== false);
+  const savesOnly      = entries.filter((e) => e.hasRsvp === false);
+  const totalRsvps     = rsvpEntries.length;
+  const attendingEntries = rsvpEntries.filter((e) => e.attended !== false);
   const totalAttended  = attendingEntries.length;
-  const totalDeclined  = entries.length - totalAttended;
+  const totalDeclined  = rsvpEntries.length - totalAttended;
+  const totalSavesOnly = savesOnly.length;
   const totalAdults    = attendingEntries.length + attendingEntries.filter((e) => e.companion).length;
   const totalChildren  = attendingEntries.reduce((s, e) => s + (e.children ?? 0), 0);
   const totalAllergies = attendingEntries.filter((e) => e.allergies && e.allergies.trim() !== "").length;
@@ -94,6 +98,7 @@ export default async function AdminPage() {
   const totalBus0130   = attendingEntries.filter((e) => e.bus_return === "01:30" || e.bus_return === "1:45").length;
   const totalPreboda   = attendingEntries.filter((e) => e.preboda).length;
   const totalPokemon   = entries.reduce((s, e) => s + (Array.isArray(e.pokemon) ? e.pokemon.length : 0), 0);
+  const totalPlayers   = entries.filter((e) => Array.isArray(e.pokemon) && e.pokemon.length > 0).length;
 
   const now = new Date().toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
 
@@ -380,6 +385,18 @@ export default async function AdminPage() {
             <span className="stat-value">{totalPokemon}</span>
             <span className="stat-sub">capturados en total</span>
           </div>
+          <div className="stat-card">
+            <span className="stat-label">Han jugado</span>
+            <span className="stat-value">{totalPlayers}</span>
+            <span className="stat-sub">con al menos 1 pokémon</span>
+          </div>
+          {totalSavesOnly > 0 && (
+            <div className="stat-card">
+              <span className="stat-label">Sin RSVP</span>
+              <span className="stat-value">{totalSavesOnly}</span>
+              <span className="stat-sub">han jugado sin responder</span>
+            </div>
+          )}
         </div>
 
         {/* ── Cards ── */}
@@ -389,18 +406,22 @@ export default async function AdminPage() {
           </p>
         ) : (
           <>
-            <p className="section-title">Invitados · {entries.length} ({totalAttended} asisten· {totalDeclined} rechazados)</p>
+            <p className="section-title">Invitados · {totalRsvps} con RSVP ({totalAttended} asisten · {totalDeclined} rechazados){totalSavesOnly > 0 ? ` · ${totalSavesOnly} sin RSVP` : ""}</p>
             <div className="cards-list">
               {entries.map((e, i) => {
                 const team = Array.isArray(e.pokemon) ? e.pokemon : [];
                 const hasAllergy = !!(e.allergies && e.allergies.trim() !== "");
                 const isDeclined = e.attended === false;
+                const noRsvp = e.hasRsvp === false;
                 return (
                   <details className="rsvp-card" key={i}>
                     <summary>
                       <span className="summary-num">#{i + 1}</span>
                       <span className="summary-name">{e.player_name}</span>
                       <span className="summary-chips">
+                        {noRsvp && (
+                          <span className="chip chip-gray">Sin RSVP</span>
+                        )}
                         {isDeclined && (
                           <span className="chip chip-red">✗ No asiste</span>
                         )}
@@ -424,6 +445,16 @@ export default async function AdminPage() {
                     </summary>
 
                     <div className="rsvp-detail">
+                      {noRsvp && (
+                        <div style={{
+                          background: "#f1f5f9", border: "1px solid #cbd5e1",
+                          borderRadius: "8px", padding: "0.6rem 0.9rem",
+                          marginBottom: "0.75rem", color: "#475569",
+                          fontWeight: 600, fontSize: "0.82rem",
+                        }}>
+                          ℹ Este invitado ha jugado pero todavía no ha respondido el RSVP.
+                        </div>
+                      )}
                       {isDeclined && (
                         <div style={{
                           background: "#fee2e2", border: "1px solid #fca5a5",

@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
       (saves as SaveRow[]).map((s) => [s.user_id, s.game_state])
     );
 
-    // Merge rsvp + pokemon
+    // ── Entradas con RSVP (enriquecidas con pokémon) ───────────────────────
     type RsvpRow = {
       user_id: string;
       player_name: string;
@@ -49,13 +49,33 @@ Deno.serve(async (req) => {
       updated_at: string;
     };
 
-    const entries = (rsvps as RsvpRow[]).map((r) => {
-      const gs = savesMap[r.user_id];
-      return {
-        ...r,
-        pokemon: gs?.pokemon ?? [],
-      };
-    });
+    const rsvpUserIds = new Set((rsvps as RsvpRow[]).map((r) => r.user_id));
+
+    const rsvpEntries = (rsvps as RsvpRow[]).map((r) => ({
+      ...r,
+      hasRsvp: true,
+      pokemon: savesMap[r.user_id]?.pokemon ?? [],
+    }));
+
+    // ── Jugadores sin RSVP (solo tienen partida guardada) ───────────────────
+    type SaveRowFull = { user_id: string; game_state: { name?: string; pokemon?: unknown[] } | null };
+    const savesOnlyEntries = (saves as SaveRowFull[])
+      .filter((s) => !rsvpUserIds.has(s.user_id))
+      .map((s) => ({
+        user_id: s.user_id,
+        player_name: s.game_state?.name ?? "Desconocido",
+        companion: null,
+        children: 0,
+        allergies: null,
+        bus_outbound: "none",
+        bus_return: "none",
+        preboda: false,
+        attended: null,
+        hasRsvp: false,
+        pokemon: s.game_state?.pokemon ?? [],
+      }));
+
+    const entries = [...rsvpEntries, ...savesOnlyEntries];
 
     return json({ entries }, 200, corsHeaders);
   } catch (e) {
