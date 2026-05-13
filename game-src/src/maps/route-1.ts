@@ -77,69 +77,84 @@ const route1: MapType = {
   exitReturnMap: MapId.PalletTown,
   music,
   encounters: getEncounterData("kanto-route-1-area"),
-  trainers: [
-    {
-      npc: youngster,
-      pokemon: [{ id: 21, level: 4 }],
-      facing: Direction.Left,
-      pos: { x: 14, y: 18 },
-      intro: [
-        "¡Para ahí, tú!",
-        "¡No te creas que llegarás tan fácil!",
-        "¡Yo quería el vino y tú me lo quitaste!",
-      ],
-      outtro: ["Bueno... puede que yo tampoco llegue a tiempo."],
-      money: 50,
-    },
-    {
-      npc: beauty,
-      pokemon: [{ id: 35, level: 2 }],
-      facing: Direction.Right,
-      pos: { x: 7, y: 20 },
-      intro: [],
-      outtro: ["¡No olvides que la preboda sin anís no es preboda!"],
-      money: 0,
-    },
-    // Mensajero — corre a avisar que ya llega el coche de los novios
-    {
-      npc: lass,
-      pokemon: [{ id: 19, level: 4 }],
-      facing: Direction.Down,
-      pos: { x: 13, y: 10 },
-      intro: [],
-      outtro: [
-        "¡El coche de los novios ya ha salido de Pamplona!",
-        "¡Muévete o te quedas sin sitio!",
-      ],
-      money: 0,
-    },
-    // Pescador — invitado de la cuñada, despistado
-    {
-      npc: fisher,
-      pokemon: [{ id: 129, level: 6 }, { id: 118, level: 5 }],
-      facing: Direction.Left,
-      pos: { x: 13, y: 26 },
-      intro: [
-        "¡Yo pensaba que la preboda era en el río!",
-        "¡Pues aun así, a ver si me ganas!",
-      ],
-      outtro: ["Bueno... en fin. Al menos el vino no estará en el río."],
-      money: 70,
-    },
-    // Marinero — llega en nombre del padrino
-    {
-      npc: sailor,
-      pokemon: [{ id: 72, level: 7 }, { id: 54, level: 7 }],
-      facing: Direction.Down,
-      pos: { x: 6, y: 16 },
-      intro: [
-        "¡El padrino me manda a probarte!",
-        "¡Si llegas tarde, él no responde!",
-      ],
-      outtro: ["Pasa, pasa. El padrino estará orgulloso."],
-      money: 90,
-    },
+// Trainers para "route-1"
+trainers: [
+  {
+  npc: youngster,
+  pokemon: [{ id: 21, level: 4 }],
+  facing: Direction.Left,
+  pos: { x: 14, y: 18 },
+  intro: [
+    "¡Para ahí, tú!",
+    "¡No te creas que llegarás tan fácil!",
+    "¡Yo quería el vino y tú me lo quitaste!"
   ],
+  outtro: [
+    "Bueno... puede que yo tampoco llegue a tiempo."
+  ],
+  money: 50,
+  persistent: true,
+},
+  {
+  npc: beauty,
+  pokemon: [{ id: 35, level: 2 }],
+  facing: Direction.Right,
+  pos: { x: 7, y: 20 },
+  intro: [
+
+  ],
+  outtro: [
+    "¡No olvides que la preboda sin anís no es preboda!"
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: lass,
+  pokemon: [{ id: 19, level: 6 }],
+  facing: Direction.Down,
+  pos: { x: 13, y: 10 },
+  intro: [
+
+  ],
+  outtro: [
+    "¡El coche de los novios ya ha salido de Pamplona!",
+    "¡Muévete o te quedas sin sitio!"
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: fisher,
+  pokemon: [{ id: 129, level: 7 }, { id: 118, level: 5 }],
+  facing: Direction.Left,
+  pos: { x: 13, y: 26 },
+  intro: [
+    "¡Yo pensaba que la preboda era en el río!",
+    "¡Pues aun así, a ver si me ganas!"
+  ],
+  outtro: [
+    "Bueno... en fin. Al menos el vino no estará en el río."
+  ],
+  money: 70,
+  persistent: true,
+},
+  {
+  npc: sailor,
+  pokemon: [{ id: 72, level: 5 }, { id: 54, level: 6 }],
+  facing: Direction.Down,
+  pos: { x: 6, y: 16 },
+  intro: [
+    "¡El padrino me manda a probarte!",
+    "¡Si llegas tarde, él no responde!"
+  ],
+  outtro: [
+    "Pasa, pasa. El padrino estará orgulloso."
+  ],
+  money: 90,
+  persistent: true,
+}
+],
   grass: {
     6: [10, 11, 12, 13, 14, 15, 16, 17],
     7: [10, 11, 12, 13, 14, 15, 16, 17],
