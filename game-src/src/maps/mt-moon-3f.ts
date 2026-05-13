@@ -20,7 +20,7 @@ walls: {
     0: [],
     1: [20, 21, 22, 23, 24, 25, 26, 27],
     2: [19],
-    3: [4, 5, 6, 7, 19, 27],
+    3: [4, 5, 6, 7, 19],
     4: [3, 8, 20, 21, 22, 23, 24, 25, 26, 27],
     5: [3, 8],
     6: [3, 8],
@@ -50,79 +50,10 @@ walls: {
   fences: {},
   grass: {},
 text: {},
-  maps: {},
-  exits: {},
-  teleports: {
-    3: {
-      23: {
-        map: MapId.MtMoon2f,
-        pos: {
-          x: 4,
-          y: 6,
-        },
-      },
-    },
-    5: {
-      5: {
-        map: MapId.MtMoon1f,
-        pos: {
-          x: 7,
-          y: 5,
-        },
-      },
-    },
-    9: {
-      25: {
-        map: MapId.MtMoon1f,
-        pos: {
-          x: 16,
-          y: 12,
-        },
-      },
-    },
-    11: {
-      17: {
-        map: MapId.MtMoon2f,
-        pos: {
-          x: 26,
-          y: 10,
-        },
-      },
-    },
-    17: {
-      21: {
-        map: MapId.MtMoon2f,
-        pos: {
-          x: 22,
-          y: 16,
-        },
-      },
-    },
-    15: {
-      25: {
-        map: MapId.MtMoon1f,
-        pos: {
-          x: 26,
-          y: 14,
-        },
-      },
-    },
-    27: {
-      13: {
-        map: MapId.MtMoon2f,
-        pos: {
-          x: 16,
-          y: 26,
-        },
-      },
-    },
-  },
-  exitReturnPos: {
-    x: 6,
-    y: 5,
-  },
+
+
   encounters: getEncounterData("mt-moon-b1f"),
-  exitReturnMap: MapId.MtMoon1f,
+
   trainers: [],
 staticPokemon: [
     {
@@ -167,6 +98,35 @@ staticPokemon: [
         "pero no más que ayer en el aperitivo..."],
     },
   ],
+  maps: {},
+teleports: {
+    3: {
+      23: { map: MapId.MtMoon2f, pos: { x: 4, y: 6 } },
+    },
+    5: {
+      5: { map: MapId.MtMoon1f, pos: { x: 7, y: 5 } },
+    },
+    9: {
+      25: { map: MapId.MtMoon1f, pos: { x: 16, y: 12 } },
+    },
+    11: {
+      17: { map: MapId.MtMoon2f, pos: { x: 26, y: 10 } },
+    },
+    15: {
+      25: { map: MapId.MtMoon1f, pos: { x: 26, y: 14 } },
+    },
+    17: {
+      21: { map: MapId.MtMoon2f, pos: { x: 22, y: 16 } },
+    },
+    27: {
+      13: { map: MapId.MtMoon2f, pos: { x: 16, y: 26 } },
+    },
+  },
+exits: {
+    3: [27],
+  },
+exitReturnMap: MapId.PalletTownHouseA2F,
+exitReturnPos: { x: 7, y: 2 },
 };
 
 export default mtMoon3f;
