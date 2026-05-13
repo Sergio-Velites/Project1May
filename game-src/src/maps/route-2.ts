@@ -204,7 +204,7 @@ maps: {
   },
 teleports: {
     11: {
-      3: { map: MapId.Route2GateNorth, pos: { x: 6, y: 1 } },
+      3: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
     },
   },
 exits: {
