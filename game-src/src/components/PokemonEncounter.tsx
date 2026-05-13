@@ -1511,7 +1511,6 @@ const PokemonEncounter = () => {
   const processEnemyOnlyTurn = () => {
     if (!enemy || !active) return;
     const enemyMoveId = getRandomEnemyMove();
-    const enemyMove = getMoveMetadata(enemyMoveId);
     const stagesSnapshot = { us: playerStages, them: enemyStages };
 
     // Snapshot del Pokémon activo actual (puede haber cambiado tras setActivePokemon).
@@ -1529,6 +1528,19 @@ const PokemonEncounter = () => {
       return;
     }
 
+    // Rival recargando tras Hyper Beam — no ataca este turno
+    if (enemyMoveId === "__recharge__") {
+      setMoveAnim(null);
+      setStage(18);
+      setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+      setTimeout(() => {
+        setAlertText(null);
+        applyEndOfTurnStatus(currentActive, enemy);
+      }, ATTACK_ANIMATION);
+      return;
+    }
+
+    const enemyMove = getMoveMetadata(enemyMoveId);
     const { us } = processMoveResult(
       processMove(currentActive, enemy, enemyMove.id, false, stagesSnapshot, {
         lastPhysicalDamageTaken: lastPhysicalDamageRef.current,

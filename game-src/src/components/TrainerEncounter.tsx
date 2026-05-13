@@ -128,6 +128,13 @@ const TrainerEncounter = () => {
 
     if (!encounter || !!pokemonEncounter) return;
 
+    // Si introIndex es -1 pero hay un encounter (caso raro de estado inconsistente),
+    // reiniciar desde el principio del intro.
+    if (introIndex === -1) {
+      setIntroIndex(0);
+      return;
+    }
+
     if (introIndex === encounter.intro.length - 1) {
       setIntroIndex(-1);
       const pokemon_ = encounter.pokemon[0];

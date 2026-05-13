@@ -181,11 +181,12 @@ export const gameSlice = createSlice({
       state.inventory = savedGameState.inventory;
       state.name = savedGameState.name;
       state.pokemon = savedGameState.pokemon;
-      state.pokemonEncounter = savedGameState.pokemonEncounter;
+      // No restaurar encuentros activos al cargar save
+      state.pokemonEncounter = undefined;
       state.activePokemonIndex = savedGameState.activePokemonIndex;
       state.money = savedGameState.money;
       state.pc = savedGameState.pc;
-      state.trainerEncounter = savedGameState.trainerEncounter;
+      state.trainerEncounter = undefined;
       state.defeatedTrainers = savedGameState.defeatedTrainers;
       state.collectedItems = savedGameState.collectedItems;
       state.completedQuests = savedGameState.completedQuests;
@@ -198,11 +199,13 @@ export const gameSlice = createSlice({
       state.inventory = s.inventory;
       state.name = s.name;
       state.pokemon = s.pokemon;
-      state.pokemonEncounter = s.pokemonEncounter;
+      // No restaurar encuentros activos al cargar save — podrían quedar corruptos
+      // si el juego crasheó durante un combate. El jugador vuelve al mapa limpio.
+      state.pokemonEncounter = undefined;
       state.activePokemonIndex = s.activePokemonIndex;
       state.money = s.money;
       state.pc = s.pc;
-      state.trainerEncounter = s.trainerEncounter;
+      state.trainerEncounter = undefined;
       state.defeatedTrainers = s.defeatedTrainers;
       state.collectedItems = s.collectedItems;
       state.completedQuests = s.completedQuests;
