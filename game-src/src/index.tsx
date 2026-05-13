@@ -25,4 +25,8 @@ root.render(
   </React.StrictMode>
 );
 
-serviceWorkerRegistration.register();
+// Service worker DESHABILITADO. Antes registraba el SW de CRA, que cacheaba
+// agresivamente el bundle: los usuarios seguían viendo versiones antiguas
+// días después de cada deploy. unregister() además desinstala cualquier SW
+// previo que tuvieran instalado.
+serviceWorkerRegistration.unregister();

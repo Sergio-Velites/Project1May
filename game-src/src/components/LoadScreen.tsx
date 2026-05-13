@@ -135,11 +135,12 @@ const LoadScreen = () => {
         : playAs
         ? "play_as"
         : null;
-      // UUID v4 simple validation — impersonation only in non-production
+      // UUID v4 simple validation. Impersonación admitida también en
+      // producción: el admin está protegido por cookie ADMIN_PASSWORD,
+      // así que solo el administrador puede generar estas URLs.
       if (
         target &&
         mode &&
-        process.env.NODE_ENV !== "production" &&
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
           target
         )
