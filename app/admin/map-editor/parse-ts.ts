@@ -31,6 +31,14 @@ export interface ParsedGift {
   questId: string;
 }
 
+export interface ParsedStaticPokemon {
+  pokemonId: number;
+  level: number;
+  pos: { x: number; y: number };
+  sprite: string;
+  questId: string;
+}
+
 export interface ParsedTextReward {
   type: 'pokemon' | 'item';
   pokemonId?: number;
@@ -58,6 +66,7 @@ export interface ParsedMap {
   exits: Record<string, number[]>;
   exitReturnMap: string | null;
   exitReturnPos: { x: number; y: number } | null;
+  staticPokemon: ParsedStaticPokemon[];
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────
@@ -267,8 +276,46 @@ function parseGiftsField(tsText: string): ParsedGift[] {
   return result;
 }
 
-function parseStringArray(text: string, key: string): string[] {
-  const keyMatch = text.match(new RegExp(`${key}\\s*:\\s*\\[`));
+function parseStaticPokemonField(tsText: string): ParsedStaticPokemon[] {
+  const m = tsText.match(/(?<![\w])staticPokemon\s*:\s*\[/);
+  if (!m || m.index === undefined) return [];
+  const arrStart = tsText.indexOf('[', m.index + m[0].length - 1);
+  const arrBlk = findBalancedBlock(tsText, arrStart, '[', ']');
+  if (!arrBlk) return [];
+  const inner = arrBlk.text.slice(1, -1);
+  const result: ParsedStaticPokemon[] = [];
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    if (inner[i] !== '{') { i++; continue; }
+    const objBlk = findBalancedBlock(inner, i);
+    if (!objBlk) break;
+    const t = objBlk.text;
+    const pid = t.match(/pokemonId\s*:\s*(\d+)/);
+    const lvl = t.match(/level\s*:\s*(\d+)/);
+    const spr = t.match(/sprite\s*:\s*"([^"]+)"/);
+    const qid = t.match(/questId\s*:\s*"([^"]+)"/);
+    let pos: { x: number; y: number } | null = null;
+    const posStartM = t.match(/pos\s*:\s*\{/);
+    if (posStartM && posStartM.index !== undefined) {
+      const posOpenIdx = t.indexOf('{', posStartM.index + posStartM[0].length - 1);
+      const posBlk = findBalancedBlock(t, posOpenIdx);
+      if (posBlk) {
+        const xm = posBlk.text.match(/x\s*:\s*(\d+)/);
+        const ym = posBlk.text.match(/y\s*:\s*(\d+)/);
+        if (xm && ym) pos = { x: parseInt(xm[1], 10), y: parseInt(ym[1], 10) };
+      }
+    }
+    if (pid && lvl && spr && pos && qid) {
+      result.push({ pokemonId: parseInt(pid[1], 10), level: parseInt(lvl[1], 10), pos, sprite: spr[1], questId: qid[1] });
+    }
+    i = objBlk.end + 1;
+  }
+  return result;
+}
+
+function parseStringArray(text: string, key: string): string[] {  const keyMatch = text.match(new RegExp(`${key}\\s*:\\s*\\[`));
   if (!keyMatch || keyMatch.index === undefined) return [];
   const startIdx = text.indexOf('[', keyMatch.index + keyMatch[0].length - 1);
   const blk = findBalancedBlock(text, startIdx, '[', ']');
@@ -470,6 +517,7 @@ export function parseMapTS(tsText: string): ParsedMap {
     textRewards: parseTextRewardsField(tsText),
     items: parseItemsField(tsText),
     gifts: parseGiftsField(tsText),
+    staticPokemon: parseStaticPokemonField(tsText),
     trainers: parseTrainers(tsText),
     pokemonCenter: parsePos(tsText, 'pokemonCenter'),
     pc: parsePos(tsText, 'pc'),

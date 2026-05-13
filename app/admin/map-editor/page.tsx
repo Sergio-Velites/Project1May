@@ -41,6 +41,7 @@ interface MapEntry {
   texts?: Record<string, Record<string, string[]>>;
   items?: { itemKey: string; pos: { x: number; y: number }; hidden?: boolean }[];
   gifts?: { pokemonId: number; level: number; pos: { x: number; y: number }; questId: string }[];
+  staticPokemon?: StaticPokemonEntry[];
   pokemonCenter?: { x: number; y: number } | null;
   pc?: { x: number; y: number } | null;
   store?: { x: number; y: number } | null;
@@ -56,7 +57,7 @@ interface MapEntry {
 
 type MapData = Record<string, MapEntry>;
 
-type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'texts' | 'items' | 'gifts' | 'spots' | 'portals';
+type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'spots' | 'portals';
 
 type SpotKey = 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation';
 
@@ -72,6 +73,7 @@ interface PortalEntry {
 
 interface ItemEntry { itemKey: string; pos: { x: number; y: number }; hidden?: boolean; }
 interface GiftEntry { pokemonId: number; level: number; pos: { x: number; y: number }; questId: string; }
+interface StaticPokemonEntry { pokemonId: number; level: number; sprite: string; pos: { x: number; y: number }; questId: string; }
 interface TextRewardEntry {
   type: 'pokemon' | 'item';
   pokemonId?: number;
@@ -260,6 +262,26 @@ function exportGiftsTS(gifts: GiftEntry[]): string {
     `    },`,
   ].join('\n'));
   return `gifts: [\n${lines.join('\n')}\n  ],`;
+}
+
+const STATIC_POKEMON_SPRITES = [
+  'none','bird-a','bird-b','bug-a','bug-b','cute-a','cute-b',
+  'dog-a','dog-b','dragon-a','dragon-b','fish-a','fish-b',
+  'fossil-a','fossil-b','grass-a','grass-b','monster-a','monster-b',
+];
+
+function exportStaticPokemonTS(staticPokemon: StaticPokemonEntry[]): string {
+  if (staticPokemon.length === 0) return 'staticPokemon: [],';
+  const lines = staticPokemon.map((sp) => [
+    `    {`,
+    `      pokemonId: ${sp.pokemonId},`,
+    `      level: ${sp.level},`,
+    `      sprite: "${sp.sprite}",`,
+    `      pos: { x: ${sp.pos.x}, y: ${sp.pos.y} },`,
+    `      questId: "${escapeTSString(sp.questId)}",`,
+    `    },`,
+  ].join('\n'));
+  return `staticPokemon: [\n${lines.join('\n')}\n  ],`;
 }
 
 function exportSpotTS(field: string, pos: { x: number; y: number } | null | undefined): string {  if (!pos) return `${field}: undefined,`;
@@ -462,6 +484,7 @@ export default function MapEditor() {
   const [textRewards, setTextRewards] = useState<Record<string, Record<string, TextRewardEntry>>>({});
   const [items, setItems] = useState<ItemEntry[]>([]);
   const [gifts, setGifts] = useState<GiftEntry[]>([]);
+  const [staticPokemon, setStaticPokemon] = useState<StaticPokemonEntry[]>([]);
   const [pokemonCenter, setPokemonCenter] = useState<{ x: number; y: number } | null>(null);
   const [pcPos, setPcPos] = useState<{ x: number; y: number } | null>(null);
   const [storePos, setStorePos] = useState<{ x: number; y: number } | null>(null);
@@ -528,6 +551,7 @@ export default function MapEditor() {
     setTextRewards((m as MapEntry & { textRewards?: Record<string, Record<string, TextRewardEntry>> }).textRewards ?? {});
     setItems(m.items ?? []);
     setGifts(m.gifts ?? []);
+    setStaticPokemon((m as MapEntry & { staticPokemon?: StaticPokemonEntry[] }).staticPokemon ?? []);
     setPokemonCenter(m.pokemonCenter ?? null);
     setPcPos(m.pc ?? null);
     setStorePos(m.store ?? null);
@@ -568,6 +592,7 @@ export default function MapEditor() {
               ...(it.hidden ? { hidden: true } : {}),
             })),
             gifts,
+            staticPokemon,
             pokemonCenter,
             pc: pcPos,
             store: storePos,
@@ -621,6 +646,7 @@ export default function MapEditor() {
             texts,
             items,
             gifts,
+            staticPokemon,
             pokemonCenter,
             pc: pcPos,
             store: storePos,
@@ -680,6 +706,11 @@ export default function MapEditor() {
     navigator.clipboard.writeText(ts).then(() => alert('¡Gifts copiados!'));
   }
 
+  function doExportStaticPokemon() {
+    const ts = exportStaticPokemonTS(staticPokemon);
+    navigator.clipboard.writeText(ts).then(() => alert('¡StaticPokemon copiado!'));
+  }
+
   function doExportSpots() {
     const parts = [
       exportSpotTS('pokemonCenter', pokemonCenter),
@@ -737,6 +768,7 @@ export default function MapEditor() {
       setTextRewards(parsed.textRewards ?? {});
       setItems(parsed.items);
       setGifts(parsed.gifts);
+      setStaticPokemon((parsed as typeof parsed & { staticPokemon?: StaticPokemonEntry[] }).staticPokemon ?? []);
       setPokemonCenter(parsed.pokemonCenter);
       setPcPos(parsed.pc);
       setStorePos(parsed.store);
@@ -1200,6 +1232,59 @@ export default function MapEditor() {
       }
       return;
     }
+    if (editMode === 'static-pokemon') {
+      const idx = staticPokemon.findIndex((sp) => sp.pos.x === tile.x && sp.pos.y === tile.y);
+      if (idx >= 0) {
+        const sp = staticPokemon[idx];
+        const action = window.prompt(
+          `Pokémon estático: #${sp.pokemonId} lv${sp.level} sprite=${sp.sprite}\n  delete\n  edit`,
+          'edit',
+        );
+        if (action === null) return;
+        if (action.trim() === 'delete') {
+          setStaticPokemon((p) => p.filter((_, i) => i !== idx));
+          setDirty(true);
+          return;
+        }
+        if (action.trim() === 'edit') {
+          const pidStr = window.prompt('pokemonId (1-151):', String(sp.pokemonId));
+          if (pidStr === null) return;
+          const lvlStr = window.prompt('level (1-100):', String(sp.level));
+          if (lvlStr === null) return;
+          const spriteStr = window.prompt(`sprite:\n${STATIC_POKEMON_SPRITES.join(', ')}`, sp.sprite);
+          if (spriteStr === null) return;
+          const qid = window.prompt('questId:', sp.questId);
+          if (qid === null) return;
+          const pid = parseInt(pidStr, 10);
+          const lvl = parseInt(lvlStr, 10);
+          if (Number.isNaN(pid) || pid < 1 || pid > 251) { alert('pokemonId inválido'); return; }
+          if (Number.isNaN(lvl) || lvl < 1 || lvl > 100) { alert('level inválido'); return; }
+          if (!STATIC_POKEMON_SPRITES.includes(spriteStr.trim())) { alert('sprite inválido'); return; }
+          if (!qid.trim()) { alert('questId vacío'); return; }
+          setStaticPokemon((p) => p.map((s, i) => i === idx ? { ...s, pokemonId: pid, level: lvl, sprite: spriteStr.trim(), questId: qid.trim() } : s));
+          setDirty(true);
+        }
+      } else {
+        const pidStr = window.prompt(`Pokémon estático en (${tile.x}, ${tile.y}). pokemonId (1-251):`, '144');
+        if (pidStr === null) return;
+        const lvlStr = window.prompt('level (1-100):', '50');
+        if (lvlStr === null) return;
+        const spriteStr = window.prompt(`sprite:\n${STATIC_POKEMON_SPRITES.join(', ')}`, 'bird-a');
+        if (spriteStr === null) return;
+        const defaultQid = `${selectedMapId}-static-${tile.x}-${tile.y}`;
+        const qid = window.prompt('questId (único):', defaultQid);
+        if (qid === null) return;
+        const pid = parseInt(pidStr, 10);
+        const lvl = parseInt(lvlStr, 10);
+        if (Number.isNaN(pid) || pid < 1 || pid > 251) { alert('pokemonId inválido'); return; }
+        if (Number.isNaN(lvl) || lvl < 1 || lvl > 100) { alert('level inválido'); return; }
+        if (!STATIC_POKEMON_SPRITES.includes(spriteStr.trim())) { alert('sprite inválido'); return; }
+        if (!qid.trim()) { alert('questId vacío'); return; }
+        setStaticPokemon((p) => [...p, { pokemonId: pid, level: lvl, sprite: spriteStr.trim(), pos: { x: tile.x, y: tile.y }, questId: qid.trim() }]);
+        setDirty(true);
+      }
+      return;
+    }
     if (editMode === 'spots') {
       const setter =
         activeSpot === 'pokemonCenter' ? setPokemonCenter :
@@ -1332,7 +1417,7 @@ export default function MapEditor() {
 
         {/* Modo edición */}
         <div style={{ display: 'flex', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
-          {(['npc', 'walls', 'fences', 'grass', 'texts', 'items', 'gifts', 'spots', 'portals'] as EditMode[]).map((m) => {
+          {(['npc', 'walls', 'fences', 'grass', 'texts', 'items', 'gifts', 'static-pokemon', 'spots', 'portals'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
               npc: '#5050b0',
               walls: '#7a3030',
@@ -1434,6 +1519,11 @@ export default function MapEditor() {
         {editMode === 'gifts' && (
           <button onClick={doExportGifts} style={{ padding: '4px 12px', background: '#2a1a2a', border: '1px solid #7a3a5a', borderRadius: 4, color: '#ff88cc', cursor: 'pointer', fontSize: 12 }}>
             🎁 Gifts
+          </button>
+        )}
+        {editMode === 'static-pokemon' && (
+          <button onClick={doExportStaticPokemon} style={{ padding: '4px 12px', background: '#1a2a2a', border: '1px solid #3a7a6a', borderRadius: 4, color: '#50ddb4', cursor: 'pointer', fontSize: 12 }}>
+            🐾 StaticPokémon
           </button>
         )}
         {editMode === 'spots' && (
@@ -1682,6 +1772,36 @@ export default function MapEditor() {
                 </div>
               ))}
 
+              {/* StaticPokemon overlay */}
+              {staticPokemon.map((sp, i) => (
+                <div
+                  key={`stp-${i}`}
+                  title={`#${sp.pokemonId} lvl ${sp.level} sprite=${sp.sprite} · ${sp.questId}`}
+                  style={{
+                    position: 'absolute',
+                    left: sp.pos.x * zoom,
+                    top: sp.pos.y * zoom,
+                    width: zoom,
+                    height: zoom,
+                    background: editMode === 'static-pokemon'
+                      ? 'rgba(80, 220, 180, 0.5)'
+                      : 'rgba(80, 220, 180, 0.22)',
+                    border: editMode === 'static-pokemon'
+                      ? '1px solid rgba(80, 230, 180, 0.95)'
+                      : '1px dashed rgba(80, 230, 180, 0.5)',
+                    pointerEvents: 'none',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: Math.max(10, zoom * 0.4),
+                    textShadow: '0 0 2px #000',
+                  }}
+                >
+                  🐾
+                </div>
+              ))}
+
               {/* Spots overlay */}
               {([
                 { key: 'pokemonCenter' as SpotKey, pos: pokemonCenter, emoji: '🏥', color: '#ff6688' },
@@ -1909,6 +2029,21 @@ export default function MapEditor() {
                 ]}
                 count={gifts.length}
                 countLabel="regalos"
+                sourceFile={currentMap?.sourceFile}
+              />
+            ) : editMode === 'static-pokemon' ? (
+              <ModeHelpBlock
+                emoji="🐾"
+                title="Pokémon Estático"
+                color="#50ddb4"
+                lines={[
+                  'Click vacío: añadir Pokémon estático (Articuno-style)',
+                  'Click en tile: editar o eliminar',
+                  'Una vez combatido (captura/derrota) desaparece',
+                  `Sprites: ${STATIC_POKEMON_SPRITES.join(', ')}`,
+                ]}
+                count={staticPokemon.length}
+                countLabel="pokémon estáticos"
                 sourceFile={currentMap?.sourceFile}
               />
             ) : editMode === 'spots' ? (

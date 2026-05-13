@@ -1,5 +1,5 @@
 import mapData from "../maps/map-data";
-import { MapId, MapItemType, SimpleGiftType, TrainerType } from "../maps/map-types";
+import { MapId, MapItemType, SimpleGiftType, StaticPokemonType, TrainerType } from "../maps/map-types";
 import { Direction, PosType } from "../state/state-types";
 import { TRAINER_VISION } from "./constants";
 
@@ -83,6 +83,23 @@ export const isGift = (
   );
 };
 
+export const isStaticPokemon = (
+  staticPokemon: StaticPokemonType[] | undefined,
+  x: number,
+  y: number,
+  completedQuests: string[]
+): boolean => {
+  return (
+    !!staticPokemon &&
+    staticPokemon.some(
+      (sp) =>
+        sp.pos.x === x &&
+        sp.pos.y === y &&
+        !completedQuests.includes(sp.questId)
+    )
+  );
+};
+
 export const canWalk = (
   x: number,
   y: number,
@@ -109,6 +126,7 @@ export const canWalk = (
     return true;
   });
   if (isTrainer(blockingTrainers, x, y)) return false;
+  if (isStaticPokemon(map.staticPokemon, x, y, completedQuests)) return false;
   return true;
 };
 

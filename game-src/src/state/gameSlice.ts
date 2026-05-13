@@ -7,7 +7,7 @@ import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
-import { canWalk, isFence, isGift, isItem, isTrainer, isWall } from "../app/map-helper";
+import { canWalk, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall } from "../app/map-helper";
 import {
   Direction,
   GameState,
@@ -94,6 +94,7 @@ export const gameSlice = createSlice({
         return true;
       });
       if (isTrainer(blockingTrainersDown, state.pos.x, state.pos.y + 1)) return;
+      if (isStaticPokemon(map.staticPokemon, state.pos.x, state.pos.y + 1, state.completedQuests)) return;
       if (
         isItem(
           map.items,

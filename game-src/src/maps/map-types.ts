@@ -139,6 +139,34 @@ export interface SimpleGiftType {
   questId: string;
 }
 
+/**
+ * Pokémon estático en el mapa (estilo legendarios Gen I: Articuno, Snorlax…).
+ * Aparece visualmente como un sprite en world-coords. Al pulsar A frente a él
+ * se inicia un combate salvaje. Una vez derrotado o capturado desaparece.
+ * El estado persiste via `completedQuests` (questId).
+ */
+export type StaticPokemonSprite =
+  | "bird-a"  | "bird-b"
+  | "bug-a"   | "bug-b"
+  | "cute-a"  | "cute-b"
+  | "dog-a"   | "dog-b"
+  | "dragon-a"| "dragon-b"
+  | "fish-a"  | "fish-b"
+  | "fossil-a"| "fossil-b"
+  | "grass-a" | "grass-b"
+  | "monster-a"| "monster-b"
+  | "none";
+
+export interface StaticPokemonType {
+  pokemonId: number;
+  level: number;
+  pos: PosType;
+  /** Sprite decorativo en el mapa. "none" = invisible (solo bloquea el tile). */
+  sprite: StaticPokemonSprite;
+  /** Se añade a completedQuests al derrotarlo o capturarlo. */
+  questId: string;
+}
+
 export interface MapWithPos {
   map: MapId;
   pos: PosType;
@@ -175,6 +203,8 @@ export interface MapType {
   items?: MapItemType[];
   /** Pokéballs-regalo declarativas (editables desde el editor de mapas). */
   gifts?: SimpleGiftType[];
+  /** Pokémon estáticos en el mapa (estilo legendarios). */
+  staticPokemon?: StaticPokemonType[];
   /** Posición del NPC de batallas online en este mapa (centros Pokémon) */
   onlineBattleNpc?: PosType;
 }

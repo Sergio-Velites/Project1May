@@ -38,6 +38,8 @@ const pewterCityPokeMart: MapType = {
   },
   storeItems: [
     ItemType.PokeBall,
+    ItemType.GreatBall,
+    ItemType.UltraBall,
     ItemType.Potion,
     ItemType.SuperPotion,
     ItemType.Antidote,

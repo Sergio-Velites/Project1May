@@ -367,6 +367,46 @@ function parseGiftsField(tsText) {
   return result;
 }
 
+// ── Parser de `staticPokemon:` (Pokémon estático estilo legendario) ──────
+function parseStaticPokemonField(tsText) {
+  const m = tsText.match(/staticPokemon\s*:\s*\[/);
+  if (!m) return [];
+  const arrStart = tsText.indexOf("[", m.index + m[0].length - 1);
+  const arrBlk = findBalancedBlock(tsText, arrStart, "[", "]");
+  if (!arrBlk) return [];
+  const inner = arrBlk.text.slice(1, -1);
+  const result = [];
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    if (inner[i] !== "{") { i++; continue; }
+    const objBlk = findBalancedBlock(inner, i);
+    if (!objBlk) break;
+    const t = objBlk.text;
+    const pid = t.match(/pokemonId\s*:\s*(\d+)/);
+    const lvl = t.match(/level\s*:\s*(\d+)/);
+    const spr = t.match(/sprite\s*:\s*"([^"]+)"/);
+    const qid = t.match(/questId\s*:\s*"([^"]+)"/);
+    let pos = null;
+    const posStartM = t.match(/pos\s*:\s*\{/);
+    if (posStartM) {
+      const posOpenIdx = t.indexOf("{", posStartM.index + posStartM[0].length - 1);
+      const posBlk = findBalancedBlock(t, posOpenIdx);
+      if (posBlk) {
+        const xm = posBlk.text.match(/x\s*:\s*(\d+)/);
+        const ym = posBlk.text.match(/y\s*:\s*(\d+)/);
+        if (xm && ym) pos = { x: parseInt(xm[1], 10), y: parseInt(ym[1], 10) };
+      }
+    }
+    if (pid && lvl && spr && pos && qid) {
+      result.push({ pokemonId: parseInt(pid[1], 10), level: parseInt(lvl[1], 10), pos, sprite: spr[1], questId: qid[1] });
+    }
+    i = objBlk.end + 1;
+  }
+  return result;
+}
+
 // ── Parsear los trainers del archivo .ts con regex ────────────────────────
 // Extrae el bloque trainers: [...] como texto y lo convierte en objetos planos.
 function parseTrainers(tsText) {
@@ -623,6 +663,7 @@ for (const file of MAP_FILES) {
   const texts = parseTextField(tsText);
   const items = parseItemsField(tsText);
   const gifts = parseGiftsField(tsText);
+  const staticPokemon = parseStaticPokemonField(tsText);
   const pokemonCenter = parsePos(tsText, "pokemonCenter");
   const pc = parsePos(tsText, "pc");
   const store = parsePos(tsText, "store");
@@ -693,6 +734,7 @@ for (const file of MAP_FILES) {
     texts,
     items,
     gifts,
+    staticPokemon,
     pokemonCenter,
     pc,
     store,

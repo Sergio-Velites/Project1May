@@ -30,6 +30,7 @@ type OverrideKey =
   | 'texts'
   | 'items'
   | 'gifts'
+  | 'staticPokemon'
   | 'fences'
   | 'grass'
   | 'pokemonCenter'
@@ -46,6 +47,7 @@ const OVERRIDE_KEYS: OverrideKey[] = [
   'texts',
   'items',
   'gifts',
+  'staticPokemon',
   'fences',
   'grass',
   'pokemonCenter',

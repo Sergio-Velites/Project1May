@@ -3,6 +3,7 @@ import styled, { css, keyframes } from "styled-components";
 import {
   addInventory,
   addPokemon,
+  completeQuest,
   defeatTrainer,
   encounterPokemon,
   endEncounter,
@@ -811,6 +812,12 @@ const PokemonEncounter = () => {
     // Ending encounter
     setTrainerPokemonIndex(0);
     dispatch(endEncounter());
+
+    // Si era un Pokémon estático del mapa, marcarlo como completado
+    // (tanto si se ha derrotado como si se captura en stage 45)
+    if (enemy?.staticQuestId) {
+      dispatch(completeQuest(enemy.staticQuestId));
+    }
 
     if (isTrainer) {
       // Defeated trainer

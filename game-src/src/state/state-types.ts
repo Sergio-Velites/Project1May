@@ -62,6 +62,8 @@ export interface PokemonEncounterType {
   level: number;
   hp: number;
   moves: string[];
+  /** Si el encuentro es un Pokémon estático del mapa, questId a completar al acabar. */
+  staticQuestId?: string;
 }
 
 export interface GameState {
