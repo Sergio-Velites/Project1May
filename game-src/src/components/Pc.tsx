@@ -149,7 +149,7 @@ const Pc = () => {
             },
           },
           {
-            label: "GUARDAR",
+            label: "DEPOSITAR",
             action: () => {
               if (pokemon.length === 0) return;
               if (pokemon.length === 1) return;

@@ -17,36 +17,28 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 self.addEventListener("install", () => {
-  // Activar inmediatamente sin esperar a que se cierren pestañas.
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      // 1. Borrar todas las cachés (incluye precache de Workbox).
       try {
         const keys = await caches.keys();
         await Promise.all(keys.map((k) => caches.delete(k)));
       } catch (e) {
         // ignore
       }
-
-      // 2. Tomar control de todas las pestañas abiertas.
       try {
         await self.clients.claim();
       } catch (e) {
         // ignore
       }
-
-      // 3. Desinstalar este SW.
       try {
         await self.registration.unregister();
       } catch (e) {
         // ignore
       }
-
-      // 4. Recargar las pestañas para que reciban el bundle nuevo de red.
       try {
         const clientsList = await self.clients.matchAll({ type: "window" });
         for (const client of clientsList) {
@@ -59,7 +51,6 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Pasar todas las peticiones a la red — sin caché, sin intercepción.
 self.addEventListener("fetch", () => {
-  // No llamar a event.respondWith → el navegador hace fetch normal.
+  // No interceptamos: el navegador hace fetch normal a la red.
 });
