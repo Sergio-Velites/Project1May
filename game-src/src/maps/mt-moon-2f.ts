@@ -134,77 +134,92 @@ const mtMoon2f: MapType = {
 trainers: [
   {
   npc: teamRocketGrunt,
-  pokemon: [],
+  pokemon: [{ id: 23, level: 17 }, { id: 41, level: 15 }],
   facing: Direction.Down,
   pos: { x: 12, y: 2 },
-  intro: [],
+  intro: [
+    "¡Robamos el anís del convite!",
+    "¡Párate si quieres verlo de nuevo!",
+  ],
   outtro: [
     "¡El EQUIPO ROCKET nunca falta",
     "a un saqueo — ni a una boda!",
     "¡Maldición! ¡Mis compis siguen",
     "durmiendo la mona en un rincón!"
   ],
-  money: 0,
+  money: 180,
   persistent: true,
 },
   {
   npc: teamRocketGrunt,
-  pokemon: [],
+  pokemon: [{ id: 41, level: 16 }, { id: 109, level: 15 }],
   facing: Direction.Up,
   pos: { x: 3, y: 8 },
-  intro: [],
+  intro: [
+    "¡Buscamos los regalos de los novios!",
+    "¡Lárgate, crío, antes de que me caliente!",
+  ],
   outtro: [
     "¡Estamos buscando los regalos",
     "de los novios! ¡Lárgate, crío!",
     "Si encuentras algún ANTÍS sin abrir,",
     "¡dánoslo y nos largamos!"
   ],
-  money: 0,
+  money: 180,
   persistent: true,
 },
   {
   npc: teamRocketGrunt,
-  pokemon: [],
+  pokemon: [{ id: 109, level: 18 }],
   facing: Direction.Left,
   pos: { x: 14, y: 18 },
-  intro: [],
+  intro: [
+    "¡Con esta cueva tenemos el escondite perfecto!",
+    "¡Nadie nos encontrará... hasta ahora!",
+  ],
   outtro: [
     "¡Los críos sin resaca",
     "no entenéis el sufrimiento adulto!",
     "MARTA y SERGIO ya andan haciendo",
     "las maletas para JAPÓN… ¡y nosotros aquí!"
   ],
-  money: 0,
+  money: 180,
   persistent: true,
 },
   {
   npc: teamRocketGrunt,
-  pokemon: [],
+  pokemon: [{ id: 23, level: 17 }, { id: 41, level: 16 }],
   facing: Direction.Down,
   pos: { x: 11, y: 16 },
-  intro: [],
+  intro: [
+    "¡Lleva tus Pokémon por otro sitio!",
+    "¡Este pasillo es nuestro!",
+  ],
   outtro: [
     "¡El EQUIPO ROCKET revenderá",
     "todas las botellas vacías del banquete!",
     "¡Me has enfadado!",
     "¡Ya nos vengaremos en TOKIO!"
   ],
-  money: 0,
+  money: 180,
   persistent: true,
 },
   {
   npc: superNerd,
-  pokemon: [],
+  pokemon: [{ id: 100, level: 15 }, { id: 81, level: 14 }],
   facing: Direction.Right,
   pos: { x: 20, y: 14 },
-  intro: [],
+  intro: [
+    "Analizo el subsuelo por si el banquete necesita hielo.",
+    "¡Pero mi equipo también quiere practicar!",
+  ],
   outtro: [
     "¡Eh, para! ¡Estos sushis caíos",
     "de la mesa son míos! ¡Los dos!",
     "¡Vale, uno cada uno!",
     "Que los novios se llevan el resto a JAPÓN."
   ],
-  money: 0,
+  money: 140,
   persistent: true,
 }
 ],

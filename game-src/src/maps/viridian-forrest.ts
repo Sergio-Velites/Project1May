@@ -193,45 +193,54 @@ text: {
 trainers: [
   {
   npc: bugCatcher,
-  pokemon: [],
+  pokemon: [{ id: 10, level: 5 }, { id: 14, level: 5 }],
   facing: Direction.Left,
   pos: { x: 29, y: 19 },
-  intro: [],
+  intro: [
+    "¡Al que llegue antes a la preboda le espera un pin de recuerdo!",
+    "¡Pero antes tendrás que ganarme!",
+  ],
   outtro: [
     "¡Detente, invitado de la boda!",
     "¡Corre que llegarás tarde!",
     "¡Sigue tu camino, valiente!"
   ],
-  money: 0,
+  money: 60,
   persistent: true,
 },
   {
   npc: bugCatcher,
-  pokemon: [],
+  pokemon: [{ id: 13, level: 7 }],
   facing: Direction.Left,
   pos: { x: 28, y: 33 },
-  intro: [],
+  intro: [
+    "¡Llevo media hora perdido en este bosque!",
+    "¡Al menos te desahogas batallando!",
+  ],
   outtro: [
     "¡Los insectos son los mejores!",
     "¡Protegen el bosque de la boda!",
     "¡Disfruta la celebración!"
   ],
-  money: 0,
+  money: 60,
   persistent: true,
 },
   {
   npc: bugCatcher,
-  pokemon: [],
+  pokemon: [{ id: 11, level: 6 }, { id: 10, level: 5 }],
   facing: Direction.Left,
   pos: { x: 2, y: 19 },
-  intro: [],
+  intro: [
+    "¡El DJ ya está calentando!",
+    "¡Demuéstrame que llegas a tiempo!",
+  ],
   outtro: [
     "¡Nadie pasa sin saludar!",
     "¡Así lo dice la ley del bosque!",
     "¡Felicidades a los novios!",
     "¡Que sean muy felices!"
   ],
-  money: 0,
+  money: 60,
   persistent: true,
 },
   {

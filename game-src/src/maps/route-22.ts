@@ -79,10 +79,13 @@ const route22: MapType = {
 trainers: [
   {
   npc: rival,
-  pokemon: [],
+  pokemon: [{ id: 21, level: 9 }, { id: 4, level: 8 }],
   facing: Direction.Right,
   pos: { x: 26, y: 5 },
-  intro: [],
+  intro: [
+    "¡Oye, yo también voy a esa boda!",
+    "¡Pero me la ganaré llegando primero!",
+  ],
   outtro: [
     "¡Ey!",
     "¿Vas a la LIGA PKMN?",
@@ -90,7 +93,7 @@ trainers: [
     "El guardia no te dejará pasar sin medallas.",
     "¡Con lo tajao que parece que vas!"
   ],
-  money: 0,
+  money: 160,
   persistent: true,
 },
   {

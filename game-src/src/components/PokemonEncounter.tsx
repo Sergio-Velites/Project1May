@@ -1961,7 +1961,7 @@ const PokemonEncounter = () => {
           // Disable del rival: inhabilita el último movimiento del jugador
           if (lastPlayerMoveRef.current) {
             playerDisabledMoveRef.current = lastPlayerMoveRef.current;
-            playerDisabledTurnsRef.current = Math.floor(Math.random() * 7); // 0-6 turnos Gen I
+            playerDisabledTurnsRef.current = 1 + Math.floor(Math.random() * 7); // 1-7 turnos Gen I
             const disabledMoveMeta = getMoveMetadata(lastPlayerMoveRef.current);
             setAlertText(`¡${disabledMoveMeta?.name?.toUpperCase() ?? "El movimiento"} de ${activeMetadata.name.toUpperCase()} quedó inhabilitado!`);
           } else {
@@ -2123,7 +2123,8 @@ const PokemonEncounter = () => {
         const enemyMoveIdRecharge = getRandomEnemyMove();
         const stagesSnapRecharge = { us: playerStages, them: enemyStages };
         const effPlayerRecharge = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
-        if (!checkSkipTurn(false) && !enemyHyperBeamRechargeRef.current) {
+        const isEnemyRechargingR = enemyMoveIdRecharge === "__recharge__";
+        if (!checkSkipTurn(false) && !isEnemyRechargingR) {
           const { us: usRecharge } = processMoveResult(
             processMove(effPlayerRecharge, enemy, enemyMoveIdRecharge, false, stagesSnapRecharge, {
               lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2138,8 +2139,17 @@ const PokemonEncounter = () => {
             else applyEndOfTurnStatus(usRecharge, enemy);
           }, ATTACK_ANIMATION + 1000);
         } else {
-          enemyHyperBeamRechargeRef.current = false;
-          applyEndOfTurnStatus(effPlayerRecharge, enemy);
+          if (isEnemyRechargingR) {
+            setMoveAnim(null);
+            setStage(18);
+            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+            setTimeout(() => {
+              setAlertText(null);
+              applyEndOfTurnStatus(effPlayerRecharge, enemy);
+            }, ATTACK_ANIMATION);
+          } else {
+            applyEndOfTurnStatus(effPlayerRecharge, enemy);
+          }
         }
       }, ATTACK_ANIMATION);
       return;
@@ -2159,7 +2169,8 @@ const PokemonEncounter = () => {
         const enemyMoveIdD = getRandomEnemyMove();
         const stagesSnapD = { us: playerStages, them: enemyStages };
         const effPlayerD = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
-        if (!checkSkipTurn(false)) {
+        const isEnemyRechargingD = enemyMoveIdD === "__recharge__";
+        if (!checkSkipTurn(false) && !isEnemyRechargingD) {
           const { us: usD } = processMoveResult(
             processMove(effPlayerD, enemy, enemyMoveIdD, false, stagesSnapD, {
               lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2174,7 +2185,17 @@ const PokemonEncounter = () => {
             else applyEndOfTurnStatus(usD, enemy);
           }, ATTACK_ANIMATION + 1000);
         } else {
-          applyEndOfTurnStatus(effPlayerD, enemy);
+          if (isEnemyRechargingD) {
+            setMoveAnim(null);
+            setStage(18);
+            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+            setTimeout(() => {
+              setAlertText(null);
+              applyEndOfTurnStatus(effPlayerD, enemy);
+            }, ATTACK_ANIMATION);
+          } else {
+            applyEndOfTurnStatus(effPlayerD, enemy);
+          }
         }
       }, ATTACK_ANIMATION);
       return;
@@ -2200,10 +2221,10 @@ const PokemonEncounter = () => {
           setAlertText(null);
           // Hacer que el rival ataque igual
           const enemyMoveIdBide = getRandomEnemyMove();
-          const enemyMoveBide = getMoveMetadata(enemyMoveIdBide);
+          const isEnemyRechargingBide = enemyMoveIdBide === "__recharge__";
           const stagesSnap = { us: playerStages, them: enemyStages };
           const effPlayer = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
-          if (!checkSkipTurn(false)) {
+          if (!checkSkipTurn(false) && !isEnemyRechargingBide) {
             const { us: usB } = processMoveResult(
               processMove(effPlayer, enemy, enemyMoveIdBide, false, stagesSnap, {
                 lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2222,7 +2243,17 @@ const PokemonEncounter = () => {
               else applyEndOfTurnStatus(usB, enemy);
             }, ATTACK_ANIMATION + 1000);
           } else {
-            applyEndOfTurnStatus(effPlayer, enemy);
+            if (isEnemyRechargingBide) {
+              setMoveAnim(null);
+              setStage(18);
+              setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+              setTimeout(() => {
+                setAlertText(null);
+                applyEndOfTurnStatus(effPlayer, enemy);
+              }, ATTACK_ANIMATION);
+            } else {
+              applyEndOfTurnStatus(effPlayer, enemy);
+            }
           }
         }, ATTACK_ANIMATION);
         return;
@@ -2275,9 +2306,10 @@ const PokemonEncounter = () => {
         setAlertText(null);
         // Rival ataca durante la carga (a menos que sea invulnerable)
         const enemyMoveIdC = getRandomEnemyMove();
+        const isEnemyRechargingC = enemyMoveIdC === "__recharge__";
         const stagesSnapC = { us: playerStages, them: enemyStages };
         const effPlayerC = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
-        if (!checkSkipTurn(false) && !playerInvulnerableRef.current) {
+        if (!checkSkipTurn(false) && !playerInvulnerableRef.current && !isEnemyRechargingC) {
           const { us: usC } = processMoveResult(
             processMove(effPlayerC, enemy, enemyMoveIdC, false, stagesSnapC, {
               lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2295,7 +2327,17 @@ const PokemonEncounter = () => {
             } else applyEndOfTurnStatus(usC, enemy);
           }, ATTACK_ANIMATION + 1000);
         } else {
-          applyEndOfTurnStatus(effPlayerC, enemy);
+          if (isEnemyRechargingC) {
+            setMoveAnim(null);
+            setStage(18);
+            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+            setTimeout(() => {
+              setAlertText(null);
+              applyEndOfTurnStatus(effPlayerC, enemy);
+            }, ATTACK_ANIMATION);
+          } else {
+            applyEndOfTurnStatus(effPlayerC, enemy);
+          }
         }
       }, ATTACK_ANIMATION);
       return;

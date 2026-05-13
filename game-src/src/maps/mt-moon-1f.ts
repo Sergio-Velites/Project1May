@@ -114,85 +114,103 @@ const mtMoon1f: MapType = {
 trainers: [
   {
   npc: bugCatcher,
-  pokemon: [],
+  pokemon: [{ id: 10, level: 10 }, { id: 11, level: 11 }],
   facing: Direction.Down,
   pos: { x: 6, y: 4 },
-  intro: [],
+  intro: [
+    "¡Anda anda! ¡Otro invitado perdido en la cueva!",
+    "¡Pues paga el peaje!",
+  ],
   outtro: [
     "Hay tipos sospechosos en la cueva.",
     "¿O serán invitados perdidos?",
     "¡Vi al EQUIPO ROCKET cargando",
-    "con cajas de vino de MONJARDÍN!"
+    "con cajas de vino de MONJÁRDÍN!"
   ],
-  money: 0,
+  money: 100,
   persistent: true,
 },
   {
   npc: lass,
-  pokemon: [],
+  pokemon: [{ id: 39, level: 12 }],
   facing: Direction.Down,
   pos: { x: 4, y: 4 },
-  intro: [],
+  intro: [
+    "¿Hay WiFi aquí dentro?",
+    "Da igual, ¡batalla conmigo mientras busco cobertura!",
+  ],
   outtro: [
     "Estoy esperando a mis amigos…",
     "¡Creíamos volver juntos del banquete!",
     "Dicen que MARTA y SERGIO ya están",
     "buscando hoteles en KIOTO."
   ],
-  money: 0,
+  money: 110,
   persistent: true,
 },
   {
   npc: superNerd,
-  pokemon: [],
+  pokemon: [{ id: 100, level: 13 }],
   facing: Direction.Up,
   pos: { x: 33, y: 10 },
-  intro: [],
+  intro: [
+    "Analizo la geología de esta cueva para el regalo de boda.",
+    "¡Pero primero, un experimento científico!",
+  ],
   outtro: [
     "¡Eh! ¡No me grites,",
     "que tengo el cerebro reseco!",
     "Necesito PKMN más fuertes",
     "que mi resaca… imposible."
   ],
-  money: 0,
+  money: 130,
   persistent: true,
 },
   {
   npc: bugCatcher,
-  pokemon: [],
+  pokemon: [{ id: 14, level: 11 }, { id: 13, level: 12 }],
   facing: Direction.Right,
   pos: { x: 13, y: 29 },
-  intro: [],
+  intro: [
+    "¡Me mandaron a buscar anís y encontré esto!",
+    "¡Batalla rápida antes de que me llamen!",
+  ],
   outtro: [
     "¡Cruza esta cueva y volverás",
     "a CIUDAD CELESTE de luna de miel!",
     "¡Los novios vuelan a JAPÓN!",
     "¡Yo me vuelvo a la cama!"
   ],
-  money: 0,
+  money: 100,
   persistent: true,
 },
   {
   npc: lass,
-  pokemon: [],
+  pokemon: [{ id: 35, level: 11 }],
   facing: Direction.Down,
   pos: { x: 14, y: 23 },
-  intro: [],
+  intro: [
+    "¡Encontré un Clefairy, es buena señal para la boda!",
+    "¡Pero primero demuéstra que mereces verlo!",
+  ],
   outtro: [
     "¡Madre mía! ¡Esto retumba",
     "como mi cabeza esta mañana!",
     "¿Por dónde se sale?",
     "¡Yo solo quería un café!"
   ],
-  money: 0,
+  money: 110,
   persistent: true,
 },
   {
   npc: hiker,
-  pokemon: [],
+  pokemon: [{ id: 74, level: 12 }, { id: 41, level: 10 }],
   facing: Direction.Down,
   pos: { x: 20, y: 14 },
-  intro: [],
+  intro: [
+    "Llevo días explorando. ¿Tú también vienes a la boda?",
+    "¡Entonces tendrás que demostrar que eres digno!",
+  ],
   outtro: [
     "¡Anda! ¡Menudo susto!",
     "Creía que eras el camarero del BOSQUECILLO",
@@ -200,15 +218,18 @@ trainers: [
     "¡A vuestra edad ya deberíais",
     "saber controlar el ANTÍS!"
   ],
-  money: 0,
+  money: 130,
   persistent: true,
 },
   {
   npc: youngster,
-  pokemon: [],
+  pokemon: [{ id: 19, level: 12 }],
   facing: Direction.Right,
   pos: { x: 8, y: 12 },
-  intro: [],
+  intro: [
+    "¡La barra libre no es gratis, hay que ganársela!",
+    "¡Demuéstrame que mereces tu copa!",
+  ],
   outtro: [
     "¿Tú también te has perdido",
     "al volver de la boda?",
@@ -216,7 +237,7 @@ trainers: [
     "¡pero MARTA y SERGIO ya se llevaron",
     "toda la suerte para JAPÓN!"
   ],
-  money: 0,
+  money: 100,
   persistent: true,
 }
 ],
