@@ -210,6 +210,17 @@ teleports: {
 exits: {
     71: [7, 8, 9],
   },
+  staticPokemon: [
+    {
+      pokemonId: 113,
+      level: 20,
+      sprite: "cute-a",
+      pos: { x: 0, y: 2 },
+      questId: "route-2-static-0-2",
+      intro: ["A lo mejor me viene bien una enferemera",
+        " para la postboda!"],
+    },
+  ],
 exitReturnMap: MapId.ViridianCity,
 exitReturnPos: { x: 18, y: 1 },
 };

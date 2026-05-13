@@ -59,11 +59,6 @@ walls: {
   },
   grass: {},
 text: {
-    8: {
-      29: [
-        "Te falta la llave... eh espera, si está abierto!"
-      ],
-    },
     9: {
       15: [
         "BODEGA CASTILLO DE MONJARDÍN",
@@ -232,6 +227,16 @@ staticPokemon: [
       sprite: "monster-b",
       pos: { x: 29, y: 24 },
       questId: "pewter-city-static-29-24",
+      intro: ["Intentaste tocarle toda la pokeflauta",
+        "No le gustó", "Snorlax ataca"],
+    },
+    {
+      pokemonId: 151,
+      level: 20,
+      sprite: "none",
+      pos: { x: 29, y: 8 },
+      questId: "pewter-city-static-29-8",
+      intro: ["Te falta la llave...", "eh espera, si está abierto!"],
     },
   ],
 };

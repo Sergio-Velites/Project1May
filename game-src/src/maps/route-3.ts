@@ -1,4 +1,5 @@
 import { bugCatcher, lass, youngster } from "../app/npcs";
+import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/route-3.png";
 import music from "../assets/music/maps/route-3.mp3";
 import { Direction } from "../state/state-types";
@@ -125,6 +126,12 @@ const route3: MapType = {
   },
   encounters: getEncounterData("kanto-route-3-area"),
   exitReturnMap: MapId.PewterCity,
+  items: [
+    {
+      item: ItemType.MasterBall,
+      pos: { x: 63, y: 18 },
+    },
+  ],
 // Trainers para "route-3"
 trainers: [
   {
