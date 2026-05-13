@@ -93,9 +93,13 @@ Deno.serve(async (req) => {
         if (gsRsvp && gsRsvp.playerName) {
           // Backfill: asegurar wedding_user + upsert rsvp para próximas lecturas
           backfillPromises.push((async () => {
+            console.log("[backfill] start", s.user_id, gsRsvp.playerName);
             const { error: userErr } = await db.from("wedding_users").insert({ id: s.user_id });
-            if (userErr && userErr.code !== "23505") return;
-            await db.rpc("upsert_rsvp", {
+            if (userErr && userErr.code !== "23505") {
+              console.error("[backfill] wedding_users insert error:", userErr);
+              return;
+            }
+            const { error: rpcErr } = await db.rpc("upsert_rsvp", {
               p_user_id:      s.user_id,
               p_player_name:  gsRsvp.playerName,
               p_companion:    gsRsvp.companion ?? null,
@@ -106,6 +110,8 @@ Deno.serve(async (req) => {
               p_preboda:      gsRsvp.preboda ?? false,
               p_attended:     gsRsvp.attended ?? true,
             });
+            if (rpcErr) console.error("[backfill] upsert_rsvp error:", rpcErr);
+            else console.log("[backfill] OK", s.user_id);
           })());
           return {
             user_id: s.user_id,
