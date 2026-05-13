@@ -287,10 +287,22 @@ export const webauthnRegister = async (
       const errBody = await finishRes.text();
       console.warn("[WebAuthn] register-finish", finishRes.status, errBody);
       localStorage.removeItem("wedding_credential_id");
+      // En modo "recover" (existingUserId presente), aunque el servidor falle
+      // mantenemos el wedding_user_id apuntando al UUID a recuperar para que
+      // el dispositivo quede asociado a esa cuenta (sin passkey, solo localStorage).
+      if (existingUserId) {
+        localStorage.setItem("wedding_user_id", existingUserId);
+        return existingUserId;
+      }
       return null;
     } catch (netErr) {
       console.warn("[WebAuthn] register-finish network error:", netErr);
       localStorage.removeItem("wedding_credential_id");
+      // Mismo fallback en modo recover ante error de red.
+      if (existingUserId) {
+        localStorage.setItem("wedding_user_id", existingUserId);
+        return existingUserId;
+      }
       return null;
     }
   } catch (err) {

@@ -183,7 +183,16 @@ export const gameSlice = createSlice({
       state.pokemon = savedGameState.pokemon;
       // No restaurar encuentros activos al cargar save
       state.pokemonEncounter = undefined;
-      state.activePokemonIndex = savedGameState.activePokemonIndex;
+      // Sanitizar índice activo: si apunta fuera del array, fall-back al primer
+      // Pokémon vivo (o 0 si todos KO). Sin esto, active === undefined y todas
+      // las batallas se cierran al instante.
+      const safeIdxLoad = (() => {
+        const idx = savedGameState.activePokemonIndex;
+        if (idx >= 0 && idx < savedGameState.pokemon.length) return idx;
+        const firstAlive = savedGameState.pokemon.findIndex((p) => p.hp > 0);
+        return firstAlive >= 0 ? firstAlive : 0;
+      })();
+      state.activePokemonIndex = safeIdxLoad;
       state.money = savedGameState.money;
       state.pc = savedGameState.pc;
       state.trainerEncounter = undefined;
@@ -202,7 +211,16 @@ export const gameSlice = createSlice({
       // No restaurar encuentros activos al cargar save — podrían quedar corruptos
       // si el juego crasheó durante un combate. El jugador vuelve al mapa limpio.
       state.pokemonEncounter = undefined;
-      state.activePokemonIndex = s.activePokemonIndex;
+      // Sanitizar índice activo: si apunta fuera del array, fall-back al primer
+      // Pokémon vivo (o 0). Soluciona saves con activePokemonIndex inválido
+      // (causa: depositar al PC sin reajustar el índice).
+      const safeIdx = (() => {
+        const idx = s.activePokemonIndex;
+        if (idx >= 0 && idx < s.pokemon.length) return idx;
+        const firstAlive = s.pokemon.findIndex((p) => p.hp > 0);
+        return firstAlive >= 0 ? firstAlive : 0;
+      })();
+      state.activePokemonIndex = safeIdx;
       state.money = s.money;
       state.pc = s.pc;
       state.trainerEncounter = undefined;
@@ -341,6 +359,15 @@ export const gameSlice = createSlice({
     depositPokemonToPc: (state, action: PayloadAction<number>) => {
       const pokemon = state.pokemon.splice(action.payload, 1);
       state.pc.push(pokemon[0]);
+      // Reajustar índice activo si apunta fuera del array tras depositar.
+      // Sin esto, active === undefined y todas las batallas se cierran al instante.
+      if (state.activePokemonIndex >= state.pokemon.length) {
+        const firstAlive = state.pokemon.findIndex((p) => p.hp > 0);
+        state.activePokemonIndex = firstAlive >= 0 ? firstAlive : 0;
+      } else if (action.payload < state.activePokemonIndex) {
+        // Si el depositado estaba antes del activo, el activo se desplaza una posición.
+        state.activePokemonIndex -= 1;
+      }
     },
     withdrawPokemonFromPc: (state, action: PayloadAction<number>) => {
       if (state.pokemon.length === 6) throw new Error("No space in party");
