@@ -746,6 +746,11 @@ export default function MapEditor() {
     navigator.clipboard.writeText(ts).then(() => alert('¡Grass copiadas!'));
   }
 
+  function doExportWater() {
+    const ts = exportRowColMapTS(water, 'water');
+    navigator.clipboard.writeText(ts).then(() => alert('¡Water copiado! Pégalo en el .ts del mapa como campo `water: { ... }`'));
+  }
+
   function doExportEncounters() {
     // Genera un bloque TS literal listo para pegar en el .ts del mapa,
     // sustituyendo el `encounters: getEncounterData("...")` por un objeto
@@ -1620,6 +1625,11 @@ export default function MapEditor() {
         {editMode === 'grass' && (
           <button onClick={doExportGrass} style={{ padding: '4px 12px', background: '#1a2a1a', border: '1px solid #3a7a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', fontSize: 12 }}>
             🌿 Grass
+          </button>
+        )}
+        {editMode === 'water' && (
+          <button onClick={doExportWater} style={{ padding: '4px 12px', background: '#0f1e2a', border: '1px solid #2a5a8a', borderRadius: 4, color: '#88ccff', cursor: 'pointer', fontSize: 12 }}>
+            💧 Water
           </button>
         )}
         {(editMode === 'grass' || editMode === 'water') && (
