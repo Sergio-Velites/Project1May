@@ -78,6 +78,13 @@ function applyOverridesToBase(
     if (!(key in overrides)) continue;
     const val = (overrides as Record<string, unknown>)[key];
     if (val === null || val === undefined) continue;
+    // `encounters` se MEZCLA con la base en lugar de reemplazarse, para
+    // que un override parcial (sólo walk, sólo oldRod, etc.) no borre el
+    // resto de tablas (surf, headbutt, etc.) que vienen del JSON original.
+    if (key === 'encounters' && isPlainObject(val) && isPlainObject(target.encounters)) {
+      target.encounters = { ...(target.encounters as Record<string, unknown>), ...val };
+      continue;
+    }
     target[key] = val;
   }
 }

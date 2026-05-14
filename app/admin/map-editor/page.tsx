@@ -39,6 +39,7 @@ interface MapEntry {
   fences?: Record<string, number[]>;
   grass?: Record<string, number[]>;
   water?: Record<string, number[]>;
+  encounters?: EncountersOverride | null;
   texts?: Record<string, Record<string, string[]>>;
   items?: { itemKey: string; pos: { x: number; y: number }; hidden?: boolean }[];
   gifts?: { pokemonId: number; level: number; pos: { x: number; y: number }; questId: string }[];
@@ -57,6 +58,33 @@ interface MapEntry {
 }
 
 type MapData = Record<string, MapEntry>;
+
+/**
+ * Pokémon que aparece en una tabla de encuentros (walk / oldRod /
+ * goodRod / superRod). Mantenemos el shape de la API original para que
+ * el override sea compatible 1:1 con `EncountersType` del juego.
+ */
+interface EncounterPokemon {
+  id: number;
+  chance: number;
+  conditionValues: { name: string; url: string }[];
+  maxLevel: number;
+  minLevel: number;
+}
+
+interface EncounterTable {
+  rate: number;
+  pokemon: EncounterPokemon[];
+}
+
+/**
+ * Override parcial de encounters — sólo se editan las tablas relevantes
+ * para el juego (caminar + 3 cañas). El resto se mantiene del JSON base.
+ */
+type EncounterTableKey = 'walk' | 'oldRod' | 'goodRod' | 'superRod';
+type EncountersOverride = Partial<Record<EncounterTableKey, EncounterTable>>;
+
+const EMPTY_TABLE = (): EncounterTable => ({ rate: 0, pokemon: [] });
 
 type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'spots' | 'portals';
 
@@ -488,6 +516,7 @@ export default function MapEditor() {
   const [fences, setFences] = useState<Record<string, number[]>>({});
   const [grass, setGrass] = useState<Record<string, number[]>>({});
   const [water, setWater] = useState<Record<string, number[]>>({});
+  const [encounters, setEncounters] = useState<EncountersOverride>({});
   const [texts, setTexts] = useState<Record<string, Record<string, string[]>>>({});
   const [textRewards, setTextRewards] = useState<Record<string, Record<string, TextRewardEntry>>>({});
   const [items, setItems] = useState<ItemEntry[]>([]);
@@ -556,6 +585,21 @@ export default function MapEditor() {
     setFences(m.fences ?? {});
     setGrass(m.grass ?? {});
     setWater((m as MapEntry & { water?: Record<string, number[]> }).water ?? {});
+    // Encounters: copiar SOLO las 4 tablas que nos interesan (walk + 3 cañas)
+    // del JSON base. Así el editor muestra los valores de la API y el usuario
+    // puede sobrescribirlos en local.
+    const baseEnc = m.encounters ?? null;
+    if (baseEnc) {
+      const picked: EncountersOverride = {};
+      const keys: EncounterTableKey[] = ['walk', 'oldRod', 'goodRod', 'superRod'];
+      for (const k of keys) {
+        const t = (baseEnc as Record<string, unknown>)[k] as EncounterTable | undefined;
+        if (t && Array.isArray(t.pokemon)) picked[k] = { rate: t.rate ?? 0, pokemon: t.pokemon };
+      }
+      setEncounters(picked);
+    } else {
+      setEncounters({});
+    }
     setTexts(m.texts ?? {});
     setTextRewards((m as MapEntry & { textRewards?: Record<string, Record<string, TextRewardEntry>> }).textRewards ?? {});
     setItems(m.items ?? []);
@@ -594,6 +638,7 @@ export default function MapEditor() {
             fences,
             grass,
             water,
+            encounters,
             texts,
             textRewards,
             items: items.map((it) => ({
@@ -654,6 +699,7 @@ export default function MapEditor() {
             fences,
             grass,
             water,
+            encounters,
             texts,
             items,
             gifts,
@@ -698,6 +744,42 @@ export default function MapEditor() {
   function doExportGrass() {
     const ts = exportRowColMapTS(grass, 'grass');
     navigator.clipboard.writeText(ts).then(() => alert('¡Grass copiadas!'));
+  }
+
+  function doExportEncounters() {
+    // Genera un bloque TS literal listo para pegar en el .ts del mapa,
+    // sustituyendo el `encounters: getEncounterData("...")` por un objeto
+    // local. Sólo incluye las 4 tablas editadas (walk + 3 cañas) y deja
+    // las demás vacías para no romper el tipo `EncountersType`.
+    const empty = '{ rate: 0, pokemon: [] }';
+    const tableTS = (t?: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[] }[] }) => {
+      if (!t) return empty;
+      const pokemon = t.pokemon
+        .map(
+          (p) =>
+            `      { id: ${p.id}, chance: ${p.chance}, conditionValues: [], minLevel: ${p.minLevel}, maxLevel: ${p.maxLevel} }`
+        )
+        .join(',\n');
+      return `{\n    rate: ${t.rate},\n    pokemon: [\n${pokemon}\n    ],\n  }`;
+    };
+    const ts =
+      `encounters: {\n` +
+      `  walk: ${tableTS(encounters.walk)},\n` +
+      `  surf: ${empty},\n` +
+      `  oldRod: ${tableTS(encounters.oldRod)},\n` +
+      `  goodRod: ${tableTS(encounters.goodRod)},\n` +
+      `  superRod: ${tableTS(encounters.superRod)},\n` +
+      `  rockSmash: ${empty}, headbutt: ${empty}, darkGrass: ${empty},\n` +
+      `  grassSpots: ${empty}, caveSpots: ${empty}, bridgeSpots: ${empty},\n` +
+      `  superRodSpots: ${empty}, surfSpots: ${empty},\n` +
+      `  yellowFlowers: ${empty}, purpleFlowers: ${empty}, redFlowers: ${empty},\n` +
+      `  roughTerrain: ${empty}, gift: ${empty}, giftEgg: ${empty}, onlyOne: ${empty},\n` +
+      `},`;
+    navigator.clipboard.writeText(ts).then(() =>
+      alert(
+        '¡Encounters copiados!\n\nPega el bloque en el .ts del mapa, reemplazando la línea `encounters: getEncounterData(...)`.'
+      )
+    );
   }
 
   function doExportTexts() {
@@ -1540,6 +1622,11 @@ export default function MapEditor() {
             🌿 Grass
           </button>
         )}
+        {(editMode === 'grass' || editMode === 'water') && (
+          <button onClick={doExportEncounters} style={{ padding: '4px 12px', background: '#10202a', border: '1px solid #3a6a8a', borderRadius: 4, color: '#88ddff', cursor: 'pointer', fontSize: 12 }}>
+            🐾 Encounters
+          </button>
+        )}
         {editMode === 'texts' && (
           <button onClick={doExportTexts} style={{ padding: '4px 12px', background: '#1a1a2a', border: '1px solid #3a5a7a', borderRadius: 4, color: '#88ccff', cursor: 'pointer', fontSize: 12 }}>
             💬 Texts
@@ -2037,18 +2124,72 @@ export default function MapEditor() {
                 sourceFile={currentMap?.sourceFile}
               />
             ) : editMode === 'grass' ? (
-              <ModeHelpBlock
-                emoji="🌿"
-                title="Modo Grass"
-                color="#88ff88"
-                lines={[
-                  'Click + arrastre: pintar/borrar hierba',
-                  'En estos tiles aparecen pokémon salvajes',
-                ]}
-                count={Object.values(grass).reduce((a, b) => a + b.length, 0)}
-                countLabel="grass"
-                sourceFile={currentMap?.sourceFile}
-              />
+              <>
+                <ModeHelpBlock
+                  emoji="🌿"
+                  title="Modo Grass"
+                  color="#88ff88"
+                  lines={[
+                    'Click + arrastre: pintar/borrar hierba',
+                    'En estos tiles aparecen pokémon salvajes (tabla walk)',
+                  ]}
+                  count={Object.values(grass).reduce((a, b) => a + b.length, 0)}
+                  countLabel="grass"
+                  sourceFile={currentMap?.sourceFile}
+                />
+                <EncountersTableEditor
+                  title="🌿 Pokémon en hierba"
+                  tableKey="walk"
+                  table={encounters.walk ?? EMPTY_TABLE()}
+                  onChange={(t) => {
+                    setEncounters((e) => ({ ...e, walk: t }));
+                    setDirty(true);
+                  }}
+                />
+              </>
+            ) : editMode === 'water' ? (
+              <>
+                <ModeHelpBlock
+                  emoji="💧"
+                  title="Modo Water"
+                  color="#88aaff"
+                  lines={[
+                    'Click + arrastre: pintar/borrar agua',
+                    'Bloquea el paso pero se puede pescar desde un tile adyacente',
+                    'Cada caña tiene su propia tabla de aparición',
+                  ]}
+                  count={Object.values(water).reduce((a, b) => a + b.length, 0)}
+                  countLabel="water"
+                  sourceFile={currentMap?.sourceFile}
+                />
+                <EncountersTableEditor
+                  title="🎣 Caña Vieja"
+                  tableKey="oldRod"
+                  table={encounters.oldRod ?? EMPTY_TABLE()}
+                  onChange={(t) => {
+                    setEncounters((e) => ({ ...e, oldRod: t }));
+                    setDirty(true);
+                  }}
+                />
+                <EncountersTableEditor
+                  title="🎣 Caña Buena"
+                  tableKey="goodRod"
+                  table={encounters.goodRod ?? EMPTY_TABLE()}
+                  onChange={(t) => {
+                    setEncounters((e) => ({ ...e, goodRod: t }));
+                    setDirty(true);
+                  }}
+                />
+                <EncountersTableEditor
+                  title="🎣 Súper Caña"
+                  tableKey="superRod"
+                  table={encounters.superRod ?? EMPTY_TABLE()}
+                  onChange={(t) => {
+                    setEncounters((e) => ({ ...e, superRod: t }));
+                    setDirty(true);
+                  }}
+                />
+              </>
             ) : editMode === 'texts' ? (
               <ModeHelpBlock
                 emoji="💬"
@@ -2386,6 +2527,158 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
           🗑 Eliminar NPC
         </button>
       </div>
+    </div>
+  );
+}
+
+// ── Editor de tabla de encounters (walk / oldRod / goodRod / superRod) ──
+
+/**
+ * Permite editar una tabla de encuentros: rate global y lista de pokémon
+ * con id, rango de niveles y "chance" (peso relativo). Al guardar se
+ * persiste en `overrides.encounters[<key>]` del mapa actual.
+ *
+ * - `rate`: 0–255 (Gen I). 0 = no hay encuentros aleatorios.
+ * - `chance`: peso relativo dentro de la tabla. La probabilidad real de
+ *   cada pokémon es `chance / sum(chances)`. La UI muestra el porcentaje.
+ */
+function EncountersTableEditor({
+  title, tableKey, table, onChange,
+}: {
+  title: string;
+  tableKey: 'walk' | 'oldRod' | 'goodRod' | 'superRod';
+  table: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[] }[] };
+  onChange: (
+    next: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[] }[] }
+  ) => void;
+}) {
+  const totalChance = table.pokemon.reduce((a, b) => a + (b.chance || 0), 0) || 1;
+
+  function update(idx: number, patch: Partial<{ id: number; chance: number; minLevel: number; maxLevel: number }>) {
+    const next = { ...table, pokemon: table.pokemon.map((p, i) => i === idx ? { ...p, ...patch } : p) };
+    onChange(next);
+  }
+
+  function remove(idx: number) {
+    onChange({ ...table, pokemon: table.pokemon.filter((_, i) => i !== idx) });
+  }
+
+  function add() {
+    onChange({
+      ...table,
+      pokemon: [
+        ...table.pokemon,
+        { id: 1, chance: 10, minLevel: 5, maxLevel: 5, conditionValues: [] },
+      ],
+    });
+  }
+
+  function setRate(rate: number) {
+    onChange({ ...table, rate: Math.max(0, Math.min(255, Math.round(rate))) });
+  }
+
+  return (
+    <div style={{ marginTop: 18, padding: 12, background: '#10102a', border: '1px solid #2a2a4a', borderRadius: 6 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#e0e0ff' }}>{title}</div>
+        <div style={{ fontSize: 10, color: '#666', fontFamily: 'monospace' }}>{tableKey}</div>
+      </div>
+
+      {/* Rate */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+        <span style={{ fontSize: 11, color: '#aaa', minWidth: 70 }}>Rate (0–255)</span>
+        <input
+          type="number"
+          min={0}
+          max={255}
+          value={table.rate}
+          onChange={(e) => setRate(parseInt(e.target.value, 10) || 0)}
+          style={{ width: 60, padding: '2px 6px', background: '#0a0a18', border: '1px solid #3a3a5a', color: '#fff', borderRadius: 3, fontSize: 12 }}
+        />
+        <span style={{ fontSize: 10, color: '#666' }}>
+          {table.rate === 0 ? 'sin encuentros' : `${((table.rate / 255) * 100).toFixed(1)}% por paso`}
+        </span>
+      </div>
+
+      {/* Lista de pokémon */}
+      {table.pokemon.length === 0 && (
+        <div style={{ fontSize: 11, color: '#666', fontStyle: 'italic', padding: '8px 0' }}>
+          (sin pokémon — añade alguno con el botón de abajo)
+        </div>
+      )}
+      {table.pokemon.map((p, i) => {
+        const pct = ((p.chance / totalChance) * 100).toFixed(1);
+        return (
+          <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 50px 70px 50px 24px', gap: 4, alignItems: 'center', padding: '4px 0', borderTop: i === 0 ? 'none' : '1px solid #1a1a3a' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ fontSize: 10, color: '#666', width: 18 }}>#</span>
+              <input
+                type="number"
+                min={1}
+                max={151}
+                value={p.id}
+                onChange={(e) => update(i, { id: parseInt(e.target.value, 10) || 1 })}
+                title="ID Pokémon (1–151)"
+                style={{ width: '100%', padding: '2px 4px', background: '#0a0a18', border: '1px solid #3a3a5a', color: '#fff', borderRadius: 3, fontSize: 11 }}
+              />
+            </div>
+            <input
+              type="number"
+              min={1}
+              max={100}
+              value={p.minLevel}
+              onChange={(e) => {
+                const v = parseInt(e.target.value, 10) || 1;
+                update(i, { minLevel: v, maxLevel: Math.max(v, p.maxLevel) });
+              }}
+              title="Nivel mínimo"
+              style={{ padding: '2px 4px', background: '#0a0a18', border: '1px solid #3a3a5a', color: '#fff', borderRadius: 3, fontSize: 11, textAlign: 'center' }}
+            />
+            <input
+              type="number"
+              min={p.minLevel}
+              max={100}
+              value={p.maxLevel}
+              onChange={(e) => update(i, { maxLevel: Math.max(p.minLevel, parseInt(e.target.value, 10) || p.minLevel) })}
+              title="Nivel máximo"
+              style={{ padding: '2px 4px', background: '#0a0a18', border: '1px solid #3a3a5a', color: '#fff', borderRadius: 3, fontSize: 11, textAlign: 'center' }}
+            />
+            <input
+              type="number"
+              min={0}
+              value={p.chance}
+              onChange={(e) => update(i, { chance: Math.max(0, parseInt(e.target.value, 10) || 0) })}
+              title={`Peso (probabilidad real: ${pct}%)`}
+              style={{ padding: '2px 4px', background: '#0a0a18', border: '1px solid #3a3a5a', color: '#fff', borderRadius: 3, fontSize: 11, textAlign: 'center' }}
+            />
+            <button
+              onClick={() => remove(i)}
+              title="Eliminar"
+              style={{ padding: '2px 4px', background: '#3a1a1a', border: '1px solid #7a3a3a', color: '#ff8888', borderRadius: 3, fontSize: 11, cursor: 'pointer' }}
+            >
+              ×
+            </button>
+          </div>
+        );
+      })}
+
+      {/* Cabecera de columnas (debajo para no estorbar si está vacío) */}
+      {table.pokemon.length > 0 && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 50px 70px 50px 24px', gap: 4, marginTop: 6, fontSize: 9, color: '#555', textAlign: 'center' }}>
+          <span style={{ textAlign: 'left' }}>id</span>
+          <span>min</span>
+          <span>max</span>
+          <span>peso</span>
+          <span></span>
+        </div>
+      )}
+
+      <button
+        onClick={add}
+        style={{ marginTop: 8, width: '100%', padding: '4px 8px', background: '#1a3a1a', border: '1px solid #3a7a3a', color: '#88ff88', borderRadius: 4, fontSize: 11, cursor: 'pointer' }}
+      >
+        + Añadir pokémon
+      </button>
     </div>
   );
 }

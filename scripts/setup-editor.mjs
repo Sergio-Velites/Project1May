@@ -635,6 +635,17 @@ const MAP_ID_TO_IMAGE = {
 
 console.log("\n📋 Procesando archivos de mapa...");
 
+// Cargar tabla de encounters (origen: PokeAPI dump). Cada mapa puede
+// referenciar una clave concreta vía getEncounterData("<location-area>").
+let locationData = {};
+try {
+  locationData = JSON.parse(
+    fs.readFileSync(path.join(GAME_SRC, "maps/location-data.json"), "utf-8")
+  );
+} catch {
+  console.warn("  ⚠️  No se pudo leer location-data.json (encounters vacíos)");
+}
+
 const mapData = {};
 let processed = 0;
 
@@ -664,6 +675,14 @@ for (const file of MAP_FILES) {
   const fences = parseRowColMap(tsText, "fences");
   const grass = parseRowColMap(tsText, "grass");
   const water = parseRowColMap(tsText, "water");
+
+  // Encounters: si el mapa hace getEncounterData("<key>"), copiar la
+  // tabla completa para que el editor pueda visualizarla y editarla.
+  let encounters = null;
+  const encMatch = tsText.match(/getEncounterData\(\s*["']([^"']+)["']\s*\)/);
+  if (encMatch && locationData[encMatch[1]]) {
+    encounters = locationData[encMatch[1]].encounters ?? null;
+  }
   const texts = parseTextField(tsText);
   const items = parseItemsField(tsText);
   const gifts = parseGiftsField(tsText);
@@ -736,6 +755,7 @@ for (const file of MAP_FILES) {
     fences,
     grass,
     water,
+    encounters,
     texts,
     items,
     gifts,
