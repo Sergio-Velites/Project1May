@@ -457,4 +457,49 @@ body {
   background: black;
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   Hitbox ×1.5 — UX táctil/ratón
+   Extiende la zona pulsable de cada control un 25% en cada lado
+   (50% total = 1.5×) usando un pseudo-elemento transparente.
+   No altera el tamaño visual de los botones.
+   ───────────────────────────────────────────────────────────────── */
+
+/* D-pad: cada flecha (no la zona central neutra) */
+.gameboy .controls .dpad > *:not(.middle)::after {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  z-index: 10;
+  background: transparent;
+}
+
+/* Botones A y B */
+.gameboy .controls .a-b .a,
+.gameboy .controls .a-b .b {
+  /* ya tienen position: absolute */
+}
+.gameboy .controls .a-b .a::after,
+.gameboy .controls .a-b .b::after {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  z-index: 10;
+  border-radius: 50%;
+  background: transparent;
+}
+
+/* Start y Select */
+.gameboy .start-select .start,
+.gameboy .start-select .select {
+  position: relative;
+}
+.gameboy .start-select .start::after,
+.gameboy .start-select .select::after {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  z-index: 10;
+  background: transparent;
+}
+
 

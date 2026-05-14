@@ -38,6 +38,7 @@ interface MapEntry {
   walls: Record<string, number[]>;
   fences?: Record<string, number[]>;
   grass?: Record<string, number[]>;
+  water?: Record<string, number[]>;
   texts?: Record<string, Record<string, string[]>>;
   items?: { itemKey: string; pos: { x: number; y: number }; hidden?: boolean }[];
   gifts?: { pokemonId: number; level: number; pos: { x: number; y: number }; questId: string }[];
@@ -57,7 +58,7 @@ interface MapEntry {
 
 type MapData = Record<string, MapEntry>;
 
-type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'spots' | 'portals';
+type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'spots' | 'portals';
 
 type SpotKey = 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation';
 
@@ -486,6 +487,7 @@ export default function MapEditor() {
   const [walls, setWalls] = useState<Record<string, number[]>>({});
   const [fences, setFences] = useState<Record<string, number[]>>({});
   const [grass, setGrass] = useState<Record<string, number[]>>({});
+  const [water, setWater] = useState<Record<string, number[]>>({});
   const [texts, setTexts] = useState<Record<string, Record<string, string[]>>>({});
   const [textRewards, setTextRewards] = useState<Record<string, Record<string, TextRewardEntry>>>({});
   const [items, setItems] = useState<ItemEntry[]>([]);
@@ -553,6 +555,7 @@ export default function MapEditor() {
     setWalls(m.walls ?? {});
     setFences(m.fences ?? {});
     setGrass(m.grass ?? {});
+    setWater((m as MapEntry & { water?: Record<string, number[]> }).water ?? {});
     setTexts(m.texts ?? {});
     setTextRewards((m as MapEntry & { textRewards?: Record<string, Record<string, TextRewardEntry>> }).textRewards ?? {});
     setItems(m.items ?? []);
@@ -590,6 +593,7 @@ export default function MapEditor() {
           overrides: {
             fences,
             grass,
+            water,
             texts,
             textRewards,
             items: items.map((it) => ({
@@ -649,6 +653,7 @@ export default function MapEditor() {
             walls,
             fences,
             grass,
+            water,
             texts,
             items,
             gifts,
@@ -770,6 +775,7 @@ export default function MapEditor() {
       setWalls(parsed.walls);
       setFences(parsed.fences);
       setGrass(parsed.grass);
+      setWater(parsed.water);
       setTexts(parsed.texts);
       setTextRewards(parsed.textRewards ?? {});
       setItems(parsed.items);
@@ -906,9 +912,9 @@ export default function MapEditor() {
         return;
       }
 
-      // Mask paint en arrastre (walls, fences, grass)
+      // Mask paint en arrastre (walls, fences, grass, water)
       if (
-        (editMode === 'walls' || editMode === 'fences' || editMode === 'grass') &&
+        (editMode === 'walls' || editMode === 'fences' || editMode === 'grass' || editMode === 'water') &&
         wallPaint.current?.active
       ) {
         const paint = wallPaint.current;
@@ -916,7 +922,10 @@ export default function MapEditor() {
         if (!paint.visited.has(k)) {
           paint.visited.add(k);
           const setter =
-            editMode === 'walls' ? setWalls : editMode === 'fences' ? setFences : setGrass;
+            editMode === 'walls' ? setWalls
+            : editMode === 'fences' ? setFences
+            : editMode === 'grass' ? setGrass
+            : setWater;
           setter((prev) => setMaskAt(prev, tileX, tileY, paint.mode === 'add'));
           setDirty(true);
         }
@@ -1026,9 +1035,9 @@ export default function MapEditor() {
     };
   }
 
-  // En modo walls/fences/grass: pointerdown en canvas inicia pintura.
+  // En modo walls/fences/grass/water: pointerdown en canvas inicia pintura.
   function onCanvasPointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    if (editMode !== 'walls' && editMode !== 'fences' && editMode !== 'grass') return;
+    if (editMode !== 'walls' && editMode !== 'fences' && editMode !== 'grass' && editMode !== 'water') return;
     const tile = tileFromEvent(e);
     if (!tile) return;
     if (
@@ -1036,8 +1045,16 @@ export default function MapEditor() {
       tile.x >= (currentMap?.width ?? 0) ||
       tile.y >= (currentMap?.height ?? 0)
     ) return;
-    const src = editMode === 'walls' ? walls : editMode === 'fences' ? fences : grass;
-    const setter = editMode === 'walls' ? setWalls : editMode === 'fences' ? setFences : setGrass;
+    const src =
+      editMode === 'walls' ? walls
+      : editMode === 'fences' ? fences
+      : editMode === 'grass' ? grass
+      : water;
+    const setter =
+      editMode === 'walls' ? setWalls
+      : editMode === 'fences' ? setFences
+      : editMode === 'grass' ? setGrass
+      : setWater;
     const currentlyOn = hasMask(src, tile.x, tile.y);
     const mode: 'add' | 'remove' = currentlyOn ? 'remove' : 'add';
     wallPaint.current = { active: true, mode, visited: new Set([`${tile.x},${tile.y}`]) };
@@ -1432,12 +1449,13 @@ export default function MapEditor() {
 
         {/* Modo edición */}
         <div style={{ display: 'flex', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
-          {(['npc', 'walls', 'fences', 'grass', 'texts', 'items', 'gifts', 'static-pokemon', 'spots', 'portals'] as EditMode[]).map((m) => {
+          {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'spots', 'portals'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
               npc: '#5050b0',
               walls: '#7a3030',
               fences: '#7a5a30',
               grass: '#3a7a3a',
+              water: '#3a5aa0',
               texts: '#3a5a7a',
               items: '#5a3a7a',
               gifts: '#7a3a5a',
@@ -1670,6 +1688,32 @@ export default function MapEditor() {
                       border: editMode === 'grass'
                         ? '1px solid rgba(80, 220, 80, 0.9)'
                         : '1px dashed rgba(80, 220, 80, 0.4)',
+                      pointerEvents: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                ));
+              })}
+
+              {/* Water overlay (bloquea paso, permite pescar adyacente) */}
+              {Object.entries(water).flatMap(([rowKey, cols]) => {
+                const y = parseInt(rowKey, 10);
+                if (Number.isNaN(y)) return [];
+                return cols.map((x) => (
+                  <div
+                    key={`w-${y}-${x}`}
+                    style={{
+                      position: 'absolute',
+                      left: x * zoom,
+                      top: y * zoom,
+                      width: zoom,
+                      height: zoom,
+                      background: editMode === 'water'
+                        ? 'rgba(80, 140, 255, 0.55)'
+                        : 'rgba(80, 140, 255, 0.22)',
+                      border: editMode === 'water'
+                        ? '1px solid rgba(80, 140, 255, 0.9)'
+                        : '1px dashed rgba(80, 140, 255, 0.45)',
                       pointerEvents: 'none',
                       boxSizing: 'border-box',
                     }}

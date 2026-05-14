@@ -53,6 +53,7 @@ export interface ParsedMap {
   walls: Record<string, number[]>;
   fences: Record<string, number[]>;
   grass: Record<string, number[]>;
+  water: Record<string, number[]>;
   texts: Record<string, Record<string, string[]>>;
   textRewards: Record<string, Record<string, ParsedTextReward>>;
   items: ParsedItem[];
@@ -515,6 +516,7 @@ export function parseMapTS(tsText: string): ParsedMap {
     walls: parseRowColMap(tsText, 'walls'),
     fences: parseRowColMap(tsText, 'fences'),
     grass: parseRowColMap(tsText, 'grass'),
+    water: parseRowColMap(tsText, 'water'),
     texts: parseTextField(tsText),
     textRewards: parseTextRewardsField(tsText),
     items: parseItemsField(tsText),

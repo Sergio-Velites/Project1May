@@ -359,7 +359,7 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
         </StatCell>
         <StatCell>
           <Txt $size={0.85}>ESP</Txt>
-          <Txt $size={0.85}>{stats.specialAttack}</Txt>
+          <Txt $size={0.85}>{stats.special}</Txt>
         </StatCell>
       </StatsGrid>
 

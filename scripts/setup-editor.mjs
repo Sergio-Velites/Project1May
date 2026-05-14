@@ -663,6 +663,7 @@ for (const file of MAP_FILES) {
   // Campos extra (todos opcionales en MapType)
   const fences = parseRowColMap(tsText, "fences");
   const grass = parseRowColMap(tsText, "grass");
+  const water = parseRowColMap(tsText, "water");
   const texts = parseTextField(tsText);
   const items = parseItemsField(tsText);
   const gifts = parseGiftsField(tsText);
@@ -734,6 +735,7 @@ for (const file of MAP_FILES) {
     walls,
     fences,
     grass,
+    water,
     texts,
     items,
     gifts,

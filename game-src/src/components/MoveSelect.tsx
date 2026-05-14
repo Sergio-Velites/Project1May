@@ -1,13 +1,15 @@
 import styled from "styled-components";
 
 import Menu, { MenuItemType } from "./Menu";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectStartMenu } from "../state/uiSlice";
 import useIsMobile from "../app/use-is-mobile";
-import { selectActivePokemon } from "../state/gameSlice";
+import { selectActivePokemon, swapMoves } from "../state/gameSlice";
 import Frame from "./Frame";
 import { useState, useEffect } from "react";
 import useMoveMetadata, { getMoveMetadata } from "../app/use-move-metadata";
+import useEvent from "../app/use-event";
+import { Event } from "../app/emitter";
 
 const Stats = styled.div`
   position: absolute;
@@ -48,17 +50,45 @@ interface Props {
 }
 
 const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
+  const dispatch = useDispatch();
   const startMenuOpen = useSelector(selectStartMenu);
   const isMobile = useIsMobile();
   const activePokemon = useSelector(selectActivePokemon);
 
   const [active, setActive] = useState(0);
   const [noPpNotice, setNoPpNotice] = useState<string | null>(null);
+  // Índice del movimiento "marcado" para intercambio (estilo Select de Gen I).
+  // Solo en modo combate normal (no en overrideMoves del flujo learn-move).
+  const [swapIndex, setSwapIndex] = useState<number | null>(null);
 
-  // Limpiar el aviso cuando el menú se cierra
+  // Limpiar estados cuando el menú se cierra
   useEffect(() => {
-    if (!show) setNoPpNotice(null);
+    if (!show) {
+      setNoPpNotice(null);
+      setSwapIndex(null);
+    }
   }, [show]);
+
+  // Botón Select: marcar movimiento o intercambiar.
+  // Deshabilitado en modo learn-move (overrideMoves) y mientras hay aviso de PP.
+  useEvent(Event.Select, () => {
+    if (!show) return;
+    if (overrideMoves) return;
+    if (noPpNotice) return;
+    if (startMenuOpen) return;
+    if (active >= activePokemon.moves.length) return;
+
+    if (swapIndex === null) {
+      setSwapIndex(active);
+      return;
+    }
+    if (swapIndex === active) {
+      setSwapIndex(null);
+      return;
+    }
+    dispatch(swapMoves({ fromIndex: swapIndex, toIndex: active }));
+    setSwapIndex(null);
+  });
 
   const displayMoves = overrideMoves ?? activePokemon.moves;
   const move = useMoveMetadata(displayMoves[Math.min(active, displayMoves.length - 1)]?.id ?? activePokemon.moves[0].id);
@@ -72,10 +102,11 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
         padd={4}
         padding={isMobile ? "100px" : "40vw"}
         show={show}
-        menuItems={displayMoves.map((m) => {
+        menuItems={displayMoves.map((m, i) => {
           const ppEmpty = m.pp <= 0;
+          const isMarked = swapIndex === i;
           const item: MenuItemType = {
-            label: getMoveMetadata(m.id).name,
+            label: (isMarked ? "↕" : "") + getMoveMetadata(m.id).name,
             action: () => {
               if (ppEmpty) {
                 // Mostrar aviso y NO seleccionar el movimiento
@@ -101,6 +132,11 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
             <StatsRow
               style={{ textAlign: "right" }}
             >{`${displayMoves[Math.min(active, displayMoves.length - 1)]?.pp ?? 0}/${move.pp}`}</StatsRow>
+            {swapIndex !== null && (
+              <StatsRow style={{ textAlign: "center", marginTop: "0.6rem" }}>
+                SELECT: cambiar
+              </StatsRow>
+            )}
           </Frame>
         </Stats>
       )}

@@ -7,9 +7,10 @@ import {
   selectMapId,
   selectCompletedQuests,
 } from "../state/gameSlice";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import useEvent from "../app/use-event";
 import emitter, { Event } from "../app/emitter";
+import useDialogLine from "../app/use-dialog-line";
 import {
   hideText,
   selectMenuOpen,
@@ -83,7 +84,6 @@ const Image = styled(PixelImage)`
 
 const Text = () => {
   const dispatch = useDispatch();
-  const [liveIndex, setLiveIndex] = useState(0);
   const [textIndex, setTextIndex] = useState(0);
   const pos = useSelector(selectPos);
   const direction = useSelector(selectDirection);
@@ -98,26 +98,22 @@ const Text = () => {
   // Se usa al cerrar el último frame para comprobar si hay recompensa pendiente.
   const currentTextTileRef = useRef<{ x: number; y: number } | null>(null);
 
-  useEffect(() => {
-    setLiveIndex(0);
-    if (text) {
-      const interval = setInterval(() => {
-        setLiveIndex((prev) => prev + 1);
-      }, 30);
+  // Si la entrada es una imagen (path largo), salta el typewriter.
+  const currentLine = text?.[textIndex] ?? "";
+  const isImage = currentLine.length > 300;
 
-      return () => clearInterval(interval);
-    }
-  }, [text, textIndex]);
-
-  useEvent(Event.A, () => {
-    // Reading text
-    if (text) {
+  // Hook compartido: typewriter + avance A/B + cooldown 300 ms.
+  // Solo activo cuando hay texto Y la línea actual es texto (no imagen).
+  const { displayed, isComplete } = useDialogLine({
+    text: currentLine,
+    enabled: !!text && !isImage,
+    onAdvance: () => {
+      if (!text) return;
       if (textIndex === text.length - 1) {
         const tile = currentTextTileRef.current;
         currentTextTileRef.current = null;
         setTextIndex(0);
         dispatch(hideText());
-        // Comprobar si el tile tiene recompensa pendiente
         if (tile) {
           const reward = map.textRewards?.[tile.y]?.[tile.x];
           if (reward && !completedQuests.includes(reward.questId)) {
@@ -127,8 +123,24 @@ const Text = () => {
       } else {
         setTextIndex((prev) => prev + 1);
       }
+    },
+  });
+
+  // Para imágenes (sin typewriter): A las cierra/avanza directamente.
+  useEvent(Event.A, () => {
+    if (text && isImage) {
+      if (textIndex === text.length - 1) {
+        currentTextTileRef.current = null;
+        setTextIndex(0);
+        dispatch(hideText());
+      } else {
+        setTextIndex((prev) => prev + 1);
+      }
       return;
     }
+
+    // Si hay texto en curso, el hook se encarga del avance.
+    if (text) return;
 
     if (menuOpen) return;
 
@@ -177,11 +189,11 @@ const Text = () => {
 
   return (
     <>
-      {text[textIndex].length > 300 ? (
-        <Image src={text[textIndex]} />
+      {isImage ? (
+        <Image src={currentLine} />
       ) : (
-        <StyledText className="framed no-hd" $done={liveIndex > text.length}>
-          <h1>{text[textIndex].substring(0, liveIndex)}</h1>
+        <StyledText className="framed no-hd" $done={isComplete}>
+          <h1>{displayed}</h1>
         </StyledText>
       )}
     </>

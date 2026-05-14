@@ -3,8 +3,7 @@ import Frame from "./Frame";
 import { useDispatch, useSelector } from "react-redux";
 import { hideTextThenAction, selectTextThenAction } from "../state/uiSlice";
 import { useEffect, useState } from "react";
-import useEvent from "../app/use-event";
-import { Event } from "../app/emitter";
+import useDialogLine from "../app/use-dialog-line";
 
 const StyledTextThenAction = styled.div`
   position: absolute;
@@ -23,29 +22,32 @@ const TextThenAction = () => {
 
   useEffect(() => {
     if (textThenAction) return;
-
     setTextIndex(0);
   }, [textThenAction]);
 
-  useEvent(Event.A, () => {
-    if (!textThenAction) return;
+  const lines = textThenAction?.text ?? [];
+  const currentLine = lines[textIndex] ?? "";
 
-    if (textIndex === textThenAction.text.length - 1) {
-      textThenAction.action();
-      dispatch(hideTextThenAction());
-
-      return;
-    }
-
-    setTextIndex(textIndex + 1);
+  const { displayed, isComplete } = useDialogLine({
+    text: currentLine,
+    enabled: !!textThenAction,
+    onAdvance: () => {
+      if (!textThenAction) return;
+      if (textIndex === textThenAction.text.length - 1) {
+        textThenAction.action();
+        dispatch(hideTextThenAction());
+        return;
+      }
+      setTextIndex(textIndex + 1);
+    },
   });
 
   if (!textThenAction) return null;
 
   return (
     <StyledTextThenAction>
-      <Frame wide tall flashing>
-        {textThenAction.text[textIndex]}
+      <Frame wide tall flashing={isComplete}>
+        {displayed}
       </Frame>
     </StyledTextThenAction>
   );

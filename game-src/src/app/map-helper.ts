@@ -27,6 +27,14 @@ export const isGrass = (
   return !!grass && grass[y] && grass[y].includes(x);
 };
 
+export const isWater = (
+  water: Record<number, number[]> | undefined,
+  x: number,
+  y: number
+): boolean => {
+  return !!water && water[y] && water[y].includes(x);
+};
+
 export const isExit = (
   exits: Record<number, number[]> | undefined,
   x: number,
@@ -113,6 +121,7 @@ export const canWalk = (
   if (isItem(map.items, x, y, collectedItems, mapId)) return false;
   if (isGift(map.gifts, x, y, completedQuests)) return false;
   if (isWall(map.walls, x, y)) return false;
+  if (isWater(map.water, x, y)) return false;
   if (isFence(map.fences, x, y)) return false;
   // Un trainer bloquea el paso siempre, como un muro.
   // La única excepción es hideCondition activa (trainer invisible).

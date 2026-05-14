@@ -511,8 +511,8 @@ const processMove = (
   if (isAttacking) {
     // Player attacking enemy
     // If critical hit, ignore stat stages (Gen I behaviour)
-    const rawAtk = moveMetadata.damageClass === "physical" ? ourStats.attack    : ourStats.specialAttack;
-    const rawDef = moveMetadata.damageClass === "physical" ? theirStats.defense : theirStats.specialDefense;
+    const rawAtk = moveMetadata.damageClass === "physical" ? ourStats.attack    : ourStats.special;
+    const rawDef = moveMetadata.damageClass === "physical" ? theirStats.defense : theirStats.special;
     const atkStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? myStages.attack    : myStages.special);
     const defStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? theirStages.defense : theirStages.special);
     const attack  = rawAtk * getStageMult(atkStage);
@@ -583,8 +583,8 @@ const processMove = (
 
   // Enemy attacking player
   // If critical hit, ignore stat stages (Gen I behaviour)
-  const rawAtk = moveMetadata.damageClass === "physical" ? theirStats.attack    : theirStats.specialAttack;
-  const rawDef = moveMetadata.damageClass === "physical" ? ourStats.defense     : ourStats.specialDefense;
+  const rawAtk = moveMetadata.damageClass === "physical" ? theirStats.attack    : theirStats.special;
+  const rawDef = moveMetadata.damageClass === "physical" ? ourStats.defense     : ourStats.special;
   const atkStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? theirStages.attack    : theirStages.special);
   const defStage  = isCrit ? 0 : (moveMetadata.damageClass === "physical" ? myStages.defense      : myStages.special);
   const attack  = rawAtk * getStageMult(atkStage);

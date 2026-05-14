@@ -195,6 +195,12 @@ export interface MapType {
   grass: Record<number, number[]>;
   recoverLocation?: PosType;
   fences?: Record<number, number[]>;
+  /**
+   * Tiles de agua. Mismo formato Record<row, col[]> que walls/grass.
+   * Bloquean el paso (como muros) pero permiten pescar desde tile adyacente
+   * con cualquiera de las 3 cañas (`OldRod`, `GoodRod`, `SuperRod`).
+   */
+  water?: Record<number, number[]>;
   pokemonCenter?: PosType;
   pc?: PosType;
   store?: PosType;

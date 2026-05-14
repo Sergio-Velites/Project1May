@@ -264,6 +264,29 @@ export const gameSlice = createSlice({
       state.pokemon[action.payload.index] = action.payload.pokemon;
     },
     /**
+     * Intercambia dos movimientos del pokémon activo (estilo Select de Gen I).
+     * Persiste tras guardar/cargar porque viven en `pokemon[i].moves`.
+     */
+    swapMoves: (
+      state,
+      action: PayloadAction<{ fromIndex: number; toIndex: number }>
+    ) => {
+      const idx = state.activePokemonIndex;
+      const p = state.pokemon[idx];
+      if (!p) return;
+      const { fromIndex, toIndex } = action.payload;
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= p.moves.length ||
+        toIndex >= p.moves.length ||
+        fromIndex === toIndex
+      ) return;
+      const tmp = p.moves[fromIndex];
+      p.moves[fromIndex] = p.moves[toIndex];
+      p.moves[toIndex] = tmp;
+    },
+    /**
      * Asigna (o limpia con null) el estado persistente de un Pokémon concreto.
      * Se invoca desde el sistema de combate cuando un movimiento aplica
      * envenenamiento, quemadura, parálisis, sueño o congelación, y al
@@ -445,6 +468,7 @@ export const {
   updatePokemonEncounter,
   updatePokemon,
   updateSpecificPokemon,
+  swapMoves,
   setPokemonStatus,
   recoverFromFainting,
   resetActivePokemon,

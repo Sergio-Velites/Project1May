@@ -211,7 +211,7 @@ const Detail = ({ id, onBack }: DetailProps) => {
             <Txt $size={0.75}>ATQ {stats.attack}</Txt>
             <Txt $size={0.75}>DEF {stats.defense}</Txt>
             <Txt $size={0.75}>VEL {stats.speed}</Txt>
-            <Txt $size={0.75}>ESP {stats.specialAttack}</Txt>
+            <Txt $size={0.75}>ESP {stats.special}</Txt>
           </InfoCol>
         </div>
 

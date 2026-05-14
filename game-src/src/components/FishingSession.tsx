@@ -1,0 +1,245 @@
+/**
+ * FishingSession — Sesión de pesca con caña (Old/Good/Super).
+ *
+ * Inicia el item de la caña (use-item-data.ts) tras detectar agua adyacente.
+ * Flujo:
+ *   1. casting (200 ms): aparece el sprite de la caña frente al jugador.
+ *   2. waiting (1.5–3 s aleatorio): muestra texto progresivo "...".
+ *   3. bite (50%) o no-bite:
+ *      - bite → "¡Picó algo!" + A → encounter usando map.encounters[rod]
+ *      - no-bite → "No pica nada..." + A → cierra
+ *   4. Al terminar (combate o cancelación), la sesión se cierra y el jugador
+ *      recupera los controles (selectMenuOpen excluye fishing al ser null).
+ */
+import { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  endFishing,
+  selectFishing,
+  selectMenuOpen,
+} from "../state/uiSlice";
+import {
+  encounterPokemon,
+  selectMap,
+  selectPokemonEncounter,
+} from "../state/gameSlice";
+import { PokemonEncounterData } from "../maps/map-types";
+import { Direction, PokemonEncounterType } from "../state/state-types";
+import getPokemonEncounter from "../app/pokemon-encounter-helper";
+import useEvent from "../app/use-event";
+import { Event } from "../app/emitter";
+import Frame from "./Frame";
+
+// Tirada ponderada de pokémon (igual que EncounterHandler).
+const randBetween = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1) + min);
+
+const pickFromTable = (
+  options: PokemonEncounterData[]
+): PokemonEncounterType | null => {
+  if (!options || options.length === 0) return null;
+  const total = options.reduce((acc, cur) => acc + cur.chance, 0);
+  let r = Math.random() * total;
+  for (const opt of options) {
+    r -= opt.chance;
+    if (r < 0) {
+      return getPokemonEncounter(opt.id, randBetween(opt.minLevel, opt.maxLevel));
+    }
+  }
+  return null;
+};
+
+const TextOverlay = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30%;
+  z-index: 1500;
+`;
+
+type Phase = "casting" | "waiting" | "bite" | "no-bite";
+
+const PROBABILITY = 0.5;        // 50% bite rate (igual que Gen I)
+const CASTING_MS = 350;
+const WAITING_MS_MIN = 1500;
+const WAITING_MS_MAX = 3000;
+
+const FishingSession = () => {
+  const dispatch = useDispatch();
+  const fishing = useSelector(selectFishing);
+  const map = useSelector(selectMap);
+  const encounter = useSelector(selectPokemonEncounter);
+  const menuOpenIgnoringFishing = useSelector(
+    (s: Parameters<typeof selectMenuOpen>[0]) => {
+      // selectMenuOpen incluye fishing → no podemos usarlo aquí.
+      // En su lugar evaluamos manualmente: si hay otro menú abierto
+      // (texto, etc.) bloqueamos la animación pero no cerramos.
+      return false;
+    }
+  );
+  void menuOpenIgnoringFishing; // reservado por si se quiere bloquear en futuro
+
+  const [phase, setPhase] = useState<Phase>("casting");
+  const [dots, setDots] = useState(0);
+  const startedAtRef = useRef<number>(Date.now());
+
+  // Reset al iniciar una nueva sesión de pesca
+  useEffect(() => {
+    if (!fishing) return;
+    setPhase("casting");
+    setDots(0);
+    startedAtRef.current = Date.now();
+  }, [fishing]);
+
+  // Si arranca un combate (encounter), cerramos la sesión.
+  useEffect(() => {
+    if (fishing && encounter) {
+      dispatch(endFishing());
+    }
+  }, [encounter, fishing, dispatch]);
+
+  // Máquina de fases: casting → waiting → bite/no-bite
+  useEffect(() => {
+    if (!fishing) return;
+
+    if (phase === "casting") {
+      const t = setTimeout(() => setPhase("waiting"), CASTING_MS);
+      return () => clearTimeout(t);
+    }
+
+    if (phase === "waiting") {
+      // Animación de puntos cada 500 ms
+      const dotInterval = setInterval(() => {
+        setDots((d) => (d + 1) % 4);
+      }, 500);
+
+      // Decisión de bite tras delay aleatorio
+      const wait = randBetween(WAITING_MS_MIN, WAITING_MS_MAX);
+      const decide = setTimeout(() => {
+        const table = (() => {
+          const enc = map.encounters;
+          if (!enc) return [];
+          if (fishing.rod === "old-rod") return enc.oldRod?.pokemon ?? [];
+          if (fishing.rod === "good-rod") return enc.goodRod?.pokemon ?? [];
+          return enc.superRod?.pokemon ?? [];
+        })();
+
+        // Sin tabla configurada → siempre no-bite
+        if (table.length === 0) {
+          setPhase("no-bite");
+          return;
+        }
+        const bite = Math.random() < PROBABILITY;
+        setPhase(bite ? "bite" : "no-bite");
+      }, wait);
+
+      return () => {
+        clearInterval(dotInterval);
+        clearTimeout(decide);
+      };
+    }
+  }, [phase, fishing, map.encounters]);
+
+  // A/B durante bite → lanza encounter; durante no-bite → cierra.
+  const handleAdvance = () => {
+    if (!fishing) return;
+    if (phase === "bite") {
+      const enc = map.encounters;
+      const table =
+        fishing.rod === "old-rod"
+          ? enc?.oldRod?.pokemon ?? []
+          : fishing.rod === "good-rod"
+          ? enc?.goodRod?.pokemon ?? []
+          : enc?.superRod?.pokemon ?? [];
+      const pkmn = pickFromTable(table);
+      if (pkmn) {
+        dispatch(encounterPokemon(pkmn));
+        // endFishing se dispara desde el efecto al detectar encounter
+      } else {
+        // Sin tabla válida (raro, table.length>0 garantizado), cierra
+        dispatch(endFishing());
+      }
+      return;
+    }
+    if (phase === "no-bite") {
+      dispatch(endFishing());
+    }
+  };
+
+  useEvent(Event.A, handleAdvance);
+  useEvent(Event.B, handleAdvance);
+
+  if (!fishing) return null;
+
+  const message =
+    phase === "casting"
+      ? "..."
+      : phase === "waiting"
+      ? ".".repeat(Math.max(1, dots) || 1)
+      : phase === "bite"
+      ? "¡Picó algo!"
+      : "No pica nada...";
+
+  return (
+    <>
+      <RodSprite direction={fishing.direction} />
+      <TextOverlay>
+        <Frame wide tall flashing={phase === "bite" || phase === "no-bite"}>
+          {message}
+        </Frame>
+      </TextOverlay>
+    </>
+  );
+};
+
+/**
+ * Sprite simple de la caña: un palito blanco con cabeza oscura,
+ * orientado según la dirección del jugador.
+ * Renderizado en screen-space cerca del centro (donde está el jugador).
+ *
+ * - Up: emerge desde la cintura del jugador hacia arriba (z-index < jugador).
+ * - Down: emerge hacia abajo desde la cintura (z-index > jugador).
+ * - Left/Right: lateral.
+ */
+const RodOverlay = styled.div<{ $dir: Direction }>`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.4cqw;
+  height: 8cqw;
+  background: #181010;
+  z-index: ${(p) => (p.$dir === Direction.Up ? 4 : 12)};
+  transform-origin: center top;
+  transform: ${(p) => {
+    switch (p.$dir) {
+      case Direction.Up:
+        return "translate(-50%, -100%) rotate(180deg)";
+      case Direction.Down:
+        return "translate(-50%, 0)";
+      case Direction.Left:
+        return "translate(-50%, -50%) rotate(90deg)";
+      case Direction.Right:
+        return "translate(-50%, -50%) rotate(-90deg)";
+    }
+  }};
+  pointer-events: none;
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -0.6cqw;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1cqw;
+    height: 1cqw;
+    background: #181010;
+    border-radius: 50%;
+  }
+`;
+
+const RodSprite = ({ direction }: { direction: Direction }) => {
+  return <RodOverlay $dir={direction} />;
+};
+
+export default FishingSession;

@@ -6,8 +6,11 @@ export interface PokemonStats {
   hp: number;
   attack: number;
   defense: number;
-  specialAttack: number;
-  specialDefense: number;
+  /**
+   * Gen I unifica Special en un único stat usado tanto para ataque como
+   * para defensa especial. El split SpA/SpD llegó en Gen II.
+   */
+  special: number;
   speed: number;
 }
 
@@ -19,11 +22,8 @@ export const getPokemonStats = (id: number, level: number): PokemonStats => {
   const defense = Math.round(
     (2 * metadata.baseStats.defense * level) / 100 + 5
   );
-  const specialAttack = Math.round(
-    (2 * metadata.baseStats.specialAttack * level) / 100 + 5
-  );
-  const specialDefense = Math.round(
-    (2 * metadata.baseStats.specialDefense * level) / 100 + 5
+  const special = Math.round(
+    (2 * metadata.baseStats.special * level) / 100 + 5
   );
   const speed = Math.round((2 * metadata.baseStats.speed * level) / 100 + 5);
 
@@ -33,8 +33,7 @@ export const getPokemonStats = (id: number, level: number): PokemonStats => {
     hp,
     attack,
     defense,
-    specialAttack,
-    specialDefense,
+    special,
     speed,
   };
 };

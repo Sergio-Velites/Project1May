@@ -31,6 +31,26 @@ interface EvolutionType {
   evolveToId: number;
 }
 
+/**
+ * Sesión de pesca activa. La inicia el `action` del item caña tras
+ * comprobar agua adyacente. La fase la gestiona el componente FishingSession.
+ */
+export interface FishingState {
+  rod: "old-rod" | "good-rod" | "super-rod";
+  direction: Direction;
+  /** Tile de agua frente al jugador (para anclar el sprite de la caña). */
+  waterPos: { x: number; y: number };
+}
+
+/**
+ * Sesión de knockback activa: el jugador es empujado en `direction` hasta
+ * chocar con un wall/fence/límite o cruzar un exit/teleport.
+ * Bloquea inputs durante toda la duración.
+ */
+export interface KnockbackState {
+  direction: Direction;
+}
+
 interface UiState {
   text: string[] | null;
   startMenu: boolean;
@@ -57,6 +77,10 @@ interface UiState {
   onlineBattleMenu: boolean;
   mapGiftPending: SimpleGiftType | null;
   textRewardPending: TextReward | null;
+  /** Sesión de pesca activa (animación + tirada). */
+  fishing: FishingState | null;
+  /** Sesión de knockback activa (empuje del jugador). */
+  knockback: KnockbackState | null;
   // Counter incrementado cada vez que el jugador consume su turno de combate
   // sin atacar (cambio de Pokémon o uso de objeto). PokemonEncounter lo
   // observa para encadenar el ataque del rival inmediatamente después.
@@ -89,6 +113,8 @@ const initialState: UiState = {
   onlineBattleMenu: false,
   mapGiftPending: null,
   textRewardPending: null,
+  fishing: null,
+  knockback: null,
   playerTurnTick: 0,
 };
 
@@ -244,6 +270,18 @@ export const uiSlice = createSlice({
     incrementPlayerTurnTick: (state) => {
       state.playerTurnTick += 1;
     },
+    startFishing: (state, action: PayloadAction<FishingState>) => {
+      state.fishing = action.payload;
+    },
+    endFishing: (state) => {
+      state.fishing = null;
+    },
+    startKnockback: (state, action: PayloadAction<KnockbackState>) => {
+      state.knockback = action.payload;
+    },
+    endKnockback: (state) => {
+      state.knockback = null;
+    },
   },
 });
 
@@ -294,6 +332,10 @@ export const {
   openTextReward,
   closeTextReward,
   incrementPlayerTurnTick,
+  startFishing,
+  endFishing,
+  startKnockback,
+  endKnockback,
 } = uiSlice.actions;
 
 export const selectText = (state: RootState) => state.ui.text;
@@ -346,7 +388,9 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.academyPokeballOpen ||
   state.ui.onlineBattleMenu ||
   state.ui.mapGiftPending !== null ||
-  state.ui.textRewardPending !== null;
+  state.ui.textRewardPending !== null ||
+  state.ui.fishing !== null ||
+  state.ui.knockback !== null;
 
 export const selectStartMenuSubOpen = (state: RootState) =>
   state.ui.itemsMenu || state.ui.playerMenu;
@@ -385,6 +429,10 @@ export const selectMapGiftPending = (state: RootState) =>
 
 export const selectTextRewardPending = (state: RootState) =>
   state.ui.textRewardPending;
+
+export const selectFishing = (state: RootState) => state.ui.fishing;
+
+export const selectKnockback = (state: RootState) => state.ui.knockback;
 
 export const selectPlayerTurnTick = (state: RootState) =>
   state.ui.playerTurnTick;

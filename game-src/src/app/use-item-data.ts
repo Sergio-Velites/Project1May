@@ -1,13 +1,18 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
   consumeItem,
+  selectDirection,
+  selectMap,
   selectPokemon,
+  selectPos,
   setPokemonStatus,
   updateSpecificPokemon,
 } from "../state/gameSlice";
 import { getPokemonStats } from "./use-pokemon-stats";
 import {
   hideItemsMenu,
+  startFishing,
+  startKnockback,
   learnMove,
   showActionOnPokemon,
   showEvolution,
@@ -15,6 +20,7 @@ import {
   showTextThenAction,
   throwPokeball,
 } from "../state/uiSlice";
+import { directionModifier, isTrainer, isWater } from "./map-helper";
 import { getMoveMetadata } from "./use-move-metadata";
 import { getHpDeltaOnLevelUp, getLearnedMove } from "./level-helper";
 import { getPokemonMetadata } from "./use-pokemon-metadata";
@@ -178,6 +184,51 @@ export interface ItemData {
 const useItemData = () => {
   const dispatch = useDispatch();
   const pokemon = useSelector(selectPokemon);
+  const pos = useSelector(selectPos);
+  const direction = useSelector(selectDirection);
+  const map = useSelector(selectMap);
+
+  /**
+   * Acción común a las 3 cañas: comprueba el tile frente al jugador y
+   * decide qué hacer:
+   *   1. Si hay un trainer / NPC: knockback estilo "¡A mí no me tires la caña!".
+   *   2. Si hay agua: inicia sesión de pesca con la caña usada.
+   *   3. Si no: mensaje de "no hay nada que pescar".
+   */
+  const useRod = (rod: "old-rod" | "good-rod" | "super-rod") => {
+    dispatch(hideItemsMenu());
+    const mod = directionModifier(direction);
+    const tx = pos.x + mod.x;
+    const ty = pos.y + mod.y;
+
+    // 1. NPC adyacente → knockback
+    if (isTrainer(map.trainers, tx, ty)) {
+      dispatch(
+        showTextThenAction({
+          text: ["¡A mí no me tires la caña!", "¡Flap!"],
+          action: () => {
+            dispatch(startKnockback({ direction }));
+          },
+        })
+      );
+      return;
+    }
+
+    // 2. Agua adyacente → pescar
+    if (isWater(map.water, tx, ty)) {
+      dispatch(
+        startFishing({
+          rod,
+          direction,
+          waterPos: { x: tx, y: ty },
+        })
+      );
+      return;
+    }
+
+    // 3. Nada útil enfrente
+    dispatch(showText(["No hay nada que pescar aquí."]));
+  };
 
   const data: Record<string, ItemData> = {
     [ItemType.MaxPotion]: {
@@ -2151,6 +2202,42 @@ const useItemData = () => {
           })
         );
       },
+    },
+    [ItemType.OldRod]: {
+      type: ItemType.OldRod,
+      name: "Caña Vieja",
+      countable: false,
+      consumable: false,
+      usableInBattle: false,
+      pokeball: false,
+      badge: false,
+      cost: null,
+      sellPrice: null,
+      action: () => useRod("old-rod"),
+    },
+    [ItemType.GoodRod]: {
+      type: ItemType.GoodRod,
+      name: "Caña Buena",
+      countable: false,
+      consumable: false,
+      usableInBattle: false,
+      pokeball: false,
+      badge: false,
+      cost: null,
+      sellPrice: null,
+      action: () => useRod("good-rod"),
+    },
+    [ItemType.SuperRod]: {
+      type: ItemType.SuperRod,
+      name: "Súper Caña",
+      countable: false,
+      consumable: false,
+      usableInBattle: false,
+      pokeball: false,
+      badge: false,
+      cost: null,
+      sellPrice: null,
+      action: () => useRod("super-rod"),
     },
     [ItemType.Hm05]: {
       type: ItemType.Hm05,

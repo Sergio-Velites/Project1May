@@ -45,6 +45,8 @@ import TextRewardModal from "./TextRewardModal";
 import StaticPokemonNpc from "./StaticPokemonNpc";
 import OnlineBattleNpc from "./OnlineBattleNpc";
 import OnlineBattleMenu from "./OnlineBattleMenu";
+import FishingSession from "./FishingSession";
+import Knockback from "./Knockback";
 import { selectPokedexOpen, hidePokedex } from "../state/uiSlice";
 
 const Container = styled.div`
@@ -149,6 +151,8 @@ const Game = () => {
       <PokeMart />
       <OnlineBattleNpc />
       <OnlineBattleMenu />
+      <FishingSession />
+      <Knockback />
       <TextThenAction />
       <StartMenu />
       <ItemsMenu />

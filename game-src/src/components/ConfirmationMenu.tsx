@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Frame from "./Frame";
 import Menu from "./Menu";
-import useEvent from "../app/use-event";
-import { Event } from "../app/emitter";
+import useDialogLine from "../app/use-dialog-line";
 import useIsMobile from "../app/use-is-mobile";
 import { useDispatch, useSelector } from "react-redux";
 import { hideConfirmationMenu, selectConfirmationMenu } from "../state/uiSlice";
@@ -33,9 +32,26 @@ const ConfirmationMenu = () => {
     if (!show) setConfirmed(false);
   }, [show]);
 
-  useEvent(Event.A, () => {
-    if (!confirmed) return;
-    dispatch(hideConfirmationMenu());
+  const preText = data?.preMessage ?? "";
+  const postText = data?.postMessage ?? "";
+
+  // Typewriter del preMessage. NO avanza nada por sí solo —
+  // solo actúa como "skip-typewriter" con A/B. El menú navega cuando termina.
+  const pre = useDialogLine({
+    text: preText,
+    enabled: show && !confirmed,
+    onAdvance: () => {
+      // Sin acción extra: tras el cooldown, A será capturado por el menú.
+    },
+  });
+
+  // Typewriter del postMessage: A/B (con cooldown) cierra el menú.
+  const post = useDialogLine({
+    text: postText,
+    enabled: show && confirmed,
+    onAdvance: () => {
+      dispatch(hideConfirmationMenu());
+    },
   });
 
   if (!show) return null;
@@ -43,15 +59,15 @@ const ConfirmationMenu = () => {
   return (
     <>
       <Container>
-        <Frame wide tall>
-          {confirmed ? data.postMessage : data.preMessage}
+        <Frame wide tall flashing={confirmed ? post.isComplete : pre.isComplete}>
+          {confirmed ? post.displayed : pre.displayed}
         </Frame>
       </Container>
       <Menu
         left="0"
         padding="1vw"
         bottom={isMobile ? "30%" : "20%"}
-        show={!confirmed}
+        show={!confirmed && pre.isComplete}
         close={() => setConfirmed(true)}
         noExit
         menuItems={[
