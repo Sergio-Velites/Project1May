@@ -13,9 +13,7 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addPokemon,
-  catchPokemonPokedex,
   completeQuest,
-  seePokemon,
   selectPokemon,
 } from "../state/gameSlice";
 import {
@@ -167,8 +165,6 @@ const MapGiftModal = () => {
             moves: computeInitialMoves(gift.pokemonId, gift.level),
           })
         );
-        dispatch(seePokemon(gift.pokemonId));
-        dispatch(catchPokemonPokedex(gift.pokemonId));
         dispatch(completeQuest(gift.questId));
         dispatch(closeMapGift());
         const name = meta.name.toUpperCase();

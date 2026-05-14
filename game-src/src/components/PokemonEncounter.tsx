@@ -1330,8 +1330,7 @@ const PokemonEncounter = () => {
           hp: Math.max(1, enemy.hp),
         })
       );
-      // Register as CAUGHT in Pokédex
-      dispatch(catchPokemonPokedex(enemy.id));
+      // (addPokemon ya marca visto+capturado en la Pokédex)
       if (teamFull) {
         setStage(53);
       } else {

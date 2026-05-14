@@ -15,9 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addInventory,
   addPokemon,
-  catchPokemonPokedex,
   completeQuest,
-  seePokemon,
   selectPokemon,
 } from "../state/gameSlice";
 import {
@@ -184,8 +182,6 @@ const TextRewardModal = () => {
             moves: computeInitialMoves(reward.pokemonId, reward.level ?? 5),
           })
         );
-        dispatch(seePokemon(reward.pokemonId));
-        dispatch(catchPokemonPokedex(reward.pokemonId));
         dispatch(completeQuest(reward.questId));
         close();
         dispatch(showText([`¡${pokemonMeta.name.toUpperCase()} se ha unido a tu equipo!`]));

@@ -16,8 +16,6 @@ import {
   completeQuest,
   selectCompletedQuests,
   selectPokemon,
-  seePokemon,
-  catchPokemonPokedex,
 } from "../state/gameSlice";
 import {
   closePokeballCard,
@@ -163,8 +161,6 @@ const StarterCard = ({ pokemonId }: { pokemonId: number }) => {
             ],
           })
         );
-        dispatch(seePokemon(starter.id));
-        dispatch(catchPokemonPokedex(starter.id));
         dispatch(completeQuest(questId));
         dispatch(closePokeballCard());
         const name = meta.name.toUpperCase();

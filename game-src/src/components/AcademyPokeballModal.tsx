@@ -15,8 +15,6 @@ import {
   completeQuest,
   selectCompletedQuests,
   selectPokemon,
-  seePokemon,
-  catchPokemonPokedex,
 } from "../state/gameSlice";
 import {
   closeAcademyPokeball,
@@ -154,8 +152,6 @@ const AcademyPokeballModal = () => {
           moves: [{ id: "transform", pp: 10 }],
         })
       );
-      dispatch(seePokemon(DITTO_ID));
-      dispatch(catchPokemonPokedex(DITTO_ID));
       dispatch(completeQuest(DITTO_QUEST_ID));
       dispatch(closeAcademyPokeball());
       dispatch(showText(["¡DITTO se ha unido a tu equipo!"]));

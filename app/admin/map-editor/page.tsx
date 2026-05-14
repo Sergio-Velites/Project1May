@@ -1501,6 +1501,22 @@ export default function MapEditor() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 84, background: '#13132a', borderBottom: '1px solid #2a2a4a', flexShrink: 0, flexWrap: 'wrap' }}>
         <span style={{ fontSize: 16, fontWeight: 700, color: '#a0a0ff', marginRight: 4 }}>🗺️ Map Editor</span>
 
+        <a
+          href="/admin/pokedex-editor"
+          style={{
+            fontSize: 12,
+            padding: '4px 8px',
+            background: '#1a1a3a',
+            border: '1px solid #3a3a5a',
+            borderRadius: 4,
+            color: '#e0e0ff',
+            textDecoration: 'none',
+            marginRight: 4,
+          }}
+        >
+          📖 Pokédex
+        </a>
+
         {/* Selector de mapa */}
         <select
           value={selectedMapId}

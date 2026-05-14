@@ -199,6 +199,8 @@ export const gameSlice = createSlice({
       state.defeatedTrainers = savedGameState.defeatedTrainers;
       state.collectedItems = savedGameState.collectedItems;
       state.completedQuests = savedGameState.completedQuests;
+      state.seenPokemon = savedGameState.seenPokemon ?? [];
+      state.caughtPokemon = savedGameState.caughtPokemon ?? [];
     },
     loadFromState: (state, action: PayloadAction<GameState>) => {
       const s = action.payload;
@@ -227,6 +229,8 @@ export const gameSlice = createSlice({
       state.defeatedTrainers = s.defeatedTrainers;
       state.collectedItems = s.collectedItems;
       state.completedQuests = s.completedQuests;
+      state.seenPokemon = s.seenPokemon ?? [];
+      state.caughtPokemon = s.caughtPokemon ?? [];
       if (s.rsvp) state.rsvp = s.rsvp;
     },
     setRsvpInternal: (state, action: PayloadAction<RSVPData>) => {
@@ -370,6 +374,13 @@ export const gameSlice = createSlice({
       state.activePokemonIndex = fistIndexWithHp;
     },
     addPokemon: (state, action: PayloadAction<PokemonInstance>) => {
+      // Cualquier Pokémon obtenido (starter, regalo, captura, academia, etc.)
+      // queda automáticamente registrado como visto y capturado en la Pokédex.
+      // Esto evita tener que duplicar dispatches en cada componente que llame
+      // a addPokemon.
+      const id = action.payload.id;
+      if (!state.seenPokemon.includes(id)) state.seenPokemon.push(id);
+      if (!state.caughtPokemon.includes(id)) state.caughtPokemon.push(id);
       if (state.pokemon.length === 6) {
         state.pc.push(action.payload);
         return;

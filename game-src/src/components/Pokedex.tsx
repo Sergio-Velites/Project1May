@@ -10,7 +10,7 @@
  *   B  → cerrar lista / volver desde ficha
  */
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import { useSelector } from "react-redux";
 import { selectSeenPokemon, selectCaughtPokemon } from "../state/gameSlice";
@@ -19,8 +19,10 @@ import usePokemonStats from "../app/use-pokemon-stats";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import PixelImage from "../styles/PixelImage";
+import { getFlavor, loadFlavorOverrides } from "../app/pokedex-flavor";
+import { getAreasForPokemon } from "../app/encounter-index";
 
-// ── Descriptions by type (Gen I flavour) ───────────────────────────────────
+// ── Descriptions by type (Gen I flavour, used como fallback) ──────────────
 
 const TYPE_DESC: Record<string, string> = {
   normal:   "Pokémon de tipo NORMAL. Sus características son equilibradas.",
@@ -40,8 +42,22 @@ const TYPE_DESC: Record<string, string> = {
   dragon:   "Pokémon de tipo DRAGÓN. Pokémon de élite difícil de capturar.",
 };
 
-const getDesc = (types: string[]): string =>
-  TYPE_DESC[types[0]] ?? "Pokémon poco conocido. Los datos son insuficientes.";
+const getDesc = (id: number, types: string[]): string => {
+  const fromJson = getFlavor(id);
+  if (fromJson && fromJson.trim().length > 0) return fromJson;
+  return TYPE_DESC[types[0]] ?? "Pokémon poco conocido. Los datos son insuficientes.";
+};
+
+const SEEN_ONLY_DESC =
+  "Aún no se dispone de datos suficientes sobre este POKéMON. Captura un ejemplar para completar la entrada.";
+
+const formatAreas = (id: number): string => {
+  const areas = getAreasForPokemon(id);
+  if (areas.length === 0) return "Desconocido";
+  // Nombres únicos en mayúsculas, separados por coma.
+  const names = Array.from(new Set(areas.map((a) => a.mapName.toUpperCase())));
+  return names.join(", ");
+};
 
 const fmtHeight = (dm: number): string => {
   const inches = Math.round((dm * 10) / 2.54);
@@ -175,17 +191,18 @@ const DescBox = styled.div`
 
 // ── Sub-components ───────────────────────────────────────────────────────────
 
-interface DetailProps { id: number; onBack: () => void; }
-const Detail = ({ id, onBack }: DetailProps) => {
+interface DetailProps { id: number; caught: boolean; onBack: () => void; }
+const Detail = ({ id, caught, onBack }: DetailProps) => {
   const meta  = usePokemonMetadata(id);
-  const stats = usePokemonStats(id, 50); // show base stats at lv50 for reference
+  const stats = usePokemonStats(id, 50); // base stats nv50 si capturado
 
   useEvent(Event.B, onBack);
   useEvent(Event.A, onBack);
 
   if (!meta) return null;
 
-  const desc = getDesc(meta.types);
+  const desc  = caught ? getDesc(id, meta.types) : SEEN_ONLY_DESC;
+  const areas = formatAreas(id);
 
   return (
     <Screen>
@@ -205,17 +222,20 @@ const Detail = ({ id, onBack }: DetailProps) => {
               <Txt key={t} $size={0.85}>TIPO:{TYPE_ES[t] ?? t.toUpperCase()}</Txt>
             ))}
             <HRule />
-            <Txt $size={0.8}>Alt.{fmtHeight(meta.height)}</Txt>
+            <Txt $size={0.8}>Alt.{caught ? fmtHeight(meta.height) : "???"}</Txt>
             <HRule />
             <Txt $size={0.75}>Nv.50 ref.:</Txt>
-            <Txt $size={0.75}>ATQ {stats.attack}</Txt>
-            <Txt $size={0.75}>DEF {stats.defense}</Txt>
-            <Txt $size={0.75}>VEL {stats.speed}</Txt>
-            <Txt $size={0.75}>ESP {stats.special}</Txt>
+            <Txt $size={0.75}>ATQ {caught ? stats.attack  : "???"}</Txt>
+            <Txt $size={0.75}>DEF {caught ? stats.defense : "???"}</Txt>
+            <Txt $size={0.75}>VEL {caught ? stats.speed   : "???"}</Txt>
+            <Txt $size={0.75}>ESP {caught ? stats.special : "???"}</Txt>
           </InfoCol>
         </div>
 
         <DescBox>
+          <div style={{ marginBottom: 4 }}>
+            <Txt $size={0.8} $bold>ÁREAS:</Txt> <Txt $size={0.8}>{areas}</Txt>
+          </div>
           {desc}
         </DescBox>
       </DetailArea>
@@ -236,6 +256,11 @@ const Pokedex = ({ onClose }: Props) => {
   const [cursor, setCursor] = useState(0); // 0-based index into 1..151
   const [scroll, setScroll]  = useState(0);
   const [detail, setDetail]  = useState<number | null>(null);
+
+  // Cargar overrides de descripciones desde el servidor (una sola vez por
+  // sesión). El JSON base ya está bundleado; getFlavor() devuelve el
+  // override si existe.
+  useEffect(() => { void loadFlavorOverrides(); }, []);
 
   // If viewing detail, delegate events to Detail
   useEvent(Event.Up, useCallback(() => {
@@ -268,7 +293,7 @@ const Pokedex = ({ onClose }: Props) => {
   }, [detail, onClose]));
 
   if (detail !== null) {
-    return <Detail id={detail} onBack={() => setDetail(null)} />;
+    return <Detail id={detail} caught={caught.includes(detail)} onBack={() => setDetail(null)} />;
   }
 
   const seenCount   = seen.length;
