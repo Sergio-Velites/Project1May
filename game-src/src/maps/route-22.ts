@@ -180,8 +180,11 @@ encounters: {
   goodRod: {
     rate: 20,
     pokemon: [
-      { id: 60, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 10 },
-      { id: 118, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 10 }
+      { id: 60, chance: 50, conditionValues: [], minLevel: 9, maxLevel: 98 },
+      { id: 118, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 10 },
+      { id: 98, chance: 10, conditionValues: [], minLevel: 7, maxLevel: 7 },
+      { id: 129, chance: 10, conditionValues: [], minLevel: 5, maxLevel: 5 },
+      { id: 90, chance: 10, conditionValues: [], minLevel: 9, maxLevel: 9 }
     ],
   },
   superRod: {
@@ -192,7 +195,9 @@ encounters: {
       { id: 60, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 15 },
       { id: 118, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 15 },
       { id: 118, chance: 8, conditionValues: [], minLevel: 15, maxLevel: 15 },
-      { id: 118, chance: 17, conditionValues: [], minLevel: 15, maxLevel: 15 }
+      { id: 118, chance: 17, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 86, chance: 10, conditionValues: [], minLevel: 12, maxLevel: 14 },
+      { id: 131, chance: 5, conditionValues: [], minLevel: 20, maxLevel: 20 }
     ],
   },
   rockSmash: { rate: 0, pokemon: [] }, headbutt: { rate: 0, pokemon: [] }, darkGrass: { rate: 0, pokemon: [] },

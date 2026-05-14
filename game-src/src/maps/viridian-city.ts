@@ -137,7 +137,48 @@ text: {
   },
   music,
   grass: {},
-  encounters: getEncounterData("viridian-city-area"),
+encounters: {
+  walk: {
+    rate: 0,
+    pokemon: [
+
+    ],
+  },
+  surf: { rate: 0, pokemon: [] },
+  oldRod: {
+    rate: 10,
+    pokemon: [
+      { id: 129, chance: 100, conditionValues: [], minLevel: 5, maxLevel: 5 }
+    ],
+  },
+  goodRod: {
+    rate: 10,
+    pokemon: [
+      { id: 60, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 10 },
+      { id: 118, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 10 },
+      { id: 129, chance: 61, conditionValues: [], minLevel: 5, maxLevel: 5 },
+      { id: 116, chance: 14, conditionValues: [], minLevel: 8, maxLevel: 100 },
+      { id: 120, chance: 35, conditionValues: [], minLevel: 8, maxLevel: 8 },
+      { id: 147, chance: 10, conditionValues: [], minLevel: 10, maxLevel: 11 }
+    ],
+  },
+  superRod: {
+    rate: 10,
+    pokemon: [
+      { id: 60, chance: 17, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 60, chance: 8, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 79, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 79 },
+      { id: 72, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 72, chance: 8, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 54, chance: 17, conditionValues: [], minLevel: 15, maxLevel: 15 }
+    ],
+  },
+  rockSmash: { rate: 0, pokemon: [] }, headbutt: { rate: 0, pokemon: [] }, darkGrass: { rate: 0, pokemon: [] },
+  grassSpots: { rate: 0, pokemon: [] }, caveSpots: { rate: 0, pokemon: [] }, bridgeSpots: { rate: 0, pokemon: [] },
+  superRodSpots: { rate: 0, pokemon: [] }, surfSpots: { rate: 0, pokemon: [] },
+  yellowFlowers: { rate: 0, pokemon: [] }, purpleFlowers: { rate: 0, pokemon: [] }, redFlowers: { rate: 0, pokemon: [] },
+  roughTerrain: { rate: 0, pokemon: [] }, gift: { rate: 0, pokemon: [] }, giftEgg: { rate: 0, pokemon: [] }, onlyOne: { rate: 0, pokemon: [] },
+},
   recoverLocation: { x: 23, y: 26 },
   exitReturnMap: MapId.Route1,
   exitReturnPos: {
