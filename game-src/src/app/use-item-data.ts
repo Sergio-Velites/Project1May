@@ -25,7 +25,7 @@ import {
   showTextThenAction,
   throwPokeball,
 } from "../state/uiSlice";
-import { directionModifier, isTrainer, isWater } from "./map-helper";
+import { directionModifier, isFence, isTrainer, isWall, isWater } from "./map-helper";
 import { getMoveMetadata } from "./use-move-metadata";
 import { getHpDeltaOnLevelUp, getLearnedMove } from "./level-helper";
 import { getPokemonMetadata } from "./use-pokemon-metadata";
@@ -236,8 +236,28 @@ const useItemData = () => {
       return;
     }
 
-    // 2. Agua adyacente → pescar
-    if (isWater(map.water, tx, ty)) {
+    // 2. Agua adyacente → pescar.
+    //    Detección robusta: además del array `water` explícito del mapa,
+    //    si el tile está bloqueado (wall/fence) y el mapa define una tabla
+    //    de pesca para alguna caña, asumimos que es agua (muchos mapas
+    //    modelan el agua como walls sin marcar `water`).
+    const rodKey =
+      rod === "old-rod" ? "oldRod" : rod === "good-rod" ? "goodRod" : "superRod";
+    const hasFishingTable = !!(
+      map.encounters &&
+      (map.encounters.oldRod?.pokemon?.length ||
+        map.encounters.goodRod?.pokemon?.length ||
+        map.encounters.superRod?.pokemon?.length)
+    );
+    const tileBlocked =
+      isWall(map.walls, tx, ty) || isFence(map.fences, tx, ty);
+    const isFishable =
+      isWater(map.water, tx, ty) || (tileBlocked && hasFishingTable);
+
+    if (isFishable) {
+      // Ignoramos rodKey aquí porque FishingSession ya hace fallback a
+      // Magikarp cuando la tabla específica de la caña está vacía.
+      void rodKey;
       dispatch(
         startFishing({
           rod,
