@@ -2,8 +2,9 @@ import image from "../assets/map/route-22.png";
 import { MapId, MapType } from "./map-types";
 
 import getEncounterData from "./get-location-data";
-import { lass, rival, youngster } from "../app/npcs";
+import { fisher, lass, rival, youngster } from "../app/npcs";
 import { Direction } from "../state/state-types";
+import { ItemType } from "../app/use-item-data";
 
 const route22: MapType = {
   name: "Ruta 22",
@@ -69,31 +70,39 @@ const route22: MapType = {
     10: [16, 17, 18, 19, 20, 21, 30, 31, 32, 33],
     11: [16, 17, 18, 19, 20, 21, 30, 31, 32, 33],
   },
-  encounters: getEncounterData("kanto-route-22-area"),
+  water: {
+    6: [22, 23, 24, 25],
+    7: [22, 23, 24, 25],
+    8: [22, 23, 24, 25],
+    9: [22, 23, 24, 25],
+  },
+
   exitReturnMap: MapId.ViridianCity,
   exitReturnPos: {
     x: 1,
     y: 16,
   },
 // Trainers para "route-22"
+// Trainers para "route-22"
 trainers: [
   {
   npc: rival,
-  pokemon: [{ id: 21, level: 9 }, { id: 4, level: 8 }],
+  pokemon: [],
   facing: Direction.Right,
   pos: { x: 26, y: 5 },
   intro: [
-    "¡Oye, yo también voy a esa boda!",
-    "¡Pero me la ganaré llegando primero!",
-  ],
-  outtro: [
     "¡Ey!",
     "¿Vas a la LIGA PKMN?",
-    "¡Ni lo sueñes!",
-    "El guardia no te dejará pasar sin medallas.",
-    "¡Con lo tajao que parece que vas!"
+    "¡Ni lo sueñes! ¡Seguro que no tienes ninguna MEDALLA!",
+    "¡El guardia no te dejará pasar!",
+    "Por cierto, ¿tus PKMN se han hecho más fuertes?",
+    "Pero que dices de una boda?"
   ],
-  money: 160,
+  outtro: [
+    "¡Vaya suerte la tuya!",
+    "Con lo tajao que parece que vas"
+  ],
+  money: 280,
   persistent: true,
 },
   {
@@ -126,8 +135,78 @@ trainers: [
   ],
   money: 120,
   persistent: true,
+},
+  {
+  npc: fisher,
+  pokemon: [{ id: 60, level: 8 }, { id: 98, level: 10 }, { id: 116, level: 12 }],
+  facing: Direction.Left,
+  pos: { x: 35, y: 2 },
+  intro: [
+    "El hermano del novio me ha dejado custodiando este objeto.",
+    "No permitiré que lo roben!"
+  ],
+  outtro: [
+    "En realidad, creo que ha ido a por otra caña mejor",
+    "que le pueda servir para la boda."
+  ],
+  money: 200,
+  persistent: true,
 }
 ],
+encounters: {
+  walk: {
+    rate: 21,
+    pokemon: [
+      { id: 19, chance: 20, conditionValues: [], minLevel: 3, maxLevel: 3 },
+      { id: 19, chance: 15, conditionValues: [], minLevel: 4, maxLevel: 4 },
+      { id: 19, chance: 10, conditionValues: [], minLevel: 2, maxLevel: 2 },
+      { id: 21, chance: 5, conditionValues: [], minLevel: 3, maxLevel: 3 },
+      { id: 21, chance: 5, conditionValues: [], minLevel: 5, maxLevel: 5 },
+      { id: 29, chance: 20, conditionValues: [], minLevel: 3, maxLevel: 3 },
+      { id: 29, chance: 10, conditionValues: [], minLevel: 4, maxLevel: 4 },
+      { id: 29, chance: 10, conditionValues: [], minLevel: 2, maxLevel: 2 },
+      { id: 32, chance: 4, conditionValues: [], minLevel: 3, maxLevel: 3 },
+      { id: 32, chance: 1, conditionValues: [], minLevel: 4, maxLevel: 4 },
+      { id: 56, chance: 10, conditionValues: [], minLevel: 4, maxLevel: 7 }
+    ],
+  },
+  surf: { rate: 0, pokemon: [] },
+  oldRod: {
+    rate: 20,
+    pokemon: [
+      { id: 129, chance: 100, conditionValues: [], minLevel: 5, maxLevel: 5 }
+    ],
+  },
+  goodRod: {
+    rate: 20,
+    pokemon: [
+      { id: 60, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 10 },
+      { id: 118, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 10 }
+    ],
+  },
+  superRod: {
+    rate: 20,
+    pokemon: [
+      { id: 60, chance: 17, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 60, chance: 8, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 60, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 118, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 118, chance: 8, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 118, chance: 17, conditionValues: [], minLevel: 15, maxLevel: 15 }
+    ],
+  },
+  rockSmash: { rate: 0, pokemon: [] }, headbutt: { rate: 0, pokemon: [] }, darkGrass: { rate: 0, pokemon: [] },
+  grassSpots: { rate: 0, pokemon: [] }, caveSpots: { rate: 0, pokemon: [] }, bridgeSpots: { rate: 0, pokemon: [] },
+  superRodSpots: { rate: 0, pokemon: [] }, surfSpots: { rate: 0, pokemon: [] },
+  yellowFlowers: { rate: 0, pokemon: [] }, purpleFlowers: { rate: 0, pokemon: [] }, redFlowers: { rate: 0, pokemon: [] },
+  roughTerrain: { rate: 0, pokemon: [] }, gift: { rate: 0, pokemon: [] }, giftEgg: { rate: 0, pokemon: [] }, onlyOne: { rate: 0, pokemon: [] },
+},
+items: [
+    {
+      item: ItemType.GoodRod,
+      pos: { x: 30, y: 2 },
+    },
+  ],
 };
 
 export default route22;
