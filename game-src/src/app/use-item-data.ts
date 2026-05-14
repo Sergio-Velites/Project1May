@@ -180,6 +180,12 @@ export interface ItemData {
   countable: boolean;
   consumable: boolean;
   usableInBattle: boolean;
+  /**
+   * Permite usar el ítem en el overworld aunque NO sea consumible (cosa que
+   * normalmente bloquearía el menú con el aviso de Oak). Pensado para
+   * herramientas reutilizables como las cañas de pescar.
+   */
+  usableOutOfBattle?: boolean;
   badge: boolean;
   pokeball: boolean;
   cost: number | null;
@@ -2255,6 +2261,7 @@ const useItemData = () => {
       countable: false,
       consumable: false,
       usableInBattle: false,
+      usableOutOfBattle: true,
       pokeball: false,
       badge: false,
       cost: null,
@@ -2267,6 +2274,7 @@ const useItemData = () => {
       countable: false,
       consumable: false,
       usableInBattle: false,
+      usableOutOfBattle: true,
       pokeball: false,
       badge: false,
       cost: null,
@@ -2279,6 +2287,7 @@ const useItemData = () => {
       countable: false,
       consumable: false,
       usableInBattle: false,
+      usableOutOfBattle: true,
       pokeball: false,
       badge: false,
       cost: null,

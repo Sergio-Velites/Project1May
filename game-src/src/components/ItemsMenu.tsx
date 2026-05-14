@@ -83,7 +83,7 @@ const ItemsMenu = () => {
                 // Can't use
                 if (
                   (inBattle && !selected.usableInBattle) ||
-                  !selected.consumable ||
+                  (!selected.consumable && !selected.usableOutOfBattle) ||
                   (selected.pokeball && !inBattle)
                 ) {
                   dispatch(

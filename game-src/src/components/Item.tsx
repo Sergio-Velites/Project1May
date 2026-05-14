@@ -16,7 +16,7 @@ import {
   selectName,
   selectPos,
 } from "../state/gameSlice";
-import { selectStartMenu, showTextThenAction } from "../state/uiSlice";
+import { selectMenuOpen, showTextThenAction } from "../state/uiSlice";
 import { directionModifier } from "../app/map-helper";
 import useItemData from "../app/use-item-data";
 
@@ -44,7 +44,12 @@ const Item = ({ item }: Props) => {
   const dispatch = useDispatch();
   const collectedItems = useSelector(selectCollectedItems);
   const mapId = useSelector(selectMapId);
-  const startMenuOpen = useSelector(selectStartMenu);
+  // Usamos selectMenuOpen (no selectStartMenu) para bloquear el handler de
+  // A mientras hay un texto/acción en curso. Si solo se mira startMenu, el
+  // mismo A que cierra el texto "X encontró ..." vuelve a disparar este
+  // handler antes de que `isCollected` se haya propagado, recogiendo el
+  // ítem dos veces.
+  const menuOpen = useSelector(selectMenuOpen);
   const facing = useSelector(selectDirection);
   const pos = useSelector(selectPos);
   const name = useSelector(selectName);
@@ -56,7 +61,7 @@ const Item = ({ item }: Props) => {
 
   useEvent(Event.A, () => {
     if (isCollected) return;
-    if (startMenuOpen) return;
+    if (menuOpen) return;
 
     const directionMod = directionModifier(facing);
 
@@ -66,7 +71,7 @@ const Item = ({ item }: Props) => {
     ) {
       dispatch(
         showTextThenAction({
-          text: [`${name} found ${itemData[item.item].name}!`],
+          text: [`¡${name} encontró ${itemData[item.item].name}!`],
           action: () => {
             dispatch(collectItem(item));
             dispatch(addInventory({ item: item.item, amount: 1 }));
