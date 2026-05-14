@@ -1,4 +1,7 @@
+import { beauty } from "../app/npcs";
+import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/route-2-gate.png";
+import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 
 const route2GateNorth: MapType = {
@@ -35,6 +38,32 @@ exits: {
   },
 exitReturnMap: MapId.ViridianForrest,
 exitReturnPos: { x: 1, y: 1 },
+items: [
+    {
+      item: ItemType.SuperRod,
+      pos: { x: 6, y: 3 },
+    },
+  ],
+  // Trainers para "route-2-gate-north"
+trainers: [
+  {
+  npc: beauty,
+  pokemon: [{ id: 19, level: 2 }],
+  facing: Direction.Left,
+  pos: { x: 6, y: 4 },
+  intro: [
+
+  ],
+  outtro: [
+    "Ese capullo del hermano del novio... ",
+    "Me intentó echar la caña...",
+    "Como si fuera un magikarp...",
+    "Y luego salió corriendo hacia VILLAMAYOR DE MONJARDÍN"
+  ],
+  money: 0,
+  persistent: true,
+}
+],
 };
 
 export default route2GateNorth;

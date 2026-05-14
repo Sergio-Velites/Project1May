@@ -147,7 +147,7 @@ trainers: [
   ],
   outtro: [
     "En realidad, creo que ha ido a por otra caña mejor",
-    "que le pueda servir para la boda."
+    "que le pueda servir para pescar algo en la boda."
   ],
   money: 200,
   persistent: true,
