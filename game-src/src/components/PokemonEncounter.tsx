@@ -2207,7 +2207,13 @@ const PokemonEncounter = () => {
     const eStatus = enemyStatusRef.current;
     let newUsHp   = currentUs.hp;
     let newThemHp = currentThem.hp;
-    let hasMsg    = false;
+    // Cola de mensajes: cuando ambos pokémon sufren efectos al final del
+    // turno (ej. ambos sembrados con Drenadoras, o ambos envenenados),
+    // hay que mostrar TODOS los mensajes en cadena. Antes se llamaba
+    // setAlertText repetidamente y la última llamada sobreescribía a las
+    // anteriores → solo se veía un mensaje y parecía que el otro efecto
+    // no había ocurrido (aunque el HP sí se actualizaba).
+    const messages: string[] = [];
 
     // Cuando Ditto está transformado, currentUs tiene el ID del rival (no el de Ditto).
     // Usar siempre el ID original de active para stats y dispatch.
@@ -2230,8 +2236,7 @@ const PokemonEncounter = () => {
         dispatch(setPokemonStatus({ index: activePokemonIndex, status: upd }));
       }
       const what = pStatus.type === "burn" ? "la quemadura" : "el veneno";
-      setAlertText(`¡${activeMetadata.name.toUpperCase()} sufre por ${what}!`);
-      hasMsg = true;
+      messages.push(`¡${activeMetadata.name.toUpperCase()} sufre por ${what}!`);
     }
 
     if (eStatus && (eStatus.type === "poison" || eStatus.type === "badly-poisoned" || eStatus.type === "burn")) {
@@ -2246,8 +2251,7 @@ const PokemonEncounter = () => {
         enemyStatusRef.current = upd;
       }
       const what = eStatus.type === "burn" ? "la quemadura" : "el veneno";
-      setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival sufre por ${what}!`);
-      hasMsg = true;
+      messages.push(`¡${enemyMetadata.name.toUpperCase()} rival sufre por ${what}!`);
     }
 
     // Drenadoras en el enemigo: le quita PS y cura al jugador
@@ -2257,8 +2261,7 @@ const PokemonEncounter = () => {
       newUsHp       = Math.min(getPokemonStats(trueUsId, currentUs.level).hp, newUsHp + seedDmg);
       dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
       dispatchUs(newUsHp);
-      setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival pierde PS por Drenadoras!`);
-      hasMsg = true;
+      messages.push(`¡${enemyMetadata.name.toUpperCase()} rival pierde PS por Drenadoras!`);
     }
 
     // Drenadoras en el jugador: le quita PS y cura al enemigo
@@ -2268,20 +2271,38 @@ const PokemonEncounter = () => {
       newThemHp     = Math.min(getPokemonStats(currentThem.id, currentThem.level).hp, newThemHp + seedDmg);
       dispatchUs(newUsHp);
       dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
-      setAlertText(`¡${activeMetadata.name.toUpperCase()} pierde PS por Drenadoras!`);
-      hasMsg = true;
+      messages.push(`¡${activeMetadata.name.toUpperCase()} pierde PS por Drenadoras!`);
     }
 
     // Limpiar flinch al inicio del próximo turno
     enemyFlinchRef.current  = false;
     playerFlinchRef.current = false;
 
-    setTimeout(() => {
+    // Mostrar todos los mensajes en cadena (1s cada uno) y solo entonces
+    // pasar al siguiente stage. Si no hay mensajes, transición inmediata.
+    const goNext = () => {
       setAlertText(null);
-      if (newUsHp <= 0)   setStage(24);
+      if (newUsHp <= 0)        setStage(24);
       else if (newThemHp <= 0) setStage(20);
-      else setStage(11);
-    }, hasMsg ? 1000 : 0);
+      else                     setStage(11);
+    };
+
+    if (messages.length === 0) {
+      goNext();
+      return;
+    }
+
+    let i = 0;
+    const showNext = () => {
+      setAlertText(messages[i]);
+      i++;
+      if (i < messages.length) {
+        setTimeout(showNext, 1000);
+      } else {
+        setTimeout(goNext, 1000);
+      }
+    };
+    showNext();
   };
 
   const processBattle = (attackId: string) => {
