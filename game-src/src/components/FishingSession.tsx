@@ -61,10 +61,20 @@ const TextOverlay = styled.div`
 
 type Phase = "casting" | "waiting" | "bite" | "no-bite";
 
-const PROBABILITY = 0.5;        // 50% bite rate (igual que Gen I)
+// En el agua siempre debe picar algo (regla de diseño WeddingBoy:
+// nunca aparece "no pica nada"). Mantenemos la fase "no-bite" en el tipo
+// por si en el futuro se reintroduce, pero la rama nunca se activa.
 const CASTING_MS = 350;
 const WAITING_MS_MIN = 1500;
 const WAITING_MS_MAX = 3000;
+
+// Fallback de captura cuando el mapa no tiene tabla configurada para la
+// caña usada: Magikarp (id 129) en un rango de niveles según la caña.
+const FALLBACK_BY_ROD: Record<"old-rod" | "good-rod" | "super-rod", { id: number; min: number; max: number }> = {
+  "old-rod":   { id: 129, min: 5,  max: 10 },
+  "good-rod":  { id: 129, min: 10, max: 20 },
+  "super-rod": { id: 129, min: 15, max: 30 },
+};
 
 const FishingSession = () => {
   const dispatch = useDispatch();
@@ -117,22 +127,10 @@ const FishingSession = () => {
 
       // Decisión de bite tras delay aleatorio
       const wait = randBetween(WAITING_MS_MIN, WAITING_MS_MAX);
+      // Decisión de bite tras delay aleatorio. En el agua siempre pica
+      // (regla de diseño WeddingBoy).
       const decide = setTimeout(() => {
-        const table = (() => {
-          const enc = map.encounters;
-          if (!enc) return [];
-          if (fishing.rod === "old-rod") return enc.oldRod?.pokemon ?? [];
-          if (fishing.rod === "good-rod") return enc.goodRod?.pokemon ?? [];
-          return enc.superRod?.pokemon ?? [];
-        })();
-
-        // Sin tabla configurada → siempre no-bite
-        if (table.length === 0) {
-          setPhase("no-bite");
-          return;
-        }
-        const bite = Math.random() < PROBABILITY;
-        setPhase(bite ? "bite" : "no-bite");
+        setPhase("bite");
       }, wait);
 
       return () => {
@@ -153,14 +151,14 @@ const FishingSession = () => {
           : fishing.rod === "good-rod"
           ? enc?.goodRod?.pokemon ?? []
           : enc?.superRod?.pokemon ?? [];
-      const pkmn = pickFromTable(table);
-      if (pkmn) {
-        dispatch(encounterPokemon(pkmn));
-        // endFishing se dispara desde el efecto al detectar encounter
-      } else {
-        // Sin tabla válida (raro, table.length>0 garantizado), cierra
-        dispatch(endFishing());
+      let pkmn = pickFromTable(table);
+      if (!pkmn) {
+        // Fallback: el agua nunca debe quedarse sin captura.
+        const fb = FALLBACK_BY_ROD[fishing.rod];
+        pkmn = getPokemonEncounter(fb.id, randBetween(fb.min, fb.max));
       }
+      dispatch(encounterPokemon(pkmn));
+      // endFishing se dispara desde el efecto al detectar encounter
       return;
     }
     if (phase === "no-bite") {

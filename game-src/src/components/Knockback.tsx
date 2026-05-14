@@ -1,12 +1,13 @@
 /**
  * Knockback — Empuja al jugador hacia atrás (sentido opuesto a `direction`)
- * a velocidad doble de la marcha normal hasta chocar con wall/fence/water/borde.
+ * a velocidad alta hasta chocar con wall/fence/water/borde, con un máximo
+ * fijo de tiles para que el rebote se sienta corto y cómico.
  *
  * Uso típico: el jugador lanza la caña a un NPC → trainer responde y
  * "rebota" al jugador unos cuantos tiles hacia atrás como gag visual.
  *
- * Bloquea inputs (selectMenuOpen incluye knockback). Cap de seguridad
- * en MAX_STEPS para evitar bucles infinitos en mapas extraños.
+ * Bloquea inputs (selectMenuOpen incluye knockback). Cap MAX_STEPS = 4
+ * (límite explicit del diseño; también se detiene antes si choca).
  */
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,8 +18,10 @@ import { MapType } from "../maps/map-types";
 import { MOVE_SPEED } from "../app/constants";
 import { isWall, isFence, isWater } from "../app/map-helper";
 
-const KNOCKBACK_SPEED = MOVE_SPEED / 2; // 2× rápido que andar normal
-const MAX_STEPS = 20;
+// Velocidad: 4× más rápido que andar normal (era 2×).
+const KNOCKBACK_SPEED = MOVE_SPEED / 4;
+// Límite duro de 4 tiles (antes 20).
+const MAX_STEPS = 4;
 
 const reverse = (d: Direction): Direction => {
   switch (d) {

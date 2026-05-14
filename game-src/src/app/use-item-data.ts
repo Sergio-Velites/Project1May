@@ -13,6 +13,8 @@ import {
 import { getPokemonStats } from "./use-pokemon-stats";
 import {
   hideItemsMenu,
+  hidePlayerMenu,
+  hideStartMenu,
   startFishing,
   startKnockback,
   learnMove,
@@ -208,9 +210,15 @@ const useItemData = () => {
    *   1. Si hay un trainer / NPC: knockback estilo "¡A mí no me tires la caña!".
    *   2. Si hay agua: inicia sesión de pesca con la caña usada.
    *   3. Si no: mensaje de "no hay nada que pescar".
+   *
+   * En cualquier rama cerramos primero TODOS los menús abiertos
+   * (start/playerList/items) para que la animación de pesca o knockback se
+   * vea sin overlays delante.
    */
   const useRod = (rod: "old-rod" | "good-rod" | "super-rod") => {
     dispatch(hideItemsMenu());
+    dispatch(hidePlayerMenu());
+    dispatch(hideStartMenu());
     const mod = directionModifier(direction);
     const tx = pos.x + mod.x;
     const ty = pos.y + mod.y;
