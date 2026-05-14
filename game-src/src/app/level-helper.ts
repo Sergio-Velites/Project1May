@@ -9,7 +9,7 @@ export type GrowthRate = "fast" | "medium-fast" | "medium-slow" | "slow";
  * Total XP required to BE at level n (Gen I formulas).
  * Medium-Slow formula can be negative for level < 5 — clamped to 0.
  */
-const totalXpForLevel = (level: number, growthRate: GrowthRate): number => {
+export const totalXpForLevel = (level: number, growthRate: GrowthRate): number => {
   const n = level;
   switch (growthRate) {
     case "fast":
@@ -48,6 +48,48 @@ const getLevelData = (
 };
 
 export default getLevelData;
+
+/**
+ * Sube EXACTAMENTE un nivel si la XP alcanza para el siguiente nivel.
+ * Devuelve `{ level, leveledUp, remainingXp }`. Pensado para iterar en
+ * bucle desde el componente de combate y poder aprender movimientos /
+ * evolucionar entre niveles intermedios.
+ */
+export const getSingleLevelUp = (
+  currentLevel: number,
+  currentExp: number,
+  growthRate: GrowthRate = "medium-fast"
+): { level: number; leveledUp: boolean; remainingXp: number } => {
+  if (currentLevel >= 100) {
+    return { level: currentLevel, leveledUp: false, remainingXp: currentExp };
+  }
+  const nextLevelXp =
+    totalXpForLevel(currentLevel + 1, growthRate) -
+    totalXpForLevel(currentLevel, growthRate);
+  if (currentExp >= nextLevelXp) {
+    return {
+      level: currentLevel + 1,
+      leveledUp: true,
+      remainingXp: currentExp - nextLevelXp,
+    };
+  }
+  return { level: currentLevel, leveledUp: false, remainingXp: currentExp };
+};
+
+/**
+ * XP necesaria para pasar del nivel `currentLevel` al `currentLevel + 1`.
+ * Se usa para decidir si seguir el bucle de subidas graduales.
+ */
+export const xpForNextLevel = (
+  currentLevel: number,
+  growthRate: GrowthRate = "medium-fast"
+): number => {
+  if (currentLevel >= 100) return Infinity;
+  return (
+    totalXpForLevel(currentLevel + 1, growthRate) -
+    totalXpForLevel(currentLevel, growthRate)
+  );
+};
 
 /**
  * Returns how much HP is gained when a Pokémon levels up.

@@ -1,9 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
   consumeItem,
+  selectActivePokemonIndex,
   selectDirection,
   selectMap,
   selectPokemon,
+  selectPokemonEncounter,
   selectPos,
   setPokemonStatus,
   updateSpecificPokemon,
@@ -14,6 +16,7 @@ import {
   startFishing,
   startKnockback,
   learnMove,
+  requestConfusionFromItem,
   showActionOnPokemon,
   showEvolution,
   showText,
@@ -166,6 +169,9 @@ export enum ItemType {
   Tm53 = "tm53", // DONE
   Tm54 = "tm54", // DONE
   Tm55 = "tm55", // DONE
+  /** Vino Monjardín — cura 40 HP (×2 que Poción) pero confunde al pokémon
+   *  si se usa en combate sobre el activo. */
+  VinoMonjardin = "vino-monjardin",
 }
 
 export interface ItemData {
@@ -187,6 +193,8 @@ const useItemData = () => {
   const pos = useSelector(selectPos);
   const direction = useSelector(selectDirection);
   const map = useSelector(selectMap);
+  const activePokemonIndex = useSelector(selectActivePokemonIndex);
+  const inBattle = useSelector(selectPokemonEncounter) !== null;
 
   /**
    * Acción común a las 3 cañas: comprueba el tile frente al jugador y
@@ -345,6 +353,44 @@ const useItemData = () => {
               })
             );
             dispatch(consumeItem(ItemType.Potion));
+          })
+        );
+      },
+    },
+    [ItemType.VinoMonjardin]: {
+      type: ItemType.VinoMonjardin,
+      name: "Vino Monjardín",
+      countable: true,
+      consumable: true,
+      usableInBattle: true,
+      pokeball: false,
+      badge: false,
+      cost: 400,
+      sellPrice: 200,
+      action: () => {
+        dispatch(
+          showActionOnPokemon((index: number) => {
+            dispatch(
+              updateSpecificPokemon({
+                index,
+                pokemon: {
+                  ...pokemon[index],
+                  hp: Math.min(
+                    getPokemonStats(pokemon[index].id, pokemon[index].level).hp,
+                    pokemon[index].hp + 40
+                  ),
+                },
+              })
+            );
+            dispatch(consumeItem(ItemType.VinoMonjardin));
+            // Si se usa en combate sobre el pokémon ACTIVO, además de
+            // curar le aplica confusión durante 2-5 turnos (rango Gen I).
+            if (inBattle && index === activePokemonIndex) {
+              const turns = 2 + Math.floor(Math.random() * 4);
+              dispatch(
+                requestConfusionFromItem({ pokemonIndex: index, turns })
+              );
+            }
           })
         );
       },

@@ -81,6 +81,15 @@ interface UiState {
   fishing: FishingState | null;
   /** Sesión de knockback activa (empuje del jugador). */
   knockback: KnockbackState | null;
+  /**
+   * Petición pendiente de aplicar CONFUSIÓN al pokémon en combate (índice
+   * del equipo) tras usar un objeto. PokemonEncounter la observa y, si el
+   * pokémon coincide con el activo y hay batalla en curso, aplica la
+   * confusión durante los próximos `turns` turnos.
+   * `tick` se incrementa por cada petición para forzar el efecto aunque
+   * los demás campos coincidan.
+   */
+  pendingConfusionFromItem: { pokemonIndex: number; turns: number; tick: number } | null;
   // Counter incrementado cada vez que el jugador consume su turno de combate
   // sin atacar (cambio de Pokémon o uso de objeto). PokemonEncounter lo
   // observa para encadenar el ataque del rival inmediatamente después.
@@ -115,6 +124,7 @@ const initialState: UiState = {
   textRewardPending: null,
   fishing: null,
   knockback: null,
+  pendingConfusionFromItem: null,
   playerTurnTick: 0,
 };
 
@@ -282,6 +292,20 @@ export const uiSlice = createSlice({
     endKnockback: (state) => {
       state.knockback = null;
     },
+    requestConfusionFromItem: (
+      state,
+      action: PayloadAction<{ pokemonIndex: number; turns: number }>
+    ) => {
+      const prevTick = state.pendingConfusionFromItem?.tick ?? 0;
+      state.pendingConfusionFromItem = {
+        pokemonIndex: action.payload.pokemonIndex,
+        turns: action.payload.turns,
+        tick: prevTick + 1,
+      };
+    },
+    consumePendingConfusionFromItem: (state) => {
+      state.pendingConfusionFromItem = null;
+    },
   },
 });
 
@@ -336,6 +360,8 @@ export const {
   endFishing,
   startKnockback,
   endKnockback,
+  requestConfusionFromItem,
+  consumePendingConfusionFromItem,
 } = uiSlice.actions;
 
 export const selectText = (state: RootState) => state.ui.text;
@@ -436,5 +462,8 @@ export const selectKnockback = (state: RootState) => state.ui.knockback;
 
 export const selectPlayerTurnTick = (state: RootState) =>
   state.ui.playerTurnTick;
+
+export const selectPendingConfusionFromItem = (state: RootState) =>
+  state.ui.pendingConfusionFromItem;
 
 export default uiSlice.reducer;

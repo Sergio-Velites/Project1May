@@ -42,6 +42,7 @@ const pewterCityPokeMart: MapType = {
     ItemType.UltraBall,
     ItemType.Potion,
     ItemType.SuperPotion,
+    ItemType.VinoMonjardin,
     ItemType.Antidote,
     ItemType.FireStone,
     ItemType.WaterStone,

@@ -145,6 +145,7 @@ text: {
     y: 1,
   },
 // Trainers para "viridian-city"
+// Trainers para "viridian-city"
 trainers: [
   {
   npc: cueBall,
@@ -191,6 +192,7 @@ trainers: [
   ],
   money: 200,
   persistent: true,
+  sightRange: 4,
 },
   {
   npc: gentleman,

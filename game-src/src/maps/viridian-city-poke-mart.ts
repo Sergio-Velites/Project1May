@@ -39,6 +39,7 @@ const viridianCityPokeMart: MapType = {
   storeItems: [
     ItemType.PokeBall,
     ItemType.GreatBall,
+    ItemType.VinoMonjardin,
     // ItemType.Antidote, TODO Add this
     // ItemType.ParalyzeHeal, TODO Add this
     // ItemType.BurnHeal, TODO Add this

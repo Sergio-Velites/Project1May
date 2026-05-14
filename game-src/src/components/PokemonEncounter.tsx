@@ -52,7 +52,9 @@ import {
   selectItemsMenu,
   selectPokeballThrowing,
   selectPlayerTurnTick,
+  selectPendingConfusionFromItem,
   selectStartMenu,
+  consumePendingConfusionFromItem,
   showEvolution,
   showItemsMenu,
   showTextThenAction,
@@ -63,7 +65,7 @@ import { getMoveMetadata } from "../app/use-move-metadata";
 import { MoveMetadata } from "../app/move-metadata";
 import processMove, { MoveResult, StatStages, DEFAULT_STAGES, getStageMult, StatusApply, isSelfTargetingStatusMove, CHARGE_MOVES, INVULNERABLE_MOVES, CHARGE_MESSAGE } from "../app/move-helper";
 import getXp from "../app/xp-helper";
-import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp } from "../app/level-helper";
+import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp, getSingleLevelUp, xpForNextLevel } from "../app/level-helper";
 import MoveSelect from "./MoveSelect";
 import catchesPokemon from "../app/pokeball-helper";
 import { MoveAnimation } from "./MoveAnimation";
@@ -544,6 +546,7 @@ const PokemonEncounter = () => {
   const trainer = useSelector(selectTrainerEncounter);
   const activePokemonIndex = useSelector(selectActivePokemonIndex);
   const playerTurnTick = useSelector(selectPlayerTurnTick);
+  const pendingConfusionFromItem = useSelector(selectPendingConfusionFromItem);
 
   // Cuando el jugador cambia de Pokémon en combate, encadenamos el turno
   // del rival al terminar la animación de salida (stage 11). Este ref evita
@@ -758,8 +761,20 @@ const PokemonEncounter = () => {
 
     // Handling switching to the next processing pokemon
     if (enemyDefeated && processingInvolvedPokemon < involvedPokemon.length - 1) {
-      const nextIndex = processingInvolvedPokemon + 1;
-      if (enemy) {
+      // Buscar el siguiente participante VIVO. Los KO no reciben XP ni
+      // cuentan para el divisor.
+      let nextIndex = processingInvolvedPokemon + 1;
+      while (
+        nextIndex < involvedPokemon.length &&
+        pokemon[involvedPokemon[nextIndex]].hp <= 0
+      ) {
+        nextIndex++;
+      }
+      if (nextIndex < involvedPokemon.length && enemy) {
+        const aliveCount = Math.max(
+          1,
+          involvedPokemon.filter((i) => pokemon[i].hp > 0).length
+        );
         dispatch(
           updateSpecificPokemon({
             index: involvedPokemon[nextIndex],
@@ -768,15 +783,18 @@ const PokemonEncounter = () => {
               xp:
                 pokemon[involvedPokemon[nextIndex]].xp +
                 Math.round(
-                  getXp(enemy.id, enemy.level, isTrainer) / involvedPokemon.length
+                  getXp(enemy.id, enemy.level, isTrainer) / aliveCount
                 ),
             },
           })
         );
+        setProcessingInvolvedPokemon(nextIndex);
+        pendingXpRef.current = null;
+        pendingLevelRef.current = null;
+        setStage(21);
+        return;
       }
-      setProcessingInvolvedPokemon(nextIndex);
-      setStage(21);
-      return;
+      // Si no hay más vivos, caer al cierre normal de encuentro.
     }
     setInvolvedPokemon([activePokemonIndex]);
     setProcessingInvolvedPokemon(0);
@@ -858,6 +876,25 @@ const PokemonEncounter = () => {
       else {
         dispatch(faintToTrainer());
       }
+    }
+  };
+
+  // Helper para encadenar subidas de nivel graduales: comprueba si el
+  // pokémon procesado tiene XP suficiente para subir otro nivel; si sí,
+  // vuelve al stage 22 (subir 1 nivel + check move). Si no, cierra el
+  // flujo (endEncounter_ pasa al siguiente participante o termina).
+  const goToNextLevelOrEnd = () => {
+    const xpToUse = pendingXpRef.current ?? processingPokemon.xp;
+    const levelToUse =
+      pendingLevelRef.current ?? processingPokemon.level;
+    const growthRate = processingMetadata?.growthRate ?? "medium-fast";
+    const needed = xpForNextLevel(levelToUse, growthRate);
+    if (xpToUse >= needed) {
+      setStage(22);
+    } else {
+      pendingXpRef.current = null;
+      pendingLevelRef.current = null;
+      endEncounter_();
     }
   };
 
@@ -1097,63 +1134,110 @@ const PokemonEncounter = () => {
     if (stage === 20) {
       setStage(21);
       if (enemy) {
-        // BUG FIX: compute total XP here and pass it through so stage 21
-        // reads the updated value (avoids stale closure on processingPokemon.xp)
-        const earnedXp = Math.round(
-          getXp(enemy.id, enemy.level, isTrainer) / involvedPokemon.length
+        // Solo se reparte XP entre los participantes que siguen vivos: si un
+        // pokémon entró al combate y se debilitó, no recibe XP y tampoco
+        // cuenta para el divisor (los vivos reciben más).
+        const aliveParticipants = involvedPokemon.filter(
+          (i) => pokemon[i].hp > 0
         );
-        const updatedXp = processingPokemon.xp + earnedXp;
+        const divisor = Math.max(1, aliveParticipants.length);
+        // Si el primer participante (active al caer el rival) está KO,
+        // saltar al primer participante vivo. En la práctica el active
+        // siempre está vivo al rematar, pero por seguridad cubrimos el caso.
+        let firstIdx = 0;
+        while (
+          firstIdx < involvedPokemon.length &&
+          pokemon[involvedPokemon[firstIdx]].hp <= 0
+        ) {
+          firstIdx++;
+        }
+        if (firstIdx >= involvedPokemon.length) {
+          // Nadie vivo (caso degenerado): saltar reparto y cerrar.
+          pendingXpRef.current = null;
+          pendingLevelRef.current = null;
+          endEncounter_();
+          return;
+        }
+        if (firstIdx !== 0) setProcessingInvolvedPokemon(firstIdx);
+        const targetPokemon = pokemon[involvedPokemon[firstIdx]];
+        const earnedXp = Math.round(
+          getXp(enemy.id, enemy.level, isTrainer) / divisor
+        );
+        const updatedXp = targetPokemon.xp + earnedXp;
         dispatch(
           updateSpecificPokemon({
-            index: involvedPokemon[processingInvolvedPokemon],
+            index: involvedPokemon[firstIdx],
             pokemon: {
-              ...processingPokemon,
+              ...targetPokemon,
               xp: updatedXp,
             },
           })
         );
         // Store computed xp so stage 21 handler can use it reliably
         pendingXpRef.current = updatedXp;
+        pendingLevelRef.current = null;
       }
     }
 
     if (stage === 21) {
-      // Use pendingXpRef to avoid stale closure from Redux dispatch above
+      // Stage 21 SOLO anuncia "ganó X EXP" y decide si hay que subir
+      // algún nivel. La aplicación efectiva del nivel ocurre en stage 22,
+      // que se encadena consigo mismo para subir gradualmente nivel a nivel.
       const xpToUse = pendingXpRef.current ?? processingPokemon.xp;
-      const { level, leveledUp, remainingXp } = getLevelData(
-        processingPokemon.level,
-        xpToUse,
-        processingMetadata?.growthRate ?? "medium-fast"
-      );
-      if (leveledUp) {
-        // Gen I: current HP increases by the same amount as max HP
-        const hpDelta = getHpDeltaOnLevelUp(processingPokemon.id, processingPokemon.level, level);
-        dispatch(
-          updateSpecificPokemon({
-            index: involvedPokemon[processingInvolvedPokemon],
-            pokemon: {
-              ...processingPokemon,
-              level,
-              xp: remainingXp,
-              hp: processingPokemon.hp + hpDelta,
-            },
-          })
-        );
-        pendingXpRef.current = null;
-        pendingLevelRef.current = level;
+      const levelToUse =
+        pendingLevelRef.current ?? processingPokemon.level;
+      const growthRate = processingMetadata?.growthRate ?? "medium-fast";
+      const needed = xpForNextLevel(levelToUse, growthRate);
+      if (xpToUse >= needed) {
         setStage(22);
       } else {
         pendingXpRef.current = null;
+        pendingLevelRef.current = null;
         endEncounter_();
       }
     }
 
     if (stage === 22) {
-      // Use pendingLevelRef to avoid stale closure: Redux already dispatched new level
-      // but processingPokemon from selector may still show old level in this render.
-      const pokemonForLearn = pendingLevelRef.current !== null
-        ? { ...processingPokemon, level: pendingLevelRef.current }
-        : processingPokemon;
+      // Subida gradual: aplicamos UN nivel cada vez. Tras posibles flujos
+      // de aprender movimiento (29 / 30-33), volvemos aquí si todavía hay
+      // XP suficiente para otro nivel (vía goToNextLevelOrEnd).
+      const xpToUse = pendingXpRef.current ?? processingPokemon.xp;
+      const levelToUse =
+        pendingLevelRef.current ?? processingPokemon.level;
+      const growthRate = processingMetadata?.growthRate ?? "medium-fast";
+      const { level, leveledUp, remainingXp } = getSingleLevelUp(
+        levelToUse,
+        xpToUse,
+        growthRate
+      );
+      if (!leveledUp) {
+        // Guard: stage 21 ya comprobó esto, pero por si acaso.
+        pendingXpRef.current = null;
+        pendingLevelRef.current = null;
+        endEncounter_();
+        return;
+      }
+      const hpDelta = getHpDeltaOnLevelUp(
+        processingPokemon.id,
+        levelToUse,
+        level
+      );
+      dispatch(
+        updateSpecificPokemon({
+          index: involvedPokemon[processingInvolvedPokemon],
+          pokemon: {
+            ...processingPokemon,
+            level,
+            xp: remainingXp,
+            hp: processingPokemon.hp + hpDelta,
+          },
+        })
+      );
+      pendingXpRef.current = remainingXp;
+      pendingLevelRef.current = level;
+
+      // Comprobar movimiento aprendido al alcanzar este nivel exacto.
+      const pokemonForLearn = { ...processingPokemon, level };
       const move = getLearnedMove(pokemonForLearn);
       const hasFourMoves = processingPokemon.moves.length === 4;
       if (move && !hasFourMoves) {
@@ -1161,7 +1245,8 @@ const PokemonEncounter = () => {
       } else if (move && hasFourMoves) {
         setStage(30);
       } else {
-        endEncounter_();
+        // No aprende nada en este nivel: comprobar si toca otro nivel.
+        goToNextLevelOrEnd();
       }
     }
 
@@ -1203,8 +1288,9 @@ const PokemonEncounter = () => {
           },
         })
       );
-      pendingLevelRef.current = null;
-      endEncounter_();
+      // Mantener pendingLevelRef + pendingXpRef para que el bucle pueda
+      // decidir si toca subir otro nivel.
+      goToNextLevelOrEnd();
     }
 
     if (stage === 30) {
@@ -1298,6 +1384,22 @@ const PokemonEncounter = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerTurnTick]);
 
+  // Petición de confusión disparada por un objeto (Vino Monjardín). Si la
+  // petición apunta al pokémon activo y hay batalla en curso, aplica la
+  // confusión por el número de turnos indicado. Siempre limpia el flag al
+  // terminar para que no se aplique en un combate posterior.
+  useEffect(() => {
+    if (!pendingConfusionFromItem) return;
+    if (
+      isInBattle &&
+      pendingConfusionFromItem.pokemonIndex === activePokemonIndex
+    ) {
+      playerConfusionTurnsRef.current = pendingConfusionFromItem.turns;
+    }
+    dispatch(consumePendingConfusionFromItem());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingConfusionFromItem]);
+
   // Encadenar ataque del rival al terminar la animación de entrada del
   // Pokémon recién cambiado en combate. La animación termina dejando
   // stage = 11; usamos el ref para distinguir un swap mid-combate
@@ -1334,15 +1436,26 @@ const PokemonEncounter = () => {
       return `¡${enemyMetadata.name.toUpperCase()} se debilitó!`;
     if (stage === 21) {
       if (!processingMetadata) throw new Error("No processing metadata found");
+      const aliveCount = Math.max(
+        1,
+        involvedPokemon.filter((i) => pokemon[i].hp > 0).length
+      );
       return `${processingMetadata.name.toUpperCase()} ganó ${Math.round(
-        getXp(enemy.id, enemy.level, isTrainer) / involvedPokemon.length
+        getXp(enemy.id, enemy.level, isTrainer) / aliveCount
       )} puntos EXP.`;
     }
     if (stage === 22) {
       if (!processingMetadata) throw new Error("No processing metadata found");
-      return `¡${processingMetadata.name.toUpperCase()} subió al nivel ${
-        getLevelData(processingPokemon.level, processingPokemon.xp, processingMetadata?.growthRate ?? "medium-fast").level
-      }!`;
+      // Mostrar el nivel al que está SUBIENDO ahora mismo (gradual, +1).
+      const xpToUse = pendingXpRef.current ?? processingPokemon.xp;
+      const levelToUse =
+        pendingLevelRef.current ?? processingPokemon.level;
+      const next = getSingleLevelUp(
+        levelToUse,
+        xpToUse,
+        processingMetadata?.growthRate ?? "medium-fast"
+      );
+      return `¡${processingMetadata.name.toUpperCase()} subió al nivel ${next.level}!`;
     }
     if (stage === 24) return `¡${activeMetadata.name.toUpperCase()} se debilitó!`;
     if (stage === 26) return `¡${name} no tiene más POKéMON!`;
@@ -2909,7 +3022,6 @@ const PokemonEncounter = () => {
                 const item: MenuItemType = {
                   label: (getMoveMetadata(m.id)?.name ?? m.id).toUpperCase(),
                   action: () => {
-                    endEncounter_();
                     dispatch(
                       updateSpecificPokemon({
                         index: involvedPokemon[processingInvolvedPokemon],
@@ -2924,6 +3036,8 @@ const PokemonEncounter = () => {
                         },
                       })
                     );
+                    // Encadenar al bucle de subida gradual.
+                    goToNextLevelOrEnd();
                   },
                 };
                 return item;
@@ -2931,11 +3045,11 @@ const PokemonEncounter = () => {
               {
                 label: "NO APRENDER",
                 action: () => {
-                  endEncounter_();
+                  goToNextLevelOrEnd();
                 },
               },
             ]}
-            close={() => endEncounter_()}
+            close={() => goToNextLevelOrEnd()}
             bottom="0"
             right="0"
           />
