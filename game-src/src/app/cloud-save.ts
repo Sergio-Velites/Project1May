@@ -49,10 +49,18 @@ export const isWebAuthnAvailable = (): boolean => {
 // ---- Low-level helpers ----
 
 const EDGE_TIMEOUT_MS = 8000;
+// save-game lleva el GameState completo (varias decenas de KB). En 3G/4G
+// flojo y con cold-start de la edge, 8s se quedaba corto y abortaba con
+// AbortError silencioso. Para esa ruta usamos un timeout más generoso.
+const SAVE_GAME_TIMEOUT_MS = 15000;
 
-const callEdge = (endpoint: string, body: unknown) => {
+const callEdge = (
+  endpoint: string,
+  body: unknown,
+  timeoutMs: number = EDGE_TIMEOUT_MS,
+) => {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), EDGE_TIMEOUT_MS);
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   return fetch(`${SUPABASE_URL}/functions/v1/${endpoint}`, {
     method: "POST",
     headers: {
@@ -88,7 +96,7 @@ export const saveToCloud = async (
 ): Promise<void> => {
   if (!SUPABASE_URL) return;
   try {
-    await callEdge("save-game", { userId, gameState });
+    await callEdge("save-game", { userId, gameState }, SAVE_GAME_TIMEOUT_MS);
   } catch {
     // Silently ignore — local save is still intact
   }
@@ -387,6 +395,107 @@ export const webauthnAuth = async (credentialId: string): Promise<string | null>
     return localUserId;
   } catch (err) {
     console.warn("[WebAuthn] Auth failed:", err);
+    return null;
+  }
+};
+
+// ---- Recovery: subir partida local a la nube si la nube está vacía ----
+//
+// Caso de uso: usuarios que jugaron mientras existía un bug por el cual el
+// RSVP llegaba a Supabase pero la partida no (race condition resuelta en
+// migración 006 + secuenciación en OakIntro). Su localStorage del dispositivo
+// SÍ contiene la partida (state.name como clave). Este helper la sube en
+// silencio la próxima vez que abren el juego, una sola vez por userId.
+//
+// Reglas defensivas:
+//   1. Solo sube si la nube está vacía para ese userId (callback decide).
+//   2. Solo escanea claves de localStorage que parsean como GameState válido
+//      (evita pisar nada que no sea una partida real).
+//   3. Marca un flag `wedding_local_save_uploaded_<userId>` para no repetir
+//      el upload en cada arranque (idempotencia, ahorro de cuota).
+//   4. No bloquea el flujo: si falla, devuelve null y el usuario sigue.
+//   5. NO se ejecuta si el localStorage no tiene una partida válida.
+
+const RECOVER_FLAG_PREFIX = "wedding_local_save_uploaded_";
+
+interface MaybeGameState {
+  name?: unknown;
+  pos?: { x?: unknown; y?: unknown };
+  map?: unknown;
+  pokemon?: unknown;
+  inventory?: unknown;
+}
+
+/**
+ * Heurística estricta para detectar una entrada de localStorage que sea un
+ * GameState serializado (no un setting random). Comprueba la presencia de los
+ * campos críticos con sus tipos esperados.
+ */
+const looksLikeGameState = (raw: string): unknown | null => {
+  if (!raw || raw[0] !== "{") return null;
+  try {
+    const obj = JSON.parse(raw) as MaybeGameState;
+    if (
+      obj &&
+      typeof obj === "object" &&
+      typeof obj.name === "string" &&
+      obj.pos &&
+      typeof (obj.pos as { x?: unknown }).x === "number" &&
+      typeof (obj.pos as { y?: unknown }).y === "number" &&
+      typeof obj.map === "string" &&
+      Array.isArray(obj.pokemon) &&
+      Array.isArray(obj.inventory)
+    ) {
+      return obj;
+    }
+  } catch {
+    // No es JSON, ignorar.
+  }
+  return null;
+};
+
+const findLocalGameState = (): unknown | null => {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+    // Saltar las claves técnicas del propio sistema.
+    if (key.startsWith("wedding_")) continue;
+    const raw = localStorage.getItem(key);
+    if (!raw) continue;
+    const candidate = looksLikeGameState(raw);
+    if (candidate) return candidate;
+  }
+  return null;
+};
+
+/**
+ * Si la nube no tiene partida para `userId` Y el localStorage del dispositivo
+ * sí, sube la partida local a la nube (una sola vez por userId).
+ *
+ * @returns la partida subida si hubo recuperación, o null en caso contrario.
+ *          Se devuelve para que el caller pueda usarla como `cloudSave`
+ *          inmediatamente sin necesidad de un segundo loadFromCloud.
+ */
+export const recoverLocalSaveIfNeeded = async (
+  userId: string,
+): Promise<unknown | null> => {
+  if (!userId) return null;
+  const flagKey = `${RECOVER_FLAG_PREFIX}${userId}`;
+  if (localStorage.getItem(flagKey) === "1") return null;
+  const local = findLocalGameState();
+  if (!local) return null;
+  try {
+    await saveToCloud(userId, local);
+    // Verificamos releyendo: si después de subir la nube SIGUE vacía algo
+    // ha fallado de verdad. No marcamos el flag para reintentar el próximo
+    // arranque. Si llegó, marcamos para no repetir.
+    const verify = await loadFromCloud(userId);
+    if (verify) {
+      localStorage.setItem(flagKey, "1");
+      return verify;
+    }
+    return null;
+  } catch {
     return null;
   }
 };

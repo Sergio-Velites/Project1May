@@ -18,6 +18,7 @@ import {
   createUser,
   setCurrentUserId,
   setImpersonatedUserId,
+  recoverLocalSaveIfNeeded,
 } from "../app/cloud-save";
 import OakIntro from "./OakIntro";
 import { GameState } from "../state/state-types";
@@ -175,6 +176,13 @@ const LoadScreen = () => {
           transitionTo("choose");
           return;
         }
+        // Nube vacía: intentar recuperar partida local huérfana.
+        const recovered = await recoverLocalSaveIfNeeded(authedId);
+        if (recovered) {
+          cloudSave.current = recovered as GameState;
+          transitionTo("choose");
+          return;
+        }
         transitionTo("oak-intro");
         return;
       }
@@ -188,6 +196,12 @@ const LoadScreen = () => {
         const save = await loadFromCloud(userId);
         if (save) {
           cloudSave.current = save as GameState;
+          transitionTo("choose");
+          return;
+        }
+        const recovered = await recoverLocalSaveIfNeeded(userId);
+        if (recovered) {
+          cloudSave.current = recovered as GameState;
           transitionTo("choose");
           return;
         }
@@ -293,6 +307,12 @@ const LoadScreen = () => {
                       transitionTo("choose");
                       return;
                     }
+                    const recovered = await recoverLocalSaveIfNeeded(userId);
+                    if (recovered) {
+                      cloudSave.current = recovered as GameState;
+                      transitionTo("choose");
+                      return;
+                    }
                     transitionTo("oak-intro");
                   } else {
                     // Registro falló en el servidor — usar userId local como fallback
@@ -303,6 +323,12 @@ const LoadScreen = () => {
                     const save = await loadFromCloud(fallbackId);
                     if (save) {
                       cloudSave.current = save as GameState;
+                      transitionTo("choose");
+                      return;
+                    }
+                    const recovered = await recoverLocalSaveIfNeeded(fallbackId);
+                    if (recovered) {
+                      cloudSave.current = recovered as GameState;
                       transitionTo("choose");
                       return;
                     }
@@ -328,7 +354,13 @@ const LoadScreen = () => {
                   cloudSave.current = save as GameState;
                   transitionTo("choose");
                 } else {
-                  transitionTo("oak-intro");
+                  const recovered = await recoverLocalSaveIfNeeded(localId);
+                  if (recovered) {
+                    cloudSave.current = recovered as GameState;
+                    transitionTo("choose");
+                  } else {
+                    transitionTo("oak-intro");
+                  }
                 }
               },
             },

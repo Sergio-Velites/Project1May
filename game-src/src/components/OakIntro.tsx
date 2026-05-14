@@ -467,12 +467,27 @@ const OakIntro = ({ onComplete }: Props) => {
     dispatch(setRsvp(rsvpData));
     // Redux dispatch es síncrono: store.getState() ya tiene name+rsvp actualizados.
     // Guardar también la partida completa para que "Continuar" esté disponible al volver.
+    //
+    // SECUENCIAL (no Promise.all): save-rsvp crea la fila en wedding_users
+    // (si no existía) que es FK requerida por saves.user_id. Lanzarlas en
+    // paralelo provocó en algunos casos que save-game llegara antes y fallara
+    // silenciosamente por FK violation → RSVP guardado pero partida no.
+    // El plan B definitivo está en la migración 006_upsert_save_autocreate_user.sql,
+    // pero secuenciar evita además sobrecargar la edge en el momento crítico.
     const userId = getCurrentUserId() ?? "";
     const gameState = store.getState().game;
-    Promise.all([
-      saveRsvp(userId, rsvpData),
-      saveToCloud(userId, gameState),
-    ]).finally(() => {
+    (async () => {
+      try {
+        await saveRsvp(userId, rsvpData);
+      } catch {
+        /* logged inside saveRsvp */
+      }
+      try {
+        await saveToCloud(userId, gameState);
+      } catch {
+        /* logged inside saveToCloud */
+      }
+    })().finally(() => {
       setTimeout(() => setShrink("overworld"), 900);
       setTimeout(() => onComplete(), 1700);
     });
