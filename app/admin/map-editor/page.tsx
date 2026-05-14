@@ -2533,14 +2533,39 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
 
 // ── Editor de tabla de encounters (walk / oldRod / goodRod / superRod) ──
 
+// Nombres Gen I (índice 0 = vacío, índice 1 = Bulbasaur, ..., 151 = Mew)
+const GEN1_NAMES = [
+  '', 'Bulbasaur', 'Ivysaur', 'Venusaur', 'Charmander', 'Charmeleon', 'Charizard',
+  'Squirtle', 'Wartortle', 'Blastoise', 'Caterpie', 'Metapod', 'Butterfree',
+  'Weedle', 'Kakuna', 'Beedrill', 'Pidgey', 'Pidgeotto', 'Pidgeot', 'Rattata',
+  'Raticate', 'Spearow', 'Fearow', 'Ekans', 'Arbok', 'Pikachu', 'Raichu',
+  'Sandshrew', 'Sandslash', 'Nidoran♀', 'Nidorina', 'Nidoqueen', 'Nidoran♂',
+  'Nidorino', 'Nidoking', 'Clefairy', 'Clefable', 'Vulpix', 'Ninetales',
+  'Jigglypuff', 'Wigglytuff', 'Zubat', 'Golbat', 'Oddish', 'Gloom', 'Vileplume',
+  'Paras', 'Parasect', 'Venonat', 'Venomoth', 'Diglett', 'Dugtrio', 'Meowth',
+  'Persian', 'Psyduck', 'Golduck', 'Mankey', 'Primeape', 'Growlithe', 'Arcanine',
+  'Poliwag', 'Poliwhirl', 'Poliwrath', 'Abra', 'Kadabra', 'Alakazam', 'Machop',
+  'Machoke', 'Machamp', 'Bellsprout', 'Weepinbell', 'Victreebel', 'Tentacool',
+  'Tentacruel', 'Geodude', 'Graveler', 'Golem', 'Ponyta', 'Rapidash', 'Slowpoke',
+  'Slowbro', 'Magnemite', 'Magneton', "Farfetch'd", 'Doduo', 'Dodrio', 'Seel',
+  'Dewgong', 'Grimer', 'Muk', 'Shellder', 'Cloyster', 'Gastly', 'Haunter',
+  'Gengar', 'Onix', 'Drowzee', 'Hypno', 'Krabby', 'Kingler', 'Voltorb',
+  'Electrode', 'Exeggcute', 'Exeggutor', 'Cubone', 'Marowak', 'Hitmonlee',
+  'Hitmonchan', 'Lickitung', 'Koffing', 'Weezing', 'Rhyhorn', 'Rhydon', 'Chansey',
+  'Tangela', 'Kangaskhan', 'Horsea', 'Seadra', 'Goldeen', 'Seaking', 'Staryu',
+  'Starmie', 'Mr. Mime', 'Scyther', 'Jynx', 'Electabuzz', 'Magmar', 'Pinsir',
+  'Tauros', 'Magikarp', 'Gyarados', 'Lapras', 'Ditto', 'Eevee', 'Vaporeon',
+  'Jolteon', 'Flareon', 'Porygon', 'Omanyte', 'Omastar', 'Kabuto', 'Kabutops',
+  'Aerodactyl', 'Snorlax', 'Articuno', 'Zapdos', 'Moltres', 'Dratini',
+  'Dragonair', 'Dragonite', 'Mewtwo', 'Mew',
+];
+
 /**
- * Permite editar una tabla de encuentros: rate global y lista de pokémon
- * con id, rango de niveles y "chance" (peso relativo). Al guardar se
- * persiste en `overrides.encounters[<key>]` del mapa actual.
+ * Editor de tabla de encuentros: sprite + ID + nombre + niveles +
+ * barra de probabilidad. Diseño de tarjeta compacta por pokémon.
  *
- * - `rate`: 0–255 (Gen I). 0 = no hay encuentros aleatorios.
- * - `chance`: peso relativo dentro de la tabla. La probabilidad real de
- *   cada pokémon es `chance / sum(chances)`. La UI muestra el porcentaje.
+ * - `rate`: 0–255 (Gen I). 0 = sin encuentros.
+ * - `chance`: peso relativo. Probabilidad real = chance / sum(chances).
  */
 function EncountersTableEditor({
   title, tableKey, table, onChange,
@@ -2555,8 +2580,7 @@ function EncountersTableEditor({
   const totalChance = table.pokemon.reduce((a, b) => a + (b.chance || 0), 0) || 1;
 
   function update(idx: number, patch: Partial<{ id: number; chance: number; minLevel: number; maxLevel: number }>) {
-    const next = { ...table, pokemon: table.pokemon.map((p, i) => i === idx ? { ...p, ...patch } : p) };
-    onChange(next);
+    onChange({ ...table, pokemon: table.pokemon.map((p, i) => i === idx ? { ...p, ...patch } : p) });
   }
 
   function remove(idx: number) {
@@ -2566,10 +2590,7 @@ function EncountersTableEditor({
   function add() {
     onChange({
       ...table,
-      pokemon: [
-        ...table.pokemon,
-        { id: 1, chance: 10, minLevel: 5, maxLevel: 5, conditionValues: [] },
-      ],
+      pokemon: [...table.pokemon, { id: 129, chance: 10, minLevel: 5, maxLevel: 5, conditionValues: [] }],
     });
   }
 
@@ -2577,108 +2598,163 @@ function EncountersTableEditor({
     onChange({ ...table, rate: Math.max(0, Math.min(255, Math.round(rate))) });
   }
 
+  const inputBase: React.CSSProperties = {
+    background: '#0a0a1e',
+    border: '1px solid #3a3a5a',
+    color: '#e0e0ff',
+    borderRadius: 4,
+    padding: '3px 6px',
+    fontSize: 12,
+    textAlign: 'center' as const,
+    width: '100%',
+    boxSizing: 'border-box' as const,
+  };
+
   return (
-    <div style={{ marginTop: 18, padding: 12, background: '#10102a', border: '1px solid #2a2a4a', borderRadius: 6 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+    <div style={{ marginTop: 18, background: '#0d0d22', border: '1px solid #2a2a4a', borderRadius: 8, overflow: 'hidden' }}>
+      {/* Cabecera */}
+      <div style={{ padding: '10px 14px', borderBottom: '1px solid #2a2a4a', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#12122e' }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: '#e0e0ff' }}>{title}</div>
-        <div style={{ fontSize: 10, color: '#666', fontFamily: 'monospace' }}>{tableKey}</div>
+        <div style={{ fontSize: 10, color: '#555', fontFamily: 'monospace', background: '#1a1a3a', padding: '2px 6px', borderRadius: 3 }}>{tableKey}</div>
       </div>
 
       {/* Rate */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-        <span style={{ fontSize: 11, color: '#aaa', minWidth: 70 }}>Rate (0–255)</span>
+      <div style={{ padding: '10px 14px', borderBottom: '1px solid #1a1a36', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ fontSize: 11, color: '#888', whiteSpace: 'nowrap' }}>Rate (0–255)</span>
         <input
           type="number"
           min={0}
           max={255}
           value={table.rate}
           onChange={(e) => setRate(parseInt(e.target.value, 10) || 0)}
-          style={{ width: 60, padding: '2px 6px', background: '#0a0a18', border: '1px solid #3a3a5a', color: '#fff', borderRadius: 3, fontSize: 12 }}
+          style={{ ...inputBase, width: 64, flexShrink: 0 }}
         />
-        <span style={{ fontSize: 10, color: '#666' }}>
-          {table.rate === 0 ? 'sin encuentros' : `${((table.rate / 255) * 100).toFixed(1)}% por paso`}
+        <div style={{ flex: 1, height: 4, background: '#1a1a3a', borderRadius: 2, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${(table.rate / 255) * 100}%`, background: table.rate === 0 ? '#333' : '#5588ff', borderRadius: 2, transition: 'width 0.2s' }} />
+        </div>
+        <span style={{ fontSize: 11, color: table.rate === 0 ? '#555' : '#88aaff', whiteSpace: 'nowrap', minWidth: 90 }}>
+          {table.rate === 0 ? 'sin encuentros' : `${((table.rate / 255) * 100).toFixed(1)}% / paso`}
         </span>
       </div>
 
-      {/* Lista de pokémon */}
-      {table.pokemon.length === 0 && (
-        <div style={{ fontSize: 11, color: '#666', fontStyle: 'italic', padding: '8px 0' }}>
-          (sin pokémon — añade alguno con el botón de abajo)
-        </div>
-      )}
-      {table.pokemon.map((p, i) => {
-        const pct = ((p.chance / totalChance) * 100).toFixed(1);
-        return (
-          <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 50px 70px 50px 24px', gap: 4, alignItems: 'center', padding: '4px 0', borderTop: i === 0 ? 'none' : '1px solid #1a1a3a' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ fontSize: 10, color: '#666', width: 18 }}>#</span>
-              <input
-                type="number"
-                min={1}
-                max={151}
-                value={p.id}
-                onChange={(e) => update(i, { id: parseInt(e.target.value, 10) || 1 })}
-                title="ID Pokémon (1–151)"
-                style={{ width: '100%', padding: '2px 4px', background: '#0a0a18', border: '1px solid #3a3a5a', color: '#fff', borderRadius: 3, fontSize: 11 }}
-              />
-            </div>
-            <input
-              type="number"
-              min={1}
-              max={100}
-              value={p.minLevel}
-              onChange={(e) => {
-                const v = parseInt(e.target.value, 10) || 1;
-                update(i, { minLevel: v, maxLevel: Math.max(v, p.maxLevel) });
-              }}
-              title="Nivel mínimo"
-              style={{ padding: '2px 4px', background: '#0a0a18', border: '1px solid #3a3a5a', color: '#fff', borderRadius: 3, fontSize: 11, textAlign: 'center' }}
-            />
-            <input
-              type="number"
-              min={p.minLevel}
-              max={100}
-              value={p.maxLevel}
-              onChange={(e) => update(i, { maxLevel: Math.max(p.minLevel, parseInt(e.target.value, 10) || p.minLevel) })}
-              title="Nivel máximo"
-              style={{ padding: '2px 4px', background: '#0a0a18', border: '1px solid #3a3a5a', color: '#fff', borderRadius: 3, fontSize: 11, textAlign: 'center' }}
-            />
-            <input
-              type="number"
-              min={0}
-              value={p.chance}
-              onChange={(e) => update(i, { chance: Math.max(0, parseInt(e.target.value, 10) || 0) })}
-              title={`Peso (probabilidad real: ${pct}%)`}
-              style={{ padding: '2px 4px', background: '#0a0a18', border: '1px solid #3a3a5a', color: '#fff', borderRadius: 3, fontSize: 11, textAlign: 'center' }}
-            />
-            <button
-              onClick={() => remove(i)}
-              title="Eliminar"
-              style={{ padding: '2px 4px', background: '#3a1a1a', border: '1px solid #7a3a3a', color: '#ff8888', borderRadius: 3, fontSize: 11, cursor: 'pointer' }}
-            >
-              ×
-            </button>
+      {/* Lista pokémon */}
+      <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {table.pokemon.length === 0 && (
+          <div style={{ padding: '12px 4px', fontSize: 11, color: '#555', fontStyle: 'italic', textAlign: 'center' }}>
+            Sin pokémon · usa el botón de abajo para añadir
           </div>
-        );
-      })}
+        )}
+        {table.pokemon.map((p, i) => {
+          const pct = ((p.chance / totalChance) * 100).toFixed(1);
+          const name = (p.id >= 1 && p.id <= 151) ? GEN1_NAMES[p.id] : `#${p.id}`;
+          const spriteOk = p.id >= 1 && p.id <= 151;
+          return (
+            <div
+              key={i}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '52px 1fr',
+                gap: 8,
+                alignItems: 'center',
+                background: '#0a0a20',
+                border: '1px solid #222240',
+                borderRadius: 6,
+                padding: '8px',
+              }}
+            >
+              {/* Sprite */}
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: 52, height: 52, background: '#111130', borderRadius: 5, flexShrink: 0, border: '1px solid #2a2a4a' }}>
+                {spriteOk ? (
+                  <img
+                    src={`/editor/pokemon/${p.id}.png`}
+                    alt={name}
+                    style={{ width: 44, height: 44, imageRendering: 'pixelated', objectFit: 'contain' }}
+                  />
+                ) : (
+                  <span style={{ fontSize: 20, color: '#444' }}>?</span>
+                )}
+              </div>
 
-      {/* Cabecera de columnas (debajo para no estorbar si está vacío) */}
-      {table.pokemon.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 50px 70px 50px 24px', gap: 4, marginTop: 6, fontSize: 9, color: '#555', textAlign: 'center' }}>
-          <span style={{ textAlign: 'left' }}>id</span>
-          <span>min</span>
-          <span>max</span>
-          <span>peso</span>
-          <span></span>
-        </div>
-      )}
+              {/* Datos */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: 0 }}>
+                {/* Fila 1: ID + nombre + borrar */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 10, color: '#666', flexShrink: 0 }}>#</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={151}
+                    value={p.id}
+                    onChange={(e) => update(i, { id: Math.max(1, Math.min(151, parseInt(e.target.value, 10) || 1)) })}
+                    title="ID Pokémon (1–151)"
+                    style={{ ...inputBase, width: 52, flexShrink: 0, fontWeight: 700, fontSize: 13, color: '#ffffaa' }}
+                  />
+                  <span style={{ fontSize: 12, color: '#ccccee', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                    {name}
+                  </span>
+                  <button
+                    onClick={() => remove(i)}
+                    title="Eliminar"
+                    style={{ flexShrink: 0, width: 22, height: 22, padding: 0, background: '#2a1010', border: '1px solid #5a2a2a', color: '#ff6666', borderRadius: 4, fontSize: 14, cursor: 'pointer', lineHeight: 1 }}
+                  >
+                    ×
+                  </button>
+                </div>
 
-      <button
-        onClick={add}
-        style={{ marginTop: 8, width: '100%', padding: '4px 8px', background: '#1a3a1a', border: '1px solid #3a7a3a', color: '#88ff88', borderRadius: 4, fontSize: 11, cursor: 'pointer' }}
-      >
-        + Añadir pokémon
-      </button>
+                {/* Fila 2: Niveles + chance */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ fontSize: 10, color: '#666', flexShrink: 0, minWidth: 14 }}>Lv</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={p.minLevel}
+                    onChange={(e) => {
+                      const v = Math.max(1, Math.min(100, parseInt(e.target.value, 10) || 1));
+                      update(i, { minLevel: v, maxLevel: Math.max(v, p.maxLevel) });
+                    }}
+                    title="Nivel mínimo"
+                    style={{ ...inputBase, width: 44, flexShrink: 0 }}
+                  />
+                  <span style={{ fontSize: 10, color: '#555', flexShrink: 0 }}>–</span>
+                  <input
+                    type="number"
+                    min={p.minLevel}
+                    max={100}
+                    value={p.maxLevel}
+                    onChange={(e) => update(i, { maxLevel: Math.max(p.minLevel, Math.min(100, parseInt(e.target.value, 10) || p.minLevel)) })}
+                    title="Nivel máximo"
+                    style={{ ...inputBase, width: 44, flexShrink: 0 }}
+                  />
+                  <div style={{ flex: 1 }} />
+                  {/* Barra de probabilidad */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                    <input
+                      type="number"
+                      min={0}
+                      value={p.chance}
+                      onChange={(e) => update(i, { chance: Math.max(0, parseInt(e.target.value, 10) || 0) })}
+                      title={`Peso relativo (${pct}% de aparición)`}
+                      style={{ ...inputBase, width: 44, flexShrink: 0 }}
+                    />
+                    <div style={{ position: 'relative', width: 36, height: 14, background: '#1a1a3a', borderRadius: 3, overflow: 'hidden', flexShrink: 0 }}>
+                      <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: `${Math.min(100, parseFloat(pct))}%`, background: parseFloat(pct) > 40 ? '#88ff88' : parseFloat(pct) > 15 ? '#ffcc55' : '#5599ff', transition: 'width 0.2s' }} />
+                      <span style={{ position: 'relative', zIndex: 1, fontSize: 8, color: '#fff', width: '100%', display: 'block', textAlign: 'center', lineHeight: '14px', fontWeight: 700, textShadow: '0 0 3px #000' }}>{pct}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        <button
+          onClick={add}
+          style={{ marginTop: 2, padding: '7px 0', background: '#0f2a0f', border: '1px dashed #3a7a3a', color: '#88ff88', borderRadius: 5, fontSize: 12, cursor: 'pointer', width: '100%' }}
+        >
+          + Añadir pokémon
+        </button>
+      </div>
     </div>
   );
 }
