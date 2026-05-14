@@ -157,7 +157,7 @@ water: {
     16: [4, 5, 6, 7],
     17: [4, 5, 6, 7],
   },
-  encounters: {
+encounters: {
   walk: {
     rate: 0,
     pokemon: [
@@ -183,10 +183,11 @@ water: {
     pokemon: [
       { id: 60, chance: 17, conditionValues: [], minLevel: 15, maxLevel: 15 },
       { id: 60, chance: 8, conditionValues: [], minLevel: 15, maxLevel: 15 },
-      { id: 60, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 15 },
+      { id: 61, chance: 25, conditionValues: [], minLevel: 18, maxLevel: 18 },
       { id: 72, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 15 },
       { id: 72, chance: 8, conditionValues: [], minLevel: 15, maxLevel: 15 },
-      { id: 72, chance: 17, conditionValues: [], minLevel: 15, maxLevel: 15 }
+      { id: 73, chance: 17, conditionValues: [], minLevel: 21, maxLevel: 21 },
+      { id: 131, chance: 19, conditionValues: [], minLevel: 20, maxLevel: 20 }
     ],
   },
   rockSmash: { rate: 0, pokemon: [] }, headbutt: { rate: 0, pokemon: [] }, darkGrass: { rate: 0, pokemon: [] },
