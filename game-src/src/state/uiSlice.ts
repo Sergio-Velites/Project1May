@@ -406,6 +406,7 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.pokemonCenterMenu ||
   state.ui.pcMenu ||
   state.ui.pokeMartMenu ||
+  state.ui.pokedexOpen ||
   state.ui.textThenAction !== null ||
   state.ui.learningMove !== null ||
   state.ui.confirmationMenu !== null ||

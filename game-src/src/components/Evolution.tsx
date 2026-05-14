@@ -7,7 +7,7 @@ import { Event } from "../app/emitter";
 import PixelImage from "../styles/PixelImage";
 import { useDispatch, useSelector } from "react-redux";
 import { hideEvolution, selectEvolution, showText } from "../state/uiSlice";
-import { selectPokemon, updateSpecificPokemon } from "../state/gameSlice";
+import { catchPokemonPokedex, selectPokemon, updateSpecificPokemon } from "../state/gameSlice";
 import { getLearnedMove } from "../app/level-helper";
 import { getMoveMetadata } from "../app/use-move-metadata";
 
@@ -294,6 +294,15 @@ const Evolution = () => {
         pokemon: pokemonWithMove,
       })
     );
+
+    // Pokédex (estilo Gen I): ambas formas quedan registradas como
+    // "vista + capturada" tras evolucionar. Los selectores selectSeenPokemon
+    // y selectCaughtPokemon hacen una unión con el equipo actual, así que si
+    // la pre-evolución nunca se persistió (caso de starters / regalos), al
+    // cambiar el id por la nueva forma desaparecía de la lista. Persistimos
+    // explícitamente las dos especies aquí; el reducer es idempotente.
+    dispatch(catchPokemonPokedex(evolvingPokemon.id));
+    dispatch(catchPokemonPokedex(pokemonWithMove.id));
 
     if (moveMessages.length > 0) {
       dispatch(showText(moveMessages));
