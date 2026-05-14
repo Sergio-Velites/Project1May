@@ -5,6 +5,8 @@
  */
 import ImpersonateButtons from "./ImpersonateButtons";
 import CsvDownload from "./CsvDownload";
+import { itemLabel, isBadgeSlug } from "./item-names";
+import { questLabel } from "./quest-names";
 
 const SUPABASE_URL = "https://kplfjrjibjptigvfgdvy.supabase.co";
 const SUPABASE_ANON_KEY =
@@ -32,6 +34,9 @@ interface RSVPEntry {
   pc?: PokemonInst[];
   seenPokemon?: number[];
   caughtPokemon?: number[];
+  inventory?: { item: string; amount: number }[];
+  completedQuests?: string[];
+  money?: number;
   map?: string | null;
   pos?: { x: number; y: number } | null;
 }
@@ -677,6 +682,60 @@ export default async function AdminPage() {
                         );
                       })()}
 
+                      {/* ── Inventario / mochila ── */}
+                      {(() => {
+                        const inv = (e.inventory ?? []).filter((it) => it.amount > 0);
+                        if (inv.length === 0 && (!e.money || e.money === 0)) return null;
+                        const items = inv.filter((it) => !isBadgeSlug(it.item));
+                        const badges = inv.filter((it) => isBadgeSlug(it.item));
+                        return (
+                          <div className="pokemon-section">
+                            <div className="pokemon-section-title">
+                              Mochila{typeof e.money === "number" ? ` · ₽${e.money}` : ""}
+                            </div>
+                            {items.length > 0 ? (
+                              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "0.3rem 0.7rem" }}>
+                                {items.map((it) => (
+                                  <li key={it.item} style={{ fontSize: "0.78rem", color: "#1a1a1a", display: "flex", justifyContent: "space-between", padding: "0.18rem 0.5rem", background: "#f8f6f0", borderRadius: 6 }}>
+                                    <span>{itemLabel(it.item)}</span>
+                                    <span style={{ color: "#888", fontWeight: 600 }}>×{it.amount}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <div className="detail-value muted" style={{ fontSize: "0.75rem" }}>Sin objetos</div>
+                            )}
+                            {badges.length > 0 && (
+                              <div style={{ marginTop: "0.55rem", display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+                                {badges.map((b) => (
+                                  <span key={b.item} className="chip chip-amber">🏅 {itemLabel(b.item)}</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
+
+                      {/* ── Logros / quests completadas ── */}
+                      {(() => {
+                        const quests = e.completedQuests ?? [];
+                        if (quests.length === 0) return null;
+                        return (
+                          <div className="pokemon-section">
+                            <div className="pokemon-section-title">
+                              Logros · {quests.length} completado{quests.length !== 1 ? "s" : ""}
+                            </div>
+                            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "0.3rem 0.7rem" }}>
+                              {quests.map((q) => (
+                                <li key={q} style={{ fontSize: "0.76rem", color: "#1a1a1a", padding: "0.2rem 0.55rem", background: "#f0f7f2", borderRadius: 6, lineHeight: 1.35 }}>
+                                  ✓ {questLabel(q)}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        );
+                      })()}
+
                       {/* ── Acciones de impersonación ── */}
                       {e.user_id && (
                         <ImpersonateButtons userId={e.user_id} playerName={e.player_name} />
@@ -684,8 +743,7 @@ export default async function AdminPage() {
                     </div>
                   </details>
                 );
-              })}
-            </div>
+              })}            </div>
           </>
         )}
 

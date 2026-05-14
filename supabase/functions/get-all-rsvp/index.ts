@@ -45,6 +45,9 @@ Deno.serve(async (req) => {
       pc?: unknown[];
       seenPokemon?: number[];
       caughtPokemon?: number[];
+      inventory?: { item: string; amount: number }[];
+      completedQuests?: string[];
+      money?: number;
       rsvp?: GameStateRsvp;
       map?: string;
       pos?: { x: number; y: number };
@@ -81,6 +84,9 @@ Deno.serve(async (req) => {
         pc: gs?.pc ?? [],
         seenPokemon: gs?.seenPokemon ?? [],
         caughtPokemon: gs?.caughtPokemon ?? [],
+        inventory: gs?.inventory ?? [],
+        completedQuests: gs?.completedQuests ?? [],
+        money: gs?.money ?? 0,
         map: gs?.map ?? null,
         pos: gs?.pos ?? null,
       };
@@ -135,6 +141,9 @@ Deno.serve(async (req) => {
             pc: s.game_state?.pc ?? [],
             seenPokemon: s.game_state?.seenPokemon ?? [],
             caughtPokemon: s.game_state?.caughtPokemon ?? [],
+            inventory: s.game_state?.inventory ?? [],
+            completedQuests: s.game_state?.completedQuests ?? [],
+            money: s.game_state?.money ?? 0,
             map: s.game_state?.map ?? null,
             pos: s.game_state?.pos ?? null,
           };
@@ -155,6 +164,9 @@ Deno.serve(async (req) => {
           pc: s.game_state?.pc ?? [],
           seenPokemon: s.game_state?.seenPokemon ?? [],
           caughtPokemon: s.game_state?.caughtPokemon ?? [],
+          inventory: s.game_state?.inventory ?? [],
+          completedQuests: s.game_state?.completedQuests ?? [],
+          money: s.game_state?.money ?? 0,
           map: s.game_state?.map ?? null,
           pos: s.game_state?.pos ?? null,
         };

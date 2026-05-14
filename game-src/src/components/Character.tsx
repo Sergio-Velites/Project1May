@@ -37,6 +37,10 @@ const Container = styled.div`
   left: 0;
   width: ${xToPx(1)};
   transform: translateY(-20%);
+  /* Encima de overlays de mundo (rod cuando $dir===Up usa z-index 4).
+     El resto de overlays de pesca/knockback usan z-index >= 12 para
+     pintarse delante del jugador. */
+  z-index: 5;
 `;
 
 const JumpContainer = styled.div`
