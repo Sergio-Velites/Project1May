@@ -8,6 +8,7 @@ import { MapId, MapType } from "./map-types";
 
 const mtMoon2f: MapType = {
   name: "Monte Luna de Miel 2F",
+  allowBicycle: true,
   image,
   music,
   cave: true,

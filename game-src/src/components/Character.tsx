@@ -16,6 +16,10 @@ import backStill from "../assets/character/back-still.png";
 import backWalk1 from "../assets/character/back-walk-1.png";
 import backWalk2 from "../assets/character/back-walk-2.png";
 import backWalk3 from "../assets/character/back-walk-3.png";
+import bikeFront from "../assets/character/bike-front.png";
+import bikeBack from "../assets/character/bike-back.png";
+import bikeLeft from "../assets/character/bike-left.png";
+import bikeRight from "../assets/character/bike-right.png";
 import { useDispatch, useSelector } from "react-redux";
 import {
   moveDown,
@@ -25,7 +29,8 @@ import {
   stopJumping,
 } from "../state/gameSlice";
 import { useEffect, useState } from "react";
-import { MOVE_SPEED, WALK_SPEED } from "../app/constants";
+import { WALK_SPEED } from "../app/constants";
+import useMoveSpeed from "../app/use-move-speed";
 import PixelImage from "../styles/PixelImage";
 import { selectFrozen, selectSpinning } from "../state/uiSlice";
 import { Direction } from "../state/state-types";
@@ -43,11 +48,11 @@ const Container = styled.div`
   z-index: 5;
 `;
 
-const JumpContainer = styled.div`
+const JumpContainer = styled.div<{ $moveSpeed: number }>`
   width: 100%;
   transform: translateY(0);
 
-  transition: transform ${MOVE_SPEED}ms linear;
+  transition: transform ${(p) => p.$moveSpeed}ms linear;
 `;
 
 const StyledCharacter = styled(PixelImage)`
@@ -62,6 +67,7 @@ const Character = () => {
   const jumping = useSelector(selectJumping);
   const spinning = useSelector(selectSpinning);
   const frozen = useSelector(selectFrozen);
+  const { moveSpeed, onBicycle } = useMoveSpeed();
 
   const [image, setImage] = useState(frontStill);
   const [animateJumping, setAnimateJumping] = useState(false);
@@ -72,12 +78,12 @@ const Character = () => {
       setTimeout(() => {
         dispatch(moveDown());
         setAnimateJumping(false);
-      }, MOVE_SPEED * 0.9);
+      }, moveSpeed * 0.9);
       setTimeout(() => {
         dispatch(stopJumping());
-      }, MOVE_SPEED * 2);
+      }, moveSpeed * 2);
     }
-  }, [jumping, dispatch]);
+  }, [jumping, dispatch, moveSpeed]);
 
   useEffect(() => {
     if (spinning) {
@@ -194,14 +200,29 @@ const Character = () => {
   return (
     <Container>
       <JumpContainer
+        $moveSpeed={moveSpeed}
         style={{
           transform: animateJumping ? "translateY(-80%)" : "translateY(0)",
         }}
       >
-        <StyledCharacter src={image} alt="Character" />
+        <StyledCharacter src={onBicycle ? bikeForDirection(direction) : image} alt="Character" />
       </JumpContainer>
     </Container>
   );
 };
+
+/**
+ * Sprite de bici según la dirección del jugador. Reusa una sola imagen
+ * por dirección (no animación de pedaleo): la velocidad del movimiento
+ * (×2) ya transmite la sensación de bici.
+ */
+function bikeForDirection(d: Direction) {
+  switch (d) {
+    case Direction.Up: return bikeBack;
+    case Direction.Down: return bikeFront;
+    case Direction.Left: return bikeLeft;
+    case Direction.Right: return bikeRight;
+  }
+}
 
 export default Character;

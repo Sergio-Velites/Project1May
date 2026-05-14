@@ -6,6 +6,7 @@ import music from "../assets/music/maps/pewter-city.mp3";
 
 const pewterCity: MapType = {
   name: "VILLAMAYOR DE MONJARDÍN",
+  allowBicycle: true,
   music,
   image,
   height: 36,

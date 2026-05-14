@@ -7,6 +7,7 @@ import { MapId, MapType } from "./map-types";
 
 const viridianForrest: MapType = {
   name: "EL BOSQUECILLO",
+  allowBicycle: true,
   image,
   height: 48,
   width: 34,

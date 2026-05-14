@@ -8,6 +8,7 @@ import { MapId, MapType } from "./map-types";
 
 const route3: MapType = {
   name: "Ruta 3 · Camino de la Resaca",
+  allowBicycle: true,
   image,
   music,
   height: 36,

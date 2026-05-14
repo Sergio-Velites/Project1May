@@ -215,4 +215,10 @@ export interface MapType {
   staticPokemon?: StaticPokemonType[];
   /** Posición del NPC de batallas online en este mapa (centros Pokémon) */
   onlineBattleNpc?: PosType;
+  /**
+   * Si está en `true`, el jugador puede usar la Bicicleta en este mapa.
+   * Por defecto los mapas son interiores (sin bici). Al entrar en un mapa
+   * sin `allowBicycle`, se desmonta automáticamente.
+   */
+  allowBicycle?: boolean;
 }

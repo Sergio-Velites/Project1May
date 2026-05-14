@@ -7,6 +7,7 @@ import { MapId, MapType } from "./map-types";
 
 const route2: MapType = {
   name: "Ruta 2",
+  allowBicycle: true,
   image,
   music,
   height: 72,

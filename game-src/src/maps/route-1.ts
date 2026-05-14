@@ -7,6 +7,7 @@ import getEncounterData from "./get-location-data";
 
 const route1: MapType = {
   name: "Ruta 1 · Camino al Soto",
+  allowBicycle: true,
   image: route1Image,
   height: 36,
   width: 20,

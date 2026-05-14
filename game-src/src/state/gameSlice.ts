@@ -42,6 +42,7 @@ const initialState: GameState = {
   seenPokemon: [],
   caughtPokemon: [],
   npcFacings: {} as Record<string, Direction>,
+  onBicycle: false,
   rsvp: undefined,
 };
 
@@ -113,11 +114,15 @@ export const gameSlice = createSlice({
       const map = mapData[action.payload];
       state.pos = map.start;
       state.npcFacings = {};
+      // Auto-desmonte si el nuevo mapa no permite bici (interiores).
+      if (!map.allowBicycle && state.onBicycle) state.onBicycle = false;
     },
     setMapWithPos: (state, action: PayloadAction<MapWithPos>) => {
       state.map = action.payload.map;
       state.pos = action.payload.pos;
       state.npcFacings = {};
+      const map = mapData[action.payload.map];
+      if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
     },
     exitMap(state) {
       const map = mapData[state.map];
@@ -130,7 +135,11 @@ export const gameSlice = createSlice({
         state.map = map.exitReturnMap;
         state.pos = newPos;
         state.npcFacings = {};
+        if (!previousMap.allowBicycle && state.onBicycle) state.onBicycle = false;
       }
+    },
+    setOnBicycle: (state, action: PayloadAction<boolean>) => {
+      state.onBicycle = action.payload;
     },
     setNpcFacing: (
       state,
@@ -201,6 +210,7 @@ export const gameSlice = createSlice({
       state.completedQuests = savedGameState.completedQuests;
       state.seenPokemon = savedGameState.seenPokemon ?? [];
       state.caughtPokemon = savedGameState.caughtPokemon ?? [];
+      state.onBicycle = savedGameState.onBicycle ?? false;
     },
     loadFromState: (state, action: PayloadAction<GameState>) => {
       const s = action.payload;
@@ -231,6 +241,7 @@ export const gameSlice = createSlice({
       state.completedQuests = s.completedQuests;
       state.seenPokemon = s.seenPokemon ?? [];
       state.caughtPokemon = s.caughtPokemon ?? [];
+      state.onBicycle = s.onBicycle ?? false;
       if (s.rsvp) state.rsvp = s.rsvp;
     },
     setRsvpInternal: (state, action: PayloadAction<RSVPData>) => {
@@ -497,6 +508,7 @@ export const {
   seePokemon,
   catchPokemonPokedex,
   setNpcFacing,
+  setOnBicycle,
     setRsvpInternal,
 } = gameSlice.actions;
 
@@ -542,6 +554,8 @@ export const selectDefeatedTrainers = (state: RootState) =>
   state.game.defeatedTrainers;
 
 export const selectMapId = (state: RootState) => state.game.map;
+
+export const selectOnBicycle = (state: RootState) => !!state.game.onBicycle;
 
 export const selectCollectedItems = (state: RootState) =>
   state.game.collectedItems;

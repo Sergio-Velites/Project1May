@@ -86,6 +86,8 @@ export interface GameState {
   seenPokemon: number[];    // IDs vistos en la Pokédex
   caughtPokemon: number[]; // IDs capturados
   npcFacings: Record<string, Direction>;
+  /** ¿El jugador está actualmente en bicicleta? Persistido. */
+  onBicycle?: boolean;
   /** Mapa y posición donde el jugador curó por última vez (recuperación tras derrota) */
   lastHealLocation?: { map: MapId; pos: PosType };
   /** Datos de confirmación de asistencia a la boda */

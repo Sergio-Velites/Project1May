@@ -8,6 +8,7 @@ import { ItemType } from "../app/use-item-data";
 
 const route22: MapType = {
   name: "Ruta 22",
+  allowBicycle: true,
   image,
   height: 18,
   width: 40,

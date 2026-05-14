@@ -8,6 +8,7 @@ import getEncounterData from "./get-location-data";
 
 const palletTown: MapType = {
   name: "PUEBLO PALETA",
+  allowBicycle: true,
   image: palletTownImage,
   height: 18,
   width: 20,

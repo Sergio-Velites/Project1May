@@ -10,7 +10,7 @@ import {
 } from "../state/gameSlice";
 import { useEffect, useRef, useState } from "react";
 import { selectFrozen, selectSpinning } from "../state/uiSlice";
-import { MOVE_SPEED } from "../app/constants";
+import useMoveSpeed from "../app/use-move-speed";
 import { Direction } from "../state/state-types";
 
 const MovementHandler = () => {
@@ -23,6 +23,7 @@ const MovementHandler = () => {
   const [cooldown, setCooldown] = useState(false);
   const spinning = useSelector(selectSpinning);
   const frozen = useSelector(selectFrozen);
+  const { moveSpeed } = useMoveSpeed();
 
   const pressingButton =
     pressingLeft || pressingRight || pressingUp || pressingDown;
@@ -70,9 +71,9 @@ const MovementHandler = () => {
       // Set up a new interval
       tickIntervalRef.current = setInterval(() => {
         move(direction);
-      }, MOVE_SPEED);
+      }, moveSpeed);
 
-      setTimeout(() => setCooldown(false), MOVE_SPEED);
+      setTimeout(() => setCooldown(false), moveSpeed);
     } else if (!pressingButton && tickIntervalRef.current) {
       // Clear the interval if the user stopped moving
       clearInterval(tickIntervalRef.current);
@@ -86,7 +87,7 @@ const MovementHandler = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pressingButton, direction, dispatch, cooldown, frozen]);
+  }, [pressingButton, direction, dispatch, cooldown, frozen, moveSpeed]);
 
   useEvent(Event.StartDown, () => {
     setPressingDown(true);

@@ -4,9 +4,11 @@ import {
   selectActivePokemonIndex,
   selectDirection,
   selectMap,
+  selectOnBicycle,
   selectPokemon,
   selectPokemonEncounter,
   selectPos,
+  setOnBicycle,
   setPokemonStatus,
   updateSpecificPokemon,
 } from "../state/gameSlice";
@@ -203,6 +205,7 @@ const useItemData = () => {
   const map = useSelector(selectMap);
   const activePokemonIndex = useSelector(selectActivePokemonIndex);
   const inBattle = useSelector(selectPokemonEncounter) !== null;
+  const onBicycle = useSelector(selectOnBicycle);
 
   /**
    * Acción común a las 3 cañas: comprueba el tile frente al jugador y
@@ -270,6 +273,32 @@ const useItemData = () => {
 
     // 3. Nada útil enfrente
     dispatch(showText(["No hay nada que pescar aquí."]));
+  };
+
+  /**
+   * Acción de la Bicicleta:
+   *   - Si combate activo → ItemsMenu ya bloquea (usableInBattle:false).
+   *   - Si el mapa NO permite bici → "No puedes montar aquí.".
+   *   - Si ya en bici → desmonta + texto "Has guardado la BICI.".
+   *   - Si a pie → monta + texto "¡A montar en BICI!".
+   * En todos los casos cierra menús abiertos para volver al mundo.
+   */
+  const useBicycle = () => {
+    dispatch(hideItemsMenu());
+    dispatch(hidePlayerMenu());
+    dispatch(hideStartMenu());
+
+    if (!map.allowBicycle) {
+      dispatch(showText(["No puedes montar aquí."]));
+      return;
+    }
+    if (onBicycle) {
+      dispatch(setOnBicycle(false));
+      dispatch(showText(["Has guardado la BICI."]));
+      return;
+    }
+    dispatch(setOnBicycle(true));
+    dispatch(showText(["¡A montar en BICI!"]));
   };
 
   const data: Record<string, ItemData> = {
@@ -2321,6 +2350,19 @@ const useItemData = () => {
       cost: null,
       sellPrice: null,
       action: () => useRod("super-rod"),
+    },
+    [ItemType.Bicycle]: {
+      type: ItemType.Bicycle,
+      name: "Bicicleta",
+      countable: false,
+      consumable: false,
+      usableInBattle: false,
+      usableOutOfBattle: true,
+      pokeball: false,
+      badge: false,
+      cost: null,
+      sellPrice: null,
+      action: () => useBicycle(),
     },
     [ItemType.Hm05]: {
       type: ItemType.Hm05,
