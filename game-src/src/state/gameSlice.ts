@@ -549,8 +549,29 @@ export const selectCollectedItems = (state: RootState) =>
 export const selectCompletedQuests = (state: RootState) =>
   state.game.completedQuests;
 
-export const selectSeenPokemon = (state: RootState) => state.game.seenPokemon;
-export const selectCaughtPokemon = (state: RootState) => state.game.caughtPokemon;
+/**
+ * Pokédex: la lista persistida puede estar incompleta para saves antiguos
+ * o para pokémon hardcodeados (iniciales, regalos) que se asignaron antes
+ * de que `addPokemon` marcara la captura. Calculamos la unión con el
+ * equipo actual y el PC para garantizar que TODO pokémon que el jugador
+ * posee aparece como visto+capturado en la Pokédex.
+ */
+export const selectSeenPokemon = (state: RootState) => {
+  const owned = [
+    ...state.game.pokemon.map((p) => p.id),
+    ...state.game.pc.map((p) => p.id),
+  ];
+  const set = new Set<number>([...state.game.seenPokemon, ...owned]);
+  return Array.from(set);
+};
+export const selectCaughtPokemon = (state: RootState) => {
+  const owned = [
+    ...state.game.pokemon.map((p) => p.id),
+    ...state.game.pc.map((p) => p.id),
+  ];
+  const set = new Set<number>([...state.game.caughtPokemon, ...owned]);
+  return Array.from(set);
+};
 
 export const selectActivePokemonIndex = (state: RootState) =>
   state.game.activePokemonIndex;

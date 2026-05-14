@@ -1,4 +1,7 @@
+import { fisher } from "../app/npcs";
+import { ItemType } from "../app/use-item-data";
 import houseBImage from "../assets/map/house-b.png";
+import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 
 const houseB: MapType = {
@@ -29,6 +32,30 @@ const houseB: MapType = {
   },
   exitReturnMap: MapId.PalletTown,
   grass: {},
+  // Trainers para "pallet-town-house-b"
+trainers: [
+  {
+  npc: fisher,
+  pokemon: [{ id: 19, level: 2 }],
+  facing: Direction.Down,
+  pos: { x: 5, y: 5 },
+  intro: [
+
+  ],
+  outtro: [
+    "El puto Peri y Aos se fueron de ",
+    "pesca sin mi..."
+  ],
+  money: 0,
+  persistent: true,
+}
+],
+items: [
+    {
+      item: ItemType.OldRod,
+      pos: { x: 4, y: 3 },
+    },
+  ],
 };
 
 export default houseB;

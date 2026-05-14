@@ -193,42 +193,47 @@ const FishingSession = () => {
 };
 
 /**
- * Sprite simple de la caña: un palito blanco con cabeza oscura,
+ * Sprite simple de la caña: un palito oscuro con cabeza al final,
  * orientado según la dirección del jugador.
- * Renderizado en screen-space cerca del centro (donde está el jugador).
  *
- * - Up: emerge desde la cintura del jugador hacia arriba (z-index < jugador).
- * - Down: emerge hacia abajo desde la cintura (z-index > jugador).
- * - Left/Right: lateral.
+ * Geometría: el rod es una barra vertical anclada por su extremo
+ * superior al centro del tile del jugador, y se rota según dirección:
+ *   - Down  →   0°  (cae hacia abajo, agua abajo)
+ *   - Up    → 180°  (sube hacia arriba, agua arriba)
+ *   - Right → -90°  (gira al este)
+ *   - Left  →  90°  (gira al oeste)
+ *
+ * El "flotador" (.bob) está en el extremo opuesto al ancla, así siempre
+ * cae sobre el agua. El z-index sitúa la caña detrás del jugador cuando
+ * apunta hacia arriba, y delante en el resto de direcciones.
  */
 const RodOverlay = styled.div<{ $dir: Direction }>`
   position: absolute;
   top: 50%;
   left: 50%;
   width: 0.4cqw;
-  height: 8cqw;
+  height: 6.5cqw;
   background: #181010;
+  transform-origin: top center;
+  transform: translate(-50%, 0)
+    rotate(
+      ${(p) =>
+        p.$dir === Direction.Up
+          ? 180
+          : p.$dir === Direction.Right
+          ? -90
+          : p.$dir === Direction.Left
+          ? 90
+          : 0}deg
+    );
   z-index: ${(p) => (p.$dir === Direction.Up ? 4 : 12)};
-  transform-origin: center top;
-  transform: ${(p) => {
-    switch (p.$dir) {
-      case Direction.Up:
-        return "translate(-50%, -100%) rotate(180deg)";
-      case Direction.Down:
-        return "translate(-50%, 0)";
-      case Direction.Left:
-        return "translate(-50%, -50%) rotate(90deg)";
-      case Direction.Right:
-        return "translate(-50%, -50%) rotate(-90deg)";
-    }
-  }};
   pointer-events: none;
   &::after {
     content: "";
     position: absolute;
-    bottom: -0.6cqw;
+    top: 100%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     width: 1cqw;
     height: 1cqw;
     background: #181010;

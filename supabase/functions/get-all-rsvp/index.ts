@@ -42,6 +42,9 @@ Deno.serve(async (req) => {
     type GameState = {
       name?: string;
       pokemon?: unknown[];
+      pc?: unknown[];
+      seenPokemon?: number[];
+      caughtPokemon?: number[];
       rsvp?: GameStateRsvp;
       map?: string;
       pos?: { x: number; y: number };
@@ -75,6 +78,9 @@ Deno.serve(async (req) => {
         hasRsvp: true,
         source: "rsvp_table" as const,
         pokemon: gs?.pokemon ?? [],
+        pc: gs?.pc ?? [],
+        seenPokemon: gs?.seenPokemon ?? [],
+        caughtPokemon: gs?.caughtPokemon ?? [],
         map: gs?.map ?? null,
         pos: gs?.pos ?? null,
       };
@@ -126,6 +132,9 @@ Deno.serve(async (req) => {
             hasRsvp: true,
             source: "game_state" as const,
             pokemon: s.game_state?.pokemon ?? [],
+            pc: s.game_state?.pc ?? [],
+            seenPokemon: s.game_state?.seenPokemon ?? [],
+            caughtPokemon: s.game_state?.caughtPokemon ?? [],
             map: s.game_state?.map ?? null,
             pos: s.game_state?.pos ?? null,
           };
@@ -143,6 +152,9 @@ Deno.serve(async (req) => {
           hasRsvp: false,
           source: "none" as const,
           pokemon: s.game_state?.pokemon ?? [],
+          pc: s.game_state?.pc ?? [],
+          seenPokemon: s.game_state?.seenPokemon ?? [],
+          caughtPokemon: s.game_state?.caughtPokemon ?? [],
           map: s.game_state?.map ?? null,
           pos: s.game_state?.pos ?? null,
         };

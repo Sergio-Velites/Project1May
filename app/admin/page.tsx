@@ -29,6 +29,9 @@ interface RSVPEntry {
   attended?: boolean | null;
   hasRsvp?: boolean;
   pokemon: PokemonInst[];
+  pc?: PokemonInst[];
+  seenPokemon?: number[];
+  caughtPokemon?: number[];
   map?: string | null;
   pos?: { x: number; y: number } | null;
 }
@@ -602,6 +605,77 @@ export default async function AdminPage() {
                           </div>
                         </div>
                       )}
+
+                      {/* ── Pokédex (vistos / capturados) ── */}
+                      {(() => {
+                        const ownedIds = [
+                          ...team.map((p) => p.id),
+                          ...((e.pc ?? []).map((p) => p.id)),
+                        ];
+                        const caughtSet = new Set<number>([
+                          ...(e.caughtPokemon ?? []),
+                          ...ownedIds,
+                        ]);
+                        const seenSet = new Set<number>([
+                          ...(e.seenPokemon ?? []),
+                          ...caughtSet,
+                        ]);
+                        const seenOnly = Array.from(seenSet)
+                          .filter((id) => !caughtSet.has(id))
+                          .sort((a, b) => a - b);
+                        const caughtSorted = Array.from(caughtSet).sort((a, b) => a - b);
+                        if (seenSet.size === 0) return null;
+                        return (
+                          <div className="pokemon-section">
+                            <div className="pokemon-section-title">
+                              Pokédex · {seenSet.size} visto{seenSet.size !== 1 ? "s" : ""} · {caughtSet.size} capturado{caughtSet.size !== 1 ? "s" : ""}
+                            </div>
+                            {caughtSorted.length > 0 && (
+                              <>
+                                <div style={{ fontSize: "0.6rem", color: "#999", margin: "0 0 0.35rem" }}>
+                                  ◆ Capturados
+                                </div>
+                                <div className="pokemon-grid" style={{ marginBottom: "0.6rem" }}>
+                                  {caughtSorted.map((id) => (
+                                    <div className="pokemon-tile" key={`c-${id}`}>
+                                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                                      <img
+                                        src={spriteUrl(id)}
+                                        alt={`Pokémon #${id}`}
+                                        width={56}
+                                        height={56}
+                                      />
+                                      <span className="pokemon-level">#{id}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                            {seenOnly.length > 0 && (
+                              <>
+                                <div style={{ fontSize: "0.6rem", color: "#999", margin: "0 0 0.35rem" }}>
+                                  ○ Solo vistos
+                                </div>
+                                <div className="pokemon-grid">
+                                  {seenOnly.map((id) => (
+                                    <div className="pokemon-tile" key={`s-${id}`} style={{ opacity: 0.55 }}>
+                                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                                      <img
+                                        src={spriteUrl(id)}
+                                        alt={`Pokémon #${id}`}
+                                        width={56}
+                                        height={56}
+                                        style={{ filter: "grayscale(1)" }}
+                                      />
+                                      <span className="pokemon-level">#{id}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        );
+                      })()}
 
                       {/* ── Acciones de impersonación ── */}
                       {e.user_id && (
