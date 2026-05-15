@@ -195,7 +195,7 @@ text: {
 trainers: [
   {
   npc: bugCatcher,
-  pokemon: [],
+  pokemon: [{ id: 13, level: 5 }, { id: 10, level: 6 }],
   facing: Direction.Left,
   pos: { x: 29, y: 19 },
   intro: [
@@ -211,7 +211,7 @@ trainers: [
 },
   {
   npc: bugCatcher,
-  pokemon: [],
+  pokemon: [{ id: 10, level: 6 }, { id: 11, level: 7 }, { id: 13, level: 6 }],
   facing: Direction.Left,
   pos: { x: 28, y: 33 },
   intro: [
@@ -227,7 +227,7 @@ trainers: [
 },
   {
   npc: bugCatcher,
-  pokemon: [],
+  pokemon: [{ id: 14, level: 7 }, { id: 11, level: 7 }],
   facing: Direction.Left,
   pos: { x: 2, y: 19 },
   intro: [
