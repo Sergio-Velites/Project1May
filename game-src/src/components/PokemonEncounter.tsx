@@ -718,6 +718,10 @@ const PokemonEncounter = () => {
   const enemyChargingMoveRef   = useRef<string | null>(null);
   const playerInvulnerableRef  = useRef(false);
   const enemyInvulnerableRef   = useRef(false);
+  // Mensaje a mostrar cuando el rival está en el turno 1 de un movimiento de
+  // 2 turnos. Se rellena dentro de getRandomEnemyMove y se consume en
+  // setAlertText durante el turno de "carga" del rival.
+  const enemyChargeAnnouncementRef = useRef<string | null>(null);
 
   // Bide: número de turnos acumulando daño + daño acumulado
   const playerBideTurnsRef  = useRef(0);   // 0 = inactivo
@@ -955,6 +959,7 @@ const PokemonEncounter = () => {
       enemyChargingMoveRef.current  = null;
       playerInvulnerableRef.current = false;
       enemyInvulnerableRef.current  = false;
+      enemyChargeAnnouncementRef.current = null;
       playerBideTurnsRef.current = 0;
       playerBideDmgRef.current   = 0;
       enemyBideTurnsRef.current  = 0;
@@ -1504,10 +1509,14 @@ const PokemonEncounter = () => {
     if (enemyBideTurnsRef.current > 0) return "bide";
     // Si el rival está en Trashing, continuar con ese move
     if (enemyThrashTurnsRef.current > 0 && enemyThrashMoveRef.current) return enemyThrashMoveRef.current;
-    // Si el rival está cargando (2-turno), ejecutar el move pendiente
+    // Turno 2 de un movimiento de carga/invulnerabilidad del rival:
+    // ejecutamos el move pendiente y limpiamos los flags (la invulnerabilidad
+    // termina al iniciar el ataque del turno 2 — así el daño aplica
+    // normalmente y el jugador puede volver a golpear al rival).
     if (enemyChargingMoveRef.current) {
       const move = enemyChargingMoveRef.current;
       enemyChargingMoveRef.current = null;
+      enemyInvulnerableRef.current = false;
       return move;
     }
     // Si el rival está transformado, elegir entre los movimientos copiados
@@ -1519,7 +1528,46 @@ const PokemonEncounter = () => {
     const disabledMove = enemyDisabledMoveRef.current;
     const available = disabledMove ? moves.filter((m: string) => m !== disabledMove) : moves;
     const pool = available.length > 0 ? available : moves;
-    return pool[Math.floor(Math.random() * pool.length)];
+    const picked = pool[Math.floor(Math.random() * pool.length)];
+
+    // Turno 1 de un movimiento de carga/invulnerabilidad: configuramos el
+    // estado de carga, guardamos el mensaje de carga y devolvemos el
+    // sentinel "__charge__" para que el flujo de ataque salte el daño y
+    // muestre el mensaje. El siguiente turno, getRandomEnemyMove devolverá
+    // el move real (rama de arriba) y aplicará el daño.
+    if (CHARGE_MOVES.has(picked) || INVULNERABLE_MOVES.has(picked)) {
+      enemyChargingMoveRef.current = picked;
+      if (INVULNERABLE_MOVES.has(picked)) enemyInvulnerableRef.current = true;
+      const enemyName = (enemyMetadata?.name ?? "Rival").toUpperCase();
+      enemyChargeAnnouncementRef.current =
+        CHARGE_MESSAGE[picked]?.replace("{user}", `${enemyName} rival`) ??
+        `¡${enemyName} rival está cargando!`;
+      return "__charge__";
+    }
+    return picked;
+  };
+
+  /**
+   * Interpreta el resultado de getRandomEnemyMove(): detecta si el rival ha
+   * usado un sentinel ("__recharge__" tras Hiperrayo, o "__charge__" en el
+   * turno 1 de un movimiento de 2 turnos como Fly/Solar Beam). En esos
+   * casos el rival no ataca este turno y solo se muestra el mensaje
+   * correspondiente.
+   */
+  const interpretEnemyTurn = (id: string) => {
+    const isRecharging = id === "__recharge__";
+    const isChargingTurn1 = id === "__charge__";
+    const enemyName = (enemyMetadata?.name ?? "Rival").toUpperCase();
+    return {
+      isRecharging,
+      isChargingTurn1,
+      turnSkipped: isRecharging || isChargingTurn1,
+      alertText: isRecharging
+        ? `¡${enemyName} rival está recargando!`
+        : isChargingTurn1
+        ? enemyChargeAnnouncementRef.current
+        : null,
+    };
   };
 
   // ── Self-KO por confusión: si checkSkipTurn dejó al combatiente a 0 HP por
@@ -1672,11 +1720,13 @@ const PokemonEncounter = () => {
       return;
     }
 
-    // Rival recargando tras Hyper Beam — no ataca este turno
-    if (enemyMoveId === "__recharge__") {
+    // Rival recargando tras Hyper Beam, o turno 1 de un move de 2 turnos
+    // (Solar Beam / Fly / Dig / ...): no daña al jugador este turno.
+    const enemyTurnOnly = interpretEnemyTurn(enemyMoveId);
+    if (enemyTurnOnly.turnSkipped) {
       setMoveAnim(null);
       setStage(18);
-      setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+      if (enemyTurnOnly.alertText) setAlertText(enemyTurnOnly.alertText);
       setTimeout(() => {
         setAlertText(null);
         applyEndOfTurnStatus(currentActive, enemy);
@@ -2318,10 +2368,10 @@ const PokemonEncounter = () => {
         const enemyMoveIdRecharge = getRandomEnemyMove();
         const stagesSnapRecharge = { us: playerStages, them: enemyStages };
         const effPlayerRecharge = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
-        const isEnemyRechargingR = enemyMoveIdRecharge === "__recharge__";
+        const enemyTurnR = interpretEnemyTurn(enemyMoveIdRecharge);
         const enemySkipR = checkSkipTurn(false);
         if (guardSelfKo()) return;
-        if (!enemySkipR && !isEnemyRechargingR) {
+        if (!enemySkipR && !enemyTurnR.turnSkipped) {
           const { us: usRecharge } = processMoveResult(
             processMove(effPlayerRecharge, enemy, enemyMoveIdRecharge, false, stagesSnapRecharge, {
               lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2336,10 +2386,10 @@ const PokemonEncounter = () => {
             else applyEndOfTurnStatus(usRecharge, enemy);
           }, ATTACK_ANIMATION + 1000);
         } else {
-          if (isEnemyRechargingR) {
+          if (enemyTurnR.turnSkipped) {
             setMoveAnim(null);
             setStage(18);
-            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+            if (enemyTurnR.alertText) setAlertText(enemyTurnR.alertText);
             setTimeout(() => {
               setAlertText(null);
               applyEndOfTurnStatus(effPlayerRecharge, enemy);
@@ -2366,10 +2416,10 @@ const PokemonEncounter = () => {
         const enemyMoveIdD = getRandomEnemyMove();
         const stagesSnapD = { us: playerStages, them: enemyStages };
         const effPlayerD = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
-        const isEnemyRechargingD = enemyMoveIdD === "__recharge__";
+        const enemyTurnD = interpretEnemyTurn(enemyMoveIdD);
         const enemySkipD = checkSkipTurn(false);
         if (guardSelfKo()) return;
-        if (!enemySkipD && !isEnemyRechargingD) {
+        if (!enemySkipD && !enemyTurnD.turnSkipped) {
           const { us: usD } = processMoveResult(
             processMove(effPlayerD, enemy, enemyMoveIdD, false, stagesSnapD, {
               lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2384,10 +2434,10 @@ const PokemonEncounter = () => {
             else applyEndOfTurnStatus(usD, enemy);
           }, ATTACK_ANIMATION + 1000);
         } else {
-          if (isEnemyRechargingD) {
+          if (enemyTurnD.turnSkipped) {
             setMoveAnim(null);
             setStage(18);
-            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+            if (enemyTurnD.alertText) setAlertText(enemyTurnD.alertText);
             setTimeout(() => {
               setAlertText(null);
               applyEndOfTurnStatus(effPlayerD, enemy);
@@ -2420,12 +2470,12 @@ const PokemonEncounter = () => {
           setAlertText(null);
           // Hacer que el rival ataque igual
           const enemyMoveIdBide = getRandomEnemyMove();
-          const isEnemyRechargingBide = enemyMoveIdBide === "__recharge__";
+          const enemyTurnBide = interpretEnemyTurn(enemyMoveIdBide);
           const stagesSnap = { us: playerStages, them: enemyStages };
           const effPlayer = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
           const enemySkipBide = checkSkipTurn(false);
           if (guardSelfKo()) return;
-          if (!enemySkipBide && !isEnemyRechargingBide) {
+          if (!enemySkipBide && !enemyTurnBide.turnSkipped) {
             const { us: usB } = processMoveResult(
               processMove(effPlayer, enemy, enemyMoveIdBide, false, stagesSnap, {
                 lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2444,10 +2494,10 @@ const PokemonEncounter = () => {
               else applyEndOfTurnStatus(usB, enemy);
             }, ATTACK_ANIMATION + 1000);
           } else {
-            if (isEnemyRechargingBide) {
+            if (enemyTurnBide.turnSkipped) {
               setMoveAnim(null);
               setStage(18);
-              setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+              if (enemyTurnBide.alertText) setAlertText(enemyTurnBide.alertText);
               setTimeout(() => {
                 setAlertText(null);
                 applyEndOfTurnStatus(effPlayer, enemy);
@@ -2519,12 +2569,12 @@ const PokemonEncounter = () => {
         setAlertText(null);
         // Rival ataca durante la carga (a menos que sea invulnerable)
         const enemyMoveIdC = getRandomEnemyMove();
-        const isEnemyRechargingC = enemyMoveIdC === "__recharge__";
+        const enemyTurnC = interpretEnemyTurn(enemyMoveIdC);
         const stagesSnapC = { us: playerStages, them: enemyStages };
         const effPlayerC = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
         const enemySkipC = checkSkipTurn(false);
         if (guardSelfKo()) return;
-        if (!enemySkipC && !playerInvulnerableRef.current && !isEnemyRechargingC) {
+        if (!enemySkipC && !playerInvulnerableRef.current && !enemyTurnC.turnSkipped) {
           const { us: usC } = processMoveResult(
             processMove(effPlayerC, enemy, enemyMoveIdC, false, stagesSnapC, {
               lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2542,10 +2592,10 @@ const PokemonEncounter = () => {
             } else applyEndOfTurnStatus(usC, enemy);
           }, ATTACK_ANIMATION + 1000);
         } else {
-          if (isEnemyRechargingC) {
+          if (enemyTurnC.turnSkipped) {
             setMoveAnim(null);
             setStage(18);
-            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+            if (enemyTurnC.alertText) setAlertText(enemyTurnC.alertText);
             setTimeout(() => {
               setAlertText(null);
               applyEndOfTurnStatus(effPlayerC, enemy);
@@ -2585,9 +2635,23 @@ const PokemonEncounter = () => {
     const activeMove = getMoveMetadata(attackId);
     const enemyMoveId = getRandomEnemyMove();
     const isEnemyRecharging = enemyMoveId === "__recharge__";
-    const enemyMove  = isEnemyRecharging ? getMoveMetadata("tackle") : getMoveMetadata(enemyMoveId);
-    // Registrar el move del rival para Mirror Move (no registrar el recharge)
-    if (!isEnemyRecharging) lastEnemyMoveRef.current = enemyMoveId;
+    // Turno 1 de un movimiento de 2 turnos del rival (Solar Beam, Fly, etc.):
+    // getRandomEnemyMove ha configurado el estado de carga y devuelve el
+    // sentinel "__charge__". Tratamos este turno como "el rival no daña":
+    // se muestra el mensaje de carga y se cede el turno al jugador.
+    const isEnemyChargingTurn1 = enemyMoveId === "__charge__";
+    const enemyTurnSkipped = isEnemyRecharging || isEnemyChargingTurn1;
+    // Texto a mostrar cuando el rival cede su turno (recarga o carga). null si
+    // el rival sí ataca normalmente.
+    const enemyTurnSkippedAlert = isEnemyRecharging
+      ? `¡${enemyMetadata.name.toUpperCase()} rival está recargando!`
+      : isEnemyChargingTurn1
+      ? enemyChargeAnnouncementRef.current
+      : null;
+    const enemyMove  = enemyTurnSkipped ? getMoveMetadata("tackle") : getMoveMetadata(enemyMoveId);
+    // Registrar el move del rival para Mirror Move (no registrar recharge ni
+    // el sentinel de carga — solo movimientos reales).
+    if (!enemyTurnSkipped) lastEnemyMoveRef.current = enemyMoveId;
 
     // Iniciar Thrash del rival si es su primer turno usándolo
     if ((enemyMoveId === "thrash" || enemyMoveId === "petal-dance") && enemyThrashTurnsRef.current === 0) {
@@ -2600,14 +2664,6 @@ const PokemonEncounter = () => {
         enemyThrashMoveRef.current = null;
         enemyConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 3);
       }
-    }
-
-    // Iniciar carga del rival para moves de 2 turnos
-    if (CHARGE_MOVES.has(enemyMoveId) && !enemyChargingMoveRef.current) {
-      enemyChargingMoveRef.current = enemyMoveId;
-      if (INVULNERABLE_MOVES.has(enemyMoveId)) enemyInvulnerableRef.current = true;
-    } else if (enemyChargingMoveRef.current) {
-      enemyInvulnerableRef.current = false;
     }
 
     const activeMovesFirst = getActiveMovesFirst(activeMove, enemyMove);
@@ -2628,16 +2684,11 @@ const PokemonEncounter = () => {
         setTimeout(() => {
           setAlertText(null);
           if (guardSelfKo()) return;
-          if (isEnemyRecharging || checkSkipTurn(false)) {
-            // Ambos saltan (o rival recarga)
-            if (isEnemyRecharging) {
-              setMoveAnim(null);
-              setStage(18);
-              setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
-            } else {
-              setMoveAnim(null);
-              setStage(18);
-            }
+          if (enemyTurnSkipped || checkSkipTurn(false)) {
+            // Ambos saltan (o rival recarga / está cargando un move de 2 turnos)
+            setMoveAnim(null);
+            setStage(18);
+            if (enemyTurnSkippedAlert) setAlertText(enemyTurnSkippedAlert);
             setTimeout(() => {
               setAlertText(null);
               if (guardSelfKo()) return;
@@ -2664,6 +2715,7 @@ const PokemonEncounter = () => {
           processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
             lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
             isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+            targetInvulnerable: enemyInvulnerableRef.current,
           }),
           true,
           attackId
@@ -2674,11 +2726,11 @@ const PokemonEncounter = () => {
           } else if (us.hp <= 0) {
             setStage(24);
           } else {
-            if (isEnemyRecharging || checkSkipTurn(false)) {
-              // Rival recarga o salta turno
+            if (enemyTurnSkipped || checkSkipTurn(false)) {
+              // Rival recarga o salta turno (incluye turno 1 de carga/Fly)
               setMoveAnim(null);
               setStage(18);
-              if (isEnemyRecharging) setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+              if (enemyTurnSkippedAlert) setAlertText(enemyTurnSkippedAlert);
               setTimeout(() => {
                 setAlertText(null);
                 if (guardSelfKo()) return;
@@ -2702,11 +2754,12 @@ const PokemonEncounter = () => {
 
     // ── Rival mueve primero ──────────────────────────────────────────────
     else {
-      if (isEnemyRecharging || checkSkipTurn(false)) {
-        // Rival recarga o salta turno — luego ataca el jugador
+      if (enemyTurnSkipped || checkSkipTurn(false)) {
+        // Rival recarga o salta turno (incluye turno 1 de carga/Fly) — luego
+        // ataca el jugador
         setMoveAnim(null);
         setStage(18);
-        if (isEnemyRecharging) setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+        if (enemyTurnSkippedAlert) setAlertText(enemyTurnSkippedAlert);
         setTimeout(() => {
           setAlertText(null);
           if (guardSelfKo()) return;
@@ -2724,6 +2777,7 @@ const PokemonEncounter = () => {
               processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
                 lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
                 isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+                targetInvulnerable: enemyInvulnerableRef.current,
               }),
               true,
               attackId
@@ -2768,6 +2822,7 @@ const PokemonEncounter = () => {
                 processMove(us, them, attackId, true, stagesSnapshot, {
                   lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
                   isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+                  targetInvulnerable: enemyInvulnerableRef.current,
                 }),
                 true,
                 attackId

@@ -247,6 +247,12 @@ export interface MoveContext {
   lastPhysicalDamageTaken: number;
   /** ¿El objetivo está dormido? (para Dream Eater) */
   isTargetSleeping: boolean;
+  /**
+   * ¿El objetivo es invulnerable (turno 1 de Fly/Dig)? Si es true, el
+   * movimiento falla automáticamente (Gen I): se consume PP, no se aplica
+   * daño ni efectos secundarios. Equivalente a un "miss" forzado.
+   */
+  targetInvulnerable?: boolean;
 }
 
 export interface MoveResult {
@@ -317,6 +323,14 @@ const processMove = (
     isBuff: false,
     isDebuff: false,
   };
+
+  // ── Objetivo invulnerable (turno 1 de Fly/Dig) ──────────────────────────
+  // Si el objetivo está volando o bajo tierra, el ataque falla y solo
+  // gastamos PP. Tratamos esto como un "miss" estándar para reutilizar
+  // todo el flujo de mensaje y animación de fallo existente.
+  if (context?.targetInvulnerable) {
+    return { ...defaultReturn, missed: true };
+  }
 
   // ── Accuracy check (incluyendo stages de precisión/evasion) ──────────────────
   if (moveMetadata.accuracy) {
