@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/game/static/css/main.84e6e57a.css",
-    "main.js": "/game/static/js/main.30db71e8.js",
+    "main.js": "/game/static/js/main.ae3e2a45.js",
     "static/media/pewter-city.mp3": "/game/static/media/pewter-city.dbfe2794208a91f807e7.mp3",
     "static/media/mt-moon.mp3": "/game/static/media/mt-moon.d3c96e8c603b742504e6.mp3",
     "static/media/intro.mp4": "/game/static/media/intro.635c67d841e2fe0b7a4e.mp4",
@@ -33,6 +33,6 @@
   },
   "entrypoints": [
     "static/css/main.84e6e57a.css",
-    "static/js/main.30db71e8.js"
+    "static/js/main.ae3e2a45.js"
   ]
 }
