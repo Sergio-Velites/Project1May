@@ -187,8 +187,12 @@ const Menu = ({
   useEvent(Event.A, () => {
     if (disabled) return;
     if (!show) return;
-    if (activeIndex < menuItems.length) {
-      menuItems[activeIndex].action();
+    // El índice global del ítem activo es activeIndex + scrollIndex.
+    // Sin esto, con la mochila scrolleada se ejecutaba un ítem distinto
+    // del visualmente seleccionado.
+    const targetIndex = activeIndex + scrollIndex;
+    if (targetIndex < menuItems.length) {
+      menuItems[targetIndex].action();
     } else {
       close();
       setActiveIndex(0);
