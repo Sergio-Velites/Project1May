@@ -125,9 +125,11 @@ const Character = () => {
   const [animateJumping, setAnimateJumping] = useState(false);
   const [surfFrame, setSurfFrame] = useState(0);
   const [bikeFrame, setBikeFrame] = useState(0);
-  // Para detectar transición agua→tierra al surfear: guardamos si la
-  // posición previa estaba en agua. Si pasamos de agua a tierra estando
-  // surfeando, animamos un pequeño salto y desmontamos.
+  // Ref de onSurfing: nos permite leer su valor actual dentro del efecto
+  // de pos sin incluirlo como dependencia (evita que el cambio de onSurfing
+  // cancele los timeouts del efecto de pos).
+  const onSurfingRef = useRef(onSurfing);
+  useEffect(() => { onSurfingRef.current = onSurfing; }, [onSurfing]);
   const wasOnWaterRef = useRef(false);
 
   useEffect(() => {
@@ -143,22 +145,25 @@ const Character = () => {
     }
   }, [jumping, dispatch, moveSpeed]);
 
-  // Salida del agua: cuando estabas en water y has pasado a un tile de
-  // tierra (no-water) estando surfeando, anima un pequeño salto y desmonta.
+  // Salida del agua: detecta transición water→tierra y desactiva surf
+  // de forma SÍNCRONA (sin setTimeout) para que ningún movimiento posterior
+  // pueda cancelar el dispatch. El salto es puramente cosmético.
   useEffect(() => {
     const onWaterNow = isWater(map.water, pos.x, pos.y);
-    if (onSurfing && wasOnWaterRef.current && !onWaterNow) {
+    if (onSurfingRef.current && wasOnWaterRef.current && !onWaterNow) {
+      // Desactivar surf inmediatamente — no puede ser cancelado.
+      dispatch(setOnSurfing(false));
+      // Animación de salto visual (cosmética, no bloquea la lógica).
       setAnimateJumping(true);
-      const t1 = setTimeout(() => setAnimateJumping(false), moveSpeed * 0.9);
-      const t2 = setTimeout(() => dispatch(setOnSurfing(false)), moveSpeed * 1.2);
+      const t = setTimeout(() => setAnimateJumping(false), moveSpeed * 0.9);
       wasOnWaterRef.current = false;
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
+      return () => clearTimeout(t);
     }
     wasOnWaterRef.current = onWaterNow;
-  }, [pos.x, pos.y, map.water, onSurfing, moveSpeed, dispatch]);
+    // Solo pos+map como deps: el cambio de onSurfing NO debe re-triggear
+    // este efecto (evita la race condition donde el cleanup cancela el dispatch).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pos.x, pos.y, map.water]);
 
   // Animación de remo: alterna entre 2 frames mientras te mueves.
   useEffect(() => {
