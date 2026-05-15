@@ -1451,7 +1451,7 @@ const PokemonEncounter = () => {
         // El branch de recarga al inicio de processBattle ignora el attackId
         processBattleRef.current("__locked_recharge__");
       }
-    }, 350);
+    }, 900);
     return () => clearTimeout(t);
   }, [stage, playerLockedReason, clickableNotice]);
 
@@ -2567,27 +2567,35 @@ const PokemonEncounter = () => {
     // Skull Bash) como los movimientos de invulnerabilidad (Dig, Fly), que
     // en Gen I son también de 2 turnos: T1 = desaparecer, T2 = atacar.
     if ((CHARGE_MOVES.has(attackId) || INVULNERABLE_MOVES.has(attackId)) && !playerChargingMoveRef.current) {
+      const moveMeta = getMoveMetadata(attackId);
+      const useMsg   = `¡${activeMetadata.name.toUpperCase()} usó ${(moveMeta?.name ?? attackId).toUpperCase()}!`;
       const chargeMsg = CHARGE_MESSAGE[attackId]?.replace("{user}", activeMetadata.name.toUpperCase()) ?? `¡${activeMetadata.name.toUpperCase()} está cargando!`;
       playerChargingMoveRef.current = attackId;
       // Bloqueo del menú: T2 se ejecutará solo en el próximo stage 11
       setPlayerLockedReason("charging");
-      // En Dig/Fly: invulnerable + sprite oculto mientras carga
-      if (INVULNERABLE_MOVES.has(attackId)) {
-        playerInvulnerableRef.current = true;
-        setPlayerHidden(true);
-      }
-      setAlertText(chargeMsg);
+      // En Dig/Fly: invulnerable mientras carga. El sprite se oculta DESPUÉS
+      // del primer mensaje (al pasar al mensaje de carga), igual que en Gen I.
+      const isInvulnerable = INVULNERABLE_MOVES.has(attackId);
+      if (isInvulnerable) playerInvulnerableRef.current = true;
+      setAlertText(useMsg);
       setStage(15);
+      // Tras el primer mensaje ("usó VUELO"), mostrar el mensaje de carga
+      // ("se elevó al cielo") + ocultar sprite si es invulnerable.
+      setTimeout(() => {
+        setAlertText(chargeMsg);
+        if (isInvulnerable) setPlayerHidden(true);
+      }, 1100);
+      // Tras el mensaje de carga, el rival intenta atacar.
       setTimeout(() => {
         setAlertText(null);
-        // Rival ataca durante la carga (a menos que sea invulnerable)
         const enemyMoveIdC = getRandomEnemyMove();
         const isEnemyRechargingC = enemyMoveIdC === "__recharge__";
         const stagesSnapC = { us: playerStages, them: enemyStages };
         const effPlayerC = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
         const enemySkipC = checkSkipTurn(false);
         if (guardSelfKo()) return;
-        if (!enemySkipC && !playerInvulnerableRef.current && !isEnemyRechargingC) {
+        if (!enemySkipC && !isEnemyRechargingC && !playerInvulnerableRef.current) {
+          // Caso normal (charge clásico, no invulnerable): el rival ataca
           const { us: usC } = processMoveResult(
             processMove(effPlayerC, enemy, enemyMoveIdC, false, stagesSnapC, {
               lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2606,11 +2614,25 @@ const PokemonEncounter = () => {
               setStage(24);
             } else applyEndOfTurnStatus(usC, enemy);
           }, ATTACK_ANIMATION + 1000);
+        } else if (!enemySkipC && !isEnemyRechargingC && playerInvulnerableRef.current) {
+          // Jugador invulnerable (Dig/Fly T1): el rival anuncia su ataque
+          // y falla por la invulnerabilidad. Igual que el original Gen I.
+          const enemyMoveMeta = getMoveMetadata(enemyMoveIdC);
+          lastEnemyMoveRef.current = enemyMoveIdC;
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival usó ${(enemyMoveMeta?.name ?? enemyMoveIdC).toUpperCase()}!`);
+          setStage(15);
+          setTimeout(() => {
+            setAlertText(`¡${activeMetadata.name.toUpperCase()} eludió el ataque!`);
+            setTimeout(() => {
+              setAlertText(null);
+              applyEndOfTurnStatus(effPlayerC, enemy);
+            }, 1000);
+          }, ATTACK_ANIMATION);
         } else {
           if (isEnemyRechargingC) {
             setMoveAnim(null);
             setStage(18);
-            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival debe recargar!`);
             setTimeout(() => {
               setAlertText(null);
               applyEndOfTurnStatus(effPlayerC, enemy);
@@ -2619,7 +2641,7 @@ const PokemonEncounter = () => {
             applyEndOfTurnStatus(effPlayerC, enemy);
           }
         }
-      }, ATTACK_ANIMATION);
+      }, 1100 + ATTACK_ANIMATION);
       return;
     } else if (playerChargingMoveRef.current && playerChargingMoveRef.current === attackId) {
       // Turno 2: ejecutar move (atacar normalmente, la invulnerabilidad acaba)
@@ -2650,6 +2672,9 @@ const PokemonEncounter = () => {
     }
 
     const activeMove = getMoveMetadata(attackId);
+    // Snapshot ANTES de getRandomEnemyMove(): si el rival estaba cargando,
+    // este turno es su T2 (la llamada limpia el ref y devuelve el move).
+    const enemyWasChargingBefore = !!enemyChargingMoveRef.current;
     const enemyMoveId = getRandomEnemyMove();
     const isEnemyRecharging = enemyMoveId === "__recharge__";
     const enemyMove  = isEnemyRecharging ? getMoveMetadata("tackle") : getMoveMetadata(enemyMoveId);
@@ -2671,13 +2696,45 @@ const PokemonEncounter = () => {
 
     // Iniciar carga del rival para moves de 2 turnos (Solar Beam, Razor
     // Wind, Sky Attack, Skull Bash) o de invulnerabilidad (Dig, Fly).
-    if ((CHARGE_MOVES.has(enemyMoveId) || INVULNERABLE_MOVES.has(enemyMoveId)) && !enemyChargingMoveRef.current) {
+    // Si acaba de iniciar carga, su turno se reduce a un mensaje y no
+    // hace daño — el daño se aplicará en T2 cuando getRandomEnemyMove
+    // reproduzca el move guardado.
+    const enemyChargeJustStarted =
+      !enemyWasChargingBefore &&
+      (CHARGE_MOVES.has(enemyMoveId) || INVULNERABLE_MOVES.has(enemyMoveId));
+    if (enemyChargeJustStarted) {
       enemyChargingMoveRef.current = enemyMoveId;
       if (INVULNERABLE_MOVES.has(enemyMoveId)) {
         enemyInvulnerableRef.current = true;
-        setEnemyHidden(true);
       }
     }
+
+    // Helper: ejecuta el T1 del rival (solo mensajes, sin daño) y luego
+    // dispara onComplete con los HP actuales (no han cambiado).
+    const runEnemyChargeT1 = (
+      currentUs: PokemonInstance,
+      currentThem: PokemonEncounterType,
+      onComplete: () => void
+    ) => {
+      const enemyMoveMeta2 = getMoveMetadata(enemyMoveId);
+      const enemyName = `${enemyMetadata.name.toUpperCase()} rival`;
+      const useMsg = `¡${enemyName} usó ${(enemyMoveMeta2?.name ?? enemyMoveId).toUpperCase()}!`;
+      const chargeMsg = CHARGE_MESSAGE[enemyMoveId]?.replace("{user}", enemyName) ?? `¡${enemyName} está cargando!`;
+      setMoveAnim(null);
+      setStage(18);
+      setAlertText(useMsg);
+      setTimeout(() => {
+        setAlertText(chargeMsg);
+        if (INVULNERABLE_MOVES.has(enemyMoveId)) setEnemyHidden(true);
+        setTimeout(() => {
+          setAlertText(null);
+          // Mantener HP — el rival no atacó
+          void currentUs;
+          void currentThem;
+          onComplete();
+        }, 1100);
+      }, 1100);
+    };
 
     const activeMovesFirst = getActiveMovesFirst(activeMove, enemyMove);
     const stagesSnapshot   = { us: playerStages, them: enemyStages };
@@ -2712,6 +2769,12 @@ const PokemonEncounter = () => {
               if (guardSelfKo()) return;
               applyEndOfTurnStatus(effectivePlayer, enemy);
             }, ATTACK_ANIMATION);
+          } else if (enemyChargeJustStarted) {
+            // Rival inicia carga (Vuelo/Excavar/Solar Beam…): solo mensaje, sin daño
+            runEnemyChargeT1(effectivePlayer, enemy, () => {
+              if (guardSelfKo()) return;
+              applyEndOfTurnStatus(effectivePlayer, enemy);
+            });
           } else {
             const { us: usNew } = processMoveResult(
               processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot, {
@@ -2753,6 +2816,12 @@ const PokemonEncounter = () => {
                 if (guardSelfKo()) return;
                 applyEndOfTurnStatus(us, them);
               }, ATTACK_ANIMATION);
+            } else if (enemyChargeJustStarted) {
+              // Rival inicia carga: solo mensaje, sin daño
+              runEnemyChargeT1(us, them, () => {
+                if (guardSelfKo()) return;
+                applyEndOfTurnStatus(us, them);
+              });
             } else {
               const { us: usNew } = processMoveResult(
                 processMove(us, them, enemyMove.id, false, stagesSnapshot),
@@ -2804,6 +2873,35 @@ const PokemonEncounter = () => {
             }, ATTACK_ANIMATION + 1000);
           }
         }, ATTACK_ANIMATION);
+      } else if (enemyChargeJustStarted) {
+        // Rival inicia carga (T1): solo mensaje, sin daño. Después el jugador
+        // hace su turno con normalidad.
+        runEnemyChargeT1(effectivePlayer, enemy, () => {
+          if (guardSelfKo()) return;
+          if (checkSkipTurn(true)) {
+            setMoveAnim(null);
+            setStage(15);
+            setTimeout(() => {
+              setAlertText(null);
+              if (guardSelfKo()) return;
+              applyEndOfTurnStatus(effectivePlayer, enemy);
+            }, ATTACK_ANIMATION);
+          } else {
+            const { us: playerAft, them: enemyAft } = processMoveResult(
+              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
+                lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+                isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+              }),
+              true,
+              attackId
+            );
+            setTimeout(() => {
+              if (enemyAft.hp <= 0) setStage(20);
+              else if (playerAft.hp <= 0) setStage(24);
+              else applyEndOfTurnStatus(playerAft, enemyAft);
+            }, ATTACK_ANIMATION + 1000);
+          }
+        });
       } else {
         // Rival ataca normalmente
         const { us, them } = processMoveResult(
