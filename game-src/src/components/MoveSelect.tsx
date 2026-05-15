@@ -127,7 +127,7 @@ const MoveSelect = ({ show, select, close, overrideMoves }: Props) => {
       {show && move && !noPpNotice && (
         <Stats>
           <Frame>
-            <StatsRow>Type/</StatsRow>
+            <StatsRow>Tipo/</StatsRow>
             <StatsRow style={{ textAlign: "center" }}>{move?.type}</StatsRow>
             <StatsRow
               style={{ textAlign: "right" }}

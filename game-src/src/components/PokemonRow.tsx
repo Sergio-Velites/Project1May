@@ -201,8 +201,8 @@ const PokemonRow = ({ pokemon, active, swapMarked, moveData }: Props) => {
         <Health>
           {moveData
             ? moveData.learnedBy.includes(pokemon.id)
-              ? "ABLE"
-              : "NOT ABLE"
+              ? "PUEDE"
+              : "NO PUEDE"
             : `${pokemon.hp}/${stats.hp}`}
           {!moveData && pokemon.status && STATUS_LABEL[pokemon.status.type] && (
             <StatusBadge>{STATUS_LABEL[pokemon.status.type]}</StatusBadge>

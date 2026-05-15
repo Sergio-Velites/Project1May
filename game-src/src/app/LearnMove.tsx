@@ -5,7 +5,7 @@ import Frame from "../components/Frame";
 import { useState, useEffect } from "react";
 import useEvent from "./use-event";
 import { Event } from "./emitter";
-import useMoveMetadata from "./use-move-metadata";
+import useMoveMetadata, { getMoveMetadata } from "./use-move-metadata";
 import PokemonList from "../components/PokemonList";
 import {
   consumeItem,
@@ -155,7 +155,7 @@ const LearnMove = () => {
         menuItems={[
           ...pokemon[pokemonIndex].moves.map((m) => {
             const item: MenuItemType = {
-              label: m.id,
+              label: getMoveMetadata(m.id)?.name?.toUpperCase() ?? m.id.toUpperCase(),
               action: () => {
                 if (!moveData) return;
                 if (move.consume) {
