@@ -31,6 +31,7 @@ import HealthBar from "./HealthBar";
 import usePokemonStats, { getPokemonStats } from "../app/use-pokemon-stats";
 
 import corner from "../assets/ui/corner.png";
+import substituteSprite from "../assets/pokemon/simple/monster-b.png";
 import { useEffect, useState, useRef } from "react";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
@@ -63,7 +64,7 @@ import {
 import useIsMobile from "../app/use-is-mobile";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { MoveMetadata } from "../app/move-metadata";
-import processMove, { MoveResult, StatStages, DEFAULT_STAGES, getStageMult, StatusApply, isSelfTargetingStatusMove, CHARGE_MOVES, INVULNERABLE_MOVES, CHARGE_MESSAGE } from "../app/move-helper";
+import processMove, { MoveResult, MoveContext, StatStages, DEFAULT_STAGES, getStageMult, StatusApply, isSelfTargetingStatusMove, CHARGE_MOVES, INVULNERABLE_MOVES, CHARGE_MESSAGE, TRAP_MOVES } from "../app/move-helper";
 import getXp from "../app/xp-helper";
 import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp, getSingleLevelUp, xpForNextLevel } from "../app/level-helper";
 import MoveSelect from "./MoveSelect";
@@ -319,6 +320,18 @@ const RightImage = styled(PixelImage)`
 
   transform: translate(-400%);
   animation: ${inFromLeft} ${`${MOVEMENT_ANIMATION}ms`} linear forwards;
+`;
+
+// F12 — Sustituto: sprite que sustituye al pokémon mientras esté activo.
+const SubImage = styled(PixelImage)`
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  pointer-events: none;
 `;
 
 const attackRight = keyframes`
@@ -743,6 +756,33 @@ const PokemonEncounter = () => {
 
   // Conversion: tipo convertido del jugador (null = tipo original)
   const playerConvertedTypeRef = useRef<string | null>(null);
+  // Conversion: tipos override (Gen I — Conversion sustituye TODOS los tipos)
+  const playerConvertedTypesRef = useRef<string[] | null>(null);
+  const enemyConvertedTypesRef  = useRef<string[] | null>(null);
+
+  // ── F4 — Trap moves (Bind/Wrap/Fire-Spin/Clamp) ───────────────────────
+  // Atacante: move y turnos restantes que sigue ejecutándolo automáticamente
+  const playerTrapMoveRef    = useRef<string | null>(null);
+  const playerTrapTurnsRef   = useRef(0);
+  const enemyTrapMoveRef     = useRef<string | null>(null);
+  const enemyTrapTurnsRef    = useRef(0);
+  // Víctima: turnos restantes que NO puede actuar (skip turn)
+  const playerTrappedTurnsRef = useRef(0);
+  const enemyTrappedTurnsRef  = useRef(0);
+
+  // ── F8 — Pay Day: monedas acumuladas en el combate ────────────────────
+  const playerPayDayCoinsRef = useRef(0);
+
+  // ── F11 — Rage: bloquea al usuario en Rage tras T1 ────────────────────
+  const playerRageActiveRef = useRef(false);
+  const enemyRageActiveRef  = useRef(false);
+
+  // ── F12 — Substitute: HP del sustituto (null = sin sustituto) ─────────
+  const playerSubHpRef  = useRef<number | null>(null);
+  const enemySubHpRef   = useRef<number | null>(null);
+  // Estado renderizable para mostrar/ocultar sprite del sustituto
+  const [playerSubVisible, setPlayerSubVisible] = useState(false);
+  const [enemySubVisible,  setEnemySubVisible]  = useState(false);
 
   const isInBattle = !!enemy && !!active && !!enemyMetadata && !!activeMetadata;
   const isTrainer = !!trainer;
@@ -977,6 +1017,21 @@ const PokemonEncounter = () => {
       enemyThrashTurnsRef.current  = 0;
       enemyThrashMoveRef.current   = null;
       playerConvertedTypeRef.current = null;
+      playerConvertedTypesRef.current = null;
+      enemyConvertedTypesRef.current  = null;
+      playerTrapMoveRef.current = null;
+      playerTrapTurnsRef.current = 0;
+      enemyTrapMoveRef.current = null;
+      enemyTrapTurnsRef.current = 0;
+      playerTrappedTurnsRef.current = 0;
+      enemyTrappedTurnsRef.current  = 0;
+      playerPayDayCoinsRef.current = 0;
+      playerRageActiveRef.current = false;
+      enemyRageActiveRef.current  = false;
+      playerSubHpRef.current = null;
+      enemySubHpRef.current  = null;
+      setPlayerSubVisible(false);
+      setEnemySubVisible(false);
       setMoveAnim(null);
       setStage(0);
       // Register enemy as SEEN in Pokédex
@@ -1146,6 +1201,11 @@ const PokemonEncounter = () => {
 
     if (stage === 20) {
       setStage(21);
+      // F8 — Pay Day: añadir las monedas acumuladas en el combate
+      if (playerPayDayCoinsRef.current > 0) {
+        dispatch(gainMoney(playerPayDayCoinsRef.current));
+        playerPayDayCoinsRef.current = 0;
+      }
       if (enemy) {
         // Solo se reparte XP entre los participantes que siguen vivos: si un
         // pokémon entró al combate y se debilitó, no recibe XP y tampoco
@@ -1544,6 +1604,10 @@ const PokemonEncounter = () => {
     }
     // Si el rival está en Bide, usar bide
     if (enemyBideTurnsRef.current > 0) return "bide";
+    // F11 — Rage: rival lockeado en Rage
+    if (enemyRageActiveRef.current) return "rage";
+    // F4 — Trap activo: rival fuerza repetir el trap move
+    if (enemyTrapTurnsRef.current > 0 && enemyTrapMoveRef.current) return enemyTrapMoveRef.current;
     // Si el rival está en Trashing, continuar con ese move
     if (enemyThrashTurnsRef.current > 0 && enemyThrashMoveRef.current) return enemyThrashMoveRef.current;
     // Si el rival está cargando (2-turno), ejecutar el move pendiente y
@@ -1593,6 +1657,17 @@ const PokemonEncounter = () => {
   // Comprueba si un combatiente debe saltarse su turno por estado/flinch/confusión.
   // Devuelve `true` si el combatiente NO puede actuar este turno.
   const checkSkipTurn = (isPlayer: boolean): boolean => {
+    // ── F4 — Trap moves: víctima atrapada salta el turno ────────────────
+    const trappedTurns = isPlayer ? playerTrappedTurnsRef.current : enemyTrappedTurnsRef.current;
+    if (trappedTurns > 0) {
+      const newTurns = trappedTurns - 1;
+      if (isPlayer) playerTrappedTurnsRef.current = newTurns;
+      else enemyTrappedTurnsRef.current = newTurns;
+      const nm = isPlayer ? activeMetadata.name.toUpperCase() : `${enemyMetadata.name.toUpperCase()} rival`;
+      setAlertText(`¡${nm} no puede moverse!`);
+      return true;
+    }
+
     if (isPlayer && playerFlinchRef.current) {
       playerFlinchRef.current = false;
       setAlertText(`¡${activeMetadata.name.toUpperCase()} no puede moverse!`);
@@ -1733,10 +1808,7 @@ const PokemonEncounter = () => {
 
     const enemyMove = getMoveMetadata(enemyMoveId);
     const { us } = processMoveResult(
-      processMove(currentActive, enemy, enemyMove.id, false, stagesSnapshot, {
-        lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-        isTargetSleeping: playerStatusRef.current?.type === "sleep",
-      }),
+      processMove(currentActive, enemy, enemyMove.id, false, stagesSnapshot, buildEnemyAttackCtx()),
       false,
       enemyMove.id
     );
@@ -1775,6 +1847,34 @@ const PokemonEncounter = () => {
     playerHyperBeamRechargeRef.current = false;
     setPlayerLockedReason(null);
     setPlayerHidden(false);
+    // ── Gen I — Reset de efectos volátiles al cambiar de pokémon ──────
+    // F9 — Reflect / Light Screen
+    playerReflectRef.current = 0;
+    playerLightScreenRef.current = 0;
+    // Mist
+    playerMistRef.current = false;
+    // F4 — Trap (atacante y víctima)
+    playerTrapMoveRef.current = null;
+    playerTrapTurnsRef.current = 0;
+    playerTrappedTurnsRef.current = 0;
+    // F11 — Rage
+    playerRageActiveRef.current = false;
+    // F12 — Substitute
+    playerSubHpRef.current = null;
+    setPlayerSubVisible(false);
+    // F10 — Conversion
+    playerConvertedTypeRef.current = null;
+    playerConvertedTypesRef.current = null;
+    // Disable
+    playerDisabledMoveRef.current = null;
+    playerDisabledTurnsRef.current = 0;
+    // Bide / Thrash / Counter sources
+    playerBideTurnsRef.current = 0;
+    playerBideDmgRef.current = 0;
+    playerThrashTurnsRef.current = 0;
+    playerThrashMoveRef.current = null;
+    lastPhysicalDamageRef.current = 0;
+    enemyLeechSeededRef.current = enemyLeechSeededRef.current; // se mantiene en el rival
     // Gen I: Transform revierte cuando el Pokémon sale del campo.
     // Limpiamos la entrada del Pokémon que sale (activePokemonIndex).
     setTransformedData((prev) => {
@@ -1803,6 +1903,27 @@ const PokemonEncounter = () => {
     throwPokeball();
   };
 
+  // ── Helpers Gen I para construir el contexto del move ───────────────────
+  const buildEnemyAttackCtx = (): MoveContext => ({
+    lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+    isTargetSleeping: playerStatusRef.current?.type === "sleep",
+    attackerStatus: enemyStatusRef.current?.type ?? null,
+    attackerOverrideTypes: enemyConvertedTypesRef.current ?? undefined,
+    defenderHasReflect: playerReflectRef.current > 0,
+    defenderHasLightScreen: playerLightScreenRef.current > 0,
+    defenderHasSubstitute: playerSubHpRef.current != null,
+    defenderSubHp: playerSubHpRef.current ?? 0,
+  });
+  const buildPlayerAttackCtx = (): MoveContext => ({
+    lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+    isTargetSleeping: enemyStatusRef.current?.type === "sleep",
+    attackerStatus: playerStatusRef.current?.type ?? null,
+    attackerOverrideTypes: playerConvertedTypesRef.current ?? undefined,
+    defenderHasReflect: enemyReflectRef.current > 0,
+    defenderHasLightScreen: enemyLightScreenRef.current > 0,
+    defenderHasSubstitute: enemySubHpRef.current != null,
+    defenderSubHp: enemySubHpRef.current ?? 0,
+  });
 
   const getActiveMovesFirst = (
     activeMove: MoveMetadata,
@@ -1968,6 +2089,12 @@ const PokemonEncounter = () => {
       isBide,
       isDisable,
       isNoEffect,
+      forceFlee,
+      payDayCoins,
+      startTrap,
+      startSubstitute,
+      subDamage,
+      blockedBySub,
     } = result;
     if (isAttacking) {
       if (moveId) {
@@ -2022,11 +2149,59 @@ const PokemonEncounter = () => {
           setPlayerLockedReason("recharging");
         }
 
+        // ── F8 — Pay Day acumula monedas ───────────────────────────────
+        if (payDayCoins) playerPayDayCoinsRef.current += payDayCoins;
+
+        // ── F4 — Trap moves: el jugador atrapa al rival 2-5 turnos ──────
+        if (startTrap) {
+          playerTrapMoveRef.current = startTrap.move;
+          playerTrapTurnsRef.current = startTrap.turns;
+          enemyTrappedTurnsRef.current = startTrap.turns;
+        }
+
+        // ── F12 — Substitute del jugador creado ────────────────────────
+        if (startSubstitute) {
+          playerSubHpRef.current = startSubstitute.hp;
+          setPlayerSubVisible(true);
+        }
+
+        // ── F12 — Daño absorbido por el sustituto del rival ────────────
+        if (subDamage && enemySubHpRef.current != null) {
+          enemySubHpRef.current -= subDamage;
+          if (enemySubHpRef.current <= 0) {
+            enemySubHpRef.current = null;
+            setEnemySubVisible(false);
+          }
+        }
+
+        // ── F11 — Rage: si el atacante es Rage, lockear al usuario ──────
+        if (moveId === "rage") playerRageActiveRef.current = true;
+
+        // ── F11 — Si el rival está en Rage y recibió daño: +1 atk al rival
+        if (enemyRageActiveRef.current && them.hp < enemy.hp && !blockedBySub) {
+          setEnemyStages((s) => ({ ...s, attack: Math.min(6, s.attack + 1) }));
+        }
+
         // Aplicar condición de estado ANTES de elegir el mensaje
         const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
 
+        // ── F7 — Roar/Whirlwind: vs salvaje termina el combate ─────────
+        if (forceFlee && !isTrainer) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} salvaje huyó!`);
+          setStage(17);
+          setTimeout(() => endEncounter_(true), 1500);
+          return { us, them };
+        }
+
         if (missed) {
           setAlertText(`¡${activeMetadata.name.toUpperCase()} falló!`);
+        } else if (blockedBySub) {
+          setAlertText(`¡El sustituto bloqueó el ataque!`);
+          setStage(17);
+        } else if (forceFlee) {
+          // Vs entrenador: no effect
+          setAlertText(`¡Pero no pasó nada!`);
+          setStage(17);
         } else if (isNoEffect) {
           setAlertText(`¡Pero no pasó nada!`);
           setStage(17);
@@ -2044,7 +2219,7 @@ const PokemonEncounter = () => {
           setStage(17);
         } else if (isBide) {
           // Bide: iniciar acumulación
-          playerBideTurnsRef.current = 2;
+          playerBideTurnsRef.current = 2 + Math.floor(Math.random() * 2);
           playerBideDmgRef.current = 0;
           setAlertText(`¡${activeMetadata.name.toUpperCase()} aguanta el ataque!`);
           setStage(17);
@@ -2078,12 +2253,14 @@ const PokemonEncounter = () => {
           setAlertText(`¡Aparece PANTALLA LUZ alrededor de ${activeMetadata.name.toUpperCase()}!`);
           setStage(17);
         } else if (isConversion) {
-          // Elegir tipo aleatorio de los moves del jugador
+          // Gen I — Conversion sustituye los tipos del usuario por el tipo
+          // de un movimiento aleatorio del propio Pokémon.
           const pMoves = transformedId !== null ? transformedMoves : active.moves;
           if (pMoves.length > 0) {
             const pickedMove = pMoves[Math.floor(Math.random() * pMoves.length)];
             const pickedType = getMoveMetadata(typeof pickedMove === "string" ? pickedMove : pickedMove.id)?.type ?? "Normal";
             playerConvertedTypeRef.current = pickedType;
+            playerConvertedTypesRef.current = [pickedType];
             setAlertText(`¡${activeMetadata.name.toUpperCase()} cambió a tipo ${pickedType.toUpperCase()}!`);
           }
           setStage(17);
@@ -2163,11 +2340,56 @@ const PokemonEncounter = () => {
         // Hyper Beam del rival: si el jugador sigue en pie, activar recarga del rival
         if (result.requiresRecharge) enemyHyperBeamRechargeRef.current = true;
 
+        // ── F4 — Trap moves: el rival atrapa al jugador 2-5 turnos ──────
+        if (startTrap) {
+          enemyTrapMoveRef.current = startTrap.move;
+          enemyTrapTurnsRef.current = startTrap.turns;
+          playerTrappedTurnsRef.current = startTrap.turns;
+        }
+
+        // ── F12 — Substitute del rival creado ───────────────────────────
+        if (startSubstitute) {
+          enemySubHpRef.current = startSubstitute.hp;
+          setEnemySubVisible(true);
+        }
+
+        // ── F12 — Daño absorbido por el sustituto del jugador ───────────
+        if (subDamage && playerSubHpRef.current != null) {
+          playerSubHpRef.current -= subDamage;
+          if (playerSubHpRef.current <= 0) {
+            playerSubHpRef.current = null;
+            setPlayerSubVisible(false);
+          }
+        }
+
+        // ── F11 — Rage: si el rival usa Rage, lockearlo ─────────────────
+        if (moveId === "rage") enemyRageActiveRef.current = true;
+
+        // ── F11 — Si el jugador está en Rage y recibió daño: +1 atk al jugador
+        if (playerRageActiveRef.current && us.hp < active.hp && !blockedBySub) {
+          setPlayerStages((s) => ({ ...s, attack: Math.min(6, s.attack + 1) }));
+        }
+
         // Aplicar condición de estado ANTES de elegir el mensaje
         const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
 
+        // ── F7 — Roar/Whirlwind del rival vs salvaje: termina combate ───
+        if (forceFlee && !isTrainer) {
+          // Vs salvaje: termina (pero el rival es el que huye, raro)
+          setAlertText(`¡El combate termina!`);
+          setStage(19);
+          setTimeout(() => endEncounter_(true), 1500);
+          return { us, them };
+        }
+
         if (missed) {
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival falló!`);
+        } else if (blockedBySub) {
+          setAlertText(`¡El sustituto bloqueó el ataque!`);
+          setStage(19);
+        } else if (forceFlee) {
+          setAlertText(`¡Pero no pasó nada!`);
+          setStage(19);
         } else if (isNoEffect) {
           setAlertText(`¡Pero no pasó nada!`);
           setStage(19);
@@ -2183,7 +2405,7 @@ const PokemonEncounter = () => {
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival se transformó!`);
           setStage(19);
         } else if (isBide) {
-          enemyBideTurnsRef.current = 2;
+          enemyBideTurnsRef.current = 2 + Math.floor(Math.random() * 2);
           enemyBideDmgRef.current = 0;
           setStage(19);
         } else if (isDisable) {
@@ -2193,7 +2415,7 @@ const PokemonEncounter = () => {
             setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival falló!`);
           } else {
             playerDisabledMoveRef.current = lastPlayerMoveRef.current;
-            playerDisabledTurnsRef.current = 1 + Math.floor(Math.random() * 7);
+            playerDisabledTurnsRef.current = 1 + Math.floor(Math.random() * 8);
             const disabledMoveMeta = getMoveMetadata(lastPlayerMoveRef.current);
             setAlertText(`¡${disabledMoveMeta?.name?.toUpperCase() ?? "El movimiento"} de ${activeMetadata.name.toUpperCase()} quedó inhabilitado!`);
           }
@@ -2213,6 +2435,15 @@ const PokemonEncounter = () => {
           enemyLightScreenRef.current = 5;
           setStage(19);
         } else if (isConversion) {
+          // Gen I — Conversion sustituye los tipos del rival por el tipo
+          // de un movimiento aleatorio del propio rival.
+          const eMoves = enemyTransformedMovesRef.current ?? enemy.moves;
+          if (eMoves.length > 0) {
+            const pickedMove = eMoves[Math.floor(Math.random() * eMoves.length)];
+            const pickedType = getMoveMetadata(typeof pickedMove === "string" ? pickedMove : pickedMove)?.type ?? "Normal";
+            enemyConvertedTypesRef.current = [pickedType];
+            setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival cambió a tipo ${pickedType.toUpperCase()}!`);
+          }
           setStage(19);
         } else if (confuse) {
           // Confusión al jugador
@@ -2334,6 +2565,33 @@ const PokemonEncounter = () => {
     enemyFlinchRef.current  = false;
     playerFlinchRef.current = false;
 
+    // ── F9 — Reflect / Light Screen: decrementar contador de turnos ─────
+    // En Gen I duran 5 turnos y se desactivan al cambiar de Pokémon.
+    if (playerReflectRef.current > 0) {
+      playerReflectRef.current -= 1;
+      if (playerReflectRef.current === 0) {
+        messages.push(`¡El REFLEJO de ${activeMetadata.name.toUpperCase()} desapareció!`);
+      }
+    }
+    if (playerLightScreenRef.current > 0) {
+      playerLightScreenRef.current -= 1;
+      if (playerLightScreenRef.current === 0) {
+        messages.push(`¡La PANTALLA LUZ de ${activeMetadata.name.toUpperCase()} desapareció!`);
+      }
+    }
+    if (enemyReflectRef.current > 0) {
+      enemyReflectRef.current -= 1;
+      if (enemyReflectRef.current === 0) {
+        messages.push(`¡El REFLEJO del rival desapareció!`);
+      }
+    }
+    if (enemyLightScreenRef.current > 0) {
+      enemyLightScreenRef.current -= 1;
+      if (enemyLightScreenRef.current === 0) {
+        messages.push(`¡La PANTALLA LUZ del rival desapareció!`);
+      }
+    }
+
     // Mostrar todos los mensajes en cadena (1s cada uno) y solo entonces
     // pasar al siguiente stage. Si no hay mensajes, transición inmediata.
     const goNext = () => {
@@ -2381,10 +2639,7 @@ const PokemonEncounter = () => {
         if (guardSelfKo()) return;
         if (!enemySkipR && !isEnemyRechargingR) {
           const { us: usRecharge } = processMoveResult(
-            processMove(effPlayerRecharge, enemy, enemyMoveIdRecharge, false, stagesSnapRecharge, {
-              lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-              isTargetSleeping: playerStatusRef.current?.type === "sleep",
-            }),
+            processMove(effPlayerRecharge, enemy, enemyMoveIdRecharge, false, stagesSnapRecharge, buildEnemyAttackCtx()),
             false,
             enemyMoveIdRecharge
           );
@@ -2429,10 +2684,7 @@ const PokemonEncounter = () => {
         if (guardSelfKo()) return;
         if (!enemySkipD && !isEnemyRechargingD) {
           const { us: usD } = processMoveResult(
-            processMove(effPlayerD, enemy, enemyMoveIdD, false, stagesSnapD, {
-              lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-              isTargetSleeping: playerStatusRef.current?.type === "sleep",
-            }),
+            processMove(effPlayerD, enemy, enemyMoveIdD, false, stagesSnapD, buildEnemyAttackCtx()),
             false,
             enemyMoveIdD
           );
@@ -2485,10 +2737,7 @@ const PokemonEncounter = () => {
           if (guardSelfKo()) return;
           if (!enemySkipBide && !isEnemyRechargingBide) {
             const { us: usB } = processMoveResult(
-              processMove(effPlayer, enemy, enemyMoveIdBide, false, stagesSnap, {
-                lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-                isTargetSleeping: playerStatusRef.current?.type === "sleep",
-              }),
+              processMove(effPlayer, enemy, enemyMoveIdBide, false, stagesSnap, buildEnemyAttackCtx()),
               false,
               enemyMoveIdBide
             );
@@ -2547,10 +2796,24 @@ const PokemonEncounter = () => {
         playerConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 3);
       }
     } else if ((attackId === "thrash" || attackId === "petal-dance") && playerThrashTurnsRef.current === 0) {
-      // Inicio de Thrash: 2-3 turnos
-      const turns = 2 + Math.floor(Math.random() * 2);
+      // Inicio de Thrash: 3-4 turnos (Gen I)
+      const turns = 3 + Math.floor(Math.random() * 2);
       playerThrashTurnsRef.current = turns - 1;
       playerThrashMoveRef.current = attackId;
+    }
+
+    // ── F4 — Trap del jugador: forzar mismo move automáticamente ──────
+    if (playerTrapTurnsRef.current > 0 && playerTrapMoveRef.current) {
+      attackId = playerTrapMoveRef.current;
+      playerTrapTurnsRef.current -= 1;
+      if (playerTrapTurnsRef.current <= 0) {
+        playerTrapMoveRef.current = null;
+      }
+    }
+
+    // ── F11 — Rage: usuario lockeado en Rage tras T1 ──────────────────
+    if (playerRageActiveRef.current) {
+      attackId = "rage";
     }
 
     // Movimientos de 2 turnos del jugador: si ya cargamos el turno anterior,
@@ -2597,10 +2860,7 @@ const PokemonEncounter = () => {
         if (!enemySkipC && !isEnemyRechargingC && !playerInvulnerableRef.current) {
           // Caso normal (charge clásico, no invulnerable): el rival ataca
           const { us: usC } = processMoveResult(
-            processMove(effPlayerC, enemy, enemyMoveIdC, false, stagesSnapC, {
-              lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-              isTargetSleeping: playerStatusRef.current?.type === "sleep",
-            }),
+            processMove(effPlayerC, enemy, enemyMoveIdC, false, stagesSnapC, buildEnemyAttackCtx()),
             false,
             enemyMoveIdC
           );
@@ -2683,7 +2943,7 @@ const PokemonEncounter = () => {
 
     // Iniciar Thrash del rival si es su primer turno usándolo
     if ((enemyMoveId === "thrash" || enemyMoveId === "petal-dance") && enemyThrashTurnsRef.current === 0) {
-      const turns = 2 + Math.floor(Math.random() * 2);
+      const turns = 3 + Math.floor(Math.random() * 2);
       enemyThrashTurnsRef.current = turns - 1;
       enemyThrashMoveRef.current = enemyMoveId;
     } else if (enemyThrashTurnsRef.current > 0) {
@@ -2692,6 +2952,12 @@ const PokemonEncounter = () => {
         enemyThrashMoveRef.current = null;
         enemyConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 3);
       }
+    }
+
+    // ── F4 — Trap del rival: decrementar contador de turnos ───────────
+    if (enemyTrapTurnsRef.current > 0) {
+      enemyTrapTurnsRef.current -= 1;
+      if (enemyTrapTurnsRef.current <= 0) enemyTrapMoveRef.current = null;
     }
 
     // Iniciar carga del rival para moves de 2 turnos (Solar Beam, Razor
@@ -2777,10 +3043,7 @@ const PokemonEncounter = () => {
             });
           } else {
             const { us: usNew } = processMoveResult(
-              processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot, {
-                lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-                isTargetSleeping: playerStatusRef.current?.type === "sleep",
-              }),
+              processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot, buildEnemyAttackCtx()),
               false,
               enemyMove.id
             );
@@ -2793,10 +3056,7 @@ const PokemonEncounter = () => {
       } else {
         // Jugador ataca normalmente
         const { us, them } = processMoveResult(
-          processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
-            lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-            isTargetSleeping: enemyStatusRef.current?.type === "sleep",
-          }),
+          processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
           true,
           attackId
         );
@@ -2824,7 +3084,7 @@ const PokemonEncounter = () => {
               });
             } else {
               const { us: usNew } = processMoveResult(
-                processMove(us, them, enemyMove.id, false, stagesSnapshot),
+                processMove(us, them, enemyMove.id, false, stagesSnapshot, buildEnemyAttackCtx()),
                 false,
                 enemyMove.id
               );
@@ -2859,10 +3119,7 @@ const PokemonEncounter = () => {
             }, ATTACK_ANIMATION);
           } else {
             const { us: playerAft, them: enemyAft } = processMoveResult(
-              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
-                lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-                isTargetSleeping: enemyStatusRef.current?.type === "sleep",
-              }),
+              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
               true,
               attackId
             );
@@ -2888,10 +3145,7 @@ const PokemonEncounter = () => {
             }, ATTACK_ANIMATION);
           } else {
             const { us: playerAft, them: enemyAft } = processMoveResult(
-              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, {
-                lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-                isTargetSleeping: enemyStatusRef.current?.type === "sleep",
-              }),
+              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
               true,
               attackId
             );
@@ -2905,10 +3159,7 @@ const PokemonEncounter = () => {
       } else {
         // Rival ataca normalmente
         const { us, them } = processMoveResult(
-          processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot, {
-            lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-            isTargetSleeping: playerStatusRef.current?.type === "sleep",
-          }),
+          processMove(effectivePlayer, enemy, enemyMove.id, false, stagesSnapshot, buildEnemyAttackCtx()),
           false,
           enemyMove.id
         );
@@ -2932,10 +3183,7 @@ const PokemonEncounter = () => {
               }, ATTACK_ANIMATION);
             } else {
               const { us: playerAfterAttack, them: themAfterAttack } = processMoveResult(
-                processMove(us, them, attackId, true, stagesSnapshot, {
-                  lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
-                  isTargetSleeping: enemyStatusRef.current?.type === "sleep",
-                }),
+                processMove(us, them, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
                 true,
                 attackId
               );
@@ -3045,7 +3293,8 @@ const PokemonEncounter = () => {
               <ImageContainer $flashing={(stage === 17 || stage === 19) && moveAnim?.target === "enemy" && moveAnim?.damageClass !== "status"}>
                 <AttackRight $attacking={stage === 18 && moveAnim?.damageClass === "physical"}>
                   <ChangeEnemyPokemon $changing={[46].includes(stage)}>
-                    <RightImage src={rightImage()} style={{ visibility: enemyHidden ? "hidden" : "visible" }} />
+                    <RightImage src={rightImage()} style={{ visibility: enemyHidden || enemySubVisible ? "hidden" : "visible" }} />
+                    {enemySubVisible && <SubImage src={substituteSprite} />}
                   </ChangeEnemyPokemon>
                 </AttackRight>
                 <MoveAnimation
@@ -3062,7 +3311,8 @@ const PokemonEncounter = () => {
               <ImageContainer $flashing={(stage === 17 || stage === 19) && moveAnim?.target === "player" && moveAnim?.damageClass !== "status"}>
                 <AttackLeft $attacking={stage === 15 && moveAnim?.damageClass === "physical"}>
                   <ChangePokemon $changing={[3, 25].includes(stage)}>
-                    <LeftImage src={leftImage()} style={{ visibility: playerHidden ? "hidden" : "visible" }} />
+                    <LeftImage src={leftImage()} style={{ visibility: playerHidden || playerSubVisible ? "hidden" : "visible" }} />
+                    {playerSubVisible && <SubImage src={substituteSprite} />}
                   </ChangePokemon>
                 </AttackLeft>
                 <MoveAnimation

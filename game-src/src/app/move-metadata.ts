@@ -1332,7 +1332,7 @@ const moveMetadata: Record<string, MoveMetadata> = {
     power: 60,
     pp: 25,
     priority: 0,
-    type: "dark",
+    type: "normal",
   },
   growl: {
     id: "growl",
