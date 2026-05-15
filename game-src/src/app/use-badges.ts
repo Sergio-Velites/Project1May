@@ -1,13 +1,23 @@
 import { useSelector } from "react-redux";
 import { selectInventory } from "../state/gameSlice";
-import useItemData from "./use-item-data";
+import { ItemType } from "./use-item-data";
+
+const GYM_BADGES = new Set<ItemType>([
+  ItemType.BoulderBadge,
+  ItemType.CascadeBadge,
+  ItemType.ThunderBadge,
+  ItemType.RainbowBadge,
+  ItemType.SoulBadge,
+  ItemType.MarshBadge,
+  ItemType.VolcanoBadge,
+  ItemType.EarthBadge,
+]);
 
 const useBadges = () => {
   const inventory = useSelector(selectInventory);
-  const itemData = useItemData();
 
-  return inventory.filter(
-    (item) => itemData[item.item]?.badge && item.amount > 0
+  return inventory.filter((item) =>
+    GYM_BADGES.has(item.item as ItemType) && item.amount > 0
   );
 };
 

@@ -2235,7 +2235,7 @@ const useItemData = () => {
       consumable: true,
       usableInBattle: false,
       pokeball: false,
-      badge: true,
+      badge: false,
       cost: null,
       sellPrice: null,
       action: () => {
@@ -2256,7 +2256,7 @@ const useItemData = () => {
       consumable: true,
       usableInBattle: false,
       pokeball: false,
-      badge: true,
+      badge: false,
       cost: null,
       sellPrice: null,
       action: () => {
@@ -2277,7 +2277,7 @@ const useItemData = () => {
       consumable: true,
       usableInBattle: false,
       pokeball: false,
-      badge: true,
+      badge: false,
       cost: null,
       sellPrice: null,
       action: () => {
@@ -2298,7 +2298,7 @@ const useItemData = () => {
       consumable: true,
       usableInBattle: false,
       pokeball: false,
-      badge: true,
+      badge: false,
       cost: null,
       sellPrice: null,
       action: () => {
@@ -2371,7 +2371,7 @@ const useItemData = () => {
       consumable: true,
       usableInBattle: false,
       pokeball: false,
-      badge: true,
+      badge: false,
       cost: null,
       sellPrice: null,
       action: () => {
