@@ -64,6 +64,33 @@ const recordVisit = (state: GameState, mapId: MapId) => {
   if (!state.visitedMaps.includes(mapId)) state.visitedMaps.push(mapId);
 };
 
+/**
+ * Infiere los mapas visitados a partir de un save sin `visitedMaps` (saves
+ * anteriores a la feature MO Vuelo). Los IDs de entrenadores derrotados
+ * siguen el formato `${mapId}-x-y`, así que para cada uno detectamos qué
+ * mapIds son prefijo del ID. Se incluyen también los mapas semilla del
+ * estado inicial y el mapa actual del jugador.
+ *
+ * Esto evita que un save antiguo se quede sin destinos disponibles para
+ * Vuelo aunque el jugador ya haya recorrido toda la ruta.
+ */
+const inferVisitedMaps = (s: GameState): MapId[] => {
+  const visited = new Set<MapId>([
+    s.map,
+    MapId.PalletTownHouseA2F,
+    MapId.PalletTownHouseA1F,
+    MapId.PalletTown,
+    MapId.PalletTownLab,
+  ]);
+  const allMapIds = Object.values(MapId) as MapId[];
+  for (const trainerId of s.defeatedTrainers ?? []) {
+    for (const mapId of allMapIds) {
+      if (trainerId.startsWith(`${mapId}-`)) visited.add(mapId);
+    }
+  }
+  return Array.from(visited);
+};
+
 export const gameSlice = createSlice({
   name: "game",
   initialState,
@@ -261,7 +288,10 @@ export const gameSlice = createSlice({
       state.caughtPokemon = savedGameState.caughtPokemon ?? [];
       state.onBicycle = savedGameState.onBicycle ?? false;
       state.onSurfing = savedGameState.onSurfing ?? false;
-      state.visitedMaps = savedGameState.visitedMaps ?? [savedGameState.map];
+      state.visitedMaps =
+        savedGameState.visitedMaps && savedGameState.visitedMaps.length > 0
+          ? savedGameState.visitedMaps
+          : inferVisitedMaps(savedGameState);
       recordVisit(state, savedGameState.map);
     },
     loadFromState: (state, action: PayloadAction<GameState>) => {
@@ -295,7 +325,10 @@ export const gameSlice = createSlice({
       state.caughtPokemon = s.caughtPokemon ?? [];
       state.onBicycle = s.onBicycle ?? false;
       state.onSurfing = s.onSurfing ?? false;
-      state.visitedMaps = s.visitedMaps ?? [s.map];
+      state.visitedMaps =
+        s.visitedMaps && s.visitedMaps.length > 0
+          ? s.visitedMaps
+          : inferVisitedMaps(s);
       recordVisit(state, s.map);
       if (s.rsvp) state.rsvp = s.rsvp;
     },

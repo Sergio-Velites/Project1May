@@ -212,15 +212,15 @@ const PokemonList = ({
         const canSurf = !onSurfing && knowsSurf && facingWater && !!target;
 
         // ── Opción VOLAR (party screen) ─────────────────────────────────
-        // Aparece solo si:
+        // Aparece si:
         //   - El pokémon seleccionado tiene un move "fly" (la MO se aprende
         //     una vez y queda permanente; PP no es necesario fuera de combate
         //     en Gen I).
-        //   - Estamos en un mapa al aire libre (allowBicycle ≈ exterior).
-        //     En Gen I solo se puede usar Vuelo en pueblos y rutas, no
-        //     dentro de cuevas, gimnasios o edificios.
         //   - No estamos surfeando (no se puede volar desde encima del agua).
         //   - Existe al menos un destino visitado distinto del actual.
+        // Nota: a diferencia de Gen I, sí permitimos usar Vuelo desde mapas
+        // interiores (gimnasios, centros, casas). En una invitación de boda
+        // es preferible no bloquear al jugador por una convención del juego.
         const flyDestinations: MapId[] = [
           MapId.PalletTown,
           MapId.ViridianCity,
@@ -233,7 +233,6 @@ const PokemonList = ({
         const canFly =
           !!target &&
           knowsFly &&
-          !!map.allowBicycle &&
           !onSurfing &&
           reachableFlyTargets.length > 0;
 
