@@ -163,7 +163,7 @@ encounters: {
     pokemon: [
       { id: 60, chance: 17, conditionValues: [], minLevel: 15, maxLevel: 15 },
       { id: 60, chance: 8, conditionValues: [], minLevel: 15, maxLevel: 15 },
-      { id: 79, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 79 },
+      { id: 79, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 20 },
       { id: 72, chance: 25, conditionValues: [], minLevel: 15, maxLevel: 15 },
       { id: 72, chance: 8, conditionValues: [], minLevel: 15, maxLevel: 15 },
       { id: 54, chance: 17, conditionValues: [], minLevel: 15, maxLevel: 15 }

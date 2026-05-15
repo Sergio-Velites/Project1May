@@ -179,7 +179,7 @@ encounters: {
   goodRod: {
     rate: 20,
     pokemon: [
-      { id: 60, chance: 50, conditionValues: [], minLevel: 9, maxLevel: 98 },
+      { id: 60, chance: 50, conditionValues: [], minLevel: 9, maxLevel: 11 },
       { id: 118, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 10 },
       { id: 98, chance: 10, conditionValues: [], minLevel: 7, maxLevel: 7 },
       { id: 129, chance: 10, conditionValues: [], minLevel: 5, maxLevel: 5 },
