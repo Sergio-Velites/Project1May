@@ -44,7 +44,24 @@ const initialState: GameState = {
   npcFacings: {} as Record<string, Direction>,
   onBicycle: false,
   onSurfing: false,
+  // En el estado inicial ya hay trainers derrotados en pallet-town,
+  // pallet-town-house-a-1f y pallet-town-lab, lo que implica que el jugador
+  // ya ha pisado esos mapas en el flujo introductorio. Sembramos todos
+  // como visitados para que la MO Vuelo permita volver desde el principio
+  // si más adelante alguien intenta volar a Pueblo Paleta.
+  visitedMaps: [
+    MapId.PalletTownHouseA2F,
+    MapId.PalletTownHouseA1F,
+    MapId.PalletTown,
+    MapId.PalletTownLab,
+  ],
   rsvp: undefined,
+};
+
+// Registra un MapId como visitado en `state.visitedMaps` (idempotente).
+const recordVisit = (state: GameState, mapId: MapId) => {
+  if (!state.visitedMaps) state.visitedMaps = [];
+  if (!state.visitedMaps.includes(mapId)) state.visitedMaps.push(mapId);
 };
 
 export const gameSlice = createSlice({
@@ -122,6 +139,7 @@ export const gameSlice = createSlice({
       if (!map.allowBicycle && state.onBicycle) state.onBicycle = false;
       // Auto-desmonte de surf si el nuevo mapa no tiene tiles de agua.
       if (state.onSurfing && !mapHasWater(map)) state.onSurfing = false;
+      recordVisit(state, action.payload);
     },
     setMapWithPos: (state, action: PayloadAction<MapWithPos>) => {
       state.map = action.payload.map;
@@ -130,6 +148,7 @@ export const gameSlice = createSlice({
       const map = mapData[action.payload.map];
       if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
       if (map && state.onSurfing && !mapHasWater(map)) state.onSurfing = false;
+      recordVisit(state, action.payload.map);
     },
     exitMap(state) {
       const map = mapData[state.map];
@@ -144,7 +163,24 @@ export const gameSlice = createSlice({
         state.npcFacings = {};
         if (!previousMap.allowBicycle && state.onBicycle) state.onBicycle = false;
         if (state.onSurfing && !mapHasWater(previousMap)) state.onSurfing = false;
+        recordVisit(state, map.exitReturnMap);
       }
+    },
+    /**
+     * Teletransporte de la MO Vuelo. Cambia mapa+posición de forma idéntica a
+     * setMapWithPos pero conceptualmente representa el aterrizaje del pajarito
+     * en el destino elegido por el jugador.
+     */
+    flyTo: (state, action: PayloadAction<MapWithPos>) => {
+      state.map = action.payload.map;
+      state.pos = action.payload.pos;
+      state.direction = Direction.Down;
+      state.npcFacings = {};
+      const map = mapData[action.payload.map];
+      if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
+      // Volar siempre desmonta el surf (el pajarito no nada).
+      state.onSurfing = false;
+      recordVisit(state, action.payload.map);
     },
     setOnBicycle: (state, action: PayloadAction<boolean>) => {
       state.onBicycle = action.payload;
@@ -225,6 +261,8 @@ export const gameSlice = createSlice({
       state.caughtPokemon = savedGameState.caughtPokemon ?? [];
       state.onBicycle = savedGameState.onBicycle ?? false;
       state.onSurfing = savedGameState.onSurfing ?? false;
+      state.visitedMaps = savedGameState.visitedMaps ?? [savedGameState.map];
+      recordVisit(state, savedGameState.map);
     },
     loadFromState: (state, action: PayloadAction<GameState>) => {
       const s = action.payload;
@@ -257,6 +295,8 @@ export const gameSlice = createSlice({
       state.caughtPokemon = s.caughtPokemon ?? [];
       state.onBicycle = s.onBicycle ?? false;
       state.onSurfing = s.onSurfing ?? false;
+      state.visitedMaps = s.visitedMaps ?? [s.map];
+      recordVisit(state, s.map);
       if (s.rsvp) state.rsvp = s.rsvp;
     },
     setRsvpInternal: (state, action: PayloadAction<RSVPData>) => {
@@ -488,6 +528,7 @@ export const {
   setMap,
   setPos,
   setMapWithPos,
+  flyTo,
   exitMap,
   setMoving,
   addInventory,
@@ -573,6 +614,8 @@ export const selectMapId = (state: RootState) => state.game.map;
 
 export const selectOnBicycle = (state: RootState) => !!state.game.onBicycle;
 export const selectOnSurfing = (state: RootState) => !!state.game.onSurfing;
+export const selectVisitedMaps = (state: RootState) =>
+  state.game.visitedMaps ?? [];
 
 export const selectCollectedItems = (state: RootState) =>
   state.game.collectedItems;

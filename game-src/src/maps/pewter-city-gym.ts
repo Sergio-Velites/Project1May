@@ -250,6 +250,17 @@ trainers: [
   money: 3000,
   persistent: true,
   sightRange: 0,
+  postGame: {
+    message: [
+      "¡Espera! Toma esta M0.",
+      "Es la M02, que contiene Vuelo.",
+      "Enséñasela a un Pokémon volador",
+      "y podrás regresar volando a los",
+      "lugares que ya conoces.",
+      "¡Que tu camino sea tan ligero como sus alas!",
+    ],
+    items: [ItemType.Hm02],
+  },
 }
 ],
 };
