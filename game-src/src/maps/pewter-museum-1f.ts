@@ -26,12 +26,6 @@ const pewterMuseum1f: MapType = {
   fences: {},
   grass: {},
 text: {
-    3: {
-      2: [
-        "FÓSIL DE AERODACTYL",
-        "Un PKMN primitivo y muy raro. parece que se mueve"
-      ],
-    },
     4: {
       11: [
         "¡Tómate tu tiempo para mirar!"
@@ -66,6 +60,16 @@ text: {
     y: 8,
   },
   exitReturnMap: MapId.PewterCity,
+  staticPokemon: [
+    {
+      pokemonId: 142,
+      level: 20,
+      sprite: "none",
+      pos: { x: 2, y: 3 },
+      questId: "pewter-city-museum-1f-static-2-3",
+      intro: ["Un fosil de AERODACTYL,", "un pokemon antgüo extingido...", "un fosil?"],
+    },
+  ],
 };
 
 export default pewterMuseum1f;
