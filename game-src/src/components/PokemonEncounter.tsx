@@ -619,6 +619,16 @@ const PokemonEncounter = () => {
 
   const [alertText, setAlertText] = useState<string | null>(null);
   const [clickableNotice, setClickableNotice] = useState<string | null>(null);
+  // Bloqueo del menú de combate del jugador (Gen I): cuando el jugador ha
+  // cargado un movimiento de 2 turnos (Solar Beam, Razor Wind, Sky Attack,
+  // Skull Bash, Dig, Fly) o tiene que recargar (Hyper Beam, Hydro Pump…),
+  // el menú no aparece y el T2/recarga se ejecuta solo.
+  const [playerLockedReason, setPlayerLockedReason] = useState<
+    "charging" | "recharging" | null
+  >(null);
+  // Sprites invisibles durante T1 de movimientos de invulnerabilidad (Dig/Fly)
+  const [playerHidden, setPlayerHidden] = useState(false);
+  const [enemyHidden, setEnemyHidden]   = useState(false);
   const [moveAnim, setMoveAnim] = useState<{
     moveId: string;
     target: "enemy" | "player";
@@ -955,6 +965,9 @@ const PokemonEncounter = () => {
       enemyChargingMoveRef.current  = null;
       playerInvulnerableRef.current = false;
       enemyInvulnerableRef.current  = false;
+      setPlayerLockedReason(null);
+      setPlayerHidden(false);
+      setEnemyHidden(false);
       playerBideTurnsRef.current = 0;
       playerBideDmgRef.current   = 0;
       enemyBideTurnsRef.current  = 0;
@@ -1504,10 +1517,15 @@ const PokemonEncounter = () => {
     if (enemyBideTurnsRef.current > 0) return "bide";
     // Si el rival está en Trashing, continuar con ese move
     if (enemyThrashTurnsRef.current > 0 && enemyThrashMoveRef.current) return enemyThrashMoveRef.current;
-    // Si el rival está cargando (2-turno), ejecutar el move pendiente
+    // Si el rival está cargando (2-turno), ejecutar el move pendiente y
+    // limpiar la invulnerabilidad de Dig/Fly antes del impacto.
     if (enemyChargingMoveRef.current) {
       const move = enemyChargingMoveRef.current;
       enemyChargingMoveRef.current = null;
+      if (enemyInvulnerableRef.current) {
+        enemyInvulnerableRef.current = false;
+        setEnemyHidden(false);
+      }
       return move;
     }
     // Si el rival está transformado, elegir entre los movimientos copiados
@@ -1722,6 +1740,12 @@ const PokemonEncounter = () => {
     // Gen I: la confusión es estado volátil de combate — se cura al cambiar.
     playerConfusionTurnsRef.current = 0;
     playerSelfKoRef.current = false;
+    // Gen I: cambiar de Pokémon limpia carga, recarga y disable del jugador
+    playerChargingMoveRef.current = null;
+    playerInvulnerableRef.current = false;
+    playerHyperBeamRechargeRef.current = false;
+    setPlayerLockedReason(null);
+    setPlayerHidden(false);
     // Gen I: Transform revierte cuando el Pokémon sale del campo.
     // Limpiamos la entrada del Pokémon que sale (activePokemonIndex).
     setTransformedData((prev) => {
@@ -1963,7 +1987,11 @@ const PokemonEncounter = () => {
         if (moveId) lastPlayerMoveRef.current = moveId;
 
         // Hyper Beam del jugador: si el rival sigue en pie, activar recarga
-        if (result.requiresRecharge) playerHyperBeamRechargeRef.current = true;
+        // (en Gen I el siguiente turno se consume sin opción de elegir)
+        if (result.requiresRecharge) {
+          playerHyperBeamRechargeRef.current = true;
+          setPlayerLockedReason("recharging");
+        }
 
         // Aplicar condición de estado ANTES de elegir el mensaje
         const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
@@ -2310,7 +2338,8 @@ const PokemonEncounter = () => {
     // Hyper Beam del jugador: si está recargando, pierde este turno
     if (playerHyperBeamRechargeRef.current) {
       playerHyperBeamRechargeRef.current = false;
-      setAlertText(`¡${activeMetadata.name.toUpperCase()} está recargando!`);
+      setPlayerLockedReason(null);
+      setAlertText(`¡${activeMetadata.name.toUpperCase()} debe recargar!`);
       setStage(15);
       setTimeout(() => {
         setAlertText(null);
@@ -2511,8 +2540,13 @@ const PokemonEncounter = () => {
     if ((CHARGE_MOVES.has(attackId) || INVULNERABLE_MOVES.has(attackId)) && !playerChargingMoveRef.current) {
       const chargeMsg = CHARGE_MESSAGE[attackId]?.replace("{user}", activeMetadata.name.toUpperCase()) ?? `¡${activeMetadata.name.toUpperCase()} está cargando!`;
       playerChargingMoveRef.current = attackId;
-      // En Dig/Fly: invulnerable mientras carga
-      if (INVULNERABLE_MOVES.has(attackId)) playerInvulnerableRef.current = true;
+      // Bloqueo del menú: T2 se ejecutará solo en el próximo stage 11
+      setPlayerLockedReason("charging");
+      // En Dig/Fly: invulnerable + sprite oculto mientras carga
+      if (INVULNERABLE_MOVES.has(attackId)) {
+        playerInvulnerableRef.current = true;
+        setPlayerHidden(true);
+      }
       setAlertText(chargeMsg);
       setStage(15);
       setTimeout(() => {
@@ -2538,6 +2572,8 @@ const PokemonEncounter = () => {
             if (usC.hp <= 0) {
               playerChargingMoveRef.current = null;
               playerInvulnerableRef.current = false;
+              setPlayerLockedReason(null);
+              setPlayerHidden(false);
               setStage(24);
             } else applyEndOfTurnStatus(usC, enemy);
           }, ATTACK_ANIMATION + 1000);
@@ -2560,6 +2596,8 @@ const PokemonEncounter = () => {
       // Turno 2: ejecutar move (atacar normalmente, la invulnerabilidad acaba)
       playerChargingMoveRef.current = null;
       playerInvulnerableRef.current = false;
+      setPlayerLockedReason(null);
+      setPlayerHidden(false);
     }
 
     // Mirror Move del jugador: copiar último move del rival
@@ -2602,12 +2640,14 @@ const PokemonEncounter = () => {
       }
     }
 
-    // Iniciar carga del rival para moves de 2 turnos
-    if (CHARGE_MOVES.has(enemyMoveId) && !enemyChargingMoveRef.current) {
+    // Iniciar carga del rival para moves de 2 turnos (Solar Beam, Razor
+    // Wind, Sky Attack, Skull Bash) o de invulnerabilidad (Dig, Fly).
+    if ((CHARGE_MOVES.has(enemyMoveId) || INVULNERABLE_MOVES.has(enemyMoveId)) && !enemyChargingMoveRef.current) {
       enemyChargingMoveRef.current = enemyMoveId;
-      if (INVULNERABLE_MOVES.has(enemyMoveId)) enemyInvulnerableRef.current = true;
-    } else if (enemyChargingMoveRef.current) {
-      enemyInvulnerableRef.current = false;
+      if (INVULNERABLE_MOVES.has(enemyMoveId)) {
+        enemyInvulnerableRef.current = true;
+        setEnemyHidden(true);
+      }
     }
 
     const activeMovesFirst = getActiveMovesFirst(activeMove, enemyMove);
@@ -2784,6 +2824,32 @@ const PokemonEncounter = () => {
     }
   };
 
+  // Ref siempre actualizada a la última instancia de processBattle (closure
+  // fresca con state actual). Necesario para llamarla desde un setTimeout
+  // dentro del useEffect de auto-disparo sin capturar valores obsoletos.
+  const processBattleRef = useRef(processBattle);
+  processBattleRef.current = processBattle;
+
+  // Auto-disparo del turno cuando el menú de combate debería estar bloqueado:
+  //   · Carga T2 (Solar Beam, Razor Wind, Sky Attack, Skull Bash, Dig, Fly).
+  //   · Recarga obligatoria (Hyper Beam y similares).
+  // En Gen I el jugador no puede elegir acción en estos turnos: se ejecuta
+  // directamente. La pantalla muestra brevemente el campo y luego avanza.
+  useEffect(() => {
+    if (stage !== 11) return;
+    if (clickableNotice) return;
+    if (!playerLockedReason) return;
+    const t = setTimeout(() => {
+      if (playerLockedReason === "charging" && playerChargingMoveRef.current) {
+        processBattleRef.current(playerChargingMoveRef.current);
+      } else if (playerLockedReason === "recharging") {
+        // El branch de recarga al inicio de processBattle ignora el attackId
+        processBattleRef.current("__locked_recharge__");
+      }
+    }, 350);
+    return () => clearTimeout(t);
+  }, [stage, playerLockedReason, clickableNotice]);
+
   const leftImage = () => {
     if (stage <= 3) return playerBack;
     if (stage === 46) return playerBack;
@@ -2874,7 +2940,7 @@ const PokemonEncounter = () => {
               <ImageContainer $flashing={(stage === 17 || stage === 19) && moveAnim?.target === "enemy" && moveAnim?.damageClass !== "status"}>
                 <AttackRight $attacking={stage === 18 && moveAnim?.damageClass === "physical"}>
                   <ChangeEnemyPokemon $changing={[46].includes(stage)}>
-                    <RightImage src={rightImage()} />
+                    <RightImage src={rightImage()} style={{ visibility: enemyHidden ? "hidden" : "visible" }} />
                   </ChangeEnemyPokemon>
                 </AttackRight>
                 <MoveAnimation
@@ -2891,7 +2957,7 @@ const PokemonEncounter = () => {
               <ImageContainer $flashing={(stage === 17 || stage === 19) && moveAnim?.target === "player" && moveAnim?.damageClass !== "status"}>
                 <AttackLeft $attacking={stage === 15 && moveAnim?.damageClass === "physical"}>
                   <ChangePokemon $changing={[3, 25].includes(stage)}>
-                    <LeftImage src={leftImage()} />
+                    <LeftImage src={leftImage()} style={{ visibility: playerHidden ? "hidden" : "visible" }} />
                   </ChangePokemon>
                 </AttackLeft>
                 <MoveAnimation
@@ -2954,7 +3020,7 @@ const PokemonEncounter = () => {
           </TextContainer>
           <Menu
             compact
-            show={stage === 11 && !clickableNotice}
+            show={stage === 11 && !clickableNotice && !playerLockedReason}
             disabled={itemMenuOpen || startMenuOpen}
             menuItems={[
               {
