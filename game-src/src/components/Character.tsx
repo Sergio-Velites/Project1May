@@ -16,10 +16,22 @@ import backStill from "../assets/character/back-still.png";
 import backWalk1 from "../assets/character/back-walk-1.png";
 import backWalk2 from "../assets/character/back-walk-2.png";
 import backWalk3 from "../assets/character/back-walk-3.png";
-import bikeFront from "../assets/character/bike-front.png";
-import bikeBack from "../assets/character/bike-back.png";
-import bikeLeft from "../assets/character/bike-left.png";
-import bikeRight from "../assets/character/bike-right.png";
+// Sprites de bici (set bike-ash-* con animación de pedaleo).
+import bikeAshDown from "../assets/walk-sprites/bike-ash-down.png";
+import bikeAshDown1 from "../assets/walk-sprites/bike-ash-down-1.png";
+import bikeAshDown2 from "../assets/walk-sprites/bike-ash-down-2.png";
+import bikeAshUp from "../assets/walk-sprites/bike-ash-up.png";
+import bikeAshUp1 from "../assets/walk-sprites/bike-ash-up-1.png";
+import bikeAshUp2 from "../assets/walk-sprites/bike-ash-up-2.png";
+import bikeAshLeft from "../assets/walk-sprites/bike-ash-left.png";
+import bikeAshLeft1 from "../assets/walk-sprites/bike-ash-left-1.png";
+import bikeAshRight from "../assets/walk-sprites/bike-ash-right.png";
+import bikeAshRight1 from "../assets/walk-sprites/bike-ash-right-1.png";
+// Sprites de pesca (jugador con caña, una pose por dirección).
+import fishAshDown from "../assets/walk-sprites/fish-ash-down.png";
+import fishAshUp from "../assets/walk-sprites/fish-ash-up.png";
+import fishAshLeft from "../assets/walk-sprites/fish-ash-left.png";
+import fishAshRight from "../assets/walk-sprites/fish-ash-right.png";
 // Sprites de surf (reuso del set ac-* ya existente).
 import acDown from "../assets/walk-sprites/ac-down.png";
 import acDown1 from "../assets/walk-sprites/ac-down-1.png";
@@ -47,7 +59,7 @@ import { useEffect, useRef, useState } from "react";
 import { WALK_SPEED } from "../app/constants";
 import useMoveSpeed from "../app/use-move-speed";
 import PixelImage from "../styles/PixelImage";
-import { selectFrozen, selectSpinning } from "../state/uiSlice";
+import { selectFishing, selectFrozen, selectSpinning } from "../state/uiSlice";
 import { Direction } from "../state/state-types";
 import { isWater } from "../app/map-helper";
 import { xToPx } from "../app/position-helper";
@@ -104,6 +116,7 @@ const Character = () => {
   const spinning = useSelector(selectSpinning);
   const frozen = useSelector(selectFrozen);
   const onSurfing = useSelector(selectOnSurfing);
+  const fishing = useSelector(selectFishing);
   const pos = useSelector(selectPos);
   const map = useSelector(selectMap);
   const { moveSpeed, onBicycle } = useMoveSpeed();
@@ -111,6 +124,7 @@ const Character = () => {
   const [image, setImage] = useState(frontStill);
   const [animateJumping, setAnimateJumping] = useState(false);
   const [surfFrame, setSurfFrame] = useState(0);
+  const [bikeFrame, setBikeFrame] = useState(0);
   // Para detectar transición agua→tierra al surfear: guardamos si la
   // posición previa estaba en agua. Si pasamos de agua a tierra estando
   // surfeando, animamos un pequeño salto y desmontamos.
@@ -152,6 +166,14 @@ const Character = () => {
     const t = setTimeout(() => setSurfFrame((f) => (f + 1) % 2), WALK_SPEED);
     return () => clearTimeout(t);
   }, [onSurfing, moving, frozen, surfFrame]);
+
+  // Animación de pedaleo: alterna entre 3 frames (down/up) o 2 frames
+  // (left/right) mientras te mueves en bici.
+  useEffect(() => {
+    if (!onBicycle || !moving || frozen) return;
+    const t = setTimeout(() => setBikeFrame((f) => (f + 1) % 3), WALK_SPEED);
+    return () => clearTimeout(t);
+  }, [onBicycle, moving, frozen, bikeFrame]);
 
   useEffect(() => {
     if (spinning) {
@@ -276,10 +298,12 @@ const Character = () => {
         {onSurfing && <SurfRaft />}
         <StyledCharacter
           src={
-            onSurfing
+            fishing
+              ? fishSpriteForDirection(fishing.direction)
+              : onSurfing
               ? surfSpriteForDirection(direction, moving && !frozen, surfFrame)
               : onBicycle
-              ? bikeForDirection(direction)
+              ? bikeAshSpriteForDirection(direction, moving && !frozen, bikeFrame)
               : image
           }
           alt="Character"
@@ -290,16 +314,41 @@ const Character = () => {
 };
 
 /**
- * Sprite de bici según la dirección del jugador. Reusa una sola imagen
- * por dirección (no animación de pedaleo): la velocidad del movimiento
- * (×2) ya transmite la sensación de bici.
+ * Sprite de bici (set bike-ash-*) con animación de pedaleo.
+ *  - Quieto: bike-ash-{dir}.png
+ *  - Up/Down moviéndose: ciclo entre still, -1, -2 (3 frames).
+ *  - Left/Right moviéndose: alterna entre still y -1 (2 frames).
  */
-function bikeForDirection(d: Direction) {
+function bikeAshSpriteForDirection(d: Direction, moving: boolean, frame: number) {
+  if (!moving) {
+    switch (d) {
+      case Direction.Up: return bikeAshUp;
+      case Direction.Down: return bikeAshDown;
+      case Direction.Left: return bikeAshLeft;
+      case Direction.Right: return bikeAshRight;
+    }
+  }
   switch (d) {
-    case Direction.Up: return bikeBack;
-    case Direction.Down: return bikeFront;
-    case Direction.Left: return bikeLeft;
-    case Direction.Right: return bikeRight;
+    case Direction.Up:
+      return [bikeAshUp, bikeAshUp1, bikeAshUp2][frame % 3];
+    case Direction.Down:
+      return [bikeAshDown, bikeAshDown1, bikeAshDown2][frame % 3];
+    case Direction.Left:
+      return frame % 2 === 0 ? bikeAshLeft : bikeAshLeft1;
+    case Direction.Right:
+      return frame % 2 === 0 ? bikeAshRight : bikeAshRight1;
+  }
+}
+
+/**
+ * Sprite de pesca: una pose fija por dirección (jugador sosteniendo la caña).
+ */
+function fishSpriteForDirection(d: Direction) {
+  switch (d) {
+    case Direction.Up: return fishAshUp;
+    case Direction.Down: return fishAshDown;
+    case Direction.Left: return fishAshLeft;
+    case Direction.Right: return fishAshRight;
   }
 }
 

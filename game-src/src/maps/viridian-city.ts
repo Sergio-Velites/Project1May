@@ -149,11 +149,11 @@ encounters: {
   goodRod: {
     rate: 10,
     pokemon: [
-      { id: 60, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 10 },
-      { id: 118, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 10 },
-      { id: 129, chance: 61, conditionValues: [], minLevel: 5, maxLevel: 5 },
-      { id: 116, chance: 14, conditionValues: [], minLevel: 8, maxLevel: 100 },
-      { id: 120, chance: 35, conditionValues: [], minLevel: 8, maxLevel: 8 },
+      { id: 60, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 11 },
+      { id: 118, chance: 50, conditionValues: [], minLevel: 10, maxLevel: 12 },
+      { id: 129, chance: 61, conditionValues: [], minLevel: 5, maxLevel: 6 },
+      { id: 116, chance: 14, conditionValues: [], minLevel: 8, maxLevel: 9 },
+      { id: 120, chance: 35, conditionValues: [], minLevel: 8, maxLevel: 9 },
       { id: 147, chance: 10, conditionValues: [], minLevel: 10, maxLevel: 11 }
     ],
   },
@@ -170,7 +170,17 @@ encounters: {
   },
   rockSmash: { rate: 0, pokemon: [] }, headbutt: { rate: 0, pokemon: [] }, darkGrass: { rate: 0, pokemon: [] },
   grassSpots: { rate: 0, pokemon: [] }, caveSpots: { rate: 0, pokemon: [] }, bridgeSpots: { rate: 0, pokemon: [] },
-  superRodSpots: { rate: 0, pokemon: [] }, surfSpots: { rate: 0, pokemon: [] },
+  superRodSpots: { rate: 0, pokemon: [] }, surfSpots: {
+    rate: 100,
+    pokemon: [
+      { id: 54, chance: 10, conditionValues: [], minLevel: 23, maxLevel: 25 },
+      { id: 130, chance: 5, conditionValues: [], minLevel: 25, maxLevel: 30 },
+      { id: 131, chance: 10, conditionValues: [], minLevel: 26, maxLevel: 100 },
+      { id: 138, chance: 10, conditionValues: [], minLevel: 20, maxLevel: 24 },
+      { id: 134, chance: 3, conditionValues: [], minLevel: 20, maxLevel: 30 },
+      { id: 140, chance: 10, conditionValues: [], minLevel: 20, maxLevel: 24 }
+    ],
+  },
   yellowFlowers: { rate: 0, pokemon: [] }, purpleFlowers: { rate: 0, pokemon: [] }, redFlowers: { rate: 0, pokemon: [] },
   roughTerrain: { rate: 0, pokemon: [] }, gift: { rate: 0, pokemon: [] }, giftEgg: { rate: 0, pokemon: [] }, onlyOne: { rate: 0, pokemon: [] },
 },
@@ -307,6 +317,12 @@ trainers: [
   persistent: true,
 }
 ],
+water: {
+    24: [8, 9, 10, 11, 12, 13],
+    25: [8, 9, 10, 11, 12, 13],
+    26: [8, 9, 10, 11, 12, 13],
+    27: [8, 9, 10, 11, 12, 13],
+  },
 };
 
 export default viridianCity;

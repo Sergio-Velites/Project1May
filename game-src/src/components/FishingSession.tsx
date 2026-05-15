@@ -25,7 +25,7 @@ import {
   selectPokemonEncounter,
 } from "../state/gameSlice";
 import { PokemonEncounterData } from "../maps/map-types";
-import { Direction, PokemonEncounterType } from "../state/state-types";
+import { PokemonEncounterType } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
@@ -182,7 +182,6 @@ const FishingSession = () => {
 
   return (
     <>
-      <RodSprite direction={fishing.direction} />
       <TextOverlay>
         <Frame wide tall flashing={phase === "bite" || phase === "no-bite"}>
           {message}
@@ -190,59 +189,6 @@ const FishingSession = () => {
       </TextOverlay>
     </>
   );
-};
-
-/**
- * Sprite simple de la caña: un palito oscuro con cabeza al final,
- * orientado según la dirección del jugador.
- *
- * Geometría: el rod es una barra vertical anclada por su extremo
- * superior al centro del tile del jugador, y se rota según dirección:
- *   - Down  →   0°  (cae hacia abajo, agua abajo)
- *   - Up    → 180°  (sube hacia arriba, agua arriba)
- *   - Right → -90°  (gira al este)
- *   - Left  →  90°  (gira al oeste)
- *
- * El "flotador" (.bob) está en el extremo opuesto al ancla, así siempre
- * cae sobre el agua. El z-index sitúa la caña detrás del jugador cuando
- * apunta hacia arriba, y delante en el resto de direcciones.
- */
-const RodOverlay = styled.div<{ $dir: Direction }>`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0.4cqw;
-  height: 6.5cqw;
-  background: #181010;
-  transform-origin: top center;
-  transform: translate(-50%, 0)
-    rotate(
-      ${(p) =>
-        p.$dir === Direction.Up
-          ? 180
-          : p.$dir === Direction.Right
-          ? -90
-          : p.$dir === Direction.Left
-          ? 90
-          : 0}deg
-    );
-  z-index: ${(p) => (p.$dir === Direction.Up ? 4 : 12)};
-  pointer-events: none;
-  &::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 1cqw;
-    height: 1cqw;
-    background: #181010;
-    border-radius: 50%;
-  }
-`;
-
-const RodSprite = ({ direction }: { direction: Direction }) => {
-  return <RodOverlay $dir={direction} />;
 };
 
 export default FishingSession;
