@@ -2495,8 +2495,20 @@ const PokemonEncounter = () => {
       playerThrashMoveRef.current = attackId;
     }
 
-    // Movimiento de carga del jugador (turno 1): mostrar mensaje de carga
-    if (CHARGE_MOVES.has(attackId) && !playerChargingMoveRef.current) {
+    // Movimientos de 2 turnos del jugador: si ya cargamos el turno anterior,
+    // forzamos el segundo turno con ese mismo movimiento (Gen I bloquea el
+    // menú de combate hasta que se ejecuta). Sin esto, si el jugador elige
+    // otro move en turno 2, el ref de carga quedaría colgado y el siguiente
+    // intento del mismo move volvería a entrar en turno 1.
+    if (playerChargingMoveRef.current) {
+      attackId = playerChargingMoveRef.current;
+    }
+
+    // Movimiento de carga del jugador (turno 1): mostrar mensaje de carga.
+    // Incluye tanto los charge clásicos (Solar Beam, Razor Wind, Sky Attack,
+    // Skull Bash) como los movimientos de invulnerabilidad (Dig, Fly), que
+    // en Gen I son también de 2 turnos: T1 = desaparecer, T2 = atacar.
+    if ((CHARGE_MOVES.has(attackId) || INVULNERABLE_MOVES.has(attackId)) && !playerChargingMoveRef.current) {
       const chargeMsg = CHARGE_MESSAGE[attackId]?.replace("{user}", activeMetadata.name.toUpperCase()) ?? `¡${activeMetadata.name.toUpperCase()} está cargando!`;
       playerChargingMoveRef.current = attackId;
       // En Dig/Fly: invulnerable mientras carga
