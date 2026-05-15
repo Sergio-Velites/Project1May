@@ -22,11 +22,10 @@ const route3PokemonCenter: MapType = {
     6: [1, 6, 7, 12, 13],
     7: [1, 6, 7, 12, 13],
   },
-  text: {
+ text: {
     4: {
       0: [
-        "Si tu cabeza no para de dar vueltas,",
-        "¡güárdala en el PC y sigue!",
+        "Volata di peluka!..."
       ],
     },
   },

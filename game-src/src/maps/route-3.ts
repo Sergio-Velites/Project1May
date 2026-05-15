@@ -134,7 +134,6 @@ const route3: MapType = {
     },
   ],
 // Trainers para "route-3"
-// Trainers para "route-3"
 trainers: [
   {
   npc: lass,
@@ -292,6 +291,22 @@ trainers: [
   ],
   outtro: [
     "Pues no hay ibuprofeno para ti!"
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: lass,
+  pokemon: [{ id: 36, level: 28 }, { id: 108, level: 30 }],
+  facing: Direction.Left,
+  pos: { x: 61, y: 26 },
+  intro: [
+    "Ah!",
+    "Gayyyyy!"
+  ],
+  outtro: [
+    "Se dice propuesto?",
+    "O proponido?"
   ],
   money: 0,
   persistent: true,
