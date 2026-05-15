@@ -82,10 +82,11 @@ walls: {
   },
 // Trainers para "route-22"
 // Trainers para "route-22"
+// Trainers para "route-22"
 trainers: [
   {
   npc: rival,
-  pokemon: [],
+  pokemon: [{ id: 2, level: 12 }, { id: 8, level: 12 }, { id: 5, level: 12 }],
   facing: Direction.Right,
   pos: { x: 26, y: 5 },
   intro: [
