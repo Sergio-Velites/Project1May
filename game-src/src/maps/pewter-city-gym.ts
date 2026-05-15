@@ -225,9 +225,10 @@ trainers: [
         message: [
           "¡Toma la INSIGNIA DEL VINO!",
           "Es el símbolo de que mereces brindar.",
+          "Y esta M0, que contiene Surf.",
           "¡Úsala bien, y que el vino fluya!",
         ],
-        items: [ItemType.BoulderBadge, ItemType.Tm34],
+        items: [ItemType.BoulderBadge, ItemType.Hm03],
       },
 },
   {
