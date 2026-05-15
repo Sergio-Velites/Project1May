@@ -7,7 +7,7 @@ import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
-import { canWalk, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall } from "../app/map-helper";
+import { canWalk, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
 import {
   Direction,
   GameState,
@@ -43,6 +43,7 @@ const initialState: GameState = {
   caughtPokemon: [],
   npcFacings: {} as Record<string, Direction>,
   onBicycle: false,
+  onSurfing: false,
   rsvp: undefined,
 };
 
@@ -54,7 +55,7 @@ export const gameSlice = createSlice({
       state.direction = Direction.Left;
       if (state.pos.x === 0) return;
       if (
-        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0)
+        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0, !!state.onSurfing)
       )
         return;
       state.pos.x -= 1;
@@ -64,7 +65,7 @@ export const gameSlice = createSlice({
       const map = mapData[state.map];
       if (state.pos.x === map.width - 1) return;
       if (
-        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0)
+        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0, !!state.onSurfing)
       )
         return;
       state.pos.x += 1;
@@ -73,7 +74,7 @@ export const gameSlice = createSlice({
       state.direction = Direction.Up;
       if (state.pos.y === 0) return;
       if (
-        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0)
+        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0, !!state.onSurfing)
       )
         return;
       state.pos.y -= 1;
@@ -86,6 +87,9 @@ export const gameSlice = createSlice({
         state.jumping = true;
       }
       if (isWall(map.walls, state.pos.x, state.pos.y + 1)) return;
+      // Surf: el agua es transitable; la tierra también (al pisarla se
+      // activa el desmonte fuera de este reducer). A pie: el agua bloquea.
+      if (!state.onSurfing && isWater(map.water, state.pos.x, state.pos.y + 1)) return;
       const hasPokemon = state.pokemon.length > 0;
       const blockingTrainersDown = (map.trainers ?? []).filter((t) => {
         if (t.hideCondition === "has-pokemon" && hasPokemon) return false;
@@ -116,6 +120,8 @@ export const gameSlice = createSlice({
       state.npcFacings = {};
       // Auto-desmonte si el nuevo mapa no permite bici (interiores).
       if (!map.allowBicycle && state.onBicycle) state.onBicycle = false;
+      // Auto-desmonte de surf si el nuevo mapa no tiene tiles de agua.
+      if (state.onSurfing && !mapHasWater(map)) state.onSurfing = false;
     },
     setMapWithPos: (state, action: PayloadAction<MapWithPos>) => {
       state.map = action.payload.map;
@@ -123,6 +129,7 @@ export const gameSlice = createSlice({
       state.npcFacings = {};
       const map = mapData[action.payload.map];
       if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
+      if (map && state.onSurfing && !mapHasWater(map)) state.onSurfing = false;
     },
     exitMap(state) {
       const map = mapData[state.map];
@@ -136,10 +143,16 @@ export const gameSlice = createSlice({
         state.pos = newPos;
         state.npcFacings = {};
         if (!previousMap.allowBicycle && state.onBicycle) state.onBicycle = false;
+        if (state.onSurfing && !mapHasWater(previousMap)) state.onSurfing = false;
       }
     },
     setOnBicycle: (state, action: PayloadAction<boolean>) => {
       state.onBicycle = action.payload;
+    },
+    setOnSurfing: (state, action: PayloadAction<boolean>) => {
+      state.onSurfing = action.payload;
+      // Surf y bici son mutuamente excluyentes.
+      if (action.payload) state.onBicycle = false;
     },
     setNpcFacing: (
       state,
@@ -211,6 +224,7 @@ export const gameSlice = createSlice({
       state.seenPokemon = savedGameState.seenPokemon ?? [];
       state.caughtPokemon = savedGameState.caughtPokemon ?? [];
       state.onBicycle = savedGameState.onBicycle ?? false;
+      state.onSurfing = savedGameState.onSurfing ?? false;
     },
     loadFromState: (state, action: PayloadAction<GameState>) => {
       const s = action.payload;
@@ -242,6 +256,7 @@ export const gameSlice = createSlice({
       state.seenPokemon = s.seenPokemon ?? [];
       state.caughtPokemon = s.caughtPokemon ?? [];
       state.onBicycle = s.onBicycle ?? false;
+      state.onSurfing = s.onSurfing ?? false;
       if (s.rsvp) state.rsvp = s.rsvp;
     },
     setRsvpInternal: (state, action: PayloadAction<RSVPData>) => {
@@ -509,6 +524,7 @@ export const {
   catchPokemonPokedex,
   setNpcFacing,
   setOnBicycle,
+  setOnSurfing,
     setRsvpInternal,
 } = gameSlice.actions;
 
@@ -556,6 +572,7 @@ export const selectDefeatedTrainers = (state: RootState) =>
 export const selectMapId = (state: RootState) => state.game.map;
 
 export const selectOnBicycle = (state: RootState) => !!state.game.onBicycle;
+export const selectOnSurfing = (state: RootState) => !!state.game.onSurfing;
 
 export const selectCollectedItems = (state: RootState) =>
   state.game.collectedItems;

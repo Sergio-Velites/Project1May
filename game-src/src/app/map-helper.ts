@@ -115,13 +115,19 @@ export const canWalk = (
   collectedItems: string[],
   defeatedTrainers: string[] = [],
   completedQuests: string[] = [],
-  hasPokemon: boolean = false
+  hasPokemon: boolean = false,
+  onSurfing: boolean = false
 ) => {
   const map = mapData[mapId];
   if (isItem(map.items, x, y, collectedItems, mapId)) return false;
   if (isGift(map.gifts, x, y, completedQuests)) return false;
   if (isWall(map.walls, x, y)) return false;
-  if (isWater(map.water, x, y)) return false;
+  // Reglas de agua:
+  //  - A pie: el agua bloquea como un muro.
+  //  - Surfeando: el agua se vuelve transitable; la tierra (no-agua) sigue
+  //    siendo transitable (al pisarla se produce un pequeño salto y el
+  //    jugador deja de surfear — ese efecto se gestiona fuera de canWalk).
+  if (!onSurfing && isWater(map.water, x, y)) return false;
   if (isFence(map.fences, x, y)) return false;
   // Un trainer bloquea el paso siempre, como un muro.
   // La única excepción es hideCondition activa (trainer invisible).
@@ -132,6 +138,18 @@ export const canWalk = (
   if (isTrainer(blockingTrainers, x, y)) return false;
   if (isStaticPokemon(map.staticPokemon, x, y, completedQuests)) return false;
   return true;
+};
+
+/**
+ * ¿El mapa tiene al menos un tile de agua? Se usa para auto-desmontar surf
+ * al cambiar a un mapa interior o sin masas de agua.
+ */
+export const mapHasWater = (map: { water?: Record<number, number[]> }): boolean => {
+  if (!map.water) return false;
+  for (const row of Object.values(map.water)) {
+    if (row && row.length > 0) return true;
+  }
+  return false;
 };
 
 export const directionModifier = (direction: Direction): PosType => {

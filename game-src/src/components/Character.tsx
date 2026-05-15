@@ -20,20 +20,36 @@ import bikeFront from "../assets/character/bike-front.png";
 import bikeBack from "../assets/character/bike-back.png";
 import bikeLeft from "../assets/character/bike-left.png";
 import bikeRight from "../assets/character/bike-right.png";
+// Sprites de surf (reuso del set ac-* ya existente).
+import acDown from "../assets/walk-sprites/ac-down.png";
+import acDown1 from "../assets/walk-sprites/ac-down-1.png";
+import acDown2 from "../assets/walk-sprites/ac-down-2.png";
+import acUp from "../assets/walk-sprites/ac-up.png";
+import acUp1 from "../assets/walk-sprites/ac-up-1.png";
+import acUp2 from "../assets/walk-sprites/ac-up-2.png";
+import acLeft from "../assets/walk-sprites/ac-left.png";
+import acLeft1 from "../assets/walk-sprites/ac-left-1.png";
+import acRight from "../assets/walk-sprites/ac-right.png";
+import acRight1 from "../assets/walk-sprites/ac-right-1.png";
 import { useDispatch, useSelector } from "react-redux";
 import {
   moveDown,
   selectDirection,
   selectJumping,
+  selectMap,
   selectMoving,
+  selectOnSurfing,
+  selectPos,
+  setOnSurfing,
   stopJumping,
 } from "../state/gameSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { WALK_SPEED } from "../app/constants";
 import useMoveSpeed from "../app/use-move-speed";
 import PixelImage from "../styles/PixelImage";
 import { selectFrozen, selectSpinning } from "../state/uiSlice";
 import { Direction } from "../state/state-types";
+import { isWater } from "../app/map-helper";
 import { xToPx } from "../app/position-helper";
 
 const Container = styled.div`
@@ -59,6 +75,26 @@ const StyledCharacter = styled(PixelImage)`
   width: 100%;
 `;
 
+// Óvalo azul translúcido bajo el personaje cuando surfea: simula la base
+// del Pokémon de agua sobre la que va montado, sin requerir un sprite extra.
+const SurfRaft = styled.div`
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 92%;
+  height: 38%;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(120, 200, 240, 0.85) 0%,
+    rgba(60, 140, 220, 0.55) 70%,
+    rgba(60, 140, 220, 0) 100%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+`;
+
 const Character = () => {
   const dispatch = useDispatch();
 
@@ -67,10 +103,18 @@ const Character = () => {
   const jumping = useSelector(selectJumping);
   const spinning = useSelector(selectSpinning);
   const frozen = useSelector(selectFrozen);
+  const onSurfing = useSelector(selectOnSurfing);
+  const pos = useSelector(selectPos);
+  const map = useSelector(selectMap);
   const { moveSpeed, onBicycle } = useMoveSpeed();
 
   const [image, setImage] = useState(frontStill);
   const [animateJumping, setAnimateJumping] = useState(false);
+  const [surfFrame, setSurfFrame] = useState(0);
+  // Para detectar transición agua→tierra al surfear: guardamos si la
+  // posición previa estaba en agua. Si pasamos de agua a tierra estando
+  // surfeando, animamos un pequeño salto y desmontamos.
+  const wasOnWaterRef = useRef(false);
 
   useEffect(() => {
     if (jumping) {
@@ -84,6 +128,30 @@ const Character = () => {
       }, moveSpeed * 2);
     }
   }, [jumping, dispatch, moveSpeed]);
+
+  // Salida del agua: cuando estabas en water y has pasado a un tile de
+  // tierra (no-water) estando surfeando, anima un pequeño salto y desmonta.
+  useEffect(() => {
+    const onWaterNow = isWater(map.water, pos.x, pos.y);
+    if (onSurfing && wasOnWaterRef.current && !onWaterNow) {
+      setAnimateJumping(true);
+      const t1 = setTimeout(() => setAnimateJumping(false), moveSpeed * 0.9);
+      const t2 = setTimeout(() => dispatch(setOnSurfing(false)), moveSpeed * 1.2);
+      wasOnWaterRef.current = false;
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+    wasOnWaterRef.current = onWaterNow;
+  }, [pos.x, pos.y, map.water, onSurfing, moveSpeed, dispatch]);
+
+  // Animación de remo: alterna entre 2 frames mientras te mueves.
+  useEffect(() => {
+    if (!onSurfing || !moving || frozen) return;
+    const t = setTimeout(() => setSurfFrame((f) => (f + 1) % 2), WALK_SPEED);
+    return () => clearTimeout(t);
+  }, [onSurfing, moving, frozen, surfFrame]);
 
   useEffect(() => {
     if (spinning) {
@@ -205,7 +273,17 @@ const Character = () => {
           transform: animateJumping ? "translateY(-80%)" : "translateY(0)",
         }}
       >
-        <StyledCharacter src={onBicycle ? bikeForDirection(direction) : image} alt="Character" />
+        {onSurfing && <SurfRaft />}
+        <StyledCharacter
+          src={
+            onSurfing
+              ? surfSpriteForDirection(direction, moving && !frozen, surfFrame)
+              : onBicycle
+              ? bikeForDirection(direction)
+              : image
+          }
+          alt="Character"
+        />
       </JumpContainer>
     </Container>
   );
@@ -222,6 +300,30 @@ function bikeForDirection(d: Direction) {
     case Direction.Down: return bikeFront;
     case Direction.Left: return bikeLeft;
     case Direction.Right: return bikeRight;
+  }
+}
+
+/**
+ * Sprite del personaje surfeando. Reusa los assets `ac-*` (set heredado).
+ * - Quieto: ac-{dir}.png
+ * - Moviéndose: alterna entre los 2 frames disponibles. Para left/right solo
+ *   hay un frame extra (-1) → animamos entre still y -1. Para up/down hay
+ *   dos (-1, -2) → ciclamos entre los dos.
+ */
+function surfSpriteForDirection(d: Direction, moving: boolean, frame: number) {
+  if (!moving) {
+    switch (d) {
+      case Direction.Up: return acUp;
+      case Direction.Down: return acDown;
+      case Direction.Left: return acLeft;
+      case Direction.Right: return acRight;
+    }
+  }
+  switch (d) {
+    case Direction.Up: return frame === 0 ? acUp1 : acUp2;
+    case Direction.Down: return frame === 0 ? acDown1 : acDown2;
+    case Direction.Left: return frame === 0 ? acLeft : acLeft1;
+    case Direction.Right: return frame === 0 ? acRight : acRight1;
   }
 }
 

@@ -16,7 +16,7 @@ const palletTown: MapType = {
     x: 8,
     y: 13,
   },
-  walls: {
+walls: {
     0: [9, 12],
     1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19],
     2: [0, 19],
@@ -31,11 +31,11 @@ const palletTown: MapType = {
     11: [0, 10, 11, 13, 14, 15, 19],
     12: [0, 19],
     13: [0, 10, 11, 12, 13, 14, 15, 19],
-    14: [0, 4, 5, 6, 7, 19],
-    15: [0, 4, 5, 6, 7, 10, 19],
-    16: [0, 4, 5, 6, 7, 19],
-    17: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-    18: [2, 3],
+    14: [0, 19],
+    15: [0, 10, 19],
+    16: [0, 19],
+    17: [0, 1, 2, 3, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+    18: [4, 5, 6, 7],
   },
   text: {
     5: {
@@ -193,7 +193,12 @@ encounters: {
   },
   rockSmash: { rate: 0, pokemon: [] }, headbutt: { rate: 0, pokemon: [] }, darkGrass: { rate: 0, pokemon: [] },
   grassSpots: { rate: 0, pokemon: [] }, caveSpots: { rate: 0, pokemon: [] }, bridgeSpots: { rate: 0, pokemon: [] },
-  superRodSpots: { rate: 0, pokemon: [] }, surfSpots: { rate: 0, pokemon: [] },
+  superRodSpots: { rate: 0, pokemon: [] }, surfSpots: {
+    rate: 6,
+    pokemon: [
+      { id: 72, chance: 100, conditionValues: [], minLevel: 5, maxLevel: 15 }
+    ],
+  },
   yellowFlowers: { rate: 0, pokemon: [] }, purpleFlowers: { rate: 0, pokemon: [] }, redFlowers: { rate: 0, pokemon: [] },
   roughTerrain: { rate: 0, pokemon: [] }, gift: { rate: 0, pokemon: [] }, giftEgg: { rate: 0, pokemon: [] }, onlyOne: { rate: 0, pokemon: [] },
 },

@@ -81,7 +81,7 @@ interface EncounterTable {
  * Override parcial de encounters — sólo se editan las tablas relevantes
  * para el juego (caminar + 3 cañas). El resto se mantiene del JSON base.
  */
-type EncounterTableKey = 'walk' | 'oldRod' | 'goodRod' | 'superRod';
+type EncounterTableKey = 'walk' | 'oldRod' | 'goodRod' | 'superRod' | 'surfSpots';
 type EncountersOverride = Partial<Record<EncounterTableKey, EncounterTable>>;
 
 const EMPTY_TABLE = (): EncounterTable => ({ rate: 0, pokemon: [] });
@@ -591,7 +591,7 @@ export default function MapEditor() {
     const baseEnc = m.encounters ?? null;
     if (baseEnc) {
       const picked: EncountersOverride = {};
-      const keys: EncounterTableKey[] = ['walk', 'oldRod', 'goodRod', 'superRod'];
+      const keys: EncounterTableKey[] = ['walk', 'oldRod', 'goodRod', 'superRod', 'surfSpots'];
       for (const k of keys) {
         const t = (baseEnc as Record<string, unknown>)[k] as EncounterTable | undefined;
         if (t && Array.isArray(t.pokemon)) picked[k] = { rate: t.rate ?? 0, pokemon: t.pokemon };
@@ -776,7 +776,7 @@ export default function MapEditor() {
       `  superRod: ${tableTS(encounters.superRod)},\n` +
       `  rockSmash: ${empty}, headbutt: ${empty}, darkGrass: ${empty},\n` +
       `  grassSpots: ${empty}, caveSpots: ${empty}, bridgeSpots: ${empty},\n` +
-      `  superRodSpots: ${empty}, surfSpots: ${empty},\n` +
+      `  superRodSpots: ${empty}, surfSpots: ${tableTS(encounters.surfSpots)},\n` +
       `  yellowFlowers: ${empty}, purpleFlowers: ${empty}, redFlowers: ${empty},\n` +
       `  roughTerrain: ${empty}, gift: ${empty}, giftEgg: ${empty}, onlyOne: ${empty},\n` +
       `},`;
@@ -2207,11 +2207,11 @@ export default function MapEditor() {
                   }}
                 />
                 <EncountersTableEditor
-                  title="🎣 Súper Caña"
-                  tableKey="superRod"
-                  table={encounters.superRod ?? EMPTY_TABLE()}
+                  title="� Surfeando"
+                  tableKey="surfSpots"
+                  table={encounters.surfSpots ?? EMPTY_TABLE()}
                   onChange={(t) => {
-                    setEncounters((e) => ({ ...e, superRod: t }));
+                    setEncounters((e) => ({ ...e, surfSpots: t }));
                     setDirty(true);
                   }}
                 />
@@ -2597,7 +2597,7 @@ function EncountersTableEditor({
   title, tableKey, table, onChange,
 }: {
   title: string;
-  tableKey: 'walk' | 'oldRod' | 'goodRod' | 'superRod';
+  tableKey: 'walk' | 'oldRod' | 'goodRod' | 'superRod' | 'surfSpots';
   table: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[] }[] };
   onChange: (
     next: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[] }[] }

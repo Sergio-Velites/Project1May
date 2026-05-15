@@ -1,10 +1,26 @@
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
-import { selectPokemon, swapPokemonPositions } from "../state/gameSlice";
+import {
+  moveDown,
+  moveLeft,
+  moveRight,
+  moveUp,
+  selectDirection,
+  selectMap,
+  selectOnSurfing,
+  selectPokemon,
+  selectPos,
+  setOnSurfing,
+  swapPokemonPositions,
+} from "../state/gameSlice";
+import { hideStartMenu, showText } from "../state/uiSlice";
+import { directionModifier, isWater } from "../app/map-helper";
+import { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import PokemonRow from "./PokemonRow";
 import { useState } from "react";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
+import { Direction } from "../state/state-types";
 import Menu from "./Menu";
 import Frame from "./Frame";
 import { PokemonInstance } from "../state/state-types";
@@ -79,6 +95,10 @@ const PokemonList = ({
 }: Props) => {
   const dispatch = useDispatch();
   const pokemon_ = useSelector(selectPokemon);
+  const pos = useSelector(selectPos);
+  const direction = useSelector(selectDirection);
+  const map = useSelector(selectMap);
+  const onSurfing = useSelector(selectOnSurfing);
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState(false);
   const [switching, setSwitching] = useState<number | null>(null);
@@ -169,7 +189,45 @@ const PokemonList = ({
 
   const menuItems = isBattleMode
     ? [cambiarItem, datosItem]
-    : [datosItem, cambiarItem];
+    : (() => {
+        // ── Opción SURFEAR (party screen) ────────────────────────────────
+        // Aparece solo si:
+        //   - No estamos ya surfeando
+        //   - El pokémon seleccionado tiene un move "surf" con PP > 0 no
+        //     es necesario, basta con conocerlo (Gen I usa HM como
+        //     habilidad permanente fuera de combate)
+        //   - El jugador mira a un tile de agua adyacente
+        const target = pokemon[cursorIndex];
+        const knowsSurf = !!target?.moves?.some((m) => m.id === "surf");
+        const dirMod = directionModifier(direction);
+        const adjX = pos.x + dirMod.x;
+        const adjY = pos.y + dirMod.y;
+        const facingWater = isWater(map.water, adjX, adjY);
+        const canSurf = !onSurfing && knowsSurf && facingWater && !!target;
+
+        if (!canSurf) return [datosItem, cambiarItem];
+
+        const surfItem = {
+          label: "Surfear",
+          action: () => {
+            setSelected(false);
+            const targetName = getPokemonMetadata(target.id).name.toUpperCase();
+            // Cerrar la party screen y el StartMenu antes de mostrar texto.
+            close();
+            dispatch(hideStartMenu());
+            dispatch(setOnSurfing(true));
+            dispatch(showText([`¡${targetName} usó SURF!`]));
+            // Avanzar 1 tile al agua en la dirección actual.
+            switch (direction) {
+              case Direction.Left:  dispatch(moveLeft());  break;
+              case Direction.Right: dispatch(moveRight()); break;
+              case Direction.Up:    dispatch(moveUp());    break;
+              case Direction.Down:  dispatch(moveDown());  break;
+            }
+          },
+        };
+        return [datosItem, cambiarItem, surfItem];
+      })();
 
   return (
     <>

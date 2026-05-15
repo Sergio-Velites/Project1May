@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
-import { encounterPokemon, selectMap, selectPos } from "../state/gameSlice";
+import { encounterPokemon, selectMap, selectOnSurfing, selectPos } from "../state/gameSlice";
 import { useEffect } from "react";
 import { PokemonEncounterData } from "../maps/map-types";
 import { DEBUG_MODE } from "../app/constants";
-import { isGrass } from "../app/map-helper";
+import { isGrass, isWater } from "../app/map-helper";
 import { PokemonEncounterType } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
 
@@ -40,9 +40,26 @@ const EncounterHandler = () => {
   const dispatch = useDispatch();
   const pos = useSelector(selectPos);
   const map = useSelector(selectMap);
+  const onSurfing = useSelector(selectOnSurfing);
 
   useEffect(() => {
     if (!map.encounters || DEBUG_MODE) return;
+
+    // Surf: encuentros sobre tiles de agua si el mapa define `surfSpots`.
+    // Si la tabla está vacía → sin encuentros (decisión segura).
+    if (onSurfing && isWater(map.water, pos.x, pos.y)) {
+      const surfTable = map.encounters.surfSpots;
+      if (surfTable && surfTable.pokemon.length > 0) {
+        const encounter = shouldEncounter(surfTable.rate);
+        if (encounter) {
+          const pokemon = getPokemon(surfTable.pokemon);
+          if (pokemon) {
+            dispatch(encounterPokemon(pokemon));
+          }
+        }
+      }
+      return;
+    }
 
     // Handling walk encounters
     const isWalk = map.cave ? true : isGrass(map.grass, pos.x, pos.y);
@@ -55,7 +72,7 @@ const EncounterHandler = () => {
         }
       }
     }
-  }, [pos, map.grass, map.encounters, dispatch, map.cave]);
+  }, [pos, map.grass, map.water, map.encounters, dispatch, map.cave, onSurfing]);
 
   return null;
 };

@@ -16,26 +16,23 @@ const route22: MapType = {
     x: 38,
     y: 8,
   },
-  walls: {
+walls: {
     1: [30, 31, 32, 33, 34, 35, 36],
     2: [29, 36],
     3: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 36],
     4: [8, 15, 36],
     5: [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15, 36, 37, 38, 39],
-    6: [1, 14, 15, 22, 23, 24, 25, 26, 27, 28, 29, 34, 35],
-    7: [1, 14, 15, 22, 29, 34],
-    8: [1, 14, 15, 22, 29, 34],
-    9: [1, 14, 15, 22, 23, 24, 25, 29, 34],
+    6: [1, 14, 15, 26, 27, 28, 29, 34, 35],
+    7: [1, 14, 15, 29, 34],
+    8: [1, 14, 15, 29, 34],
+    9: [1, 14, 15, 29, 34],
     10: [1, 14, 15, 26, 29, 34, 38, 39],
     11: [1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 26, 29, 34, 38],
     12: [1, 26, 29, 38],
     13: [1, 26, 27, 28, 29, 38],
     14: [1, 38],
     15: [1, 38],
-    16: [
-      2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-      22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-    ],
+    16: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37],
   },
   fences: {
     3: [30, 31, 32, 34, 35],
@@ -203,7 +200,14 @@ encounters: {
   },
   rockSmash: { rate: 0, pokemon: [] }, headbutt: { rate: 0, pokemon: [] }, darkGrass: { rate: 0, pokemon: [] },
   grassSpots: { rate: 0, pokemon: [] }, caveSpots: { rate: 0, pokemon: [] }, bridgeSpots: { rate: 0, pokemon: [] },
-  superRodSpots: { rate: 0, pokemon: [] }, surfSpots: { rate: 0, pokemon: [] },
+  superRodSpots: { rate: 0, pokemon: [] }, surfSpots: {
+    rate: 8,
+    pokemon: [
+      { id: 54, chance: 60, conditionValues: [], minLevel: 10, maxLevel: 20 },
+      { id: 60, chance: 30, conditionValues: [], minLevel: 8, maxLevel: 15 },
+      { id: 79, chance: 10, conditionValues: [], minLevel: 15, maxLevel: 25 }
+    ],
+  },
   yellowFlowers: { rate: 0, pokemon: [] }, purpleFlowers: { rate: 0, pokemon: [] }, redFlowers: { rate: 0, pokemon: [] },
   roughTerrain: { rate: 0, pokemon: [] }, gift: { rate: 0, pokemon: [] }, giftEgg: { rate: 0, pokemon: [] }, onlyOne: { rate: 0, pokemon: [] },
 },
