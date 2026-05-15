@@ -194,9 +194,16 @@ encounters: {
   rockSmash: { rate: 0, pokemon: [] }, headbutt: { rate: 0, pokemon: [] }, darkGrass: { rate: 0, pokemon: [] },
   grassSpots: { rate: 0, pokemon: [] }, caveSpots: { rate: 0, pokemon: [] }, bridgeSpots: { rate: 0, pokemon: [] },
   superRodSpots: { rate: 0, pokemon: [] }, surfSpots: {
-    rate: 6,
+    rate: 100,
     pokemon: [
-      { id: 72, chance: 100, conditionValues: [], minLevel: 5, maxLevel: 15 }
+      { id: 134, chance: 5, conditionValues: [], minLevel: 25, maxLevel: 29 },
+      { id: 121, chance: 9, conditionValues: [], minLevel: 25, maxLevel: 29 },
+      { id: 120, chance: 12, conditionValues: [], minLevel: 20, maxLevel: 23 },
+      { id: 119, chance: 12, conditionValues: [], minLevel: 20, maxLevel: 28 },
+      { id: 118, chance: 10, conditionValues: [], minLevel: 15, maxLevel: 26 },
+      { id: 116, chance: 10, conditionValues: [], minLevel: 15, maxLevel: 21 },
+      { id: 80, chance: 10, conditionValues: [], minLevel: 24, maxLevel: 30 },
+      { id: 73, chance: 10, conditionValues: [], minLevel: 24, maxLevel: 30 }
     ],
   },
   yellowFlowers: { rate: 0, pokemon: [] }, purpleFlowers: { rate: 0, pokemon: [] }, redFlowers: { rate: 0, pokemon: [] },

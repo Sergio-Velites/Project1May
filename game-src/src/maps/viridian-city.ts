@@ -173,9 +173,8 @@ encounters: {
   superRodSpots: { rate: 0, pokemon: [] }, surfSpots: {
     rate: 100,
     pokemon: [
-      { id: 54, chance: 10, conditionValues: [], minLevel: 23, maxLevel: 25 },
+      { id: 54, chance: 10, conditionValues: [], minLevel: 18, maxLevel: 25 },
       { id: 130, chance: 5, conditionValues: [], minLevel: 25, maxLevel: 30 },
-      { id: 131, chance: 10, conditionValues: [], minLevel: 26, maxLevel: 100 },
       { id: 138, chance: 10, conditionValues: [], minLevel: 20, maxLevel: 24 },
       { id: 134, chance: 3, conditionValues: [], minLevel: 20, maxLevel: 30 },
       { id: 140, chance: 10, conditionValues: [], minLevel: 20, maxLevel: 24 }
