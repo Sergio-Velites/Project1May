@@ -226,7 +226,7 @@ trainers: [
           "¡Toma la INSIGNIA DEL VINO!",
           "Es el símbolo de que mereces brindar.",
           "Y esta M0, que contiene Surf.",
-          "¡Úsala bien, y que el vino fluya!",
+          "¡Úsala bien, y fluye como el buen vino!",
         ],
         items: [ItemType.BoulderBadge, ItemType.Hm03],
       },
@@ -252,8 +252,10 @@ trainers: [
   sightRange: 0,
   postGame: {
     message: [
-      "¡Espera! Toma esta M0.",
-      "Es la M02, que contiene Vuelo.",
+      "Por lo menos, ahora toca volar a Japón",
+      "¡Espera! hablando de volar",
+      "Toma esta M0.",
+      "contiene Vuelo.",
       "Enséñasela a un Pokémon volador",
       "y podrás regresar volando a los",
       "lugares que ya conoces.",
