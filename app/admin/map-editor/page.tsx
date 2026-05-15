@@ -2207,7 +2207,16 @@ export default function MapEditor() {
                   }}
                 />
                 <EncountersTableEditor
-                  title="� Surfeando"
+                  title="🎣 Súper Caña"
+                  tableKey="superRod"
+                  table={encounters.superRod ?? EMPTY_TABLE()}
+                  onChange={(t) => {
+                    setEncounters((e) => ({ ...e, superRod: t }));
+                    setDirty(true);
+                  }}
+                />
+                <EncountersTableEditor
+                  title="🏄 Surfeando"
                   tableKey="surfSpots"
                   table={encounters.surfSpots ?? EMPTY_TABLE()}
                   onChange={(t) => {
