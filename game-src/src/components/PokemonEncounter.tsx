@@ -1426,6 +1426,35 @@ const PokemonEncounter = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
 
+  // Ref siempre actualizada a la última instancia de processBattle (closure
+  // fresca con state actual). Necesario para llamarla desde un setTimeout
+  // dentro del useEffect de auto-disparo sin capturar valores obsoletos.
+  // OJO: la asignación a .current vive más abajo, después del early return,
+  // porque depende de `processBattle` (definido más abajo). Solo el `useRef`
+  // necesita ir aquí para mantener el orden de hooks.
+  const processBattleRef = useRef<((id: string) => void) | null>(null);
+
+  // Auto-disparo del turno cuando el menú de combate debe estar bloqueado:
+  //   · Carga T2 (Solar Beam, Razor Wind, Sky Attack, Skull Bash, Dig, Fly).
+  //   · Recarga obligatoria (Hyper Beam y similares).
+  // En Gen I el jugador no puede elegir acción en estos turnos: se ejecuta
+  // directamente. La pantalla muestra brevemente el campo y luego avanza.
+  useEffect(() => {
+    if (stage !== 11) return;
+    if (clickableNotice) return;
+    if (!playerLockedReason) return;
+    const t = setTimeout(() => {
+      if (!processBattleRef.current) return;
+      if (playerLockedReason === "charging" && playerChargingMoveRef.current) {
+        processBattleRef.current(playerChargingMoveRef.current);
+      } else if (playerLockedReason === "recharging") {
+        // El branch de recarga al inicio de processBattle ignora el attackId
+        processBattleRef.current("__locked_recharge__");
+      }
+    }, 350);
+    return () => clearTimeout(t);
+  }, [stage, playerLockedReason, clickableNotice]);
+
   if (!isInBattle) return null;
 
   const text = () => {
@@ -2824,31 +2853,9 @@ const PokemonEncounter = () => {
     }
   };
 
-  // Ref siempre actualizada a la última instancia de processBattle (closure
-  // fresca con state actual). Necesario para llamarla desde un setTimeout
-  // dentro del useEffect de auto-disparo sin capturar valores obsoletos.
-  const processBattleRef = useRef(processBattle);
+  // Mantener processBattleRef apuntando a la última closure (no es un hook,
+  // solo asignación a .current de un ref ya declarado antes del early return).
   processBattleRef.current = processBattle;
-
-  // Auto-disparo del turno cuando el menú de combate debería estar bloqueado:
-  //   · Carga T2 (Solar Beam, Razor Wind, Sky Attack, Skull Bash, Dig, Fly).
-  //   · Recarga obligatoria (Hyper Beam y similares).
-  // En Gen I el jugador no puede elegir acción en estos turnos: se ejecuta
-  // directamente. La pantalla muestra brevemente el campo y luego avanza.
-  useEffect(() => {
-    if (stage !== 11) return;
-    if (clickableNotice) return;
-    if (!playerLockedReason) return;
-    const t = setTimeout(() => {
-      if (playerLockedReason === "charging" && playerChargingMoveRef.current) {
-        processBattleRef.current(playerChargingMoveRef.current);
-      } else if (playerLockedReason === "recharging") {
-        // El branch de recarga al inicio de processBattle ignora el attackId
-        processBattleRef.current("__locked_recharge__");
-      }
-    }, 350);
-    return () => clearTimeout(t);
-  }, [stage, playerLockedReason, clickableNotice]);
 
   const leftImage = () => {
     if (stage <= 3) return playerBack;
