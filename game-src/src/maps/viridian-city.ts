@@ -4,6 +4,7 @@ import { cueBall, fisher, gentleman, jrTrainerFemale, lass, rocker, sailor, team
 import { Direction } from "../state/state-types";
 import music from "../assets/music/maps/pallet-town.mp3";
 import getEncounterData from "./get-location-data";
+import { ItemType } from "../app/use-item-data";
 
 const viridianCity: MapType = {
   name: "SOTO LEZKAIRU",
@@ -322,6 +323,12 @@ water: {
     26: [8, 9, 10, 11, 12, 13],
     27: [8, 9, 10, 11, 12, 13],
   },
+  items: [
+    {
+      item: ItemType.MasterBall,
+      pos: { x: 5, y: 23 },
+    },
+  ],
 };
 
 export default viridianCity;
