@@ -1082,7 +1082,7 @@ const PokemonEncounter = () => {
       };
 
       throwPokeballAtEnemy();
-      const caught = catchesPokemon(enemy, pokeballThrowing);
+      const caught = catchesPokemon(enemy, pokeballThrowing, enemyStatusRef.current);
       setTimeout(() => {
         if (caught) {
           shakePokeball(3, caught);
