@@ -47,6 +47,8 @@ import OnlineBattleNpc from "./OnlineBattleNpc";
 import OnlineBattleMenu from "./OnlineBattleMenu";
 import FishingSession from "./FishingSession";
 import Knockback from "./Knockback";
+import FlyMenu from "./FlyMenu";
+import FlyAnimation from "./FlyAnimation";
 import { selectPokedexOpen, hidePokedex } from "../state/uiSlice";
 
 const Container = styled.div`
@@ -153,6 +155,8 @@ const Game = () => {
       <OnlineBattleMenu />
       <FishingSession />
       <Knockback />
+      <FlyMenu />
+      <FlyAnimation />
       <TextThenAction />
       <StartMenu />
       <ItemsMenu />

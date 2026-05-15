@@ -7,13 +7,16 @@ import {
   moveUp,
   selectDirection,
   selectMap,
+  selectMapId,
   selectOnSurfing,
   selectPokemon,
   selectPos,
+  selectVisitedMaps,
   setOnSurfing,
   swapPokemonPositions,
 } from "../state/gameSlice";
-import { hideStartMenu, showText } from "../state/uiSlice";
+import { hideStartMenu, showFlyMenu, showText } from "../state/uiSlice";
+import { MapId } from "../maps/map-types";
 import { directionModifier, isWater } from "../app/map-helper";
 import { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import PokemonRow from "./PokemonRow";
@@ -98,7 +101,9 @@ const PokemonList = ({
   const pos = useSelector(selectPos);
   const direction = useSelector(selectDirection);
   const map = useSelector(selectMap);
+  const mapId = useSelector(selectMapId);
   const onSurfing = useSelector(selectOnSurfing);
+  const visitedMaps = useSelector(selectVisitedMaps);
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState(false);
   const [switching, setSwitching] = useState<number | null>(null);
@@ -199,19 +204,43 @@ const PokemonList = ({
         //   - El jugador mira a un tile de agua adyacente
         const target = pokemon[cursorIndex];
         const knowsSurf = !!target?.moves?.some((m) => m.id === "surf");
+        const knowsFly = !!target?.moves?.some((m) => m.id === "fly");
         const dirMod = directionModifier(direction);
         const adjX = pos.x + dirMod.x;
         const adjY = pos.y + dirMod.y;
         const facingWater = isWater(map.water, adjX, adjY);
         const canSurf = !onSurfing && knowsSurf && facingWater && !!target;
 
-        if (!canSurf) return [datosItem, cambiarItem];
+        // ── Opción VOLAR (party screen) ─────────────────────────────────
+        // Aparece si:
+        //   - El pokémon seleccionado tiene un move "fly" (la MO se aprende
+        //     una vez y queda permanente; PP no es necesario fuera de combate
+        //     en Gen I).
+        //   - No estamos surfeando (no se puede volar desde encima del agua).
+        //   - Existe al menos un destino visitado distinto del actual.
+        // Nota: a diferencia de Gen I, sí permitimos usar Vuelo desde mapas
+        // interiores (gimnasios, centros, casas). En una invitación de boda
+        // es preferible no bloquear al jugador por una convención del juego.
+        const flyDestinations: MapId[] = [
+          MapId.PalletTown,
+          MapId.ViridianCity,
+          MapId.Route3PokemonCenter,
+          MapId.PewterCity,
+        ];
+        const reachableFlyTargets = flyDestinations.filter(
+          (m) => visitedMaps.includes(m) && m !== mapId
+        );
+        const canFly =
+          !!target &&
+          knowsFly &&
+          !onSurfing &&
+          reachableFlyTargets.length > 0;
 
-        const surfItem = {
+        const surfItem = canSurf && {
           label: "Surfear",
           action: () => {
             setSelected(false);
-            const targetName = getPokemonMetadata(target.id).name.toUpperCase();
+            const targetName = getPokemonMetadata(target!.id).name.toUpperCase();
             // Cerrar la party screen y el StartMenu antes de mostrar texto.
             close();
             dispatch(hideStartMenu());
@@ -226,7 +255,23 @@ const PokemonList = ({
             }
           },
         };
-        return [datosItem, cambiarItem, surfItem];
+
+        const flyItem = canFly && {
+          label: "Volar",
+          action: () => {
+            setSelected(false);
+            close();
+            dispatch(hideStartMenu());
+            dispatch(showFlyMenu());
+          },
+        };
+
+        const extras = [surfItem, flyItem].filter(Boolean) as {
+          label: string;
+          action: () => void;
+        }[];
+
+        return [datosItem, cambiarItem, ...extras];
       })();
 
   return (

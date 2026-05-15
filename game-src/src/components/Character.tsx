@@ -59,7 +59,12 @@ import { useEffect, useRef, useState } from "react";
 import { WALK_SPEED } from "../app/constants";
 import useMoveSpeed from "../app/use-move-speed";
 import PixelImage from "../styles/PixelImage";
-import { selectFishing, selectFrozen, selectSpinning } from "../state/uiSlice";
+import {
+  selectFishing,
+  selectFlyAnimation,
+  selectFrozen,
+  selectSpinning,
+} from "../state/uiSlice";
 import { Direction } from "../state/state-types";
 import { isWater } from "../app/map-helper";
 import { xToPx } from "../app/position-helper";
@@ -117,6 +122,7 @@ const Character = () => {
   const frozen = useSelector(selectFrozen);
   const onSurfing = useSelector(selectOnSurfing);
   const fishing = useSelector(selectFishing);
+  const flyAnimation = useSelector(selectFlyAnimation);
   const pos = useSelector(selectPos);
   const map = useSelector(selectMap);
   const { moveSpeed, onBicycle } = useMoveSpeed();
@@ -291,6 +297,12 @@ const Character = () => {
       }
     }
   }, [image, moving, direction, spinning, frozen]);
+
+  // Durante la animación de Vuelo el personaje real se oculta: el pajarito
+  // (FlyAnimation.tsx, sprite `bird-*`) se renderiza como overlay y simula
+  // el viaje. Si dejásemos el sprite del personaje visible, se vería al
+  // jugador en la posición de origen y luego en el destino sin transición.
+  if (flyAnimation) return null;
 
   return (
     <Container>

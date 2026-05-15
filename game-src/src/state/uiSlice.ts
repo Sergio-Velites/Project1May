@@ -1,8 +1,8 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { ItemType } from "../app/use-item-data";
-import { Direction } from "./state-types";
-import { SimpleGiftType, TextReward } from "../maps/map-types";
+import { Direction, PosType } from "./state-types";
+import { MapId, SimpleGiftType, TextReward } from "../maps/map-types";
 
 interface TextThenActionType {
   text: string[];
@@ -51,6 +51,20 @@ export interface KnockbackState {
   direction: Direction;
 }
 
+/**
+ * Animación de Vuelo (MO02). Tres fases:
+ *  - "takeoff"  : el pajarito sube con el jugador y sale por arriba.
+ *  - "transit"  : pantalla negra; se aplica el `flyTo` en el reducer y se
+ *    cambia a la fase de aterrizaje en el siguiente tick.
+ *  - "landing"  : el pajarito desciende en el destino y desaparece.
+ * `destination` se conserva durante todas las fases para que el componente
+ * de animación sepa adónde aplicar `flyTo`.
+ */
+export interface FlyAnimationState {
+  phase: "takeoff" | "transit" | "landing";
+  destination: { map: MapId; pos: PosType };
+}
+
 interface UiState {
   text: string[] | null;
   startMenu: boolean;
@@ -81,6 +95,10 @@ interface UiState {
   fishing: FishingState | null;
   /** Sesión de knockback activa (empuje del jugador). */
   knockback: KnockbackState | null;
+  /** Menú de selección de destino para la MO Vuelo. */
+  flyMenu: boolean;
+  /** Animación de vuelo en curso (pajarito subiendo/aterrizando). */
+  flyAnimation: FlyAnimationState | null;
   /**
    * Petición pendiente de aplicar CONFUSIÓN al pokémon en combate (índice
    * del equipo) tras usar un objeto. PokemonEncounter la observa y, si el
@@ -124,6 +142,8 @@ const initialState: UiState = {
   textRewardPending: null,
   fishing: null,
   knockback: null,
+  flyMenu: false,
+  flyAnimation: null,
   pendingConfusionFromItem: null,
   playerTurnTick: 0,
 };
@@ -292,6 +312,27 @@ export const uiSlice = createSlice({
     endKnockback: (state) => {
       state.knockback = null;
     },
+    showFlyMenu: (state) => {
+      state.flyMenu = true;
+    },
+    hideFlyMenu: (state) => {
+      state.flyMenu = false;
+    },
+    startFlyAnimation: (
+      state,
+      action: PayloadAction<{ map: MapId; pos: PosType }>
+    ) => {
+      state.flyAnimation = { phase: "takeoff", destination: action.payload };
+    },
+    setFlyPhase: (
+      state,
+      action: PayloadAction<"takeoff" | "transit" | "landing">
+    ) => {
+      if (state.flyAnimation) state.flyAnimation.phase = action.payload;
+    },
+    endFlyAnimation: (state) => {
+      state.flyAnimation = null;
+    },
     requestConfusionFromItem: (
       state,
       action: PayloadAction<{ pokemonIndex: number; turns: number }>
@@ -360,6 +401,11 @@ export const {
   endFishing,
   startKnockback,
   endKnockback,
+  showFlyMenu,
+  hideFlyMenu,
+  startFlyAnimation,
+  setFlyPhase,
+  endFlyAnimation,
   requestConfusionFromItem,
   consumePendingConfusionFromItem,
 } = uiSlice.actions;
@@ -417,7 +463,9 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.mapGiftPending !== null ||
   state.ui.textRewardPending !== null ||
   state.ui.fishing !== null ||
-  state.ui.knockback !== null;
+  state.ui.knockback !== null ||
+  state.ui.flyMenu ||
+  state.ui.flyAnimation !== null;
 
 export const selectStartMenuSubOpen = (state: RootState) =>
   state.ui.itemsMenu || state.ui.playerMenu;
@@ -460,6 +508,10 @@ export const selectTextRewardPending = (state: RootState) =>
 export const selectFishing = (state: RootState) => state.ui.fishing;
 
 export const selectKnockback = (state: RootState) => state.ui.knockback;
+
+export const selectFlyMenu = (state: RootState) => state.ui.flyMenu;
+
+export const selectFlyAnimation = (state: RootState) => state.ui.flyAnimation;
 
 export const selectPlayerTurnTick = (state: RootState) =>
   state.ui.playerTurnTick;
