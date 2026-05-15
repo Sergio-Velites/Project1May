@@ -39,7 +39,7 @@ text: {
       11: {
         type: "item",
         itemKey: ItemType.RareCandy,
-        amount: 100,
+        amount: 30,
         questId: "text-reward-pewter-city-museum-2f-11-2",
       },
     },
