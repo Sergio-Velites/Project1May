@@ -191,58 +191,55 @@ text: {
   },
   exitReturnMap: MapId.Route2Gate,
 // Trainers para "viridian-forrest"
+// Trainers para "viridian-forrest"
 trainers: [
   {
   npc: bugCatcher,
-  pokemon: [{ id: 10, level: 5 }, { id: 14, level: 5 }],
+  pokemon: [],
   facing: Direction.Left,
   pos: { x: 29, y: 19 },
   intro: [
-    "¡Al que llegue antes a la preboda le espera un pin de recuerdo!",
-    "¡Pero antes tendrás que ganarme!",
+    "¡Detente, invitado de la boda!",
+    "¡Primero debes combatir!"
   ],
   outtro: [
-    "¡Detente, invitado de la boda!",
-    "¡Corre que llegarás tarde!",
+    "¡Qué batalla tan emocionante!",
     "¡Sigue tu camino, valiente!"
   ],
   money: 60,
-  persistent: true,
+
 },
   {
   npc: bugCatcher,
-  pokemon: [{ id: 13, level: 7 }],
+  pokemon: [],
   facing: Direction.Left,
   pos: { x: 28, y: 33 },
   intro: [
-    "¡Llevo media hora perdido en este bosque!",
-    "¡Al menos te desahogas batallando!",
+    "¡Los insectos son los mejores!",
+    "¡Protegen el bosque de la boda!"
   ],
   outtro: [
-    "¡Los insectos son los mejores!",
-    "¡Protegen el bosque de la boda!",
+    "¡Bien luchado!",
     "¡Disfruta la celebración!"
   ],
-  money: 60,
-  persistent: true,
+  money: 70,
+
 },
   {
   npc: bugCatcher,
-  pokemon: [{ id: 11, level: 6 }, { id: 10, level: 5 }],
+  pokemon: [],
   facing: Direction.Left,
   pos: { x: 2, y: 19 },
   intro: [
-    "¡El DJ ya está calentando!",
-    "¡Demuéstrame que llegas a tiempo!",
+    "¡Nadie pasa sin combatir!",
+    "¡Así lo dice la ley del bosque!"
   ],
   outtro: [
-    "¡Nadie pasa sin saludar!",
-    "¡Así lo dice la ley del bosque!",
     "¡Felicidades a los novios!",
     "¡Que sean muy felices!"
   ],
   money: 60,
-  persistent: true,
+
 },
   {
   npc: beauty,
@@ -262,7 +259,7 @@ trainers: [
   npc: lass,
   pokemon: [{ id: 35, level: 4 }],
   facing: Direction.Right,
-  pos: { x: 20, y: 38 },
+  pos: { x: 17, y: 40 },
   intro: [
 
   ],

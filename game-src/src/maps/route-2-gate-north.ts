@@ -1,4 +1,4 @@
-import { beauty } from "../app/npcs";
+import { beauty, blackBelt } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/route-2-gate.png";
 import { Direction } from "../state/state-types";
@@ -45,6 +45,7 @@ items: [
     },
   ],
   // Trainers para "route-2-gate-north"
+// Trainers para "route-2-gate-north"
 trainers: [
   {
   npc: beauty,
@@ -61,6 +62,23 @@ trainers: [
     "Y luego salió corriendo hacia VILLAMAYOR DE MONJARDÍN"
   ],
   money: 0,
+  persistent: true,
+},
+  {
+  npc: blackBelt,
+  pokemon: [{ id: 68, level: 20 }],
+  facing: Direction.Left,
+  pos: { x: 7, y: 1 },
+  intro: [
+    "Antes me hacía llamar Berrito...",
+    "Pero gracias a gym Unav,",
+    "Hoy vengo de incógnito!",
+    "Ssshhhh no se lo digas a nadie"
+  ],
+  outtro: [
+    "Como me jode que la boda no sea en Zentral..."
+  ],
+  money: 99995,
   persistent: true,
 }
 ],
