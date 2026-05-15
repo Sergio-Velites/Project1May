@@ -1,4 +1,4 @@
-import { bugCatcher, lass, youngster } from "../app/npcs";
+import { birdKeeper, bugCatcher, burglar, lass, youngster } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/route-3.png";
 import music from "../assets/music/maps/route-3.mp3";
@@ -134,12 +134,13 @@ const route3: MapType = {
     },
   ],
 // Trainers para "route-3"
+// Trainers para "route-3"
 trainers: [
   {
   npc: lass,
-  pokemon: [{ id: 16, level: 13 }, { id: 19, level: 13 }],
+  pokemon: [{ id: 17, level: 26 }, { id: 20, level: 29 }],
   facing: Direction.Left,
-  pos: { x: 22, y: 27 },
+  pos: { x: 63, y: 15 },
   intro: [
     "Eh… ¿tú también vienes de la boda?",
     "¡Pues a celebrar otra vez!"
@@ -153,7 +154,7 @@ trainers: [
 },
   {
   npc: bugCatcher,
-  pokemon: [{ id: 10, level: 14 }, { id: 13, level: 14 }],
+  pokemon: [{ id: 12, level: 19 }, { id: 15, level: 26 }],
   facing: Direction.Right,
   pos: { x: 24, y: 27 },
   intro: [
@@ -169,9 +170,9 @@ trainers: [
 },
   {
   npc: youngster,
-  pokemon: [{ id: 19, level: 13 }, { id: 19, level: 13 }, { id: 19, level: 13 }],
+  pokemon: [{ id: 19, level: 17 }, { id: 19, level: 21 }, { id: 20, level: 25 }],
   facing: Direction.Down,
-  pos: { x: 21, y: 22 },
+  pos: { x: 59, y: 21 },
   intro: [
     "¡Hola! ¡Me gustan los pantalones cortos!",
     "¡Aunque hoy llevo el esmoquin aún puesto!"
@@ -185,7 +186,7 @@ trainers: [
 },
   {
   npc: bugCatcher,
-  pokemon: [{ id: 10, level: 14 }, { id: 11, level: 14 }],
+  pokemon: [{ id: 10, level: 14 }, { id: 12, level: 19 }],
   facing: Direction.Down,
   pos: { x: 15, y: 22 },
   intro: [
@@ -201,7 +202,7 @@ trainers: [
 },
   {
   npc: youngster,
-  pokemon: [{ id: 21, level: 15 }, { id: 19, level: 15 }],
+  pokemon: [{ id: 21, level: 20 }, { id: 19, level: 27 }],
   facing: Direction.Left,
   pos: { x: 27, y: 23 },
   intro: [
@@ -217,7 +218,7 @@ trainers: [
 },
   {
   npc: lass,
-  pokemon: [{ id: 39, level: 14 }, { id: 16, level: 14 }],
+  pokemon: [{ id: 39, level: 14 }, { id: 17, level: 21 }],
   facing: Direction.Left,
   pos: { x: 14, y: 26 },
   intro: [
@@ -234,7 +235,7 @@ trainers: [
 },
   {
   npc: bugCatcher,
-  pokemon: [{ id: 13, level: 14 }, { id: 14, level: 14 }],
+  pokemon: [{ id: 13, level: 14 }, { id: 15, level: 20 }],
   facing: Direction.Right,
   pos: { x: 10, y: 24 },
   intro: [
@@ -250,9 +251,9 @@ trainers: [
 },
   {
   npc: lass,
-  pokemon: [{ id: 19, level: 14 }, { id: 29, level: 14 }],
+  pokemon: [{ id: 19, level: 14 }, { id: 30, level: 25 }],
   facing: Direction.Up,
-  pos: { x: 18, y: 24 },
+  pos: { x: 20, y: 24 },
   intro: [
     "¡Ay! ¡No me toques la cabeza!",
     "¡Me retumba como un GONG!"
@@ -264,6 +265,36 @@ trainers: [
   ],
   money: 210,
 
+},
+  {
+  npc: burglar,
+  pokemon: [{ id: 24, level: 30 }],
+  facing: Direction.Left,
+  pos: { x: 69, y: 6 },
+  intro: [
+    "No me invitaron a la boda.",
+    "Pero robaré los restos..."
+  ],
+  outtro: [
+    "ay primo!"
+  ],
+  money: 0,
+  persistent: true,
+},
+  {
+  npc: birdKeeper,
+  pokemon: [{ id: 22, level: 20 }, { id: 17, level: 25 }, { id: 83, level: 30 }],
+  facing: Direction.Down,
+  pos: { x: 46, y: 22 },
+  intro: [
+    "Menuda cara me llevas...",
+    "Quieres un ibuprofeno?"
+  ],
+  outtro: [
+    "Pues no hay ibuprofeno para ti!"
+  ],
+  money: 0,
+  persistent: true,
 }
 ],
 };

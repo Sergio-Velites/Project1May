@@ -115,12 +115,12 @@ const mtMoon1f: MapType = {
 trainers: [
   {
   npc: bugCatcher,
-  pokemon: [{ id: 10, level: 10 }, { id: 11, level: 11 }],
+  pokemon: [{ id: 11, level: 19 }, { id: 12, level: 28 }],
   facing: Direction.Down,
   pos: { x: 6, y: 4 },
   intro: [
     "¡Anda anda! ¡Otro invitado perdido en la cueva!",
-    "¡Pues paga el peaje!",
+    "¡Pues paga el peaje!"
   ],
   outtro: [
     "Hay tipos sospechosos en la cueva.",
@@ -133,12 +133,12 @@ trainers: [
 },
   {
   npc: lass,
-  pokemon: [{ id: 39, level: 12 }],
+  pokemon: [{ id: 39, level: 29 }],
   facing: Direction.Down,
   pos: { x: 4, y: 4 },
   intro: [
     "¿Hay WiFi aquí dentro?",
-    "Da igual, ¡batalla conmigo mientras busco cobertura!",
+    "Da igual, ¡batalla conmigo mientras busco cobertura!"
   ],
   outtro: [
     "Estoy esperando a mis amigos…",
@@ -151,12 +151,12 @@ trainers: [
 },
   {
   npc: superNerd,
-  pokemon: [{ id: 100, level: 13 }],
+  pokemon: [{ id: 101, level: 29 }],
   facing: Direction.Up,
   pos: { x: 33, y: 10 },
   intro: [
     "Analizo la geología de esta cueva para el regalo de boda.",
-    "¡Pero primero, un experimento científico!",
+    "¡Pero primero, un experimento científico!"
   ],
   outtro: [
     "¡Eh! ¡No me grites,",
@@ -169,12 +169,12 @@ trainers: [
 },
   {
   npc: bugCatcher,
-  pokemon: [{ id: 14, level: 11 }, { id: 13, level: 12 }],
+  pokemon: [{ id: 14, level: 20 }, { id: 15, level: 28 }],
   facing: Direction.Right,
   pos: { x: 13, y: 29 },
   intro: [
     "¡Me mandaron a buscar anís y encontré esto!",
-    "¡Batalla rápida antes de que me llamen!",
+    "¡Batalla rápida antes de que me llamen!"
   ],
   outtro: [
     "¡Cruza esta cueva y volverás",
@@ -187,12 +187,12 @@ trainers: [
 },
   {
   npc: lass,
-  pokemon: [{ id: 35, level: 11 }],
+  pokemon: [{ id: 36, level: 25 }],
   facing: Direction.Down,
   pos: { x: 14, y: 23 },
   intro: [
     "¡Encontré un Clefairy, es buena señal para la boda!",
-    "¡Pero primero demuéstra que mereces verlo!",
+    "¡Pero primero demuéstra que mereces verlo!"
   ],
   outtro: [
     "¡Madre mía! ¡Esto retumba",
@@ -205,12 +205,12 @@ trainers: [
 },
   {
   npc: hiker,
-  pokemon: [{ id: 74, level: 12 }, { id: 41, level: 10 }],
+  pokemon: [{ id: 75, level: 24 }, { id: 42, level: 29 }],
   facing: Direction.Down,
   pos: { x: 20, y: 14 },
   intro: [
     "Llevo días explorando. ¿Tú también vienes a la boda?",
-    "¡Entonces tendrás que demostrar que eres digno!",
+    "¡Entonces tendrás que demostrar que eres digno!"
   ],
   outtro: [
     "¡Anda! ¡Menudo susto!",
@@ -224,12 +224,12 @@ trainers: [
 },
   {
   npc: youngster,
-  pokemon: [{ id: 19, level: 12 }],
+  pokemon: [{ id: 20, level: 28 }],
   facing: Direction.Right,
   pos: { x: 8, y: 12 },
   intro: [
     "¡La barra libre no es gratis, hay que ganársela!",
-    "¡Demuéstrame que mereces tu copa!",
+    "¡Demuéstrame que mereces tu copa!"
   ],
   outtro: [
     "¿Tú también te has perdido",
