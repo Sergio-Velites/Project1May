@@ -67,8 +67,8 @@ const TextContainer = styled.div`
 // Rejilla: 2 tiles ancho × 1.5 tiles alto = 3 filas × 2 cols
 const MachineGrid = styled.div`
   position: absolute;
-  left: calc(50% - 40cqw / 2.34);
-  top:  calc(50% - 24cqw / 2.34);
+  left: calc(50% - 32cqw / 2.34);
+  top:  calc(50% - 40cqw / 2.34);
   width:  calc(32cqw / 2.34);
   height: calc(24cqw / 2.34);
   display: grid;
