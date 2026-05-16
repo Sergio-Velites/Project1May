@@ -125,7 +125,53 @@ const route3: MapType = {
     x: 38,
     y: 17,
   },
-  encounters: getEncounterData("kanto-route-3-area"),
+encounters: {
+  walk: {
+    rate: 21,
+    pokemon: [
+      { id: 16, chance: 20, conditionValues: [], minLevel: 11, maxLevel: 18 },
+      { id: 16, chance: 15, conditionValues: [], minLevel: 13, maxLevel: 21 },
+      { id: 17, chance: 10, conditionValues: [], minLevel: 16, maxLevel: 26 },
+      { id: 21, chance: 20, conditionValues: [], minLevel: 9, maxLevel: 15 },
+      { id: 21, chance: 10, conditionValues: [], minLevel: 12, maxLevel: 14 },
+      { id: 21, chance: 10, conditionValues: [], minLevel: 12, maxLevel: 18 },
+      { id: 22, chance: 5, conditionValues: [], minLevel: 17, maxLevel: 29 },
+      { id: 39, chance: 5, conditionValues: [], minLevel: 7, maxLevel: 14 },
+      { id: 39, chance: 4, conditionValues: [], minLevel: 10, maxLevel: 20 },
+      { id: 40, chance: 2, conditionValues: [], minLevel: 18, maxLevel: 25 },
+      { id: 128, chance: 1, conditionValues: [], minLevel: 25, maxLevel: 30 }
+    ],
+  },
+  surf: { rate: 0, pokemon: [] },
+  oldRod: {
+    rate: 0,
+    pokemon: [
+
+    ],
+  },
+  goodRod: {
+    rate: 0,
+    pokemon: [
+
+    ],
+  },
+  superRod: {
+    rate: 0,
+    pokemon: [
+
+    ],
+  },
+  rockSmash: { rate: 0, pokemon: [] }, headbutt: { rate: 0, pokemon: [] }, darkGrass: { rate: 0, pokemon: [] },
+  grassSpots: { rate: 0, pokemon: [] }, caveSpots: { rate: 0, pokemon: [] }, bridgeSpots: { rate: 0, pokemon: [] },
+  superRodSpots: { rate: 0, pokemon: [] }, surfSpots: {
+    rate: 0,
+    pokemon: [
+
+    ],
+  },
+  yellowFlowers: { rate: 0, pokemon: [] }, purpleFlowers: { rate: 0, pokemon: [] }, redFlowers: { rate: 0, pokemon: [] },
+  roughTerrain: { rate: 0, pokemon: [] }, gift: { rate: 0, pokemon: [] }, giftEgg: { rate: 0, pokemon: [] }, onlyOne: { rate: 0, pokemon: [] },
+},
   exitReturnMap: MapId.PewterCity,
   items: [
     {
