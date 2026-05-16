@@ -272,13 +272,6 @@ trainers: [
       },
     },
     {
-      item: ItemType.EscapeRope,
-      pos: {
-        x: 36,
-        y: 23,
-      },
-    },
-    {
       item: ItemType.MoonStone,
       hidden: true,
       pos: {
