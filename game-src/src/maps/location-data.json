@@ -7934,71 +7934,78 @@
             "id": 35,
             "chance": 1,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
-          },
-          {
-            "id": 41,
-            "chance": 20,
-            "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
-          },
-          {
-            "id": 41,
-            "chance": 20,
-            "conditionValues": [],
-            "maxLevel": 7,
-            "minLevel": 7
+            "maxLevel": 18,
+            "minLevel": 18
           },
           {
             "id": 41,
             "chance": 15,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
+            "maxLevel": 18,
+            "minLevel": 18
+          },
+          {
+            "id": 41,
+            "chance": 20,
+            "conditionValues": [],
+            "maxLevel": 16,
+            "minLevel": 16
+          },
+          {
+            "id": 41,
+            "chance": 15,
+            "conditionValues": [],
+            "maxLevel": 20,
+            "minLevel": 20
           },
           {
             "id": 41,
             "chance": 10,
             "conditionValues": [],
-            "maxLevel": 6,
-            "minLevel": 6
+            "maxLevel": 14,
+            "minLevel": 14
           },
           {
             "id": 41,
             "chance": 10,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "maxLevel": 22,
+            "minLevel": 22
           },
           {
             "id": 41,
             "chance": 4,
             "conditionValues": [],
-            "maxLevel": 11,
-            "minLevel": 11
+            "maxLevel": 24,
+            "minLevel": 24
           },
           {
             "id": 46,
             "chance": 5,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
+            "maxLevel": 18,
+            "minLevel": 18
           },
           {
             "id": 74,
             "chance": 10,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
+            "maxLevel": 18,
+            "minLevel": 18
           },
           {
             "id": 74,
             "chance": 5,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "maxLevel": 22,
+            "minLevel": 22
+          },
+          {
+            "id": 95,
+            "chance": 5,
+            "conditionValues": [],
+            "maxLevel": 20,
+            "minLevel": 18
           }
         ]
       },
@@ -11901,71 +11908,78 @@
             "id": 35,
             "chance": 4,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
+            "maxLevel": 20,
+            "minLevel": 20
+          },
+          {
+            "id": 41,
+            "chance": 14,
+            "conditionValues": [],
+            "maxLevel": 18,
+            "minLevel": 18
           },
           {
             "id": 41,
             "chance": 20,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
-          },
-          {
-            "id": 41,
-            "chance": 20,
-            "conditionValues": [],
-            "maxLevel": 7,
-            "minLevel": 7
+            "maxLevel": 16,
+            "minLevel": 16
           },
           {
             "id": 41,
             "chance": 10,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
+            "maxLevel": 20,
+            "minLevel": 20
           },
           {
             "id": 41,
             "chance": 5,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "maxLevel": 22,
+            "minLevel": 22
           },
           {
             "id": 41,
             "chance": 5,
             "conditionValues": [],
-            "maxLevel": 11,
-            "minLevel": 11
+            "maxLevel": 24,
+            "minLevel": 24
           },
           {
             "id": 46,
             "chance": 10,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "maxLevel": 22,
+            "minLevel": 22
           },
           {
             "id": 74,
             "chance": 15,
             "conditionValues": [],
-            "maxLevel": 7,
-            "minLevel": 7
+            "maxLevel": 16,
+            "minLevel": 16
           },
           {
             "id": 74,
             "chance": 10,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
+            "maxLevel": 18,
+            "minLevel": 18
           },
           {
             "id": 74,
             "chance": 1,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
+            "maxLevel": 20,
+            "minLevel": 20
+          },
+          {
+            "id": 95,
+            "chance": 6,
+            "conditionValues": [],
+            "maxLevel": 24,
+            "minLevel": 22
           }
         ]
       },
@@ -12001,71 +12015,78 @@
             "id": 35,
             "chance": 5,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "maxLevel": 22,
+            "minLevel": 22
           },
           {
             "id": 35,
             "chance": 1,
             "conditionValues": [],
-            "maxLevel": 12,
-            "minLevel": 12
+            "maxLevel": 26,
+            "minLevel": 26
           },
           {
             "id": 41,
-            "chance": 20,
+            "chance": 14,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
+            "maxLevel": 20,
+            "minLevel": 20
           },
           {
             "id": 41,
             "chance": 15,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "maxLevel": 22,
+            "minLevel": 22
           },
           {
             "id": 41,
             "chance": 10,
             "conditionValues": [],
-            "maxLevel": 11,
-            "minLevel": 11
+            "maxLevel": 24,
+            "minLevel": 24
           },
           {
             "id": 41,
             "chance": 4,
             "conditionValues": [],
-            "maxLevel": 12,
-            "minLevel": 12
+            "maxLevel": 26,
+            "minLevel": 26
           },
           {
             "id": 46,
             "chance": 10,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "maxLevel": 22,
+            "minLevel": 22
           },
           {
             "id": 46,
             "chance": 5,
             "conditionValues": [],
-            "maxLevel": 12,
-            "minLevel": 12
+            "maxLevel": 26,
+            "minLevel": 26
           },
           {
             "id": 74,
             "chance": 20,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
+            "maxLevel": 20,
+            "minLevel": 20
           },
           {
             "id": 74,
             "chance": 10,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "maxLevel": 22,
+            "minLevel": 22
+          },
+          {
+            "id": 95,
+            "chance": 6,
+            "conditionValues": [],
+            "maxLevel": 28,
+            "minLevel": 26
           }
         ]
       },
