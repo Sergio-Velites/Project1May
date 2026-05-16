@@ -24,6 +24,7 @@ import {
 } from "../state/uiSlice";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
+import emitter from "../app/emitter";
 import usePokemonMetadata from "../app/use-pokemon-metadata";
 import usePokemonStats from "../app/use-pokemon-stats";
 import PixelImage from "../styles/PixelImage";
@@ -164,7 +165,7 @@ const StarterCard = ({ pokemonId }: { pokemonId: number }) => {
         );
         dispatch(completeQuest(questId));
         dispatch(closePokeballCard());
-        playGameSfx(GAME_SFX.pokemonObtained);
+        emitter.emit(Event.PokemonObtained);
         const name = meta.name.toUpperCase();
         dispatch(showText([`¡${name} se ha unido a tu equipo!`]));
       } else {

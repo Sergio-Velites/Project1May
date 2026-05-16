@@ -1401,7 +1401,8 @@ const PokemonEncounter = () => {
       if (!enemy) throw new Error("No enemy found");
       if (!enemyMetadata) throw new Error("No enemy metadata found");
       const teamFull = pokemon.length >= 6;
-      playGameSfx(GAME_SFX.pokemonCaught);
+      // Emitir evento: SoundHandler reproducirá jingle de captura → victory-wild
+      emitter.emit(Event.PokemonCaught);
       dispatch(
         addPokemon({
           id: enemy.id,
@@ -1417,12 +1418,20 @@ const PokemonEncounter = () => {
           hp: Math.max(1, enemy.hp),
         })
       );
-      // (addPokemon ya marca visto+capturado en la Pokédex)
-      if (teamFull) {
-        setStage(53);
-      } else {
-        endEncounter_();
-      }
+      // Cambiar stage para evitar re-entrada mientras se muestra el texto
+      setStage(46);
+      // Mantener UI de combate abierta mientras suenan jingle y victory-wild
+      const catchName = enemyMetadata.name.toUpperCase();
+      dispatch(
+        showTextThenAction({
+          text: [
+            teamFull
+              ? `¡${catchName} fue enviado al PC de Bill!`
+              : `¡${catchName} fue capturado!`,
+          ],
+          action: () => endEncounter_(),
+        })
+      );
     }
 
     if (stage === 53) {

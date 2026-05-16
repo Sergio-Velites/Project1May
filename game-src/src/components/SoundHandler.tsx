@@ -4,7 +4,7 @@ import { selectGameboyMenu, selectLoadMenu, selectVideoShown, selectOakIntroActi
 
 import mapData from "../maps/map-data";
 import { MapType } from "../maps/map-types";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Event } from "../app/emitter";
 import useEvent from "../app/use-event";
 
@@ -20,6 +20,8 @@ const VICTORY_WILD     = "/game/sfx/game/victory-wild.mp3";
 const VICTORY_GYM      = "/game/sfx/game/victory-gym.mp3";
 const EVOLUTION_MUSIC  = "/game/sfx/game/evolution.mp3";
 const PROFESSOR_OAK    = "/game/sfx/game/professor-oak.mp3";
+const POKEMON_CAUGHT_SFX   = "/game/sfx/game/pokemon-caught.mp3";
+const POKEMON_OBTAINED_SFX = "/game/sfx/game/pokemon-obtained.mp3";
 
 // Duraciones aproximadas de cada jingle en ms (usadas para el override de música)
 const VICTORY_TRAINER_MS = 38000;
@@ -41,8 +43,23 @@ const SoundHandler = () => {
 
   const [musicOverride, setMusicOverride] = useState<string | null>(null);
 
+  // jingleSrc: reproduce una vez (sin loop) y al terminar dispara afterJingleRef
+  const [jingleSrc, setJingleSrc] = useState<string | null>(null);
+  const afterJingleRef = useRef<(() => void) | null>(null);
+
+  // clearOnBattleEnd: limpia musicOverride cuando inBattle pasa a false
+  const [clearOnBattleEnd, setClearOnBattleEnd] = useState(false);
+
   // Solo reproducir música de apertura después de que el vídeo haya terminado
   const isOpening = !isGameboyMenu && isLoadScreen && videoShown;
+
+  // Limpiar victory-wild override cuando el combate termine (captura)
+  useEffect(() => {
+    if (!inBattle && clearOnBattleEnd) {
+      setMusicOverride(null);
+      setClearOnBattleEnd(false);
+    }
+  }, [inBattle, clearOnBattleEnd]);
 
   const getMapMusic = (map: MapType): string => {
     if (map.music) return map.music;
@@ -53,6 +70,7 @@ const SoundHandler = () => {
   };
 
   const music = () => {
+    if (jingleSrc) return jingleSrc;      // jingle de captura/obtenido (una reproducción)
     if (oakIntroActive) return PROFESSOR_OAK;
     if (isOpening) return openingMusic;
     if (musicOverride) return musicOverride;
@@ -61,6 +79,19 @@ const SoundHandler = () => {
     const mapMusic = getMapMusic(map);
     if (mapMusic) return mapMusic;
     return undefined;
+  };
+
+  const playJingle = (src: string, onEnd?: () => void) => {
+    setJingleSrc(src);
+    afterJingleRef.current = onEnd || null;
+  };
+
+  const handleJingleEnded = () => {
+    setJingleSrc(null);
+    if (afterJingleRef.current) {
+      afterJingleRef.current();
+      afterJingleRef.current = null;
+    }
   };
 
   const playUiSound = (sound: string, volume = 1) => {
@@ -112,9 +143,27 @@ const SoundHandler = () => {
     setMusicOverride(null);
   });
 
+  // Captura: jingle de captura (una vez) → victory-wild en loop hasta salir del combate
+  useEvent(Event.PokemonCaught, () => {
+    playJingle(POKEMON_CAUGHT_SFX, () => {
+      setMusicOverride(VICTORY_WILD);
+      setClearOnBattleEnd(true);
+    });
+  });
+
+  // Obtener pokémon (starter/regalo): jingle una vez, luego vuelve la música del mapa
+  useEvent(Event.PokemonObtained, () => {
+    playJingle(POKEMON_OBTAINED_SFX);
+  });
+
   return (
     <>
-      <audio autoPlay loop src={music()} />
+      <audio
+        autoPlay
+        loop={!jingleSrc}
+        src={music()}
+        onEnded={jingleSrc ? handleJingleEnded : undefined}
+      />
       <audio
         ref={uiSoundRef}
         autoPlay
