@@ -72,7 +72,7 @@ import catchesPokemon from "../app/pokeball-helper";
 import { getMoveSfxPath } from "../app/move-sfx-map";
 import emitter from "../app/emitter";
 import { playGameSfx } from "../app/game-sfx";
-import { playCry, isCryActive, cancelCry } from "../app/pokemon-cry";
+import { playCry, isCryActive, waitForCry, cancelCry } from "../app/pokemon-cry";
 import { MoveAnimation } from "./MoveAnimation";
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
@@ -1071,12 +1071,14 @@ const PokemonEncounter = () => {
   // materializa" en pantalla (Gen I auténtico). Toda la mecánica vive en
   // `app/pokemon-cry.ts` para garantizar:
   //   · un solo grito a la vez (sin solapes)
-  //   · lock real basado en la duración del audio (no hardcoded)
+  //   · lock real de 1200ms (cubre los .mp3 de Gen I)
   //   · fallback robusto si el audio no carga
   //
   // Aquí solo decidimos CUÁNDO sonar (stage 1/10/48/49) y QUÉ pokémon
   // toca (leyendo del store en el instante para evitar races con dispatch).
-  const playCryNow = (id: number): Promise<number> => playCry(id);
+  const playCryNow = (id: number): void => {
+    playCry(id);
+  };
   const isCryLocked = () => isCryActive();
 
   const throwPokeball = (cryId?: number) => {
@@ -1111,16 +1113,11 @@ const PokemonEncounter = () => {
       const freshId =
         stateNow.game.pokemon[stateNow.game.activePokemonIndex]?.id ??
         cryId;
-      // Programamos el menú de acción para DESPUÉS de que el grito termine
-      // (no hardcoded +1100ms). Si el grito falla, el helper resuelve en
-      // CRY_FALLBACK_MS, así que la UI nunca se queda colgada.
-      if (freshId !== undefined) {
-        playCryNow(freshId).then((lockMs) => {
-          setTimeout(() => setStage(11), lockMs);
-        });
-      } else {
-        setTimeout(() => setStage(11), 1100);
-      }
+      if (freshId !== undefined) playCryNow(freshId);
+      // El menú de acción aparece DESPUÉS del grito (cualquier grito en
+      // curso: del jugador que acaba de salir o uno residual). waitForCry
+      // resuelve inmediato si no hay lock activo.
+      waitForCry(() => setStage(11));
     }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 5);
   };
 
@@ -1994,11 +1991,15 @@ const PokemonEncounter = () => {
 
     dispatch(setActivePokemon(index));
     setInvolvedPokemon([...involvedPokemon, index]);
-    // Cierra PokemonList (stage 13 o 25) inmediatamente: stage 3 es el
-    // arranque del throw del jugador (sin sprite todavía). Sin esto, la
-    // lista se quedaba 1300ms en pantalla esperando el primer setTimeout
-    // de throwPokeball → la "acción de aparición" se sentía rota.
-    setStage(3);
+    // NO cambiar a stage 3 aquí: stage 3 dispara la animación ChangePokemon
+    // con el sprite `playerBack` (Ash) sliding-out — eso es el "throw" inicial
+    // del combate, NO un cambio de pokémon. En el original RBY el cambio usa
+    // la animación de retiro de la pokéball, no el throw inicial.
+    //
+    // El stage actual (13 o 25 = PokemonList visible) se mantiene hasta que
+    // los setTimeouts de throwPokeball pasen a stage 4 (1300ms). Durante ese
+    // intervalo PokemonList sigue como cortina visual, que es la transición
+    // que esperaba el usuario.
     throwPokeball(incoming?.id);
   };
 

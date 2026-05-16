@@ -1,20 +1,22 @@
-// Singleton helper for Pokémon cry playback (Gen I style).
+// Pokémon cry playback helper — réplica del comportamiento Gen I.
 //
-// Garantías:
-//   1. Solo un grito a la vez: si llega otro, se interrumpe el anterior
-//      antes de iniciar el nuevo (los gritos no se solapan).
-//   2. `playCry(id)` devuelve una Promise<number> con la duración real
-//      del audio (ms). Resuelve cuando el audio termina de sonar (o tras
-//      un fallback si el navegador no dispara `ended`).
-//   3. `isCryActive()` y `cryLockUntil()` exponen el estado para que la
-//      capa de UI bloquee inputs y/o retrase transiciones de escena.
-//   4. Robusto ante fallos de carga: si el audio no se puede reproducir
-//      (404, autoplay bloqueado, etc.) usa un fallback de 700 ms para no
-//      colgar nunca a la UI.
+// En el juego original el grito dura ~1s, suena en cuanto el sprite aparece
+// y bloquea cualquier transición hasta que termina. No queremos OVERLAP entre
+// gritos (rival → tuyo en secuencia rápida cuando hay un KO encadenado).
+//
+// Diseño deliberadamente simple:
+//   · `playCry(id)`: corta cualquier audio en curso, crea y reproduce el
+//      nuevo. Devuelve el `HTMLAudioElement` (o null si la creación falló).
+//      NO usa Promises ni onloadedmetadata — esos APIs introducen races
+//      sutiles (la metadata puede llegar tarde por red, onended a veces
+//      no dispara si el src se sustituye, etc.). En su lugar fijamos un
+//      lock temporal generoso de CRY_LOCK_MS que cubre el grito completo.
+//   · `isCryActive()`: la capa de UI consulta esto para bloquear inputs.
+//   · `waitForCry()`: helper para encadenar la siguiente acción justo
+//      después del lock (evita tener que .then en cada caller).
+//   · `cancelCry()`: pause + reset, llamar al salir de combate.
 
-const CRY_FALLBACK_MS = 700;     // duración mínima asumida si el audio no carga
-const CRY_MIN_LOCK_MS = 1100;    // lock mínimo (mantiene UX original)
-const CRY_MAX_LOCK_MS = 2500;    // tope de seguridad por si un audio es eterno
+const CRY_LOCK_MS = 1200; // duración real de los .mp3 ≤ ~1.1s; +100ms cola
 
 let currentAudio: HTMLAudioElement | null = null;
 let lockUntil = 0;
@@ -23,83 +25,34 @@ const cryPath = (id: number): string =>
   "/game/sfx/pokemon-cries/" + String(id).padStart(3, "0") + ".mp3";
 
 const stopCurrent = (): void => {
-  if (!currentAudio) return;
+  const a = currentAudio;
+  currentAudio = null;
+  if (!a) return;
   try {
-    currentAudio.onended = null;
-    currentAudio.onerror = null;
-    currentAudio.pause();
-    currentAudio.src = "";
+    a.pause();
+    a.currentTime = 0;
   } catch {
     // ignore
   }
-  currentAudio = null;
 };
 
-/**
- * Reproduce el grito del Pokémon `id`. Devuelve una Promise<number> con
- * los ms reservados como lock (>= CRY_MIN_LOCK_MS). Resuelve al terminar
- * el audio o tras el fallback.
- */
-export const playCry = (id: number): Promise<number> => {
-  // Cortar cualquier grito previo: dos gritos NUNCA se solapan.
+export const playCry = (id: number): HTMLAudioElement | null => {
+  // Si hay un grito en curso, lo cortamos para evitar solape (un solo grito
+  // a la vez, igual que el original).
   stopCurrent();
-
-  let audio: HTMLAudioElement | null = null;
   try {
-    audio = new Audio(cryPath(id));
-    audio.volume = 1;
+    const a = new Audio(cryPath(id));
+    a.volume = 1;
+    currentAudio = a;
+    lockUntil = Date.now() + CRY_LOCK_MS;
+    // Nota: a.play() devuelve Promise — la atrapamos para no ensuciar la
+    // consola si el navegador bloquea autoplay. NUNCA esperamos esa Promise:
+    // queremos que el lock arranque aunque play() resuelva tarde.
+    a.play().catch(() => {});
+    return a;
   } catch {
-    audio = null;
+    return null;
   }
-
-  if (!audio) {
-    lockUntil = Date.now() + CRY_FALLBACK_MS;
-    return new Promise((resolve) =>
-      setTimeout(() => resolve(CRY_FALLBACK_MS), CRY_FALLBACK_MS)
-    );
-  }
-
-  currentAudio = audio;
-  // Lock inicial pesimista: se ajusta cuando llega metadata.
-  let lockMs = CRY_MIN_LOCK_MS;
-  lockUntil = Date.now() + lockMs;
-
-  return new Promise<number>((resolve) => {
-    let settled = false;
-    const settle = (ms: number) => {
-      if (settled) return;
-      settled = true;
-      if (currentAudio === audio) currentAudio = null;
-      resolve(ms);
-    };
-
-    audio!.onloadedmetadata = () => {
-      const dur = (audio!.duration || 0) * 1000;
-      if (dur > 0 && Number.isFinite(dur)) {
-        // Reservamos al menos CRY_MIN_LOCK_MS, como tope CRY_MAX_LOCK_MS.
-        // Añadimos 100ms de cola para que la voz no se corte abrupta.
-        lockMs = Math.min(
-          CRY_MAX_LOCK_MS,
-          Math.max(CRY_MIN_LOCK_MS, Math.round(dur) + 100)
-        );
-        lockUntil = Date.now() + lockMs;
-      }
-    };
-    audio!.onended = () => settle(lockMs);
-    audio!.onerror = () => {
-      lockUntil = Date.now() + CRY_FALLBACK_MS;
-      settle(CRY_FALLBACK_MS);
-    };
-
-    // Fallback duro: si pasan CRY_MAX_LOCK_MS y nadie nos liberó, resolvemos.
-    setTimeout(() => settle(lockMs), CRY_MAX_LOCK_MS);
-
-    audio!.play().catch(() => {
-      // Autoplay bloqueado u otro fallo: liberamos rápido con fallback.
-      lockUntil = Date.now() + CRY_FALLBACK_MS;
-      setTimeout(() => settle(CRY_FALLBACK_MS), CRY_FALLBACK_MS);
-    });
-  });
 };
 
 export const isCryActive = (): boolean => Date.now() < lockUntil;
@@ -107,8 +60,20 @@ export const isCryActive = (): boolean => Date.now() < lockUntil;
 export const cryLockRemainingMs = (): number =>
   Math.max(0, lockUntil - Date.now());
 
-/** Limpia el estado del módulo (llamar al salir de combate). */
+/**
+ * Ejecuta `cb` justo cuando el grito en curso termina (o inmediatamente si
+ * no hay grito activo). Útil para encadenar la siguiente fase de la
+ * animación sin que el audio se corte.
+ */
+export const waitForCry = (cb: () => void): void => {
+  const remaining = cryLockRemainingMs();
+  if (remaining <= 0) cb();
+  else setTimeout(cb, remaining);
+};
+
+/** Limpia el estado (llamar al salir de combate). */
 export const cancelCry = (): void => {
   stopCurrent();
   lockUntil = 0;
 };
+
