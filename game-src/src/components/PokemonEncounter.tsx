@@ -1113,9 +1113,18 @@ const PokemonEncounter = () => {
     }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 4);
     setTimeout(() => {
       setStage(10);
-      // Stage 10 — grito del pokémon del jugador. INLINE para evitar el
-      // problema del useEffect que no ve el `active.id` correcto.
-      if (cryId !== undefined) playCryNow(cryId);
+      // Leer el ID del Pokémon del jugador del STORE en este instante exacto
+      // (no del cierre capturado 3100ms antes) para garantizar el id fresco.
+      // Esto cubre todos los paths: inicio de batalla, switch voluntario,
+      // switch tras KO. Si el caller ya conoce el id (cryId !== undefined),
+      // lo usamos directamente como fallback rápido; si no, tiramos del store.
+      const stateNow = store.getState() as {
+        game: { pokemon: { id: number }[]; activePokemonIndex: number };
+      };
+      const freshId =
+        stateNow.game.pokemon[stateNow.game.activePokemonIndex]?.id ??
+        cryId;
+      if (freshId !== undefined) playCryNow(freshId);
     }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 5);
     setTimeout(() => {
       setStage(11);
