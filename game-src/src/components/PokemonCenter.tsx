@@ -84,7 +84,7 @@ const TextContainer = styled.div`
 const MachineGrid = styled.div`
   position: absolute;
   left: calc(50% - 24cqw / 2.34);
-  top:  calc(50% - 24cqw / 2.34);
+  top:  calc(50% - 40cqw / 2.34);
   width:  calc(16cqw / 2.34);
   height: calc(16cqw / 2.34);
   display: grid;
