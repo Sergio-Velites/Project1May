@@ -13,12 +13,11 @@ import {
 import Frame from "./Frame";
 import Menu from "./Menu";
 import useIsMobile from "../app/use-is-mobile";
-import pokeballImg from "../assets/misc/pokeball.png";
+import ballImg from "../assets/pokemon/simple/ball-0.png";
 
 // ── Sonido "ding" via Web Audio API — imita el bip de colocación del original ──
 function playPokeballDing(audioCtx: AudioContext, delayMs: number) {
   const startAt = audioCtx.currentTime + delayMs / 1000;
-  // Tono principal: square wave 880 Hz, 80 ms — clásico Game Boy
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   osc.type = "square";
@@ -53,34 +52,50 @@ const TextContainer = styled.div`
   }
 `;
 
-// Contenedor de pokéballs centrado en la parte superior del juego
-const BallsRow = styled.div`
+// ── Rejilla de pokéballs sobre la bandeja de la máquina de curación ──────────
+// La máquina de curación ocupa las tiles (1-2, 2) del mapa.
+// La nurse está en pokemonCenter = {x:3, y:2}. El jugador siempre en (3,3).
+//
+// Fórmula (PokemonCenter está fuera de StyledGame, relativo al Container):
+//   left = 50% - (0.5 + Δx) * TILE    donde TILE = 16cqw/2.34
+//   top  = 50% - (0.5 + Δy) * TILE
+//
+// Máquina tile (1, 2):  Δx = 3-1 = 2,  Δy = 3-2 = 1
+//   left = 50% - 2.5 * TILE = 50% - 40cqw/2.34
+//   top  = 50% - 1.5 * TILE = 50% - 24cqw/2.34
+//
+// Rejilla: 2 tiles ancho × 1.5 tiles alto = 3 filas × 2 cols
+const MachineGrid = styled.div`
   position: absolute;
-  top: 28%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6cqw;
-  align-items: center;
+  left: calc(50% - 40cqw / 2.34);
+  top:  calc(50% - 24cqw / 2.34);
+  width:  calc(32cqw / 2.34);
+  height: calc(24cqw / 2.34);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   z-index: 200;
+  pointer-events: none;
 `;
 
 const popIn = keyframes`
-  0%   { transform: scale(0) translateY(-30%); opacity: 0; }
-  60%  { transform: scale(1.2) translateY(0%); opacity: 1; }
-  100% { transform: scale(1) translateY(0%); opacity: 1; }
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+`;
+
+const BallCell = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const BallImg = styled.img`
-  width: 12cqw;
-  height: 12cqw;
+  width: 80%;
+  height: 80%;
   image-rendering: pixelated;
-  animation: ${popIn} 0.18s ease-out forwards;
-
-  @media (max-width: 1000px) {
-    width: 10cqw;
-    height: 10cqw;
-  }
+  object-fit: contain;
+  animation: ${popIn} 0.15s ease-out forwards;
 `;
 
 // ── Timing ────────────────────────────────────────────────────────────────────
@@ -177,13 +192,15 @@ const PokemonCenter = () => {
 
   return (
     <StyledPokemonCenter>
-      {/* Pokéballs animadas durante la curación */}
+      {/* Rejilla 3×2 de pokéballs sobre la bandeja de la máquina */}
       {stage === 3 && visibleBalls > 0 && (
-        <BallsRow>
-          {Array.from({ length: visibleBalls }).map((_, i) => (
-            <BallImg key={i} src={pokeballImg} alt="" />
+        <MachineGrid>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <BallCell key={i}>
+              {i < visibleBalls && <BallImg src={ballImg} alt="" />}
+            </BallCell>
           ))}
-        </BallsRow>
+        </MachineGrid>
       )}
 
       <TextContainer>
