@@ -83,13 +83,19 @@ const TextContainer = styled.div`
 // Dentro: rejilla 2 columnas × 3 filas → 6 huecos para los 6 pokémon
 const MachineGrid = styled.div`
   position: absolute;
+  /* Centro horizontal: tile (2,2) = 50% - 1.5 * TILE; X ya estaba bien con -30cqw */
   left: calc(50% - 30cqw / 2.34);
-  top:  calc(50% - 36cqw / 2.34);
+  /* Tile (2,2) ocupa de top -1.5*TILE a -0.5*TILE => centramos en -1*TILE */
+  top:  calc(50% - 40cqw / 2.34);
   width:  calc(12cqw / 2.34);
-  height: calc(8cqw / 2.34);
+  height: calc(16cqw / 2.34);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
+  /* Filas a contenido + gap pequeño + centrado vertical en el tile completo */
+  grid-template-rows: auto auto auto;
+  row-gap: calc(1cqw / 2.34);
+  align-content: center;
+  justify-items: center;
   z-index: 200;
   pointer-events: none;
 `;
@@ -101,14 +107,18 @@ const popIn = keyframes`
 `;
 
 const BallCell = styled.div`
+  /* Tamaño fijo de celda, no depende del grid */
+  width:  calc(6cqw / 2.34);
+  height: calc(6cqw / 2.34);
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
 const BallImg = styled.img`
-  width: 80%;
-  height: 80%;
+  /* Sprite a tamaño nativo del Game Boy: 6px = 6cqw/2.34 */
+  width:  calc(6cqw / 2.34);
+  height: calc(6cqw / 2.34);
   image-rendering: pixelated;
   object-fit: contain;
   animation: ${popIn} 0.15s ease-out forwards;
