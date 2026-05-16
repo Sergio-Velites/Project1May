@@ -648,6 +648,9 @@ const PokemonEncounter = () => {
     target: "enemy" | "player";
     damageClass: string;
   } | null>(null);
+  // Ref al audio del último SFX de ataque — permite esperar a que termine
+  // antes de iniciar el turno del siguiente combatiente.
+  const battleSfxRef = useRef<HTMLAudioElement | null>(null);
   // Ref to pass computed XP from stage 20 to stage 21 without stale closure
   const pendingXpRef = useRef<number | null>(null);
   // Ref to pass new level from stage 21 to stages 22/29/33 without stale closure
@@ -2114,6 +2117,7 @@ const PokemonEncounter = () => {
             const sfx = new Audio(sfxPath);
             sfx.volume = 0.55;
             sfx.play().catch(() => {});
+            battleSfxRef.current = sfx;
           }
         } else {
           setMoveAnim(null);
@@ -2321,6 +2325,7 @@ const PokemonEncounter = () => {
             const sfx = new Audio(sfxPath);
             sfx.volume = 0.55;
             sfx.play().catch(() => {});
+            battleSfxRef.current = sfx;
           }
         } else {
           setMoveAnim(null);
@@ -2630,6 +2635,28 @@ const PokemonEncounter = () => {
       }
     };
     showNext();
+  };
+
+  // Ejecuta `callback` después de `minDelay` ms, pero si hay un SFX de ataque
+  // todavía sonando, espera a que termine (cap de seguridad: 3 s extra).
+  // Esto evita que los SFX del jugador y del rival se solapan en el mismo turno.
+  const waitForBattleSfxThen = (callback: () => void, minDelay: number) => {
+    setTimeout(() => {
+      const audio = battleSfxRef.current;
+      if (!audio || audio.paused || audio.ended) {
+        callback();
+        return;
+      }
+      let fired = false;
+      const fire = () => {
+        if (fired) return;
+        fired = true;
+        callback();
+      };
+      audio.addEventListener("ended", fire, { once: true });
+      // Cap de seguridad: no bloquear el combate más de 3 s adicionales
+      setTimeout(fire, 3000);
+    }, minDelay);
   };
 
   const processBattle = (attackId: string) => {
@@ -3073,7 +3100,9 @@ const PokemonEncounter = () => {
           true,
           attackId
         );
-        setTimeout(() => {
+        // waitForBattleSfxThen: espera a que el SFX del jugador termine antes
+        // de iniciar el turno del rival, evitando que los sonidos se solapan.
+        waitForBattleSfxThen(() => {
           if (them.hp <= 0) {
             setStage(20);
           } else if (us.hp <= 0) {
@@ -3176,7 +3205,9 @@ const PokemonEncounter = () => {
           false,
           enemyMove.id
         );
-        setTimeout(() => {
+        // waitForBattleSfxThen: espera a que el SFX del rival termine antes
+        // de iniciar el turno del jugador, evitando que los sonidos se solapan.
+        waitForBattleSfxThen(() => {
           // BUG FIX: if the enemy self-destructed, it has 0 HP — player wins
           if (them.hp <= 0) {
             setStage(20);
