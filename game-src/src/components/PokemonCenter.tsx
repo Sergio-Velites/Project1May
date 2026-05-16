@@ -83,10 +83,10 @@ const TextContainer = styled.div`
 // Dentro: rejilla 2 columnas × 3 filas → 6 huecos para los 6 pokémon
 const MachineGrid = styled.div`
   position: absolute;
-  left: calc(50% - 28cqw / 2.34);
-  top:  calc(50% - 40cqw / 2.34);
+  left: calc(50% - 30cqw / 2.34);
+  top:  calc(50% - 36cqw / 2.34);
   width:  calc(12cqw / 2.34);
-  height: calc(16cqw / 2.34);
+  height: calc(8cqw / 2.34);
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
