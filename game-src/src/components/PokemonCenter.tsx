@@ -65,12 +65,28 @@ const TextContainer = styled.div`
 //   top  = 50% - 1.5 * TILE = 50% - 24cqw/2.34
 //
 // Rejilla: 2 tiles ancho × 1.5 tiles alto = 3 filas × 2 cols
+// ── Rejilla de pokéballs sobre la bandeja de la máquina de curación ──────────
+// Geometría: el jugador está en (3,3), la nurse en (3,2), la máquina (cuadrado
+// negro) ocupa el tile (2,2) — 1 tile completo.
+//
+// La proyección de un tile (X,Y) al container (PokemonCenter renderiza fuera
+// de StyledGame, posicionado absolute sobre todo el viewport) es:
+//   screenX = 50% + (X - playerX - 0.5) * TILE
+//   screenY = 50% + (Y - playerY - 0.5) * TILE
+// donde TILE = 16cqw / 2.34
+//
+// Para tile (2,2) con jugador en (3,3):
+//   left = 50% - 1.5 * TILE = 50% - 24cqw/2.34
+//   top  = 50% - 1.5 * TILE = 50% - 24cqw/2.34
+//   width  = height = 1 * TILE = 16cqw/2.34
+//
+// Dentro: rejilla 2 columnas × 3 filas → 6 huecos para los 6 pokémon
 const MachineGrid = styled.div`
   position: absolute;
-  left: calc(50% - 32cqw / 2.34);
-  top:  calc(50% - 40cqw / 2.34);
-  width:  calc(32cqw / 2.34);
-  height: calc(24cqw / 2.34);
+  left: calc(50% - 24cqw / 2.34);
+  top:  calc(50% - 24cqw / 2.34);
+  width:  calc(16cqw / 2.34);
+  height: calc(16cqw / 2.34);
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
