@@ -53,10 +53,13 @@ const SoundHandler = () => {
   // Solo reproducir música de apertura después de que el vídeo haya terminado
   const isOpening = !isGameboyMenu && isLoadScreen && videoShown;
 
-  // Limpiar victory-wild override cuando el combate termine (captura)
+  // Limpiar overrides al cerrar el combate (cualquier final: huida, KO,
+  // victoria, captura). Garantiza que la música del mapa vuelva siempre.
   useEffect(() => {
     if (!inBattle && clearOnBattleEnd) {
       setMusicOverride(null);
+      setJingleSrc(null);
+      afterJingleRef.current = null;
       setClearOnBattleEnd(false);
     }
   }, [inBattle, clearOnBattleEnd]);
@@ -104,6 +107,14 @@ const SoundHandler = () => {
     setTimeout(() => setMusicOverride(null), durationMs);
   };
 
+  // Wrapper: además de aplicar override+timeout, marca que al cerrar el
+  // combate hay que limpiar inmediatamente (los jingles de victoria duran
+  // más que el combate normalmente).
+  const setBattleOverrideFor = (src: string, durationMs: number) => {
+    setOverrideFor(src, durationMs);
+    setClearOnBattleEnd(true);
+  };
+
   useEvent(Event.A, () => {
     playUiSound(buttonPress, 0.2);
   });
@@ -124,15 +135,15 @@ const SoundHandler = () => {
   });
 
   useEvent(Event.VictoryTrainer, () => {
-    setOverrideFor(VICTORY_TRAINER, VICTORY_TRAINER_MS);
+    setBattleOverrideFor(VICTORY_TRAINER, VICTORY_TRAINER_MS);
   });
 
   useEvent(Event.VictoryWild, () => {
-    setOverrideFor(VICTORY_WILD, VICTORY_WILD_MS);
+    setBattleOverrideFor(VICTORY_WILD, VICTORY_WILD_MS);
   });
 
   useEvent(Event.VictoryGym, () => {
-    setOverrideFor(VICTORY_GYM, VICTORY_GYM_MS);
+    setBattleOverrideFor(VICTORY_GYM, VICTORY_GYM_MS);
   });
 
   useEvent(Event.Evolution, () => {
@@ -145,6 +156,9 @@ const SoundHandler = () => {
 
   // Captura: jingle de captura (una vez) → victory-wild en loop hasta salir del combate
   useEvent(Event.PokemonCaught, () => {
+    // Marcar inmediatamente: si el combate termina antes incluso de que
+    // acabe el jingle de captura, limpiar el jingle también.
+    setClearOnBattleEnd(true);
     playJingle(POKEMON_CAUGHT_SFX, () => {
       setMusicOverride(VICTORY_WILD);
       setClearOnBattleEnd(true);
