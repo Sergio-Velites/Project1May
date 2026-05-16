@@ -1061,40 +1061,32 @@ const PokemonEncounter = () => {
   }, [isInBattle, dispatch]);
 
   // Gritos de Pokémon (canal SFX): se reproducen cuando el sprite aparece en pantalla.
-  //   Stage 1  → Pokémon salvaje aparece (combate wild) — NUNCA en trainer
+  //   Stage 1  → Pokémon salvaje aparece (combate wild)         — solo wild
   //   Stage 10 → Pokémon del jugador aparece (inicio + switch)
   //   Stage 48 → Primer Pokémon del entrenador rival
   //   Stage 49 → Siguiente Pokémon del rival tras KO
-  // Notas:
-  //   · En trainer battles, stage 1 también se ejecuta (parte del flujo
-  //     común de inicio), pero el grito del rival NO debe sonar todavía
-  //     porque el sprite aún no aparece — debe esperar al pokeball
-  //     throw del rival (stage 48). Antes el grito sonaba a stage 1 y
-  //     OTRA VEZ a stage 48, dando dos sonidos seguidos.
-  //   · Dependencias incluyen `enemy?.id` y `active?.id` para que el
-  //     useEffect re-evalue cuando el id del pokémon cambia (envíos
-  //     sucesivos). Antes solo dependía de `stage`, así que si el
-  //     stage 49 se setteaba antes de que React propagara el nuevo
-  //     `enemy`, el cry se quedaba con el id viejo o no se evaluaba.
-  //   · `lastCryRef` evita reproducir el mismo grito dos veces en
-  //     rerenders consecutivos (ej. cuando React 18 repite efectos en dev).
+  //
+  // Notas Gen I:
+  //   · En trainer battles, stage 1 también ocurre (parte del flujo común
+  //     de inicio), pero el sprite del rival NO está aún en pantalla en
+  //     trainer mode — debe esperar al lanzamiento de pokeball (stage 48).
+  //     Por eso `!isTrainer` filtra el grito de stage 1 en trainer.
+  //   · Las dependencias incluyen `enemy?.id` y `active?.id` para que el
+  //     useEffect re-evalúe cuando el id cambia (envíos sucesivos en
+  //     trainer + cambios del jugador). Antes solo dependía de `stage`,
+  //     y un mismo stage con id distinto no re-disparaba.
+  //   · NO usamos debounce/cache: con las deps tight el efecto solo re-corre
+  //     ante cambios reales de stage o id, y el if/else asigna id solo en
+  //     los stages "el sprite acaba de aparecer".
   const crySfx = (id: number) =>
     playGameSfx("/game/sfx/pokemon-cries/" + String(id).padStart(3, "0") + ".mp3");
 
-  const lastCryRef = useRef<{ stage: number; id: number } | null>(null);
-
   useEffect(() => {
-    let id: number | null = null;
-    if (stage === 1 && enemy && !isTrainer) id = enemy.id;
-    else if (stage === 10 && active) id = active.id;
-    else if (stage === 48 && enemy) id = enemy.id;
-    else if (stage === 49 && enemy) id = enemy.id;
-
-    if (id == null) return;
-    const last = lastCryRef.current;
-    if (last && last.stage === stage && last.id === id) return;
-    lastCryRef.current = { stage, id };
-    crySfx(id);
+    if (stage === 1 && enemy && !isTrainer) crySfx(enemy.id);
+    else if (stage === 10 && active) crySfx(active.id);
+    else if (stage === 48 && enemy) crySfx(enemy.id);
+    else if (stage === 49 && enemy) crySfx(enemy.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage, enemy?.id, active?.id, isTrainer]);
 
   const throwPokeball = () => {
