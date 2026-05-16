@@ -222,17 +222,7 @@ trainers: [
   money: 140,
   persistent: true,
 }
-],
-  items: [
-    {
-      item: ItemType.HelixFossil,
-      pos: { x: 27, y: 28 },
-    },
-    {
-      item: ItemType.DomeFossil,
-      pos: { x: 21, y: 28 },
-    },
-  ],
+]
 };
 
 export default mtMoon2f;

@@ -890,7 +890,7 @@ const PokemonEncounter = () => {
       setEnemyStages(DEFAULT_STAGES);
       enemyFlinchRef.current = false;
 
-      throwPokeballAtEnemy(49);
+      throwPokeballAtEnemy(49, newPokemon.id);
       return;
     }
 
@@ -1047,8 +1047,12 @@ const PokemonEncounter = () => {
       setStage(0);
       // Register enemy as SEEN in Pokédex
       dispatch(seePokemon(enemy.id));
+      const wildEnemyId = enemy.id;
+      const wildIsTrainer = !!trainer;
       setTimeout(() => {
         setStage(1);
+        // Stage 1 — grito del salvaje (no en trainer; en trainer suena en stage 48)
+        if (!wildIsTrainer) playCryNow(wildEnemyId);
       }, 2000);
       setTimeout(() => {
         setStage(2);
@@ -1060,36 +1064,35 @@ const PokemonEncounter = () => {
     }
   }, [isInBattle, dispatch]);
 
-  // Gritos de Pokémon (canal SFX): se reproducen cuando el sprite aparece en pantalla.
-  //   Stage 1  → Pokémon salvaje aparece (combate wild)         — solo wild
-  //   Stage 10 → Pokémon del jugador aparece (inicio + switch)
-  //   Stage 48 → Primer Pokémon del entrenador rival
-  //   Stage 49 → Siguiente Pokémon del rival tras KO
+  // Gritos de Pokémon: se reproducen exactamente cuando el sprite "se
+  // materializa" en pantalla (Gen I auténtico).
   //
-  // Notas Gen I:
-  //   · En trainer battles, stage 1 también ocurre (parte del flujo común
-  //     de inicio), pero el sprite del rival NO está aún en pantalla en
-  //     trainer mode — debe esperar al lanzamiento de pokeball (stage 48).
-  //     Por eso `!isTrainer` filtra el grito de stage 1 en trainer.
-  //   · Las dependencias incluyen `enemy?.id` y `active?.id` para que el
-  //     useEffect re-evalúe cuando el id cambia (envíos sucesivos en
-  //     trainer + cambios del jugador). Antes solo dependía de `stage`,
-  //     y un mismo stage con id distinto no re-disparaba.
-  //   · NO usamos debounce/cache: con las deps tight el efecto solo re-corre
-  //     ante cambios reales de stage o id, y el if/else asigna id solo en
-  //     los stages "el sprite acaba de aparecer".
-  const crySfx = (id: number) =>
-    playGameSfx("/game/sfx/pokemon-cries/" + String(id).padStart(3, "0") + ".mp3");
+  // Implementación robusta:
+  //   1. `playCryNow(id)` se llama INLINE en el setTimeout que setea el
+  //      stage de aparición. Antes usábamos un useEffect dependiendo de
+  //      [stage, enemy?.id, active?.id, isTrainer], pero las races de
+  //      React (batches, render commits) hacían que el efecto a veces no
+  //      viera el `active.id` correcto en stage 10 → silencio total para
+  //      el jugador. Inline garantiza el id correcto en el momento exacto.
+  //   2. `cryAudioRef` retiene el HTMLAudioElement para que el GC no lo
+  //      destruya antes de que empiece la reproducción.
+  //   3. `cryLockRef` bloquea Event.A durante 1100ms para que el grito se
+  //      oiga completo (los mp3s duran ~2s) antes de que el siguiente
+  //      stage o menú se interponga.
+  const cryAudioRef = useRef<HTMLAudioElement | null>(null);
+  const cryLockRef = useRef<number>(0); // ms timestamp when lock expires
+  const playCryNow = (id: number) => {
+    try {
+      const a = new Audio("/game/sfx/pokemon-cries/" + String(id).padStart(3, "0") + ".mp3");
+      cryAudioRef.current = a;
+      a.volume = 1;
+      a.play().catch(() => {});
+    } catch {}
+    cryLockRef.current = Date.now() + 1100;
+  };
+  const isCryLocked = () => Date.now() < cryLockRef.current;
 
-  useEffect(() => {
-    if (stage === 1 && enemy && !isTrainer) crySfx(enemy.id);
-    else if (stage === 10 && active) crySfx(active.id);
-    else if (stage === 48 && enemy) crySfx(enemy.id);
-    else if (stage === 49 && enemy) crySfx(enemy.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage, enemy?.id, active?.id, isTrainer]);
-
-  const throwPokeball = () => {
+  const throwPokeball = (cryId?: number) => {
     setTimeout(() => {
       setStage(4);
     }, MOVEMENT_ANIMATION);
@@ -1110,13 +1113,16 @@ const PokemonEncounter = () => {
     }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 4);
     setTimeout(() => {
       setStage(10);
+      // Stage 10 — grito del pokémon del jugador. INLINE para evitar el
+      // problema del useEffect que no ve el `active.id` correcto.
+      if (cryId !== undefined) playCryNow(cryId);
     }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 5);
     setTimeout(() => {
       setStage(11);
-    }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 5 + 500);
+    }, MOVEMENT_ANIMATION * 2 + FRAME_DURATION * 5 + 1100);
   };
 
-  const throwPokeballAtEnemy = (end: number = 39) => {
+  const throwPokeballAtEnemy = (end: number = 39, cryId?: number) => {
     setStage(34);
     setTimeout(() => {
       setStage(35);
@@ -1132,6 +1138,8 @@ const PokemonEncounter = () => {
     }, FRAME_DURATION * 4);
     setTimeout(() => {
       setStage(end);
+      // Grito del rival al aparecer (stage 48: 1º del trainer; 49: siguientes)
+      if ((end === 48 || end === 49) && cryId !== undefined) playCryNow(cryId);
     }, FRAME_DURATION * 5);
   };
 
@@ -1207,6 +1215,11 @@ const PokemonEncounter = () => {
   useEvent(Event.A, () => {
     if (startMenuOpen) return;
     if (pokemonEvolving !== null) return;
+    // Bloquear A durante el grito de aparición del pokémon (~1.1s)
+    // para que el jugador escuche el cry completo antes de cualquier
+    // interacción. Imita el ritmo del original RBY donde el cry suena
+    // antes de mostrar el menú de batalla.
+    if (isCryLocked()) return;
 
     if (clickableNotice) {
       setClickableNotice(null);
@@ -1217,18 +1230,19 @@ const PokemonEncounter = () => {
       setProcessingInvolvedPokemon(0);
       if (isTrainer) {
         setStage(46);
+        const firstEnemyId = enemy?.id;
         setTimeout(() => {
-          throwPokeballAtEnemy(48);
+          throwPokeballAtEnemy(48, firstEnemyId);
         }, 1000);
       } else {
         setStage(3);
-        throwPokeball();
+        throwPokeball(active?.id);
       }
     }
 
     if (stage === 48) {
       setStage(3);
-      throwPokeball();
+      throwPokeball(active?.id);
     }
 
     if (stage === 49) {
@@ -1978,7 +1992,7 @@ const PokemonEncounter = () => {
 
     dispatch(setActivePokemon(index));
     setInvolvedPokemon([...involvedPokemon, index]);
-    throwPokeball();
+    throwPokeball(incoming?.id);
   };
 
   // ── Helpers Gen I para construir el contexto del move ───────────────────
