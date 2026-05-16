@@ -504,6 +504,15 @@ const useItemData = () => {
             dispatch(updateSpecificPokemon({ index, pokemon: updatedPokemon }));
             dispatch(consumeItem(ItemType.RareCandy));
 
+            // Cierra mochila/menús antes de mostrar el texto de subida de
+            // nivel. Esto evita que pulsaciones A residuales (mientras el
+            // jugador da varios Caramelos Raros rápido) lleguen a la
+            // evolución/learnMove a medio renderizar y disparen efectos
+            // dobles. El jugador ve la subida sobre el mapa, como en RBY.
+            dispatch(hideItemsMenu());
+            dispatch(hidePlayerMenu());
+            dispatch(hideStartMenu());
+
             const meta = getPokemonMetadata(p.id);
             // ¿Evoluciona a este nivel? (sólo evoluciones por nivel)
             const evolves =
