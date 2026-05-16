@@ -1,6 +1,6 @@
 import styled, { keyframes } from "styled-components";
 import Frame from "./Frame";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import usePokemonMetadata from "../app/use-pokemon-metadata";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
@@ -257,10 +257,14 @@ const Evolution = () => {
   const show = evolution !== null;
 
   const [evolved, setEvolved] = useState(false);
+  // Guard: evita que el handler de A se ejecute más de una vez por evolución
+  // (el cambio de Redux es asíncrono respecto a las pulsaciones A rápidas).
+  const firedRef = useRef(false);
 
   // Emitir evento de música de evolución al mostrar el componente
   useEffect(() => {
     if (!show) return;
+    firedRef.current = false;
     emitter.emit(Event.Evolution);
     return () => { emitter.emit(Event.EvolutionEnd); };
   }, [show]);
@@ -268,7 +272,9 @@ const Evolution = () => {
   useEvent(Event.A, () => {
     if (!show) return;
     if (!evolved) return;
+    if (firedRef.current) return;
     if (!metadata) throw new Error("No metadata for evolution");
+    firedRef.current = true;
 
     setEvolved(false);
 

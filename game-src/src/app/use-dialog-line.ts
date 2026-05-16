@@ -41,6 +41,7 @@ export const useDialogLine = ({
 }: UseDialogLineOptions) => {
   const [liveIndex, setLiveIndex] = useState(0);
   const completedAtRef = useRef<number | null>(null);
+  const advancedRef = useRef(false);
   const textRef = useRef(text);
   textRef.current = text;
 
@@ -49,6 +50,7 @@ export const useDialogLine = ({
     if (!enabled) return;
     setLiveIndex(0);
     completedAtRef.current = null;
+    advancedRef.current = false;
     if (text.length === 0) {
       completedAtRef.current = Date.now();
       return;
@@ -69,6 +71,7 @@ export const useDialogLine = ({
 
   const handle = () => {
     if (!enabled) return;
+    if (advancedRef.current) return;
     if (liveIndex < textRef.current.length) {
       setLiveIndex(textRef.current.length);
       completedAtRef.current = Date.now();
@@ -76,6 +79,7 @@ export const useDialogLine = ({
     }
     if (completedAtRef.current === null) completedAtRef.current = Date.now();
     if (Date.now() - completedAtRef.current < cooldownMs) return;
+    advancedRef.current = true;
     onAdvance();
   };
 

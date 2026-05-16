@@ -20,7 +20,7 @@ import { MapId } from "../maps/map-types";
 import { directionModifier, isWater } from "../app/map-helper";
 import { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import PokemonRow from "./PokemonRow";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import { Direction } from "../state/state-types";
@@ -109,6 +109,8 @@ const PokemonList = ({
   const [switching, setSwitching] = useState<number | null>(null);
   const [scroll, setScroll] = useState(0);
   const [viewingStats, setViewingStats] = useState(false);
+  // Guard contra doble-A: clickPokemon solo debe correr una vez por sesión
+  const clickedRef = useRef(false);
 
   const pokemon = customPokemon ?? pokemon_;
   const isBattleMode = mode === "battle";
@@ -157,6 +159,8 @@ const PokemonList = ({
     if (selected || viewingStats) return;
 
     if (clickPokemon) {
+      if (clickedRef.current) return;
+      clickedRef.current = true;
       clickPokemon(cursorIndex);
       return;
     }
