@@ -25,6 +25,7 @@ export enum Event {
   VictoryWild = "victory-wild",
   VictoryGym = "victory-gym",
   TrainerAppears = "trainer-appears",
+  ItemObtained = "item-obtained",
   Evolution = "evolution",
   EvolutionEnd = "evolution-end",
   PokemonCaught = "pokemon-caught",

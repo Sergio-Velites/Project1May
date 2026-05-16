@@ -5,7 +5,7 @@ import { xToPx, yToPx } from "../app/position-helper";
 import pokeball from "../assets/misc/pokeball.png";
 import { MapItemType } from "../maps/map-types";
 import useEvent from "../app/use-event";
-import { Event } from "../app/emitter";
+import emitter, { Event } from "../app/emitter";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addInventory,
@@ -19,7 +19,6 @@ import {
 import { selectMenuOpen, showTextThenAction } from "../state/uiSlice";
 import { directionModifier } from "../app/map-helper";
 import useItemData from "../app/use-item-data";
-import { playGameSfx, GAME_SFX } from "../app/game-sfx";
 
 interface ItemProps {
   x: number;
@@ -74,7 +73,7 @@ const Item = ({ item }: Props) => {
         showTextThenAction({
           text: [`¡${name} encontró ${itemData[item.item].name}!`],
           action: () => {
-            playGameSfx(GAME_SFX.itemObtained);
+            emitter.emit(Event.ItemObtained);
             dispatch(collectItem(item));
             dispatch(addInventory({ item: item.item, amount: 1 }));
           },

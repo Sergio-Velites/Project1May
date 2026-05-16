@@ -22,6 +22,11 @@ const EVOLUTION_MUSIC  = "/game/sfx/game/evolution.mp3";
 const PROFESSOR_OAK    = "/game/sfx/game/professor-oak.mp3";
 const POKEMON_CAUGHT_SFX   = "/game/sfx/game/pokemon-caught.mp3";
 const POKEMON_OBTAINED_SFX = "/game/sfx/game/pokemon-obtained.mp3";
+const ITEM_OBTAINED_SFX    = "/game/sfx/game/item-obtained.mp3";
+const LEVEL_UP_SFX         = "/game/sfx/game/level-up.mp3";
+const TRAINER_APPEARS_BOY    = "/game/sfx/game/trainer-appears-boy.mp3";
+const TRAINER_APPEARS_GIRL   = "/game/sfx/game/trainer-appears-girl.mp3";
+const TRAINER_APPEARS_ROCKET = "/game/sfx/game/trainer-appears-rocket.mp3";
 const SURF_MUSIC           = "/game/sfx/game/surf.mp3";
 const BICYCLE_MUSIC        = "/game/sfx/game/bicycle.mp3";
 
@@ -177,6 +182,26 @@ const SoundHandler = () => {
   // Obtener pokémon (starter/regalo): jingle una vez, luego vuelve la música del mapa
   useEvent(Event.PokemonObtained, () => {
     playJingle(POKEMON_OBTAINED_SFX);
+  });
+
+  // Encontrar un objeto: jingle una vez, luego vuelve la música del mapa
+  useEvent(Event.ItemObtained, () => {
+    playJingle(ITEM_OBTAINED_SFX);
+  });
+
+  // Subir de nivel en combate: jingle una vez, luego vuelve la música de batalla
+  useEvent(Event.LevelUp, () => {
+    playJingle(LEVEL_UP_SFX);
+  });
+
+  // Aparece entrenador: jingle según NPC. Mientras suena, music() lo prioriza
+  // sobre la batalla, así que no hay solape con battle-trainer.
+  useEvent(Event.TrainerAppears, (payload?: "boy" | "girl" | "rocket") => {
+    const src =
+      payload === "rocket" ? TRAINER_APPEARS_ROCKET :
+      payload === "girl"   ? TRAINER_APPEARS_GIRL :
+                             TRAINER_APPEARS_BOY;
+    playJingle(src);
   });
 
   // Control imperativo del <audio> de música.

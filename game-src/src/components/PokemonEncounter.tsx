@@ -70,7 +70,6 @@ import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp, getSingleLevelUp, xp
 import MoveSelect from "./MoveSelect";
 import catchesPokemon from "../app/pokeball-helper";
 import { getMoveSfxPath } from "../app/move-sfx-map";
-import { playGameSfx, GAME_SFX } from "../app/game-sfx";
 import emitter from "../app/emitter";
 import { MoveAnimation } from "./MoveAnimation";
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
@@ -1319,8 +1318,8 @@ const PokemonEncounter = () => {
       pendingXpRef.current = remainingXp;
       pendingLevelRef.current = level;
 
-      // Jingle de subida de nivel
-      playGameSfx(GAME_SFX.levelUp);
+      // Jingle de subida de nivel (vía SoundHandler para no solapar batalla)
+      emitter.emit(Event.LevelUp);
 
       // Comprobar movimiento aprendido al alcanzar este nivel exacto.
       const pokemonForLearn = { ...processingPokemon, level };

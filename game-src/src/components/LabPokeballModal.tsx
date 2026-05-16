@@ -29,7 +29,6 @@ import usePokemonMetadata from "../app/use-pokemon-metadata";
 import usePokemonStats from "../app/use-pokemon-stats";
 import PixelImage from "../styles/PixelImage";
 import { STARTERS, starterQuestId } from "./LabPokeball";
-import { playGameSfx, GAME_SFX } from "../app/game-sfx";
 
 // ── Styled ────────────────────────────────────────────────────────────────
 const Overlay = styled.div`

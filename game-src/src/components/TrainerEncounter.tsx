@@ -22,11 +22,10 @@ import {
 } from "../app/map-helper";
 import Frame from "./Frame";
 import useEvent from "../app/use-event";
-import { Event } from "../app/emitter";
+import emitter, { Event } from "../app/emitter";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
 import { showText, selectMenuOpen } from "../state/uiSlice";
 import { Direction } from "../state/state-types";
-import { playGameSfx, GAME_SFX } from "../app/game-sfx";
 import {
   beauty, channeler, aceTrainerFemale, jrTrainerFemale, lass,
   misty, erica, sabrina, martaNpc, swimmer, psychic,
@@ -46,10 +45,10 @@ const FEMALE_NPCS: NpcType[] = [
   misty, erica, sabrina, martaNpc, swimmer, psychic,
 ];
 
-function getTrainerAppearsSfx(npc: NpcType): string {
-  if (npc === teamRocketGrunt) return GAME_SFX.trainerAppearsRocket;
-  if ((FEMALE_NPCS as NpcType[]).includes(npc)) return GAME_SFX.trainerAppearsGirl;
-  return GAME_SFX.trainerAppearsBoy;
+function getTrainerAppearsVariant(npc: NpcType): "boy" | "girl" | "rocket" {
+  if (npc === teamRocketGrunt) return "rocket";
+  if ((FEMALE_NPCS as NpcType[]).includes(npc)) return "girl";
+  return "boy";
 }
 
 const StyledTrainerEncounter = styled.div`
@@ -97,7 +96,7 @@ const TrainerEncounter = () => {
     if (!encounter_) return;
     // No disparar encuentro si el trainer no tiene intro (NPC decorativo sin combate)
     if (!encounter_.intro || encounter_.intro.length === 0) return;
-    playGameSfx(getTrainerAppearsSfx(encounter_.npc));
+    emitter.emit(Event.TrainerAppears, getTrainerAppearsVariant(encounter_.npc));
     dispatch(encounterTrainer(encounter_));
     setTimeout(() => {
       setIntroIndex(0);
@@ -139,7 +138,7 @@ const TrainerEncounter = () => {
         }
         return;
       }
-      playGameSfx(getTrainerAppearsSfx(trainer.npc));
+      emitter.emit(Event.TrainerAppears, getTrainerAppearsVariant(trainer.npc));
       dispatch(encounterTrainer(trainer));
       setTimeout(() => {
         setIntroIndex(0);
