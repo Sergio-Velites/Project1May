@@ -71,6 +71,7 @@ import MoveSelect from "./MoveSelect";
 import catchesPokemon from "../app/pokeball-helper";
 import { getMoveSfxPath } from "../app/move-sfx-map";
 import emitter from "../app/emitter";
+import { playGameSfx } from "../app/game-sfx";
 import { MoveAnimation } from "./MoveAnimation";
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
@@ -1053,6 +1054,22 @@ const PokemonEncounter = () => {
       setStage(-1);
     }
   }, [isInBattle, dispatch]);
+
+  // Gritos de Pokémon (canal SFX): se reproducen cuando el sprite aparece en pantalla.
+  //   Stage 1  → Pokémon salvaje aparece (combate wild)
+  //   Stage 10 → Pokémon del jugador aparece (inicio + switch)
+  //   Stage 48 → Primer Pokémon del entrenador rival
+  //   Stage 49 → Siguiente Pokémon del rival tras KO
+  const crySfx = (id: number) =>
+    playGameSfx("/game/sfx/pokemon-cries/" + String(id).padStart(3, "0") + ".mp3");
+
+  useEffect(() => {
+    if (stage === 1 && enemy) crySfx(enemy.id);
+    if (stage === 10 && active) crySfx(active.id);
+    if (stage === 48 && enemy) crySfx(enemy.id);
+    if (stage === 49 && enemy) crySfx(enemy.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
 
   const throwPokeball = () => {
     setTimeout(() => {

@@ -59,6 +59,10 @@ const SoundHandler = () => {
   // clearOnBattleEnd: limpia musicOverride cuando inBattle pasa a false
   const [clearOnBattleEnd, setClearOnBattleEnd] = useState(false);
 
+  // Rastrea si el jingle activo es de trainer-appears para cancelarlo
+  // en cuanto comienza el combate real (inBattle=true).
+  const isTrainerAppearsJingleRef = useRef(false);
+
   // Solo reproducir música de apertura después de que el vídeo haya terminado
   const isOpening = !isGameboyMenu && isLoadScreen && videoShown;
 
@@ -104,12 +108,24 @@ const SoundHandler = () => {
   };
 
   const handleJingleEnded = () => {
+    isTrainerAppearsJingleRef.current = false;
     setJingleSrc(null);
     if (afterJingleRef.current) {
       afterJingleRef.current();
       afterJingleRef.current = null;
     }
   };
+
+  // Cancelar jingle de trainer-appears en cuanto empieza el combate.
+  // Así la música de batalla arranca inmediatamente al iniciarse el combate,
+  // sin esperar a que el jingle de ~3s expire por sí solo.
+  useEffect(() => {
+    if (inBattle && isTrainerAppearsJingleRef.current) {
+      isTrainerAppearsJingleRef.current = false;
+      setJingleSrc(null);
+      afterJingleRef.current = null;
+    }
+  }, [inBattle]);
 
   const playUiSound = (sound: string, volume = 1) => {
     if (uiSoundRef.current) uiSoundRef.current.volume = volume;
@@ -194,13 +210,15 @@ const SoundHandler = () => {
     playJingle(LEVEL_UP_SFX);
   });
 
-  // Aparece entrenador: jingle según NPC. Mientras suena, music() lo prioriza
-  // sobre la batalla, así que no hay solape con battle-trainer.
+  // Aparece entrenador: jingle según NPC. Se cancela automáticamente
+  // cuando inBattle pasa a true, para que la música de batalla arranque
+  // de inmediato sin esperar al final del jingle.
   useEvent(Event.TrainerAppears, (payload?: "boy" | "girl" | "rocket") => {
     const src =
       payload === "rocket" ? TRAINER_APPEARS_ROCKET :
       payload === "girl"   ? TRAINER_APPEARS_GIRL :
                              TRAINER_APPEARS_BOY;
+    isTrainerAppearsJingleRef.current = true;
     playJingle(src);
   });
 
