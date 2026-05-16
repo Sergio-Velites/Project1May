@@ -1,9 +1,10 @@
 import styled, { keyframes } from "styled-components";
 import Frame from "./Frame";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import usePokemonMetadata from "../app/use-pokemon-metadata";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
+import emitter from "../app/emitter";
 import PixelImage from "../styles/PixelImage";
 import { useDispatch, useSelector } from "react-redux";
 import { hideEvolution, selectEvolution, showText } from "../state/uiSlice";
@@ -256,6 +257,13 @@ const Evolution = () => {
   const show = evolution !== null;
 
   const [evolved, setEvolved] = useState(false);
+
+  // Emitir evento de música de evolución al mostrar el componente
+  useEffect(() => {
+    if (!show) return;
+    emitter.emit(Event.Evolution);
+    return () => { emitter.emit(Event.EvolutionEnd); };
+  }, [show]);
 
   useEvent(Event.A, () => {
     if (!show) return;

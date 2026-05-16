@@ -16,6 +16,7 @@ export interface ParsedTrainer {
   outtro: string[];
   pokemon: { id: number; level: number }[];
   postGame: string | null;
+  isGymLeader: boolean;
 }
 
 export interface ParsedItem {
@@ -378,6 +379,7 @@ function parseTrainerObject(text: string): ParsedTrainer | null {
 
     const persistent = /(?<![\w])persistent\s*:\s*true/.test(text);
     const isOnline = /(?<![\w])isOnline\s*:\s*true/.test(text);
+    const isGymLeader = /(?<![\w])isGymLeader\s*:\s*true/.test(text);
     const hideM = text.match(/(?<![\w])hideCondition\s*:\s*"([^"]+)"/);
     const hideCondition = hideM ? hideM[1] : null;
     const sightM = text.match(/(?<![\w])sightRange\s*:\s*(\d+)/);
@@ -404,6 +406,7 @@ function parseTrainerObject(text: string): ParsedTrainer | null {
       money,
       persistent,
       isOnline,
+      isGymLeader,
       hideCondition,
       sightRange,
       intro,

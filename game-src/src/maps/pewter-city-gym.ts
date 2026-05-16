@@ -220,6 +220,7 @@ trainers: [
   ],
   money: 2800,
   persistent: true,
+  isGymLeader: true,
   sightRange: 0,
   postGame: {
         message: [
@@ -249,6 +250,7 @@ trainers: [
   ],
   money: 3000,
   persistent: true,
+  isGymLeader: true,
   sightRange: 0,
   postGame: {
     message: [

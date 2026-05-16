@@ -19,6 +19,7 @@ import {
 import { selectMenuOpen, showTextThenAction } from "../state/uiSlice";
 import { directionModifier } from "../app/map-helper";
 import useItemData from "../app/use-item-data";
+import { playGameSfx, GAME_SFX } from "../app/game-sfx";
 
 interface ItemProps {
   x: number;
@@ -73,6 +74,7 @@ const Item = ({ item }: Props) => {
         showTextThenAction({
           text: [`¡${name} encontró ${itemData[item.item].name}!`],
           action: () => {
+            playGameSfx(GAME_SFX.itemObtained);
             dispatch(collectItem(item));
             dispatch(addInventory({ item: item.item, amount: 1 }));
           },

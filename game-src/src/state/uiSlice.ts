@@ -112,6 +112,8 @@ interface UiState {
   // sin atacar (cambio de Pokémon o uso de objeto). PokemonEncounter lo
   // observa para encadenar el ataque del rival inmediatamente después.
   playerTurnTick: number;
+  /** Indica que la intro de Oak está activa → SoundHandler reproduce la música del profesor. */
+  oakIntroActive: boolean;
 }
 
 const initialState: UiState = {
@@ -146,6 +148,7 @@ const initialState: UiState = {
   flyAnimation: null,
   pendingConfusionFromItem: null,
   playerTurnTick: 0,
+  oakIntroActive: false,
 };
 
 export const uiSlice = createSlice({
@@ -347,6 +350,12 @@ export const uiSlice = createSlice({
     consumePendingConfusionFromItem: (state) => {
       state.pendingConfusionFromItem = null;
     },
+    showOakIntro: (state) => {
+      state.oakIntroActive = true;
+    },
+    hideOakIntro: (state) => {
+      state.oakIntroActive = false;
+    },
   },
 });
 
@@ -408,6 +417,8 @@ export const {
   endFlyAnimation,
   requestConfusionFromItem,
   consumePendingConfusionFromItem,
+  showOakIntro,
+  hideOakIntro,
 } = uiSlice.actions;
 
 export const selectText = (state: RootState) => state.ui.text;
@@ -518,5 +529,7 @@ export const selectPlayerTurnTick = (state: RootState) =>
 
 export const selectPendingConfusionFromItem = (state: RootState) =>
   state.ui.pendingConfusionFromItem;
+
+export const selectOakIntroActive = (state: RootState) => state.ui.oakIntroActive;
 
 export default uiSlice.reducer;

@@ -96,6 +96,8 @@ export interface TrainerType {
   isOnline?: boolean;
   /** Para batallas online: nombre real del invitado. Se muestra en lugar de "rival" durante el combate. */
   playerName?: string;
+  /** Indica que este entrenador es líder de gimnasio → música de batalla y victoria de Gym Leader. */
+  isGymLeader?: boolean;
   postGame?: {
     message: string[];
     items?: ItemType[];

@@ -26,6 +26,7 @@ interface Trainer {
   // Raw TypeScript text preservado del fuente (ej: ItemType.BoulderBadge).
   // El editor no edita este campo — solo lo preserva y lo re-emite en el export.
   postGame?: string | null;
+  isGymLeader?: boolean;
 }
 
 interface MapEntry {
@@ -188,6 +189,7 @@ function exportTS(trainers: Trainer[], mapId: string): string {
     if (t.persistent) opts.push('  persistent: true,');
     if (t.hideCondition) opts.push(`  hideCondition: "${t.hideCondition}",`);
     if (t.isOnline) opts.push('  isOnline: true,');
+    if (t.isGymLeader) opts.push('  isGymLeader: true,');
     if (t.sightRange !== null && t.sightRange !== undefined)
       opts.push(`  sightRange: ${t.sightRange},`);
     if (t.postGame) opts.push(`  postGame: ${t.postGame},`);

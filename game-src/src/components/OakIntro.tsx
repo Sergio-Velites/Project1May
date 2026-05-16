@@ -9,6 +9,7 @@ import { Event } from "../app/emitter";
 import PixelImage from "../styles/PixelImage";
 import { useDispatch } from "react-redux";
 import { setName, setRsvp } from "../state/gameSlice";
+import { showOakIntro, hideOakIntro } from "../state/uiSlice";
 import { RSVPData } from "../state/state-types";
 import { saveRsvp, saveToCloud, getCurrentUserId } from "../app/cloud-save";
 import { store } from "../state/store";
@@ -378,6 +379,12 @@ const OakIntro = ({ onComplete }: Props) => {
   const chansey = usePokemon(113);
   const mrMime  = usePokemon(122);
   const ditto   = usePokemon(132);
+
+  // Activar música del Profesor Oak mientras esta pantalla esté montada
+  useEffect(() => {
+    dispatch(showOakIntro());
+    return () => { dispatch(hideOakIntro()); };
+  }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [displayed,   setDisplayed]  = useState("");
   const [finished,    setFinished]   = useState(false);

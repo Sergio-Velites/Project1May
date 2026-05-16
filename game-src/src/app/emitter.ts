@@ -20,6 +20,13 @@ export enum Event {
   StopMoving = "stop-moving",
   EnterDoor = "enter-door",
   HealPokemon = "heal-pokemon",
+  LevelUp = "level-up",
+  VictoryTrainer = "victory-trainer",
+  VictoryWild = "victory-wild",
+  VictoryGym = "victory-gym",
+  TrainerAppears = "trainer-appears",
+  Evolution = "evolution",
+  EvolutionEnd = "evolution-end",
 }
 
 const emitter = mitt();

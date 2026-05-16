@@ -28,6 +28,7 @@ import usePokemonMetadata from "../app/use-pokemon-metadata";
 import usePokemonStats from "../app/use-pokemon-stats";
 import PixelImage from "../styles/PixelImage";
 import { STARTERS, starterQuestId } from "./LabPokeball";
+import { playGameSfx, GAME_SFX } from "../app/game-sfx";
 
 // ── Styled ────────────────────────────────────────────────────────────────
 const Overlay = styled.div`
@@ -163,6 +164,7 @@ const StarterCard = ({ pokemonId }: { pokemonId: number }) => {
         );
         dispatch(completeQuest(questId));
         dispatch(closePokeballCard());
+        playGameSfx(GAME_SFX.pokemonObtained);
         const name = meta.name.toUpperCase();
         dispatch(showText([`¡${name} se ha unido a tu equipo!`]));
       } else {

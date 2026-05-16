@@ -70,6 +70,8 @@ import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp, getSingleLevelUp, xp
 import MoveSelect from "./MoveSelect";
 import catchesPokemon from "../app/pokeball-helper";
 import { getMoveSfxPath } from "../app/move-sfx-map";
+import { playGameSfx, GAME_SFX } from "../app/game-sfx";
+import emitter from "../app/emitter";
 import { MoveAnimation } from "./MoveAnimation";
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
@@ -1205,6 +1207,10 @@ const PokemonEncounter = () => {
 
     if (stage === 20) {
       setStage(21);
+      // Victoria wild: emitir evento para que SoundHandler cambie la música
+      if (!isTrainer) {
+        emitter.emit(Event.VictoryWild);
+      }
       // F8 — Pay Day: añadir las monedas acumuladas en el combate
       if (playerPayDayCoinsRef.current > 0) {
         dispatch(gainMoney(playerPayDayCoinsRef.current));
@@ -1313,6 +1319,9 @@ const PokemonEncounter = () => {
       pendingXpRef.current = remainingXp;
       pendingLevelRef.current = level;
 
+      // Jingle de subida de nivel
+      playGameSfx(GAME_SFX.levelUp);
+
       // Comprobar movimiento aprendido al alcanzar este nivel exacto.
       const pokemonForLearn = { ...processingPokemon, level };
       const move = getLearnedMove(pokemonForLearn);
@@ -1392,6 +1401,7 @@ const PokemonEncounter = () => {
       if (!enemy) throw new Error("No enemy found");
       if (!enemyMetadata) throw new Error("No enemy metadata found");
       const teamFull = pokemon.length >= 6;
+      playGameSfx(GAME_SFX.pokemonCaught);
       dispatch(
         addPokemon({
           id: enemy.id,
@@ -1420,6 +1430,12 @@ const PokemonEncounter = () => {
     }
 
     if (stage === 50) {
+      // Emitir el evento de victoria adecuado para que SoundHandler cambie la música
+      if (trainer?.isGymLeader) {
+        emitter.emit(Event.VictoryGym);
+      } else {
+        emitter.emit(Event.VictoryTrainer);
+      }
       setStage(51);
     }
 
