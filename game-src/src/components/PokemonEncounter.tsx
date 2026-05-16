@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, useStore } from "react-redux";
 import styled, { css, keyframes } from "styled-components";
 import {
   addInventory,
@@ -547,6 +547,11 @@ const BlackOverlay = styled.div`
 
 const PokemonEncounter = () => {
   const dispatch = useDispatch();
+  // Acceso directo al store para leer HP más reciente desde dentro de
+  // setTimeout/closures de combate, evitando stale-snapshot bugs (ej. Rest
+  // curaba HP al máximo pero applyEndOfTurnStatus seguía viendo el HP
+  // pre-Rest y al aplicar Drenadoras sobrescribía la curación).
+  const store = useStore();
   const enemy = useSelector(selectPokemonEncounter);
   const enemyMetadata = usePokemonMetadata(enemy?.id || null);
   const enemyStats = usePokemonStats(enemy?.id || 1, enemy?.level || 1);
@@ -640,7 +645,7 @@ const PokemonEncounter = () => {
   // Skull Bash, Dig, Fly) o tiene que recargar (Hyper Beam, Hydro Pump…),
   // el menú no aparece y el T2/recarga se ejecuta solo.
   const [playerLockedReason, setPlayerLockedReason] = useState<
-    "charging" | "recharging" | null
+    "charging" | "recharging" | "trap" | null
   >(null);
   // Sprites invisibles durante T1 de movimientos de invulnerabilidad (Dig/Fly)
   const [playerHidden, setPlayerHidden] = useState(false);
@@ -1214,6 +1219,13 @@ const PokemonEncounter = () => {
     }
 
     if (stage === 49) {
+      // Trainer envía siguiente pokémon: cualquier trap del jugador termina
+      // (no puede continuar atando a un objetivo distinto).
+      if (playerTrapMoveRef.current) {
+        playerTrapMoveRef.current = null;
+        playerTrapTurnsRef.current = 0;
+        setPlayerLockedReason((prev) => (prev === "trap" ? null : prev));
+      }
       setStage(11);
     }
 
@@ -1555,6 +1567,14 @@ const PokemonEncounter = () => {
       } else if (playerLockedReason === "recharging") {
         // El branch de recarga al inicio de processBattle ignora el attackId
         processBattleRef.current("__locked_recharge__");
+      } else if (playerLockedReason === "trap" && playerTrapMoveRef.current) {
+        // F4 — Trap moves (Wrap/Fire-Spin/Bind/Clamp): el jugador queda
+        // forzado a repetir el mismo movimiento durante 2-5 turnos. Sin
+        // este auto-advance el menú seguía apareciendo y el jugador podía
+        // elegir otro move — el código lo sobreescribía silenciosamente con
+        // el trap move y daba sensación de que el PP del move elegido no
+        // se gastaba (en realidad nunca se usó).
+        processBattleRef.current(playerTrapMoveRef.current);
       }
     }, 900);
     return () => clearTimeout(t);
@@ -2209,6 +2229,9 @@ const PokemonEncounter = () => {
           playerTrapMoveRef.current = startTrap.move;
           playerTrapTurnsRef.current = startTrap.turns;
           enemyTrappedTurnsRef.current = startTrap.turns;
+          // Bloquear el menú del jugador: próximos turnos se ejecutan solos
+          // con el trap move (Gen I: el usuario tampoco puede elegir).
+          setPlayerLockedReason("trap");
         }
 
         // ── F12 — Substitute del jugador creado ────────────────────────
@@ -2551,8 +2574,17 @@ const PokemonEncounter = () => {
   ) => {
     const pStatus = playerStatusRef.current;
     const eStatus = enemyStatusRef.current;
-    let newUsHp   = currentUs.hp;
-    let newThemHp = currentThem.hp;
+    // FUENTE DE VERDAD: leer HP del store en este instante. currentUs/currentThem
+    // pueden venir de una closure stale (ej. tras Rest, que cura al máximo y
+    // dispatcha en el momento, pero el setTimeout que llama aquí captura el
+    // `us` previo a la curación). Usar el HP stale como base hacía que las
+    // Drenadoras restaran 1/16 a un valor antiguo y al dispatcharlo se
+    // sobrescribiera el max recién curado por Rest.
+    const latestState = store.getState() as { game: { pokemon: PokemonInstance[]; activePokemonIndex: number; pokemonEncounter: PokemonEncounterType | null } };
+    const latestActive = latestState.game.pokemon[latestState.game.activePokemonIndex];
+    const latestEnemy  = latestState.game.pokemonEncounter;
+    let newUsHp   = latestActive?.hp ?? currentUs.hp;
+    let newThemHp = latestEnemy?.hp  ?? currentThem.hp;
     // Cola de mensajes: cuando ambos pokémon sufren efectos al final del
     // turno (ej. ambos sembrados con Drenadoras, o ambos envenenados),
     // hay que mostrar TODOS los mensajes en cadena. Antes se llamaba
@@ -2889,6 +2921,8 @@ const PokemonEncounter = () => {
       playerTrapTurnsRef.current -= 1;
       if (playerTrapTurnsRef.current <= 0) {
         playerTrapMoveRef.current = null;
+        // Último turno del trap: liberar el menú para el siguiente turno.
+        setPlayerLockedReason(null);
       }
     }
 

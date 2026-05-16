@@ -103,7 +103,20 @@ const Menu = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const [scrollIndex, setScrollIndex] = useState(0);
 
-  const requiresScrolling = menuItems.length > MENU_MAX_HEIGHT;
+  // Longitud REAL de la lista renderizada. La lista visible incluye una fila
+  // "Salir" extra cuando no hay noSelect/noExit/noExitOption. Antes el bound
+  // de scroll usaba menuItems.length (sin contar Salir) con "<=", lo que
+  // permitía over-scroll: el slice quedaba más corto que MENU_MAX_HEIGHT y la
+  // última fila visual quedaba vacía → el cursor podía detenerse en una
+  // posición sin elemento, dando la sensación de "bloqueado".
+  const hasExitRow = !(noSelect || noExit || noExitOption);
+  const totalItems = hasExitRow
+    ? menuItems.length + 1
+    : padd && padd > menuItems.length
+      ? padd
+      : menuItems.length;
+
+  const requiresScrolling = totalItems > MENU_MAX_HEIGHT;
 
   useEffect(() => {
     if (setHovered) setHovered(activeIndex);
@@ -147,7 +160,7 @@ const Menu = ({
     if (requiresScrolling) {
       if (
         activeIndex === 2 &&
-        scrollIndex + MENU_MAX_HEIGHT <= menuItems.length
+        scrollIndex + MENU_MAX_HEIGHT < totalItems
       ) {
         setScrollIndex((prev) => prev + 1);
         return;
@@ -155,11 +168,12 @@ const Menu = ({
     }
 
     setActiveIndex((prev) => {
-      if (noExit || noExitOption) {
-        if (prev + scrollIndex === menuItems.length - 1) return prev;
-      } else {
-        if (prev + scrollIndex === menuItems.length) return prev;
-      }
+      // Detenerse cuando el cursor llegue al último elemento real (Salir si
+      // existe, o el último del array). Antes había dos ramas inconsistentes
+      // (una usaba menuItems.length-1, otra menuItems.length) y se sumaban a
+      // un over-scroll del bloque anterior → el cursor podía parar en una
+      // celda vacía al final.
+      if (prev + scrollIndex >= totalItems - 1) return prev;
       return prev + 1;
     });
   });
