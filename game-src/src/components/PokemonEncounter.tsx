@@ -1061,20 +1061,41 @@ const PokemonEncounter = () => {
   }, [isInBattle, dispatch]);
 
   // Gritos de Pokémon (canal SFX): se reproducen cuando el sprite aparece en pantalla.
-  //   Stage 1  → Pokémon salvaje aparece (combate wild)
+  //   Stage 1  → Pokémon salvaje aparece (combate wild) — NUNCA en trainer
   //   Stage 10 → Pokémon del jugador aparece (inicio + switch)
   //   Stage 48 → Primer Pokémon del entrenador rival
   //   Stage 49 → Siguiente Pokémon del rival tras KO
+  // Notas:
+  //   · En trainer battles, stage 1 también se ejecuta (parte del flujo
+  //     común de inicio), pero el grito del rival NO debe sonar todavía
+  //     porque el sprite aún no aparece — debe esperar al pokeball
+  //     throw del rival (stage 48). Antes el grito sonaba a stage 1 y
+  //     OTRA VEZ a stage 48, dando dos sonidos seguidos.
+  //   · Dependencias incluyen `enemy?.id` y `active?.id` para que el
+  //     useEffect re-evalue cuando el id del pokémon cambia (envíos
+  //     sucesivos). Antes solo dependía de `stage`, así que si el
+  //     stage 49 se setteaba antes de que React propagara el nuevo
+  //     `enemy`, el cry se quedaba con el id viejo o no se evaluaba.
+  //   · `lastCryRef` evita reproducir el mismo grito dos veces en
+  //     rerenders consecutivos (ej. cuando React 18 repite efectos en dev).
   const crySfx = (id: number) =>
     playGameSfx("/game/sfx/pokemon-cries/" + String(id).padStart(3, "0") + ".mp3");
 
+  const lastCryRef = useRef<{ stage: number; id: number } | null>(null);
+
   useEffect(() => {
-    if (stage === 1 && enemy) crySfx(enemy.id);
-    if (stage === 10 && active) crySfx(active.id);
-    if (stage === 48 && enemy) crySfx(enemy.id);
-    if (stage === 49 && enemy) crySfx(enemy.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage]);
+    let id: number | null = null;
+    if (stage === 1 && enemy && !isTrainer) id = enemy.id;
+    else if (stage === 10 && active) id = active.id;
+    else if (stage === 48 && enemy) id = enemy.id;
+    else if (stage === 49 && enemy) id = enemy.id;
+
+    if (id == null) return;
+    const last = lastCryRef.current;
+    if (last && last.stage === stage && last.id === id) return;
+    lastCryRef.current = { stage, id };
+    crySfx(id);
+  }, [stage, enemy?.id, active?.id, isTrainer]);
 
   const throwPokeball = () => {
     setTimeout(() => {
@@ -2260,6 +2281,20 @@ const PokemonEncounter = () => {
         // Aplicar condición de estado ANTES de elegir el mensaje
         const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
 
+        // F2 — Aplicar confusión SIEMPRE que el resultado lo indique. Antes
+        // estaba SOLO en la cadena `else if (confuse)` más abajo, pero en
+        // moves que infligen daño (Confusion/Psybeam/Dizzy Punch) las ramas
+        // anteriores (¡Golpe crítico!, ¡Es muy efectivo!, No es muy
+        // efectivo...) se quedaban con el branch primero y la confusión se
+        // silenciaba → el rival nunca quedaba realmente confundido si el
+        // ataque era crítico/SE/NVE. Mismo bug en path opuesto = el rival
+        // confundía al jugador solo cuando no había daño "destacado", lo
+        // que explicaba la sensación de "se sigue pudiendo atacar sin rate
+        // de golpearte a ti mismo".
+        if (confuse && !blockedBySub && (!enemyStatus || enemyStatus.type !== "sleep") && enemyConfusionTurnsRef.current === 0) {
+          enemyConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 4);
+        }
+
         // ── F7 — Roar/Whirlwind: vs salvaje termina el combate ─────────
         if (forceFlee && !isTrainer) {
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} salvaje huyó!`);
@@ -2340,9 +2375,9 @@ const PokemonEncounter = () => {
           }
           setStage(17);
         } else if (confuse) {
-          // Confusión al rival
+          // Confusión al rival (mensaje; el ref ya se aplicó arriba para que
+          // funcione también cuando un crítico/SE/NVE gane este else-if).
           if (!enemyStatus || enemyStatus.type !== "sleep") {
-            enemyConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 4);
             setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival quedó confundido!`);
           }
           setStage(17);
@@ -2455,6 +2490,15 @@ const PokemonEncounter = () => {
         // Aplicar condición de estado ANTES de elegir el mensaje
         const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
 
+        // F2 — Aplicar confusión al jugador SIEMPRE que el resultado lo
+        // indique (ver explicación en el path opuesto). Si el rival usa
+        // Confusion/Psybeam y resulta crítico/SE/NVE, antes la confusión
+        // se silenciaba y el jugador seguía atacando sin riesgo de
+        // autogolpe.
+        if (confuse && !blockedBySub && playerConfusionTurnsRef.current === 0) {
+          playerConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 4);
+        }
+
         // ── F7 — Roar/Whirlwind del rival vs salvaje: termina combate ───
         if (forceFlee && !isTrainer) {
           // Vs salvaje: termina (pero el rival es el que huye, raro)
@@ -2528,8 +2572,8 @@ const PokemonEncounter = () => {
           }
           setStage(19);
         } else if (confuse) {
-          // Confusión al jugador
-          playerConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 4);
+          // Confusión al jugador (mensaje; el ref ya se aplicó arriba para
+          // que funcione también cuando un crítico/SE/NVE gane este else-if).
           setAlertText(`¡${activeMetadata.name.toUpperCase()} quedó confundido!`);
           setStage(19);
         } else if (statChange) {
