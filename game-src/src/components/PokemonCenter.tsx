@@ -86,7 +86,7 @@ const MachineGrid = styled.div`
   /* Centro horizontal: tile (2,2) = 50% - 1.5 * TILE; X ya estaba bien con -30cqw */
   left: calc(50% - 30cqw / 2.34);
   /* Tile (2,2) ocupa de top -1.5*TILE a -0.5*TILE => centramos en -1*TILE */
-  top:  calc(50% - 40cqw / 2.34);
+  top:  calc(50% - 42cqw / 2.34);
   width:  calc(12cqw / 2.34);
   height: calc(16cqw / 2.34);
   display: grid;
