@@ -107,12 +107,14 @@ const popIn = keyframes`
 `;
 
 const BallCell = styled.div`
-  /* Tamaño fijo de celda, no depende del grid */
+  /* Celda más estrecha que la imagen → las filas se solapan
+     y se elimina la transparencia interna del sprite. */
   width:  calc(6cqw / 2.34);
-  height: calc(6cqw / 2.34);
+  height: calc(4cqw / 2.34);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
 `;
 
 const BallImg = styled.img`
