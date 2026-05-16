@@ -493,8 +493,9 @@ const useItemData = () => {
         dispatch(
           showActionOnPokemon((index: number) => {
             const p = pokemon[index];
+            const pokemonName = getPokemonMetadata(p.id).name.toUpperCase();
             if (p.level >= 100) {
-              dispatch(showText([`¡${getPokemonMetadata(p.id).name.toUpperCase()} ya está en el nivel máximo!`]));
+              dispatch(showText([`¡${pokemonName} ya está en el nivel máximo!`]));
               return;
             }
             const newLevel = p.level + 1;
@@ -502,14 +503,30 @@ const useItemData = () => {
             const updatedPokemon = { ...p, level: newLevel, hp: p.hp + hpDelta };
             dispatch(updateSpecificPokemon({ index, pokemon: updatedPokemon }));
             dispatch(consumeItem(ItemType.RareCandy));
+
+            const meta = getPokemonMetadata(p.id);
+            // ¿Evoluciona a este nivel? (sólo evoluciones por nivel)
+            const evolves =
+              !!meta.evolution && newLevel >= meta.evolution.level;
             const newMove = getLearnedMove(updatedPokemon);
-            const pokemonName = getPokemonMetadata(p.id).name.toUpperCase();
-            if (newMove) {
-              // Mostrar "subió de nivel" y después abrir flujo de aprendizaje
-              dispatch(
-                showTextThenAction({
-                  text: [`¡${pokemonName} subió al nivel ${newLevel}!`],
-                  action: () =>
+
+            // Orden fiel al original Pokémon Rojo/Azul:
+            //  1) "X subió al nivel N"
+            //  2) si evoluciona → Evolution.tsx (que también aprende moves
+            //     de la nueva forma a este nivel)
+            //  3) si NO evoluciona y aprende move → flujo learnMove
+            dispatch(
+              showTextThenAction({
+                text: [`¡${pokemonName} subió al nivel ${newLevel}!`],
+                action: () => {
+                  if (evolves && meta.evolution) {
+                    dispatch(
+                      showEvolution({
+                        index,
+                        evolveToId: meta.evolution.pokemon,
+                      })
+                    );
+                  } else if (newMove) {
                     dispatch(
                       learnMove({
                         itemName: "Caramelo Raro",
@@ -518,14 +535,11 @@ const useItemData = () => {
                         item: ItemType.RareCandy,
                         preselectedPokemonIndex: index,
                       })
-                    ),
-                })
-              );
-            } else {
-              dispatch(
-                showText([`¡${pokemonName} subió al nivel ${newLevel}!`])
-              );
-            }
+                    );
+                  }
+                },
+              })
+            );
           })
         );
       },

@@ -58,6 +58,11 @@ const LearnMove = () => {
     setPreselectedHandled(true);
     const p = pokemon[idx];
     if (!p) return;
+    // Defensa: si ya conoce el movimiento, no añadir duplicado
+    if (p.moves.some((m) => m.id === moveData.id)) {
+      end();
+      return;
+    }
     if (p.moves.length === 4) {
       // El pokémon tiene 4 moves: ir al flujo "elige cuál olvidar"
       setStage(3);
@@ -74,6 +79,7 @@ const LearnMove = () => {
       );
       setStage(7);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [move, moveData, preselectedHandled, pokemon, dispatch]);
 
   useEvent(Event.A, () => {
@@ -97,7 +103,8 @@ const LearnMove = () => {
         pokemon[pokemonIndex].id
       ).name.toUpperCase()} intenta aprender ${moveData.name.toUpperCase()}.`;
     if (stage === 4) return `¡Pero no puede aprender más de 4 movimientos!`;
-    if (stage === 5) return `¿Qué movimiento quieres olvidar?`;
+    if (stage === 5 || stage === 6)
+      return `¿Qué movimiento quieres olvidar?`;
     if (stage === 7)
       return `¡${getPokemonMetadata(
         pokemon[pokemonIndex].id
@@ -121,6 +128,11 @@ const LearnMove = () => {
             const canLearn = moveData?.learnedBy.includes(pokemon_.id);
             if (!canLearn) return;
             if (!moveData) return;
+            // Defensa: si ya conoce el movimiento, no añadir duplicado
+            if (pokemon_.moves.some((m) => m.id === moveData.id)) {
+              end();
+              return;
+            }
             if (pokemon_.moves.length === 4) {
               setPokemonIndex(index);
               setStage(3);
