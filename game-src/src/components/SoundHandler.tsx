@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { selectMap, selectPokemonEncounter, selectTrainerEncounter } from "../state/gameSlice";
+import { selectMap, selectOnBicycle, selectOnSurfing, selectPokemonEncounter, selectTrainerEncounter } from "../state/gameSlice";
 import { selectGameboyMenu, selectLoadMenu, selectVideoShown, selectOakIntroActive } from "../state/uiSlice";
 
 import mapData from "../maps/map-data";
@@ -22,6 +22,8 @@ const EVOLUTION_MUSIC  = "/game/sfx/game/evolution.mp3";
 const PROFESSOR_OAK    = "/game/sfx/game/professor-oak.mp3";
 const POKEMON_CAUGHT_SFX   = "/game/sfx/game/pokemon-caught.mp3";
 const POKEMON_OBTAINED_SFX = "/game/sfx/game/pokemon-obtained.mp3";
+const SURF_MUSIC           = "/game/sfx/game/surf.mp3";
+const BICYCLE_MUSIC        = "/game/sfx/game/bicycle.mp3";
 
 // Duraciones aproximadas de cada jingle en ms (usadas para el override de música)
 const VICTORY_TRAINER_MS = 38000;
@@ -40,6 +42,8 @@ const SoundHandler = () => {
   const inBattle = !!useSelector(selectPokemonEncounter);
   const trainerEncounter = useSelector(selectTrainerEncounter);
   const isGymBattle = inBattle && !!trainerEncounter?.isGymLeader;
+  const onSurfing = useSelector(selectOnSurfing);
+  const onBicycle = useSelector(selectOnBicycle);
 
   const [musicOverride, setMusicOverride] = useState<string | null>(null);
 
@@ -79,6 +83,11 @@ const SoundHandler = () => {
     if (musicOverride) return musicOverride;
     if (isGymBattle) return GYM_BATTLE_SFX;
     if (inBattle) return battleMusic;
+    // Surf y bici se comportan como "mapas" alternativos: sustituyen la
+    // música del mapa actual mientras estén activos. En combate prevalece
+    // la música de batalla; al salir vuelve a sonar surf/bici.
+    if (onSurfing) return SURF_MUSIC;
+    if (onBicycle) return BICYCLE_MUSIC;
     const mapMusic = getMapMusic(map);
     if (mapMusic) return mapMusic;
     return undefined;
