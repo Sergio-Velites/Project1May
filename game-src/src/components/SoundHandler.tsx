@@ -179,12 +179,52 @@ const SoundHandler = () => {
     playJingle(POKEMON_OBTAINED_SFX);
   });
 
+  // Control imperativo del <audio> de música.
+  //
+  // Problema observado en producción: al cambiar de pista (ej. mapa → combate,
+  // combate → mapa, jingle → override) se solapaban dos músicas. Causa raíz:
+  // confiar en que React/navegador detengan la pista anterior con solo
+  // cambiar el atributo `src` es frágil — Safari, iOS y Chrome en algunos
+  // casos siguen reproduciendo la anterior si tenía una `play()` Promise
+  // pendiente, y el nuevo `src` arranca encima.
+  //
+  // Solución: un único <audio> con ref, y un useEffect que en cada cambio
+  // de pista hace pause() + asigna src + load() + play(). Esto garantiza
+  // que sólo una pista suene a la vez.
+  const musicRef = useRef<HTMLAudioElement>(null);
+  const currentSrcRef = useRef<string | undefined>(undefined);
+  const desiredSrc = music();
+
+  useEffect(() => {
+    const audio = musicRef.current;
+    if (!audio) return;
+
+    // Resolver a URL absoluta como hace el navegador para comparar sin
+    // falsos positivos de rutas relativas vs absolutas.
+    const resolved = desiredSrc ? new URL(desiredSrc, window.location.href).href : "";
+
+    if (currentSrcRef.current === resolved) return;
+    currentSrcRef.current = resolved;
+
+    audio.pause();
+    audio.loop = !jingleSrc;
+    if (!resolved) {
+      audio.removeAttribute("src");
+      audio.load();
+      return;
+    }
+    audio.src = resolved;
+    audio.load();
+    audio.play().catch(() => {
+      // Política de autoplay: requiere primer gesto del usuario.
+      // Cuando llegue, el siguiente cambio de pista lo iniciará.
+    });
+  }, [desiredSrc, jingleSrc]);
+
   return (
     <>
       <audio
-        autoPlay
-        loop={!jingleSrc}
-        src={music()}
+        ref={musicRef}
         onEnded={jingleSrc ? handleJingleEnded : undefined}
       />
       <audio
