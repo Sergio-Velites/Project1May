@@ -69,6 +69,7 @@ import getXp from "../app/xp-helper";
 import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp, getSingleLevelUp, xpForNextLevel } from "../app/level-helper";
 import MoveSelect from "./MoveSelect";
 import catchesPokemon from "../app/pokeball-helper";
+import { getMoveSfxPath } from "../app/move-sfx-map";
 import { MoveAnimation } from "./MoveAnimation";
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
@@ -2108,6 +2109,12 @@ const PokemonEncounter = () => {
             target: animTarget,
             damageClass: moveDataAnim?.damageClass ?? "physical",
           });
+          const sfxPath = getMoveSfxPath(moveId);
+          if (sfxPath) {
+            const sfx = new Audio(sfxPath);
+            sfx.volume = 0.55;
+            sfx.play().catch(() => {});
+          }
         } else {
           setMoveAnim(null);
         }
@@ -2309,6 +2316,12 @@ const PokemonEncounter = () => {
             target: animTarget,
             damageClass: moveDataAnim?.damageClass ?? "physical",
           });
+          const sfxPath = getMoveSfxPath(moveId);
+          if (sfxPath) {
+            const sfx = new Audio(sfxPath);
+            sfx.volume = 0.55;
+            sfx.play().catch(() => {});
+          }
         } else {
           setMoveAnim(null);
         }
