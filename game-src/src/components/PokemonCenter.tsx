@@ -93,7 +93,7 @@ const MachineGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   /* Filas a contenido + gap pequeño + centrado vertical en el tile completo */
   grid-template-rows: auto auto auto;
-  row-gap: calc(1cqw / 2.34);
+  row-gap: calc(0.5cqw / 2.34);
   align-content: center;
   justify-items: center;
   z-index: 200;
