@@ -208,6 +208,40 @@ const mtMoon2f: MapType = {
       persistent: true,
     },
   ],
+  staticPokemon: [
+    {
+      pokemonId: 94,
+      level: 35,
+      sprite: "monster-b",
+      pos: { x: 24, y: 21 },
+      questId: "mt-moon-2f-static-24-21",
+      intro: ["..."],
+    },
+    {
+      pokemonId: 65,
+      level: 35,
+      sprite: "monster-a",
+      pos: { x: 25, y: 21 },
+      questId: "mt-moon-2f-static-25-21",
+      intro: ["..."],
+    },
+    {
+      pokemonId: 68,
+      level: 35,
+      sprite: "monster-a",
+      pos: { x: 28, y: 5 },
+      questId: "mt-moon-2f-static-28-5",
+      intro: ["..."],
+    },
+    {
+      pokemonId: 76,
+      level: 35,
+      sprite: "monster-b",
+      pos: { x: 29, y: 5 },
+      questId: "mt-moon-2f-static-29-5",
+      intro: ["..."],
+    },
+  ],
 };
 
 export default mtMoon2f;
