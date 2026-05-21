@@ -275,7 +275,7 @@ export function getMilestoneMedals(e: RSVPForMedals): Medal[] {
     medals.push({ emoji: "💰", label: "El Adinerado", description: `Acumuló ${money.toLocaleString("es-ES")}₽. Con eso se paga el banquete... casi.`, rarity: "bronze" });
   }
   if (money >= 20000) {
-    medals.push({ emoji: "💵", label: "El Millonario Pokémon", description: `¡${money.toLocaleString("es-ES")}₽! A este ritmo puede permitirse ser Campeón y contador.", rarity: "silver" });
+    medals.push({ emoji: "💵", label: "El Millonario Pokémon", description: `¡${money.toLocaleString("es-ES")}₽! A este ritmo puede permitirse ser Campeón y contador.`, rarity: "silver" });
   }
 
   // ── Nivel alto ──
