@@ -14,6 +14,23 @@ const mtMoon1f: MapType = {
   cave: true,
   height: 36,
   width: 40,
+  maps: {},
+  teleports: {
+    5: {
+      5: { map: MapId.MtMoon3f, pos: { x: 6, y: 6 } },
+    },
+    11: {
+      17: { map: MapId.MtMoon3f, pos: { x: 24, y: 9 } },
+    },
+    15: {
+      25: { map: MapId.MtMoon3f, pos: { x: 26, y: 16 } },
+    },
+  },
+  exits: {
+    35: [14, 15],
+  },
+  exitReturnMap: MapId.Route3,
+  exitReturnPos: { x: 68, y: 6 },
   start: {
     x: 14,
     y: 34,
@@ -72,176 +89,147 @@ const mtMoon1f: MapType = {
       ],
     },
   },
-  maps: {},
-  exits: {
-    35: [14, 15],
-  },
-  exitReturnPos: {
-    x: 68,
-    y: 6,
-  },
-  teleports: {
-    11: {
-      17: {
-        map: MapId.MtMoon2f,
-        pos: {
-          x: 3,
-          y: 6,
-        },
-      },
-    },
-    15: {
-      25: {
-        map: MapId.MtMoon3f,
-        pos: {
-          x: 26,
-          y: 16,
-        },
-      },
-    },
-    5: {
-      5: {
-        map: MapId.MtMoon3f,
-        pos: {
-          x: 6,
-          y: 6,
-        },
-      },
-    },
-  },
-  exitReturnMap: MapId.Route3,
   encounters: getEncounterData("mt-moon-1f"),
-// Trainers para "mt-moon-1f"
-trainers: [
-  {
-  npc: bugCatcher,
-  pokemon: [{ id: 11, level: 19 }, { id: 12, level: 28 }],
-  facing: Direction.Down,
-  pos: { x: 6, y: 4 },
-  intro: [
-    "¡Anda anda! ¡Otro invitado perdido en la cueva!",
-    "¡Pues paga el peaje!"
+  // Trainers para "mt-moon-1f"
+  trainers: [
+    {
+      npc: bugCatcher,
+      pokemon: [
+        { id: 11, level: 19 },
+        { id: 12, level: 28 },
+      ],
+      facing: Direction.Down,
+      pos: { x: 6, y: 4 },
+      intro: [
+        "¡Anda anda! ¡Otro invitado perdido en la cueva!",
+        "¡Pues paga el peaje!",
+      ],
+      outtro: [
+        "Hay tipos sospechosos en la cueva.",
+        "¿O serán invitados perdidos?",
+        "¡Vi al EQUIPO ROCKET cargando",
+        "con cajas de vino de MONJÁRDÍN!",
+      ],
+      money: 100,
+      persistent: true,
+    },
+    {
+      npc: lass,
+      pokemon: [{ id: 39, level: 29 }],
+      facing: Direction.Down,
+      pos: { x: 4, y: 4 },
+      intro: [
+        "¿Hay WiFi aquí dentro?",
+        "Da igual, ¡batalla conmigo mientras busco cobertura!",
+      ],
+      outtro: [
+        "Estoy esperando a mis amigos…",
+        "¡Creíamos volver juntos del banquete!",
+        "Dicen que MARTA y SERGIO ya están",
+        "buscando hoteles en KIOTO.",
+      ],
+      money: 110,
+      persistent: true,
+    },
+    {
+      npc: superNerd,
+      pokemon: [{ id: 101, level: 29 }],
+      facing: Direction.Up,
+      pos: { x: 33, y: 10 },
+      intro: [
+        "Analizo la geología de esta cueva para el regalo de boda.",
+        "¡Pero primero, un experimento científico!",
+      ],
+      outtro: [
+        "¡Eh! ¡No me grites,",
+        "que tengo el cerebro reseco!",
+        "Necesito PKMN más fuertes",
+        "que mi resaca… imposible.",
+      ],
+      money: 130,
+      persistent: true,
+    },
+    {
+      npc: bugCatcher,
+      pokemon: [
+        { id: 14, level: 20 },
+        { id: 15, level: 28 },
+      ],
+      facing: Direction.Right,
+      pos: { x: 13, y: 29 },
+      intro: [
+        "¡Me mandaron a buscar anís y encontré esto!",
+        "¡Batalla rápida antes de que me llamen!",
+      ],
+      outtro: [
+        "¡Cruza esta cueva y volverás",
+        "a CIUDAD CELESTE de luna de miel!",
+        "¡Los novios vuelan a JAPÓN!",
+        "¡Yo me vuelvo a la cama!",
+      ],
+      money: 100,
+      persistent: true,
+    },
+    {
+      npc: lass,
+      pokemon: [{ id: 36, level: 25 }],
+      facing: Direction.Down,
+      pos: { x: 14, y: 23 },
+      intro: [
+        "¡Encontré un Clefairy, es buena señal para la boda!",
+        "¡Pero primero demuéstra que mereces verlo!",
+      ],
+      outtro: [
+        "¡Madre mía! ¡Esto retumba",
+        "como mi cabeza esta mañana!",
+        "¿Por dónde se sale?",
+        "¡Yo solo quería un café!",
+      ],
+      money: 110,
+      persistent: true,
+    },
+    {
+      npc: hiker,
+      pokemon: [
+        { id: 75, level: 24 },
+        { id: 42, level: 29 },
+      ],
+      facing: Direction.Down,
+      pos: { x: 20, y: 14 },
+      intro: [
+        "Llevo días explorando. ¿Tú también vienes a la boda?",
+        "¡Entonces tendrás que demostrar que eres digno!",
+      ],
+      outtro: [
+        "¡Anda! ¡Menudo susto!",
+        "Creía que eras el camarero del BOSQUECILLO",
+        "viniendo a cobrarme los chupitos.",
+        "¡A vuestra edad ya deberíais",
+        "saber controlar el ANTÍS!",
+      ],
+      money: 130,
+      persistent: true,
+    },
+    {
+      npc: youngster,
+      pokemon: [{ id: 20, level: 28 }],
+      facing: Direction.Right,
+      pos: { x: 8, y: 12 },
+      intro: [
+        "¡La barra libre no es gratis, hay que ganársela!",
+        "¡Demuéstrame que mereces tu copa!",
+      ],
+      outtro: [
+        "¿Tú también te has perdido",
+        "al volver de la boda?",
+        "Yo vine a buscar pareja…",
+        "¡pero MARTA y SERGIO ya se llevaron",
+        "toda la suerte para JAPÓN!",
+      ],
+      money: 100,
+      persistent: true,
+    },
   ],
-  outtro: [
-    "Hay tipos sospechosos en la cueva.",
-    "¿O serán invitados perdidos?",
-    "¡Vi al EQUIPO ROCKET cargando",
-    "con cajas de vino de MONJÁRDÍN!"
-  ],
-  money: 100,
-  persistent: true,
-},
-  {
-  npc: lass,
-  pokemon: [{ id: 39, level: 29 }],
-  facing: Direction.Down,
-  pos: { x: 4, y: 4 },
-  intro: [
-    "¿Hay WiFi aquí dentro?",
-    "Da igual, ¡batalla conmigo mientras busco cobertura!"
-  ],
-  outtro: [
-    "Estoy esperando a mis amigos…",
-    "¡Creíamos volver juntos del banquete!",
-    "Dicen que MARTA y SERGIO ya están",
-    "buscando hoteles en KIOTO."
-  ],
-  money: 110,
-  persistent: true,
-},
-  {
-  npc: superNerd,
-  pokemon: [{ id: 101, level: 29 }],
-  facing: Direction.Up,
-  pos: { x: 33, y: 10 },
-  intro: [
-    "Analizo la geología de esta cueva para el regalo de boda.",
-    "¡Pero primero, un experimento científico!"
-  ],
-  outtro: [
-    "¡Eh! ¡No me grites,",
-    "que tengo el cerebro reseco!",
-    "Necesito PKMN más fuertes",
-    "que mi resaca… imposible."
-  ],
-  money: 130,
-  persistent: true,
-},
-  {
-  npc: bugCatcher,
-  pokemon: [{ id: 14, level: 20 }, { id: 15, level: 28 }],
-  facing: Direction.Right,
-  pos: { x: 13, y: 29 },
-  intro: [
-    "¡Me mandaron a buscar anís y encontré esto!",
-    "¡Batalla rápida antes de que me llamen!"
-  ],
-  outtro: [
-    "¡Cruza esta cueva y volverás",
-    "a CIUDAD CELESTE de luna de miel!",
-    "¡Los novios vuelan a JAPÓN!",
-    "¡Yo me vuelvo a la cama!"
-  ],
-  money: 100,
-  persistent: true,
-},
-  {
-  npc: lass,
-  pokemon: [{ id: 36, level: 25 }],
-  facing: Direction.Down,
-  pos: { x: 14, y: 23 },
-  intro: [
-    "¡Encontré un Clefairy, es buena señal para la boda!",
-    "¡Pero primero demuéstra que mereces verlo!"
-  ],
-  outtro: [
-    "¡Madre mía! ¡Esto retumba",
-    "como mi cabeza esta mañana!",
-    "¿Por dónde se sale?",
-    "¡Yo solo quería un café!"
-  ],
-  money: 110,
-  persistent: true,
-},
-  {
-  npc: hiker,
-  pokemon: [{ id: 75, level: 24 }, { id: 42, level: 29 }],
-  facing: Direction.Down,
-  pos: { x: 20, y: 14 },
-  intro: [
-    "Llevo días explorando. ¿Tú también vienes a la boda?",
-    "¡Entonces tendrás que demostrar que eres digno!"
-  ],
-  outtro: [
-    "¡Anda! ¡Menudo susto!",
-    "Creía que eras el camarero del BOSQUECILLO",
-    "viniendo a cobrarme los chupitos.",
-    "¡A vuestra edad ya deberíais",
-    "saber controlar el ANTÍS!"
-  ],
-  money: 130,
-  persistent: true,
-},
-  {
-  npc: youngster,
-  pokemon: [{ id: 20, level: 28 }],
-  facing: Direction.Right,
-  pos: { x: 8, y: 12 },
-  intro: [
-    "¡La barra libre no es gratis, hay que ganársela!",
-    "¡Demuéstrame que mereces tu copa!"
-  ],
-  outtro: [
-    "¿Tú también te has perdido",
-    "al volver de la boda?",
-    "Yo vine a buscar pareja…",
-    "¡pero MARTA y SERGIO ya se llevaron",
-    "toda la suerte para JAPÓN!"
-  ],
-  money: 100,
-  persistent: true,
-}
-],
   items: [
     {
       item: ItemType.Tm12,
