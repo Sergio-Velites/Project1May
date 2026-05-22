@@ -285,7 +285,33 @@
     "imageFile": "house-b.png",
     "height": 8,
     "width": 8,
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "fisher",
+        "pos": {
+          "x": 5,
+          "y": 5
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "El puto Peri y Aos se fueron de ",
+          "pesca sin mi..."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -324,7 +350,15 @@
     "water": {},
     "encounters": null,
     "texts": {},
-    "items": [],
+    "items": [
+      {
+        "itemKey": "OldRod",
+        "pos": {
+          "x": 4,
+          "y": 3
+        }
+      }
+    ],
     "gifts": [],
     "staticPokemon": [],
     "pokemonCenter": null,
@@ -512,12 +546,12 @@
         ],
         "pokemon": [
           {
-            "id": 10,
-            "level": 10
+            "id": 11,
+            "level": 19
           },
           {
-            "id": 11,
-            "level": 11
+            "id": 12,
+            "level": 28
           }
         ],
         "postGame": null
@@ -547,7 +581,7 @@
         "pokemon": [
           {
             "id": 39,
-            "level": 12
+            "level": 29
           }
         ],
         "postGame": null
@@ -576,8 +610,8 @@
         ],
         "pokemon": [
           {
-            "id": 100,
-            "level": 13
+            "id": 101,
+            "level": 29
           }
         ],
         "postGame": null
@@ -607,11 +641,11 @@
         "pokemon": [
           {
             "id": 14,
-            "level": 11
+            "level": 20
           },
           {
-            "id": 13,
-            "level": 12
+            "id": 15,
+            "level": 28
           }
         ],
         "postGame": null
@@ -640,8 +674,8 @@
         ],
         "pokemon": [
           {
-            "id": 35,
-            "level": 11
+            "id": 36,
+            "level": 25
           }
         ],
         "postGame": null
@@ -671,12 +705,12 @@
         ],
         "pokemon": [
           {
-            "id": 74,
-            "level": 12
+            "id": 75,
+            "level": 24
           },
           {
-            "id": 41,
-            "level": 10
+            "id": 42,
+            "level": 29
           }
         ],
         "postGame": null
@@ -706,8 +740,8 @@
         ],
         "pokemon": [
           {
-            "id": 19,
-            "level": 12
+            "id": 20,
+            "level": 28
           }
         ],
         "postGame": null
@@ -1190,74 +1224,151 @@
         "rate": 7,
         "pokemon": [
           {
-            "id": 35,
-            "chance": 1,
+            "id": 41,
+            "chance": 17,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
+            "minLevel": 14,
+            "maxLevel": 18
           },
           {
-            "id": 41,
-            "chance": 20,
+            "id": 74,
+            "chance": 9,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
+            "minLevel": 14,
+            "maxLevel": 18
           },
           {
-            "id": 41,
-            "chance": 20,
+            "id": 27,
+            "chance": 8,
             "conditionValues": [],
-            "maxLevel": 7,
-            "minLevel": 7
+            "minLevel": 12,
+            "maxLevel": 16
           },
           {
-            "id": 41,
-            "chance": 15,
+            "id": 50,
+            "chance": 6,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
-          },
-          {
-            "id": 41,
-            "chance": 10,
-            "conditionValues": [],
-            "maxLevel": 6,
-            "minLevel": 6
-          },
-          {
-            "id": 41,
-            "chance": 10,
-            "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
-          },
-          {
-            "id": 41,
-            "chance": 4,
-            "conditionValues": [],
-            "maxLevel": 11,
-            "minLevel": 11
+            "minLevel": 12,
+            "maxLevel": 16
           },
           {
             "id": 46,
-            "chance": 5,
+            "chance": 7,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
+            "minLevel": 12,
+            "maxLevel": 16
           },
           {
-            "id": 74,
-            "chance": 10,
+            "id": 58,
+            "chance": 7,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
+            "minLevel": 12,
+            "maxLevel": 16
           },
           {
-            "id": 74,
+            "id": 77,
             "chance": 5,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "minLevel": 14,
+            "maxLevel": 18
+          },
+          {
+            "id": 66,
+            "chance": 6,
+            "conditionValues": [],
+            "minLevel": 12,
+            "maxLevel": 16
+          },
+          {
+            "id": 104,
+            "chance": 5,
+            "conditionValues": [],
+            "minLevel": 12,
+            "maxLevel": 16
+          },
+          {
+            "id": 95,
+            "chance": 4,
+            "conditionValues": [],
+            "minLevel": 16,
+            "maxLevel": 20
+          },
+          {
+            "id": 111,
+            "chance": 4,
+            "conditionValues": [],
+            "minLevel": 14,
+            "maxLevel": 18
+          },
+          {
+            "id": 109,
+            "chance": 4,
+            "conditionValues": [],
+            "minLevel": 12,
+            "maxLevel": 16
+          },
+          {
+            "id": 127,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 14,
+            "maxLevel": 18
+          },
+          {
+            "id": 92,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 12,
+            "maxLevel": 16
+          },
+          {
+            "id": 28,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 18,
+            "maxLevel": 22
+          },
+          {
+            "id": 51,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 18,
+            "maxLevel": 20
+          },
+          {
+            "id": 75,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 18,
+            "maxLevel": 22
+          },
+          {
+            "id": 78,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 20,
+            "maxLevel": 22
+          },
+          {
+            "id": 67,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 18,
+            "maxLevel": 22
+          },
+          {
+            "id": 105,
+            "chance": 1,
+            "conditionValues": [],
+            "minLevel": 20,
+            "maxLevel": 22
+          },
+          {
+            "id": 76,
+            "chance": 1,
+            "conditionValues": [],
+            "minLevel": 20,
+            "maxLevel": 22
           }
         ]
       },
@@ -1377,13 +1488,6 @@
         }
       },
       {
-        "itemKey": "EscapeRope",
-        "pos": {
-          "x": 36,
-          "y": 23
-        }
-      },
-      {
         "itemKey": "MoonStone",
         "pos": {
           "x": 2,
@@ -1411,10 +1515,10 @@
       },
       "11": {
         "17": {
-          "map": "mt-moon-2f",
+          "map": "mt-moon-3f",
           "pos": {
-            "x": 3,
-            "y": 6
+            "x": 24,
+            "y": 9
           }
         }
       },
@@ -1472,12 +1576,12 @@
         ],
         "pokemon": [
           {
-            "id": 23,
-            "level": 17
+            "id": 24,
+            "level": 31
           },
           {
-            "id": 41,
-            "level": 15
+            "id": 42,
+            "level": 32
           }
         ],
         "postGame": null
@@ -1506,12 +1610,12 @@
         ],
         "pokemon": [
           {
-            "id": 41,
-            "level": 16
+            "id": 42,
+            "level": 30
           },
           {
-            "id": 109,
-            "level": 15
+            "id": 110,
+            "level": 33
           }
         ],
         "postGame": null
@@ -1540,8 +1644,8 @@
         ],
         "pokemon": [
           {
-            "id": 109,
-            "level": 18
+            "id": 110,
+            "level": 28
           }
         ],
         "postGame": null
@@ -1570,12 +1674,12 @@
         ],
         "pokemon": [
           {
-            "id": 23,
-            "level": 17
+            "id": 24,
+            "level": 33
           },
           {
-            "id": 41,
-            "level": 16
+            "id": 42,
+            "level": 31
           }
         ],
         "postGame": null
@@ -1604,12 +1708,12 @@
         ],
         "pokemon": [
           {
-            "id": 100,
-            "level": 15
+            "id": 101,
+            "level": 28
           },
           {
-            "id": 81,
-            "level": 14
+            "id": 82,
+            "level": 29
           }
         ],
         "postGame": null
@@ -1624,6 +1728,7 @@
         5,
         6,
         7,
+        8,
         9,
         10,
         11,
@@ -1633,8 +1738,7 @@
         15,
         16,
         17,
-        18,
-        8
+        18
       ],
       "2": [
         2,
@@ -1662,8 +1766,8 @@
         31
       ],
       "5": [
-        2,
         1,
+        2,
         4,
         5,
         6,
@@ -1727,39 +1831,35 @@
         6,
         7,
         8,
-        17,
-        14,
-        11,
-        10,
         9,
+        10,
+        11,
+        14,
+        17,
         18,
         19,
         23,
-        36,
-        33
+        33,
+        36
       ],
       "10": [
-        17,
-        14,
         7,
+        14,
+        17,
         18,
         19,
         23,
         36
       ],
       "11": [
-        17,
+        7,
         14,
         15,
         16,
-        7,
+        17,
         18,
         19,
-        39,
         23,
-        36,
-        37,
-        38,
         24,
         25,
         26,
@@ -1771,15 +1871,19 @@
         32,
         33,
         34,
-        35
+        35,
+        36,
+        37,
+        38,
+        39
       ],
       "12": [
         7,
-        39,
-        30,
-        29,
         18,
-        19
+        19,
+        29,
+        30,
+        39
       ],
       "13": [
         7,
@@ -1787,31 +1891,31 @@
         9,
         10,
         11,
+        14,
         15,
         16,
         17,
         18,
         19,
-        39,
-        30,
         29,
-        14
+        30,
+        39
       ],
       "14": [
         11,
         14,
         19,
-        39,
+        29,
         30,
-        29
+        39
       ],
       "15": [
-        11,
-        10,
-        9,
-        8,
-        7,
         6,
+        7,
+        8,
+        9,
+        10,
+        11,
         14,
         15,
         16,
@@ -1820,37 +1924,37 @@
         19,
         24,
         25,
-        39,
-        35,
-        34,
-        31,
-        30,
+        28,
         29,
-        28
+        30,
+        31,
+        34,
+        35,
+        39
       ],
       "16": [
         6,
         18,
         19,
         24,
-        39,
-        35
+        35,
+        39
       ],
       "17": [
         6,
         18,
         19,
         24,
-        39,
-        35
+        35,
+        39
       ],
       "18": [
         6,
         18,
         19,
         24,
-        39,
-        35
+        35,
+        39
       ],
       "19": [
         6,
@@ -1875,34 +1979,36 @@
         30,
         31,
         32,
-        39,
-        35
+        33,
+        34,
+        35,
+        39
       ],
       "20": [
         6,
         12,
         13,
         31,
-        39,
-        35
+        35,
+        39
       ],
       "21": [
         6,
         12,
         13,
-        30,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
         27,
         28,
         29,
-        22,
-        21,
-        20,
-        19,
-        18,
-        17,
-        16,
-        15,
-        14,
+        30,
         31,
         32,
         33,
@@ -1914,9 +2020,9 @@
         6,
         12,
         13,
-        30,
-        27,
         22,
+        27,
+        30,
         31,
         39
       ],
@@ -1924,11 +2030,11 @@
         6,
         12,
         13,
-        30,
-        27,
-        26,
-        23,
         22,
+        23,
+        26,
+        27,
+        30,
         31,
         39
       ],
@@ -1942,11 +2048,11 @@
       ],
       "25": [
         6,
-        35,
         12,
         13,
         30,
         31,
+        35,
         36,
         37,
         38,
@@ -1954,23 +2060,22 @@
       ],
       "26": [
         6,
-        35,
         12,
         13,
         30,
-        31
+        31,
+        35
       ],
       "27": [
         6,
-        35,
         12,
         13,
         30,
-        31
+        31,
+        35
       ],
       "28": [
         6,
-        35,
         12,
         13,
         14,
@@ -1990,22 +2095,22 @@
         28,
         29,
         30,
-        31
+        31,
+        35
       ],
       "29": [
         6,
-        35,
+        12,
         22,
         23,
         24,
         25,
         26,
-        12,
-        31
+        31,
+        35
       ],
       "30": [
         6,
-        35,
         12,
         13,
         14,
@@ -2017,15 +2122,16 @@
         20,
         21,
         22,
+        23,
+        24,
+        25,
         26,
         27,
         28,
         29,
         30,
-        25,
-        24,
-        23,
-        31
+        31,
+        35
       ],
       "31": [
         6,
@@ -2039,12 +2145,20 @@
         6,
         7,
         8,
+        9,
         10,
+        11,
+        12,
         13,
+        14,
+        15,
         16,
+        17,
         18,
+        19,
         20,
         21,
+        22,
         23,
         24,
         25,
@@ -2057,15 +2171,7 @@
         32,
         33,
         34,
-        35,
-        22,
-        19,
-        17,
-        15,
-        14,
-        12,
-        11,
-        9
+        35
       ],
       "34": [],
       "35": []
@@ -2078,74 +2184,235 @@
         "rate": 7,
         "pokemon": [
           {
-            "id": 35,
-            "chance": 5,
-            "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
-          },
-          {
-            "id": 35,
-            "chance": 1,
-            "conditionValues": [],
-            "maxLevel": 12,
-            "minLevel": 12
-          },
-          {
-            "id": 41,
-            "chance": 20,
-            "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
-          },
-          {
-            "id": 41,
-            "chance": 15,
-            "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
-          },
-          {
             "id": 41,
             "chance": 10,
             "conditionValues": [],
-            "maxLevel": 11,
-            "minLevel": 11
+            "minLevel": 22,
+            "maxLevel": 26
           },
           {
-            "id": 41,
+            "id": 35,
+            "chance": 6,
+            "conditionValues": [],
+            "minLevel": 22,
+            "maxLevel": 26
+          },
+          {
+            "id": 39,
             "chance": 4,
             "conditionValues": [],
-            "maxLevel": 12,
-            "minLevel": 12
+            "minLevel": 22,
+            "maxLevel": 26
           },
           {
-            "id": 46,
-            "chance": 10,
+            "id": 92,
+            "chance": 2,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "minLevel": 22,
+            "maxLevel": 26
           },
           {
-            "id": 46,
-            "chance": 5,
+            "id": 93,
+            "chance": 3,
             "conditionValues": [],
-            "maxLevel": 12,
-            "minLevel": 12
+            "minLevel": 26,
+            "maxLevel": 28
+          },
+          {
+            "id": 94,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 28,
+            "maxLevel": 30
           },
           {
             "id": 74,
-            "chance": 20,
+            "chance": 3,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
+            "minLevel": 22,
+            "maxLevel": 26
           },
           {
-            "id": 74,
-            "chance": 10,
+            "id": 115,
+            "chance": 3,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 126,
+            "chance": 4,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 124,
+            "chance": 4,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 122,
+            "chance": 4,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 123,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 125,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 108,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 127,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 110,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 26,
+            "maxLevel": 30
+          },
+          {
+            "id": 112,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 26,
+            "maxLevel": 30
+          },
+          {
+            "id": 75,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 26,
+            "maxLevel": 30
+          },
+          {
+            "id": 106,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 107,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 104,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 22,
+            "maxLevel": 26
+          },
+          {
+            "id": 68,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 28,
+            "maxLevel": 30
+          },
+          {
+            "id": 40,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 26,
+            "maxLevel": 30
+          },
+          {
+            "id": 36,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 26,
+            "maxLevel": 30
+          },
+          {
+            "id": 76,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 28,
+            "maxLevel": 30
+          },
+          {
+            "id": 95,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 26,
+            "maxLevel": 30
+          },
+          {
+            "id": 105,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 26,
+            "maxLevel": 30
+          },
+          {
+            "id": 137,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 26,
+            "maxLevel": 30
+          },
+          {
+            "id": 77,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 78,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 28,
+            "maxLevel": 30
+          },
+          {
+            "id": 28,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 51,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 28
+          },
+          {
+            "id": 67,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 26,
+            "maxLevel": 30
           }
         ]
       },
@@ -2227,24 +2494,62 @@
       }
     },
     "texts": {},
-    "items": [
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [
       {
-        "itemKey": "HelixFossil",
+        "pokemonId": 94,
+        "level": 35,
         "pos": {
-          "x": 27,
-          "y": 28
-        }
+          "x": 24,
+          "y": 21
+        },
+        "sprite": "monster-b",
+        "questId": "mt-moon-2f-static-24-21",
+        "intro": [
+          "..."
+        ]
       },
       {
-        "itemKey": "DomeFossil",
+        "pokemonId": 65,
+        "level": 35,
         "pos": {
-          "x": 21,
-          "y": 28
-        }
+          "x": 25,
+          "y": 21
+        },
+        "sprite": "monster-a",
+        "questId": "mt-moon-2f-static-25-21",
+        "intro": [
+          "..."
+        ]
+      },
+      {
+        "pokemonId": 68,
+        "level": 35,
+        "pos": {
+          "x": 28,
+          "y": 5
+        },
+        "sprite": "monster-a",
+        "questId": "mt-moon-2f-static-28-5",
+        "intro": [
+          "..."
+        ]
+      },
+      {
+        "pokemonId": 76,
+        "level": 35,
+        "pos": {
+          "x": 29,
+          "y": 5
+        },
+        "sprite": "monster-b",
+        "questId": "mt-moon-2f-static-29-5",
+        "intro": [
+          "..."
+        ]
       }
     ],
-    "gifts": [],
-    "staticPokemon": [],
     "pokemonCenter": null,
     "pc": null,
     "store": null,
@@ -2512,74 +2817,228 @@
         "rate": 5,
         "pokemon": [
           {
+            "id": 41,
+            "chance": 14,
+            "conditionValues": [],
+            "minLevel": 18,
+            "maxLevel": 22
+          },
+          {
+            "id": 92,
+            "chance": 5,
+            "conditionValues": [],
+            "minLevel": 18,
+            "maxLevel": 22
+          },
+          {
+            "id": 74,
+            "chance": 5,
+            "conditionValues": [],
+            "minLevel": 18,
+            "maxLevel": 22
+          },
+          {
+            "id": 66,
+            "chance": 5,
+            "conditionValues": [],
+            "minLevel": 16,
+            "maxLevel": 20
+          },
+          {
+            "id": 39,
+            "chance": 5,
+            "conditionValues": [],
+            "minLevel": 16,
+            "maxLevel": 20
+          },
+          {
             "id": 35,
+            "chance": 5,
+            "conditionValues": [],
+            "minLevel": 16,
+            "maxLevel": 20
+          },
+          {
+            "id": 37,
+            "chance": 5,
+            "conditionValues": [],
+            "minLevel": 16,
+            "maxLevel": 20
+          },
+          {
+            "id": 104,
+            "chance": 5,
+            "conditionValues": [],
+            "minLevel": 16,
+            "maxLevel": 20
+          },
+          {
+            "id": 109,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 16,
+            "maxLevel": 20
+          },
+          {
+            "id": 111,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 18,
+            "maxLevel": 22
+          },
+          {
+            "id": 58,
             "chance": 4,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
+            "minLevel": 16,
+            "maxLevel": 20
           },
           {
-            "id": 41,
-            "chance": 20,
+            "id": 77,
+            "chance": 2,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
+            "minLevel": 18,
+            "maxLevel": 22
           },
           {
-            "id": 41,
-            "chance": 20,
+            "id": 67,
+            "chance": 3,
             "conditionValues": [],
-            "maxLevel": 7,
-            "minLevel": 7
+            "minLevel": 22,
+            "maxLevel": 26
           },
           {
-            "id": 41,
-            "chance": 10,
+            "id": 106,
+            "chance": 2,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
+            "minLevel": 20,
+            "maxLevel": 24
           },
           {
-            "id": 41,
-            "chance": 5,
+            "id": 107,
+            "chance": 2,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "minLevel": 20,
+            "maxLevel": 24
           },
           {
-            "id": 41,
-            "chance": 5,
+            "id": 108,
+            "chance": 2,
             "conditionValues": [],
-            "maxLevel": 11,
-            "minLevel": 11
+            "minLevel": 18,
+            "maxLevel": 22
           },
           {
-            "id": 46,
-            "chance": 10,
+            "id": 123,
+            "chance": 2,
             "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
+            "minLevel": 20,
+            "maxLevel": 24
           },
           {
-            "id": 74,
-            "chance": 15,
+            "id": 125,
+            "chance": 2,
             "conditionValues": [],
-            "maxLevel": 7,
-            "minLevel": 7
+            "minLevel": 20,
+            "maxLevel": 24
           },
           {
-            "id": 74,
-            "chance": 10,
+            "id": 93,
+            "chance": 2,
             "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
+            "minLevel": 22,
+            "maxLevel": 26
           },
           {
-            "id": 74,
+            "id": 75,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 22,
+            "maxLevel": 26
+          },
+          {
+            "id": 95,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 20,
+            "maxLevel": 24
+          },
+          {
+            "id": 122,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 20,
+            "maxLevel": 24
+          },
+          {
+            "id": 40,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 26
+          },
+          {
+            "id": 105,
+            "chance": 3,
+            "conditionValues": [],
+            "minLevel": 22,
+            "maxLevel": 26
+          },
+          {
+            "id": 110,
             "chance": 1,
             "conditionValues": [],
-            "maxLevel": 9,
-            "minLevel": 9
+            "minLevel": 22,
+            "maxLevel": 26
+          },
+          {
+            "id": 36,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 26
+          },
+          {
+            "id": 76,
+            "chance": 2,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 26
+          },
+          {
+            "id": 68,
+            "chance": 1,
+            "conditionValues": [],
+            "minLevel": 26,
+            "maxLevel": 28
+          },
+          {
+            "id": 115,
+            "chance": 1,
+            "conditionValues": [],
+            "minLevel": 22,
+            "maxLevel": 26
+          },
+          {
+            "id": 126,
+            "chance": 1,
+            "conditionValues": [],
+            "minLevel": 22,
+            "maxLevel": 26
+          },
+          {
+            "id": 124,
+            "chance": 1,
+            "conditionValues": [],
+            "minLevel": 22,
+            "maxLevel": 26
+          },
+          {
+            "id": 137,
+            "chance": 1,
+            "conditionValues": [],
+            "minLevel": 24,
+            "maxLevel": 26
           }
         ]
       },
@@ -3056,38 +3515,20 @@
       ],
       "14": [
         0,
-        4,
-        5,
-        6,
-        7,
         19
       ],
       "15": [
         0,
-        4,
-        5,
-        6,
-        7,
         10,
         19
       ],
       "16": [
         0,
-        4,
-        5,
-        6,
-        7,
         19
       ],
       "17": [
         0,
         1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
         8,
         9,
         10,
@@ -3103,182 +3544,42 @@
       ],
       "18": [
         2,
-        3
+        3,
+        4,
+        5,
+        6,
+        7
       ]
     },
     "fences": {},
     "grass": {},
-    "water": {},
-    "encounters": {
-      "walk": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "oldRod": {
-        "rate": 10,
-        "pokemon": [
-          {
-            "id": 129,
-            "chance": 100,
-            "conditionValues": [],
-            "maxLevel": 5,
-            "minLevel": 5
-          }
-        ]
-      },
-      "goodRod": {
-        "rate": 10,
-        "pokemon": [
-          {
-            "id": 60,
-            "chance": 50,
-            "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
-          },
-          {
-            "id": 118,
-            "chance": 50,
-            "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
-          }
-        ]
-      },
-      "superRod": {
-        "rate": 10,
-        "pokemon": [
-          {
-            "id": 60,
-            "chance": 17,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 60,
-            "chance": 8,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 60,
-            "chance": 25,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 72,
-            "chance": 25,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 72,
-            "chance": 8,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 72,
-            "chance": 17,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          }
-        ]
-      },
-      "surf": {
-        "rate": 1,
-        "pokemon": []
-      },
-      "rockSmash": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "headbutt": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "darkGrass": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "grassSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "caveSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "bridgeSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "superRodSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "surfSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "yellowFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "purpleFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "redFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "roughTerrain": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "gift": {
-        "rate": 0,
-        "pokemon": [
-          {
-            "id": 1,
-            "chance": 100,
-            "conditionValues": [],
-            "maxLevel": 5,
-            "minLevel": 5
-          },
-          {
-            "id": 4,
-            "chance": 100,
-            "conditionValues": [],
-            "maxLevel": 5,
-            "minLevel": 5
-          },
-          {
-            "id": 7,
-            "chance": 100,
-            "conditionValues": [],
-            "maxLevel": 5,
-            "minLevel": 5
-          }
-        ]
-      },
-      "giftEgg": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "onlyOne": {
-        "rate": 0,
-        "pokemon": []
-      }
+    "water": {
+      "14": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "15": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "16": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "17": [
+        4,
+        5,
+        6,
+        7
+      ]
     },
+    "encounters": null,
     "texts": {
       "5": {
         "3": [
@@ -3374,11 +3675,11 @@
         "pokemon": [
           {
             "id": 74,
-            "level": 15
+            "level": 12
           },
           {
             "id": 95,
-            "level": 17
+            "level": 14
           }
         ],
         "postGame": null
@@ -3406,11 +3707,11 @@
         "pokemon": [
           {
             "id": 120,
-            "level": 16
+            "level": 14
           },
           {
             "id": 121,
-            "level": 18
+            "level": 17
           }
         ],
         "postGame": null
@@ -3440,11 +3741,11 @@
         "pokemon": [
           {
             "id": 100,
-            "level": 17
+            "level": 18
           },
           {
-            "id": 25,
-            "level": 17
+            "id": 26,
+            "level": 20
           }
         ],
         "postGame": null
@@ -3473,15 +3774,15 @@
         "pokemon": [
           {
             "id": 71,
-            "level": 17
+            "level": 20
           },
           {
             "id": 114,
-            "level": 17
+            "level": 20
           },
           {
             "id": 45,
-            "level": 18
+            "level": 22
           }
         ],
         "postGame": null
@@ -3510,15 +3811,15 @@
         "pokemon": [
           {
             "id": 109,
-            "level": 18
+            "level": 21
           },
           {
             "id": 89,
-            "level": 18
+            "level": 21
           },
           {
             "id": 49,
-            "level": 19
+            "level": 23
           }
         ],
         "postGame": null
@@ -3547,11 +3848,11 @@
         "pokemon": [
           {
             "id": 64,
-            "level": 18
+            "level": 23
           },
           {
             "id": 65,
-            "level": 19
+            "level": 25
           }
         ],
         "postGame": null
@@ -3580,15 +3881,15 @@
         "pokemon": [
           {
             "id": 58,
-            "level": 19
+            "level": 24
           },
           {
             "id": 78,
-            "level": 19
+            "level": 25
           },
           {
             "id": 126,
-            "level": 20
+            "level": 27
           }
         ],
         "postGame": null
@@ -3619,19 +3920,19 @@
         "pokemon": [
           {
             "id": 51,
-            "level": 19
+            "level": 25
           },
           {
             "id": 31,
-            "level": 20
+            "level": 27
           },
           {
             "id": 34,
-            "level": 20
+            "level": 27
           },
           {
             "id": 53,
-            "level": 21
+            "level": 30
           }
         ],
         "postGame": null
@@ -3661,15 +3962,31 @@
         ],
         "pokemon": [
           {
-            "id": 58,
-            "level": 21
+            "id": 59,
+            "level": 28
           },
           {
-            "id": 77,
-            "level": 21
+            "id": 94,
+            "level": 28
+          },
+          {
+            "id": 57,
+            "level": 29
+          },
+          {
+            "id": 127,
+            "level": 30
+          },
+          {
+            "id": 131,
+            "level": 30
+          },
+          {
+            "id": 149,
+            "level": 31
           }
         ],
-        "postGame": "{\n        message: [\n          \"¡Toma la INSIGNIA DEL VINO!\",\n          \"Es el símbolo de que mereces brindar.\",\n          \"¡Úsala bien, y que el vino fluya!\",\n        ],\n        items: [ItemType.BoulderBadge, ItemType.Tm34],\n      }"
+        "postGame": "{\n        message: [\n          \"¡Toma la INSIGNIA DEL VINO!\",\n          \"Es el símbolo de que mereces brindar.\",\n          \"Y esta M0, que contiene Surf.\",\n          \"¡Úsala bien, y fluye como el buen vino!\",\n        ],\n        items: [ItemType.BoulderBadge, ItemType.Hm03],\n      }"
       },
       {
         "npcKey": "martaNpc",
@@ -3691,20 +4008,36 @@
         ],
         "outtro": [
           "¡Increíble! ¡Enhorabuena!",
-          "El 8 de agosto... trae buen vino.",
-          "Y prepárate para bailar hasta el amanecer."
+          "El 8 de agosto...",
+          "Ponemos nosotros el vino."
         ],
         "pokemon": [
           {
             "id": 12,
-            "level": 22
+            "level": 28
           },
           {
             "id": 36,
-            "level": 23
+            "level": 30
+          },
+          {
+            "id": 18,
+            "level": 30
+          },
+          {
+            "id": 42,
+            "level": 30
+          },
+          {
+            "id": 55,
+            "level": 30
+          },
+          {
+            "id": 52,
+            "level": 40
           }
         ],
-        "postGame": null
+        "postGame": "{\n    message: [\n      \"Por lo menos, ahora toca volar a Japón\",\n      \"¡Espera! hablando de volar\",\n      \"Toma esta M0.\",\n      \"contiene Vuelo.\",\n      \"Enséñasela a un Pokémon volador\",\n      \"y podrás regresar volando a los\",\n      \"lugares que ya conoces.\",\n      \"¡Que tu camino sea tan ligero como sus alas!\",\n    ],\n    items: [ItemType.Hm02],\n  }"
       }
     ],
     "walls": {
@@ -3842,7 +4175,36 @@
     "imageFile": "pewter-city-npc-house.png",
     "height": 8,
     "width": 8,
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "biker",
+        "pos": {
+          "x": 5,
+          "y": 5
+        },
+        "facing": "left",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Tadej Pogačar:",
+          "Pensaba que me invitarían a través de Gudari,",
+          "Pero me equivoqué.",
+          "Me sobra una bici.",
+          "Si la quieres es tuya."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -3881,7 +4243,15 @@
     "water": {},
     "encounters": null,
     "texts": {},
-    "items": [],
+    "items": [
+      {
+        "itemKey": "Bicycle",
+        "pos": {
+          "x": 7,
+          "y": 5
+        }
+      }
+    ],
     "gifts": [],
     "staticPokemon": [],
     "pokemonCenter": null,
@@ -3909,7 +4279,108 @@
     "imageFile": "pewter-city-npc-house.png",
     "height": 8,
     "width": 8,
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "gentleman",
+        "pos": {
+          "x": 4,
+          "y": 1
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Me pregunto si Diego irá con sombrero a la boda..."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "jrTrainerMale",
+        "pos": {
+          "x": 7,
+          "y": 2
+        },
+        "facing": "up",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Mike llevará su boina??",
+          "Fijo que a Eva le hace mucha ilusión"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "youngster",
+        "pos": {
+          "x": 0,
+          "y": 3
+        },
+        "facing": "right",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "En si solo he venido para ver la actuación del cuchillos..."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 7,
+          "y": 5
+        },
+        "facing": "right",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Aaaah!",
+          "Ufff, menos mal",
+          "Pensaba que eras Fer con otro de sus chistes",
+          "Por favor no le digas que estoy aquí"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -4933,12 +5404,6 @@
     "water": {},
     "encounters": null,
     "texts": {
-      "3": {
-        "2": [
-          "FÓSIL DE AERODACTYL",
-          "Un PKMN primitivo y muy raro. parece que se mueve"
-        ]
-      },
       "4": {
         "11": [
           "¡Tómate tu tiempo para mirar!"
@@ -4952,7 +5417,23 @@
     },
     "items": [],
     "gifts": [],
-    "staticPokemon": [],
+    "staticPokemon": [
+      {
+        "pokemonId": 142,
+        "level": 20,
+        "pos": {
+          "x": 2,
+          "y": 3
+        },
+        "sprite": "none",
+        "questId": "pewter-city-museum-1f-static-2-3",
+        "intro": [
+          "Un fosil de AERODACTYL,",
+          "un pokemon antgüo extingido...",
+          "un fosil?"
+        ]
+      }
+    ],
     "pokemonCenter": null,
     "pc": null,
     "store": null,
@@ -5799,7 +6280,64 @@
     "imageFile": "route-2-gate.png",
     "height": 8,
     "width": 10,
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 6,
+          "y": 4
+        },
+        "facing": "left",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Ese capullo del hermano del novio... ",
+          "Me intentó echar la caña...",
+          "Como si fuera un magikarp...",
+          "Y luego salió corriendo hacia VILLAMAYOR DE MONJARDÍN"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "blackBelt",
+        "pos": {
+          "x": 7,
+          "y": 1
+        },
+        "facing": "left",
+        "money": 99995,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Antes me hacía llamar Berrito...",
+          "Pero gracias a gym Unav,",
+          "Hoy vengo de incógnito!",
+          "Ssshhhh no se lo digas a nadie"
+        ],
+        "outtro": [
+          "Como me jode que la boda no sea en Zentral..."
+        ],
+        "pokemon": [
+          {
+            "id": 68,
+            "level": 20
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -5850,7 +6388,15 @@
     "water": {},
     "encounters": null,
     "texts": {},
-    "items": [],
+    "items": [
+      {
+        "itemKey": "SuperRod",
+        "pos": {
+          "x": 6,
+          "y": 3
+        }
+      }
+    ],
     "gifts": [],
     "staticPokemon": [],
     "pokemonCenter": null,
@@ -6922,30 +7468,35 @@
           "y": 5
         },
         "facing": "right",
-        "money": 160,
+        "money": 280,
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Oye, yo también voy a esa boda!",
-          "¡Pero me la ganaré llegando primero!"
-        ],
-        "outtro": [
           "¡Ey!",
           "¿Vas a la LIGA PKMN?",
-          "¡Ni lo sueñes!",
-          "El guardia no te dejará pasar sin medallas.",
-          "¡Con lo tajao que parece que vas!"
+          "¡Ni lo sueñes! ¡Seguro que no tienes ninguna MEDALLA!",
+          "¡El guardia no te dejará pasar!",
+          "Por cierto, ¿tus PKMN se han hecho más fuertes?",
+          "Pero que dices de una boda?"
+        ],
+        "outtro": [
+          "¡Vaya suerte la tuya!",
+          "Con lo tajao que parece que vas"
         ],
         "pokemon": [
           {
-            "id": 21,
-            "level": 9
+            "id": 2,
+            "level": 12
           },
           {
-            "id": 4,
-            "level": 8
+            "id": 8,
+            "level": 12
+          },
+          {
+            "id": 5,
+            "level": 12
           }
         ],
         "postGame": null
@@ -7012,6 +7563,42 @@
           }
         ],
         "postGame": null
+      },
+      {
+        "npcKey": "fisher",
+        "pos": {
+          "x": 35,
+          "y": 2
+        },
+        "facing": "left",
+        "money": 200,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "El hermano del novio me ha dejado custodiando este objeto.",
+          "No permitiré que lo roben!"
+        ],
+        "outtro": [
+          "En realidad, creo que ha ido a por otra caña mejor",
+          "que le pueda servir para pescar algo en la boda."
+        ],
+        "pokemon": [
+          {
+            "id": 60,
+            "level": 8
+          },
+          {
+            "id": 98,
+            "level": 10
+          },
+          {
+            "id": 116,
+            "level": 12
+          }
+        ],
+        "postGame": null
       }
     ],
     "walls": {
@@ -7074,10 +7661,6 @@
         1,
         14,
         15,
-        22,
-        23,
-        24,
-        25,
         26,
         27,
         28,
@@ -7089,7 +7672,6 @@
         1,
         14,
         15,
-        22,
         29,
         34
       ],
@@ -7097,7 +7679,6 @@
         1,
         14,
         15,
-        22,
         29,
         34
       ],
@@ -7105,10 +7686,6 @@
         1,
         14,
         15,
-        22,
-        23,
-        24,
-        25,
         29,
         34
       ],
@@ -7316,226 +7893,33 @@
         33
       ]
     },
-    "water": {},
-    "encounters": {
-      "walk": {
-        "rate": 21,
-        "pokemon": [
-          {
-            "id": 19,
-            "chance": 20,
-            "conditionValues": [],
-            "maxLevel": 3,
-            "minLevel": 3
-          },
-          {
-            "id": 19,
-            "chance": 15,
-            "conditionValues": [],
-            "maxLevel": 4,
-            "minLevel": 4
-          },
-          {
-            "id": 19,
-            "chance": 10,
-            "conditionValues": [],
-            "maxLevel": 2,
-            "minLevel": 2
-          },
-          {
-            "id": 21,
-            "chance": 5,
-            "conditionValues": [],
-            "maxLevel": 3,
-            "minLevel": 3
-          },
-          {
-            "id": 21,
-            "chance": 5,
-            "conditionValues": [],
-            "maxLevel": 5,
-            "minLevel": 5
-          },
-          {
-            "id": 29,
-            "chance": 20,
-            "conditionValues": [],
-            "maxLevel": 3,
-            "minLevel": 3
-          },
-          {
-            "id": 29,
-            "chance": 10,
-            "conditionValues": [],
-            "maxLevel": 4,
-            "minLevel": 4
-          },
-          {
-            "id": 29,
-            "chance": 10,
-            "conditionValues": [],
-            "maxLevel": 2,
-            "minLevel": 2
-          },
-          {
-            "id": 32,
-            "chance": 4,
-            "conditionValues": [],
-            "maxLevel": 3,
-            "minLevel": 3
-          },
-          {
-            "id": 32,
-            "chance": 1,
-            "conditionValues": [],
-            "maxLevel": 4,
-            "minLevel": 4
-          }
-        ]
-      },
-      "oldRod": {
-        "rate": 20,
-        "pokemon": [
-          {
-            "id": 129,
-            "chance": 100,
-            "conditionValues": [],
-            "maxLevel": 5,
-            "minLevel": 5
-          }
-        ]
-      },
-      "goodRod": {
-        "rate": 20,
-        "pokemon": [
-          {
-            "id": 60,
-            "chance": 50,
-            "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
-          },
-          {
-            "id": 118,
-            "chance": 50,
-            "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
-          }
-        ]
-      },
-      "superRod": {
-        "rate": 20,
-        "pokemon": [
-          {
-            "id": 60,
-            "chance": 17,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 60,
-            "chance": 8,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 60,
-            "chance": 25,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 118,
-            "chance": 25,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 118,
-            "chance": 8,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 118,
-            "chance": 17,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          }
-        ]
-      },
-      "surf": {
-        "rate": 2,
-        "pokemon": []
-      },
-      "rockSmash": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "headbutt": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "darkGrass": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "grassSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "caveSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "bridgeSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "superRodSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "surfSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "yellowFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "purpleFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "redFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "roughTerrain": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "gift": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "giftEgg": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "onlyOne": {
-        "rate": 0,
-        "pokemon": []
-      }
+    "water": {
+      "6": [
+        22,
+        23,
+        24,
+        25
+      ],
+      "7": [
+        22,
+        23,
+        24,
+        25
+      ],
+      "8": [
+        22,
+        23,
+        24,
+        25
+      ],
+      "9": [
+        22,
+        23,
+        24,
+        25
+      ]
     },
+    "encounters": null,
     "texts": {
       "11": {
         "7": [
@@ -7544,7 +7928,15 @@
         ]
       }
     },
-    "items": [],
+    "items": [
+      {
+        "itemKey": "GoodRod",
+        "pos": {
+          "x": 30,
+          "y": 2
+        }
+      }
+    ],
     "gifts": [],
     "staticPokemon": [],
     "pokemonCenter": null,
@@ -7656,8 +8048,7 @@
     "texts": {
       "4": {
         "0": [
-          "Si tu cabeza no para de dar vueltas,",
-          "¡güárdala en el PC y sigue!"
+          "Volata di peluka!..."
         ]
       }
     },
@@ -7699,8 +8090,8 @@
       {
         "npcKey": "lass",
         "pos": {
-          "x": 22,
-          "y": 27
+          "x": 63,
+          "y": 15
         },
         "facing": "left",
         "money": 135,
@@ -7718,12 +8109,12 @@
         ],
         "pokemon": [
           {
-            "id": 16,
-            "level": 13
+            "id": 17,
+            "level": 26
           },
           {
-            "id": 19,
-            "level": 13
+            "id": 20,
+            "level": 29
           }
         ],
         "postGame": null
@@ -7750,12 +8141,12 @@
         ],
         "pokemon": [
           {
-            "id": 10,
-            "level": 14
+            "id": 12,
+            "level": 19
           },
           {
-            "id": 13,
-            "level": 14
+            "id": 15,
+            "level": 26
           }
         ],
         "postGame": null
@@ -7763,8 +8154,8 @@
       {
         "npcKey": "youngster",
         "pos": {
-          "x": 21,
-          "y": 22
+          "x": 59,
+          "y": 21
         },
         "facing": "down",
         "money": 165,
@@ -7783,15 +8174,15 @@
         "pokemon": [
           {
             "id": 19,
-            "level": 13
+            "level": 17
           },
           {
             "id": 19,
-            "level": 13
+            "level": 21
           },
           {
-            "id": 19,
-            "level": 13
+            "id": 20,
+            "level": 25
           }
         ],
         "postGame": null
@@ -7822,8 +8213,8 @@
             "level": 14
           },
           {
-            "id": 11,
-            "level": 14
+            "id": 12,
+            "level": 19
           }
         ],
         "postGame": null
@@ -7851,11 +8242,11 @@
         "pokemon": [
           {
             "id": 21,
-            "level": 15
+            "level": 20
           },
           {
             "id": 19,
-            "level": 15
+            "level": 27
           }
         ],
         "postGame": null
@@ -7887,8 +8278,8 @@
             "level": 14
           },
           {
-            "id": 16,
-            "level": 14
+            "id": 17,
+            "level": 21
           }
         ],
         "postGame": null
@@ -7919,8 +8310,8 @@
             "level": 14
           },
           {
-            "id": 14,
-            "level": 14
+            "id": 15,
+            "level": 20
           }
         ],
         "postGame": null
@@ -7928,7 +8319,7 @@
       {
         "npcKey": "lass",
         "pos": {
-          "x": 18,
+          "x": 20,
           "y": 24
         },
         "facing": "up",
@@ -7952,8 +8343,102 @@
             "level": 14
           },
           {
-            "id": 29,
-            "level": 14
+            "id": 30,
+            "level": 25
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "burglar",
+        "pos": {
+          "x": 69,
+          "y": 6
+        },
+        "facing": "left",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "No me invitaron a la boda.",
+          "Pero robaré los restos..."
+        ],
+        "outtro": [
+          "ay primo!"
+        ],
+        "pokemon": [
+          {
+            "id": 24,
+            "level": 30
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "birdKeeper",
+        "pos": {
+          "x": 46,
+          "y": 22
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Menuda cara me llevas...",
+          "Quieres un ibuprofeno?"
+        ],
+        "outtro": [
+          "Pues no hay ibuprofeno para ti!"
+        ],
+        "pokemon": [
+          {
+            "id": 22,
+            "level": 20
+          },
+          {
+            "id": 17,
+            "level": 25
+          },
+          {
+            "id": 83,
+            "level": 30
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 61,
+          "y": 26
+        },
+        "facing": "left",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Ah!",
+          "Gayyyyy!"
+        ],
+        "outtro": [
+          "Se dice propuesto?",
+          "O proponido?"
+        ],
+        "pokemon": [
+          {
+            "id": 36,
+            "level": 28
+          },
+          {
+            "id": 108,
+            "level": 30
           }
         ],
         "postGame": null
@@ -8500,159 +8985,7 @@
       ]
     },
     "water": {},
-    "encounters": {
-      "walk": {
-        "rate": 21,
-        "pokemon": [
-          {
-            "id": 16,
-            "chance": 20,
-            "conditionValues": [],
-            "maxLevel": 6,
-            "minLevel": 6
-          },
-          {
-            "id": 16,
-            "chance": 15,
-            "conditionValues": [],
-            "maxLevel": 7,
-            "minLevel": 7
-          },
-          {
-            "id": 16,
-            "chance": 10,
-            "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
-          },
-          {
-            "id": 21,
-            "chance": 20,
-            "conditionValues": [],
-            "maxLevel": 5,
-            "minLevel": 5
-          },
-          {
-            "id": 21,
-            "chance": 10,
-            "conditionValues": [],
-            "maxLevel": 6,
-            "minLevel": 6
-          },
-          {
-            "id": 21,
-            "chance": 10,
-            "conditionValues": [],
-            "maxLevel": 7,
-            "minLevel": 7
-          },
-          {
-            "id": 21,
-            "chance": 5,
-            "conditionValues": [],
-            "maxLevel": 8,
-            "minLevel": 8
-          },
-          {
-            "id": 39,
-            "chance": 5,
-            "conditionValues": [],
-            "maxLevel": 3,
-            "minLevel": 3
-          },
-          {
-            "id": 39,
-            "chance": 4,
-            "conditionValues": [],
-            "maxLevel": 5,
-            "minLevel": 5
-          },
-          {
-            "id": 39,
-            "chance": 1,
-            "conditionValues": [],
-            "maxLevel": 7,
-            "minLevel": 7
-          }
-        ]
-      },
-      "oldRod": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "goodRod": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "superRod": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "surf": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "rockSmash": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "headbutt": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "darkGrass": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "grassSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "caveSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "bridgeSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "superRodSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "surfSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "yellowFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "purpleFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "redFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "roughTerrain": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "gift": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "giftEgg": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "onlyOne": {
-        "rate": 0,
-        "pokemon": []
-      }
-    },
+    "encounters": null,
     "texts": {
       "7": {
         "67": [
@@ -9385,7 +9718,7 @@
         "persistent": true,
         "isOnline": false,
         "hideCondition": null,
-        "sightRange": null,
+        "sightRange": 4,
         "intro": [
           "¡Con este vino seremos los reyes de la fiesta!",
           "¡No te metas en nuestros asuntos!"
@@ -9799,12 +10132,6 @@
       ],
       "24": [
         3,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
         22,
         23,
         24,
@@ -9813,12 +10140,6 @@
       ],
       "25": [
         3,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
         22,
         24,
         25,
@@ -9826,22 +10147,10 @@
       ],
       "26": [
         3,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
         36
       ],
       "27": [
         3,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
         36
       ],
       "28": [
@@ -9951,155 +10260,41 @@
       ]
     },
     "grass": {},
-    "water": {},
-    "encounters": {
-      "walk": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "oldRod": {
-        "rate": 10,
-        "pokemon": [
-          {
-            "id": 129,
-            "chance": 100,
-            "conditionValues": [],
-            "maxLevel": 5,
-            "minLevel": 5
-          }
-        ]
-      },
-      "goodRod": {
-        "rate": 10,
-        "pokemon": [
-          {
-            "id": 60,
-            "chance": 50,
-            "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
-          },
-          {
-            "id": 118,
-            "chance": 50,
-            "conditionValues": [],
-            "maxLevel": 10,
-            "minLevel": 10
-          }
-        ]
-      },
-      "superRod": {
-        "rate": 10,
-        "pokemon": [
-          {
-            "id": 60,
-            "chance": 17,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 60,
-            "chance": 8,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 60,
-            "chance": 25,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 72,
-            "chance": 25,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 72,
-            "chance": 8,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          },
-          {
-            "id": 72,
-            "chance": 17,
-            "conditionValues": [],
-            "maxLevel": 15,
-            "minLevel": 15
-          }
-        ]
-      },
-      "surf": {
-        "rate": 1,
-        "pokemon": []
-      },
-      "rockSmash": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "headbutt": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "darkGrass": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "grassSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "caveSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "bridgeSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "superRodSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "surfSpots": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "yellowFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "purpleFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "redFlowers": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "roughTerrain": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "gift": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "giftEgg": {
-        "rate": 0,
-        "pokemon": []
-      },
-      "onlyOne": {
-        "rate": 0,
-        "pokemon": []
-      }
+    "water": {
+      "24": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "25": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "26": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "27": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
     },
+    "encounters": null,
     "texts": {
       "1": {
         "19": [
@@ -10135,7 +10330,15 @@
         ]
       }
     },
-    "items": [],
+    "items": [
+      {
+        "itemKey": "MasterBall",
+        "pos": {
+          "x": 5,
+          "y": 23
+        }
+      }
+    ],
     "gifts": [],
     "staticPokemon": [],
     "pokemonCenter": null,
@@ -10206,27 +10409,26 @@
         },
         "facing": "left",
         "money": 60,
-        "persistent": true,
+        "persistent": false,
         "isOnline": false,
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Al que llegue antes a la preboda le espera un pin de recuerdo!",
-          "¡Pero antes tendrás que ganarme!"
+          "¡Detente, invitado de la boda!",
+          "¡Primero debes combatir!"
         ],
         "outtro": [
-          "¡Detente, invitado de la boda!",
-          "¡Corre que llegarás tarde!",
+          "¡Qué batalla tan emocionante!",
           "¡Sigue tu camino, valiente!"
         ],
         "pokemon": [
           {
-            "id": 10,
+            "id": 13,
             "level": 5
           },
           {
-            "id": 14,
-            "level": 5
+            "id": 10,
+            "level": 6
           }
         ],
         "postGame": null
@@ -10238,24 +10440,31 @@
           "y": 33
         },
         "facing": "left",
-        "money": 60,
-        "persistent": true,
+        "money": 70,
+        "persistent": false,
         "isOnline": false,
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡Llevo media hora perdido en este bosque!",
-          "¡Al menos te desahogas batallando!"
+          "¡Los insectos son los mejores!",
+          "¡Protegen el bosque de la boda!"
         ],
         "outtro": [
-          "¡Los insectos son los mejores!",
-          "¡Protegen el bosque de la boda!",
+          "¡Bien luchado!",
           "¡Disfruta la celebración!"
         ],
         "pokemon": [
           {
-            "id": 13,
+            "id": 10,
+            "level": 6
+          },
+          {
+            "id": 11,
             "level": 7
+          },
+          {
+            "id": 13,
+            "level": 6
           }
         ],
         "postGame": null
@@ -10268,28 +10477,26 @@
         },
         "facing": "left",
         "money": 60,
-        "persistent": true,
+        "persistent": false,
         "isOnline": false,
         "hideCondition": null,
         "sightRange": null,
         "intro": [
-          "¡El DJ ya está calentando!",
-          "¡Demuéstrame que llegas a tiempo!"
+          "¡Nadie pasa sin combatir!",
+          "¡Así lo dice la ley del bosque!"
         ],
         "outtro": [
-          "¡Nadie pasa sin saludar!",
-          "¡Así lo dice la ley del bosque!",
           "¡Felicidades a los novios!",
           "¡Que sean muy felices!"
         ],
         "pokemon": [
           {
-            "id": 11,
-            "level": 6
+            "id": 14,
+            "level": 7
           },
           {
-            "id": 10,
-            "level": 5
+            "id": 11,
+            "level": 7
           }
         ],
         "postGame": null
@@ -10321,8 +10528,8 @@
       {
         "npcKey": "lass",
         "pos": {
-          "x": 20,
-          "y": 38
+          "x": 17,
+          "y": 40
         },
         "facing": "right",
         "money": 0,

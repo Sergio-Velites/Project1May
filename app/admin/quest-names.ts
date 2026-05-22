@@ -6,7 +6,7 @@
  *   - game-src/src/components/AcademyPokeballModal.tsx (Ditto academia)
  *   - mapas con `questId:` en game-src/src/maps/
  */
-import POKEMON_NAMES_GEN1 from "./pokemon-names";
+import POKEMON_NAMES from "./pokemon-names";
 
 const STATIC_QUESTS: Record<string, string> = {
   // Narrativas (use-quests.ts)
@@ -44,7 +44,7 @@ export const questLabel = (slug: string): string => {
   const starterMatch = slug.match(/^lab-starter-taken-(\d+)$/);
   if (starterMatch) {
     const id = Number(starterMatch[1]);
-    const name = POKEMON_NAMES_GEN1[id - 1] ?? `#${id}`;
+    const name = POKEMON_NAMES[id - 1] ?? `#${id}`;
     return `Inicial elegido: ${name}`;
   }
 

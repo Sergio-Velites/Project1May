@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Editor de descripciones de la Pokédex (151 Gen I).
+ * Editor de descripciones de la Pokédex (251 Pokémon: Gen I + Gen II).
  *
  * - Carga base + overrides desde /api/admin/pokedex-flavor.
  * - Edición inline (textarea por entrada).
@@ -111,7 +111,7 @@ export default function PokedexEditorPage() {
 
       <h1 style={{ fontSize: 22, marginBottom: 4 }}>Editor de Pokédex</h1>
       <p style={{ color: '#555', marginBottom: 16, fontSize: 13 }}>
-        Edita las descripciones (flavor text) en español de los 151 Pokémon de Gen I.
+        Edita las descripciones (flavor text) en español de los 251 Pokémon (Gen I + Gen II).
         Los cambios se guardan en Supabase y el juego los carga al abrir la Pokédex.
         El botón <em>Restaurar base</em> borra el override y vuelve al texto original
         de PokéAPI.

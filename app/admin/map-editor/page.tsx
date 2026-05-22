@@ -1240,7 +1240,7 @@ export default function MapEditor() {
           });
           setDirty(true);
         } else if (rewardChoice.trim() === 'pokemon') {
-          const pidStr = window.prompt('ID del Pokémon (1-151):', String(existingReward?.pokemonId ?? 1));
+          const pidStr = window.prompt('ID del Pokémon (1-251):', String(existingReward?.pokemonId ?? 1));
           const pokemonId = parseInt(pidStr ?? '1', 10);
           if (!pokemonId || pokemonId < 1 || pokemonId > 251) {
             alert('ID de Pokémon inválido (1-251).');
@@ -1312,7 +1312,7 @@ export default function MapEditor() {
           return;
         }
         if (action.trim() === 'edit') {
-          const pidStr = window.prompt('pokemonId (1-151):', String(gifts[idx].pokemonId));
+          const pidStr = window.prompt('pokemonId (1-251):', String(gifts[idx].pokemonId));
           if (pidStr === null) return;
           const lvlStr = window.prompt('level (1-100):', String(gifts[idx].level));
           if (lvlStr === null) return;
@@ -1320,14 +1320,14 @@ export default function MapEditor() {
           if (qid === null) return;
           const pid = parseInt(pidStr, 10);
           const lvl = parseInt(lvlStr, 10);
-          if (Number.isNaN(pid) || pid < 1 || pid > 151) { alert('pokemonId inválido'); return; }
+          if (Number.isNaN(pid) || pid < 1 || pid > 251) { alert('pokemonId inválido'); return; }
           if (Number.isNaN(lvl) || lvl < 1 || lvl > 100) { alert('level inválido'); return; }
           if (!qid.trim()) { alert('questId vacío'); return; }
           setGifts((p) => p.map((g, i) => i === idx ? { ...g, pokemonId: pid, level: lvl, questId: qid.trim() } : g));
           setDirty(true);
         }
       } else {
-        const pidStr = window.prompt(`Nuevo regalo en (${tile.x}, ${tile.y}). pokemonId (1-151):`, '1');
+        const pidStr = window.prompt(`Nuevo regalo en (${tile.x}, ${tile.y}). pokemonId (1-251):`, '1');
         if (pidStr === null) return;
         const lvlStr = window.prompt('level (1-100):', '5');
         if (lvlStr === null) return;
@@ -1336,7 +1336,7 @@ export default function MapEditor() {
         if (qid === null) return;
         const pid = parseInt(pidStr, 10);
         const lvl = parseInt(lvlStr, 10);
-        if (Number.isNaN(pid) || pid < 1 || pid > 151) { alert('pokemonId inválido'); return; }
+        if (Number.isNaN(pid) || pid < 1 || pid > 251) { alert('pokemonId inválido'); return; }
         if (Number.isNaN(lvl) || lvl < 1 || lvl > 100) { alert('level inválido'); return; }
         if (!qid.trim()) { alert('questId vacío'); return; }
         setGifts((p) => [...p, { pokemonId: pid, level: lvl, pos: { x: tile.x, y: tile.y }, questId: qid.trim() }]);
@@ -2263,7 +2263,7 @@ export default function MapEditor() {
                 lines={[
                   'Click vacío: nueva pokéball-regalo',
                   'Click en regalo: editar o eliminar',
-                  'Pokémon (1-151) + nivel + questId único',
+                  'Pokémon (1-251) + nivel + questId único',
                 ]}
                 count={gifts.length}
                 countLabel="regalos"
@@ -2428,9 +2428,12 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
         {trainer.pokemon.map((p, i) => (
           <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6, alignItems: 'center' }}>
             {/* Sprite del pokémon */}
-            {p.id > 0 && p.id <= 151 && (
+            {p.id > 0 && p.id <= MAX_POKEMON_ID && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={`/editor/pokemon/${p.id}.png`} alt={`#${p.id}`} title={`#${p.id}`}
+              <img
+                src={`/editor/pokemon/${p.id}.png`}
+                alt={POKEMON_NAMES_EDITOR[p.id] ?? `#${p.id}`}
+                title={`#${p.id} ${POKEMON_NAMES_EDITOR[p.id] ?? ''}`}
                 style={{ width: 24, height: 24, imageRendering: 'pixelated', flexShrink: 0, background: '#0a0a18', borderRadius: 2 }}
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
@@ -2570,8 +2573,11 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
 
 // ── Editor de tabla de encounters (walk / oldRod / goodRod / superRod) ──
 
-// Nombres Gen I (índice 0 = vacío, índice 1 = Bulbasaur, ..., 151 = Mew)
-const GEN1_NAMES = [
+// Total de Pokémon admitidos en el editor (Gen I + Gen II = 251).
+const MAX_POKEMON_ID = 251;
+
+// Nombres Pokémon (índice 0 = vacío, 1 = Bulbasaur … 251 = Celebi).
+const POKEMON_NAMES_EDITOR = [
   '', 'Bulbasaur', 'Ivysaur', 'Venusaur', 'Charmander', 'Charmeleon', 'Charizard',
   'Squirtle', 'Wartortle', 'Blastoise', 'Caterpie', 'Metapod', 'Butterfree',
   'Weedle', 'Kakuna', 'Beedrill', 'Pidgey', 'Pidgeotto', 'Pidgeot', 'Rattata',
@@ -2595,7 +2601,26 @@ const GEN1_NAMES = [
   'Jolteon', 'Flareon', 'Porygon', 'Omanyte', 'Omastar', 'Kabuto', 'Kabutops',
   'Aerodactyl', 'Snorlax', 'Articuno', 'Zapdos', 'Moltres', 'Dratini',
   'Dragonair', 'Dragonite', 'Mewtwo', 'Mew',
+  // Gen II (152-251)
+  'Chikorita', 'Bayleef', 'Meganium', 'Cyndaquil', 'Quilava', 'Typhlosion',
+  'Totodile', 'Croconaw', 'Feraligatr', 'Sentret', 'Furret', 'Hoothoot',
+  'Noctowl', 'Ledyba', 'Ledian', 'Spinarak', 'Ariados', 'Crobat', 'Chinchou',
+  'Lanturn', 'Pichu', 'Cleffa', 'Igglybuff', 'Togepi', 'Togetic', 'Natu', 'Xatu',
+  'Mareep', 'Flaaffy', 'Ampharos', 'Bellossom', 'Marill', 'Azumarill', 'Sudowoodo',
+  'Politoed', 'Hoppip', 'Skiploom', 'Jumpluff', 'Aipom', 'Sunkern', 'Sunflora',
+  'Yanma', 'Wooper', 'Quagsire', 'Espeon', 'Umbreon', 'Murkrow', 'Slowking',
+  'Misdreavus', 'Unown', 'Wobbuffet', 'Girafarig', 'Pineco', 'Forretress',
+  'Dunsparce', 'Gligar', 'Steelix', 'Snubbull', 'Granbull', 'Qwilfish', 'Scizor',
+  'Shuckle', 'Heracross', 'Sneasel', 'Teddiursa', 'Ursaring', 'Slugma', 'Magcargo',
+  'Swinub', 'Piloswine', 'Corsola', 'Remoraid', 'Octillery', 'Delibird', 'Mantine',
+  'Skarmory', 'Houndour', 'Houndoom', 'Kingdra', 'Phanpy', 'Donphan', 'Porygon2',
+  'Stantler', 'Smeargle', 'Tyrogue', 'Hitmontop', 'Smoochum', 'Elekid', 'Magby',
+  'Miltank', 'Blissey', 'Raikou', 'Entei', 'Suicune', 'Larvitar', 'Pupitar',
+  'Tyranitar', 'Lugia', 'Ho-Oh', 'Celebi',
 ];
+
+// Alias retro-compatible (existían usos antiguos como `GEN1_NAMES[...]`).
+const GEN1_NAMES = POKEMON_NAMES_EDITOR;
 
 /**
  * Editor de tabla de encuentros: sprite + ID + nombre + niveles +
@@ -2683,8 +2708,8 @@ function EncountersTableEditor({
         )}
         {table.pokemon.map((p, i) => {
           const pct = ((p.chance / totalChance) * 100).toFixed(1);
-          const name = (p.id >= 1 && p.id <= 151) ? GEN1_NAMES[p.id] : `#${p.id}`;
-          const spriteOk = p.id >= 1 && p.id <= 151;
+          const name = (p.id >= 1 && p.id <= MAX_POKEMON_ID) ? POKEMON_NAMES_EDITOR[p.id] : `#${p.id}`;
+          const spriteOk = p.id >= 1 && p.id <= MAX_POKEMON_ID;
           return (
             <div
               key={i}
@@ -2720,10 +2745,10 @@ function EncountersTableEditor({
                   <input
                     type="number"
                     min={1}
-                    max={151}
+                    max={MAX_POKEMON_ID}
                     value={p.id}
-                    onChange={(e) => update(i, { id: Math.max(1, Math.min(151, parseInt(e.target.value, 10) || 1)) })}
-                    title="ID Pokémon (1–151)"
+                    onChange={(e) => update(i, { id: Math.max(1, Math.min(MAX_POKEMON_ID, parseInt(e.target.value, 10) || 1)) })}
+                    title={`ID Pokémon (1–${MAX_POKEMON_ID})`}
                     style={{ ...inputBase, width: 52, flexShrink: 0, fontWeight: 700, fontSize: 13, color: '#ffffaa' }}
                   />
                   <span style={{ fontSize: 12, color: '#ccccee', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>

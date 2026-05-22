@@ -1,7 +1,8 @@
 /**
  * API admin para descripciones de Pokédex.
  *
- *   GET  → devuelve [{ id, name, base, override }] para los 151 Gen I.
+ *   GET  → devuelve [{ id, name, base, override }] para los 251 Pokémon
+ *          (Gen I + Gen II).
  *   POST → upsert de { id, flavor }. flavor === "" elimina el override
  *          (vuelve a usar el texto base del JSON empaquetado).
  *
@@ -12,9 +13,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import baseFlavor from '../../../../game-src/src/app/pokedex-flavor-es.json';
-import POKEMON_NAMES_GEN1 from '../../../admin/pokemon-names';
+import POKEMON_NAMES from '../../../admin/pokemon-names';
 
-const TOTAL = 151;
+const TOTAL = 251;
 
 function getSupabase() {
   return createClient(
@@ -24,7 +25,7 @@ function getSupabase() {
 }
 
 function nameFor(id: number): string {
-  return POKEMON_NAMES_GEN1[id - 1] ?? `#${id}`;
+  return POKEMON_NAMES[id - 1] ?? `#${id}`;
 }
 
 export async function GET() {

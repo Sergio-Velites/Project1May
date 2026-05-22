@@ -1,8 +1,10 @@
-// Lista mínima de nombres oficiales (en inglés, capitalizados) para los 151
-// Pokémon de Gen I. Usado por el admin/api del editor de Pokédex para
-// mostrar el nombre junto al sprite. No se carga en el bundle del juego.
+// Lista de nombres oficiales (en inglés, capitalizados) para los 251 Pokémon
+// de Gen I + Gen II. Usado por el admin/api del editor de Pokédex y por el
+// editor de mapas para mostrar el nombre junto al sprite.
+// No se carga en el bundle del juego.
 
-const POKEMON_NAMES_GEN1: string[] = [
+const POKEMON_NAMES: string[] = [
+  // Gen I (1-151)
   "Bulbasaur","Ivysaur","Venusaur","Charmander","Charmeleon","Charizard",
   "Squirtle","Wartortle","Blastoise","Caterpie","Metapod","Butterfree",
   "Weedle","Kakuna","Beedrill","Pidgey","Pidgeotto","Pidgeot","Rattata",
@@ -26,6 +28,25 @@ const POKEMON_NAMES_GEN1: string[] = [
   "Flareon","Porygon","Omanyte","Omastar","Kabuto","Kabutops","Aerodactyl",
   "Snorlax","Articuno","Zapdos","Moltres","Dratini","Dragonair","Dragonite",
   "Mewtwo","Mew",
+  // Gen II (152-251)
+  "Chikorita","Bayleef","Meganium","Cyndaquil","Quilava","Typhlosion",
+  "Totodile","Croconaw","Feraligatr","Sentret","Furret","Hoothoot",
+  "Noctowl","Ledyba","Ledian","Spinarak","Ariados","Crobat","Chinchou",
+  "Lanturn","Pichu","Cleffa","Igglybuff","Togepi","Togetic","Natu","Xatu",
+  "Mareep","Flaaffy","Ampharos","Bellossom","Marill","Azumarill","Sudowoodo",
+  "Politoed","Hoppip","Skiploom","Jumpluff","Aipom","Sunkern","Sunflora",
+  "Yanma","Wooper","Quagsire","Espeon","Umbreon","Murkrow","Slowking",
+  "Misdreavus","Unown","Wobbuffet","Girafarig","Pineco","Forretress",
+  "Dunsparce","Gligar","Steelix","Snubbull","Granbull","Qwilfish","Scizor",
+  "Shuckle","Heracross","Sneasel","Teddiursa","Ursaring","Slugma","Magcargo",
+  "Swinub","Piloswine","Corsola","Remoraid","Octillery","Delibird","Mantine",
+  "Skarmory","Houndour","Houndoom","Kingdra","Phanpy","Donphan","Porygon2",
+  "Stantler","Smeargle","Tyrogue","Hitmontop","Smoochum","Elekid","Magby",
+  "Miltank","Blissey","Raikou","Entei","Suicune","Larvitar","Pupitar",
+  "Tyranitar","Lugia","Ho-Oh","Celebi",
 ];
 
-export default POKEMON_NAMES_GEN1;
+// Mantener compatibilidad con el nombre anterior (Gen I only) para imports antiguos.
+export const POKEMON_NAMES_GEN1 = POKEMON_NAMES.slice(0, 151);
+
+export default POKEMON_NAMES;
