@@ -77,6 +77,9 @@ const MAP_NAMES: Record<string, string> = {
 async function fetchRsvps(
   adminKey: string
 ): Promise<{ entries: RSVPEntry[]; httpStatus: number; errorMsg: string | null }> {
+  if (!SUPABASE_URL) {
+    return { entries: [], httpStatus: 0, errorMsg: "SUPABASE_URL no configurada — añadir en Variables de Entorno de Vercel" };
+  }
   try {
     const res = await fetch(`${SUPABASE_URL}/functions/v1/get-all-rsvp`, {
       headers: {

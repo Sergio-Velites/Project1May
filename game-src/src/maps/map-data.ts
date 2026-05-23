@@ -1,4 +1,5 @@
 import gateHouse from "./gate-house";
+import leagueRoute from "./league-route";
 import houseA1f from "./house-a-1f";
 import houseA2f from "./house-a-2f";
 import houseB from "./house-b";
@@ -46,6 +47,7 @@ const mapData: Record<string, MapType> = {
   [MapId.ViridianCityGym]: viridianCityGym,
   [MapId.Route22]: route22,
   [MapId.GateHouse]: gateHouse,
+  [MapId.LeagueRoute]: leagueRoute,
   [MapId.Route2]: route2,
   [MapId.Route2Gate]: route2Gate,
   [MapId.ViridianForrest]: viridianForrest,

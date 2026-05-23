@@ -876,6 +876,9 @@ const PokemonEncounter = () => {
 
     // Ending encounter
     if (exitBattle) {
+      // Sincronizar el estado del jugador con Redux antes de cerrar
+      // (garantiza que el wakeup dispatch haya persistido correctamente)
+      dispatch(setPokemonStatus({ index: activePokemonIndex, status: playerStatusRef.current }));
       setTrainerPokemonIndex(0);
       dispatch(endEncounter());
       dispatch(faintToTrainer());
@@ -916,6 +919,8 @@ const PokemonEncounter = () => {
     }
 
     // Ending encounter
+    // Sincronizar el estado del jugador con Redux antes de cerrar
+    dispatch(setPokemonStatus({ index: activePokemonIndex, status: playerStatusRef.current }));
     setTrainerPokemonIndex(0);
     dispatch(endEncounter());
 
@@ -1763,7 +1768,8 @@ const PokemonEncounter = () => {
   // ── Helper compartido por processBattle / processEnemyOnlyTurn ──────────
   // Comprueba si un combatiente debe saltarse su turno por estado/flinch/confusión.
   // Devuelve `true` si el combatiente NO puede actuar este turno.
-  const checkSkipTurn = (isPlayer: boolean): boolean => {
+  // attackId: si es "snore" o "sleep-talk", el sueño no bloquea el turno.
+  const checkSkipTurn = (isPlayer: boolean, attackId?: string): boolean => {
     // ── F4 — Trap moves: víctima atrapada salta el turno ────────────────
     const trappedTurns = isPlayer ? playerTrappedTurnsRef.current : enemyTrappedTurnsRef.current;
     if (trappedTurns > 0) {
@@ -1854,6 +1860,10 @@ const PokemonEncounter = () => {
       : enemyMetadata.name.toUpperCase() + " rival";
 
     if (status.type === "sleep") {
+      // Ronquido (Snore) y Sonámbulo (Sleep Talk) pueden usarse dormido
+      if (isPlayer && (attackId === "snore" || attackId === "sleep-talk")) {
+        return false;
+      }
       const newTurns = status.turns - 1;
       if (newTurns <= 0) {
         setStatus(null);
@@ -3074,6 +3084,10 @@ const PokemonEncounter = () => {
     if (playerChargingMoveRef.current) {
       attackId = playerChargingMoveRef.current;
     }
+    // originalAttackId: move original elegido por el jugador (antes de que
+    // Sleep Talk lo sustituya por un move aleatorio). Se pasa a checkSkipTurn
+    // para que "snore" / "sleep-talk" puedan bypassear el bloqueo de sueño.
+    let originalAttackId = attackId;
 
     // Movimiento de carga del jugador (turno 1): mostrar mensaje de carga.
     // Incluye tanto los charge clásicos (Solar Beam, Razor Wind, Sky Attack,
@@ -3082,7 +3096,7 @@ const PokemonEncounter = () => {
     // IMPORTANTE: comprobar sueño/parálisis/confusión ANTES de iniciar la carga.
     // Si el jugador está dormido en T1, no debe iniciarse la carga en absoluto.
     if ((CHARGE_MOVES.has(attackId) || INVULNERABLE_MOVES.has(attackId)) && !playerChargingMoveRef.current) {
-      if (checkSkipTurn(true)) {
+      if (checkSkipTurn(true, originalAttackId)) {
         const selfHitMsgC = confusionSelfHitMsgRef.current;
         confusionSelfHitMsgRef.current = null;
         setMoveAnim(null);
@@ -3287,6 +3301,22 @@ const PokemonEncounter = () => {
       }, 1100);
     };
 
+    // ── Sonámbulo (Sleep Talk): usar move aleatorio mientras dormido ────
+    // Sleep Talk: sustituye attackId por un move aleatorio del equipo.
+    // originalAttackId mantiene "sleep-talk" para el bypass de sueño en checkSkipTurn.
+    if (attackId === "sleep-talk" && playerStatusRef.current?.type === "sleep") {
+      const poolMoves = active.moves
+        .map((m) => m.id)
+        .filter((id) => id !== "sleep-talk");
+      if (poolMoves.length > 0) {
+        attackId = poolMoves[Math.floor(Math.random() * poolMoves.length)];
+      } else {
+        setAlertText(`¡${activeMetadata.name.toUpperCase()} usó SONÁMBULO pero falló!`);
+        setStage(15);
+        return;
+      }
+    }
+
     const activeMovesFirst = getActiveMovesFirst(activeMove, enemyMove);
     const stagesSnapshot   = { us: playerStages, them: enemyStages };
 
@@ -3298,7 +3328,7 @@ const PokemonEncounter = () => {
 
     // ── Jugador mueve primero ─────────────────────────────────────────────
     if (activeMovesFirst) {
-      if (checkSkipTurn(true)) {
+      if (checkSkipTurn(true, originalAttackId)) {
         // Jugador salta turno — mostrar mensaje, luego ataca el rival
         const selfHitMsg1 = confusionSelfHitMsgRef.current;
         confusionSelfHitMsgRef.current = null;
@@ -3402,7 +3432,7 @@ const PokemonEncounter = () => {
         setTimeout(() => {
           setAlertText(null);
           if (guardSelfKo()) return;
-          if (checkSkipTurn(true)) {
+          if (checkSkipTurn(true, originalAttackId)) {
             // Ambos saltan
             const selfHitMsg2 = confusionSelfHitMsgRef.current;
             confusionSelfHitMsgRef.current = null;
@@ -3436,7 +3466,7 @@ const PokemonEncounter = () => {
         // hace su turno con normalidad.
         runEnemyChargeT1(effectivePlayer, enemy, () => {
           if (guardSelfKo()) return;
-          if (checkSkipTurn(true)) {
+          if (checkSkipTurn(true, originalAttackId)) {
             const selfHitMsg3 = confusionSelfHitMsgRef.current;
             confusionSelfHitMsgRef.current = null;
             setMoveAnim(null);
@@ -3482,7 +3512,7 @@ const PokemonEncounter = () => {
           if (us.hp <= 0) {
             setStage(24);
           } else {
-            if (checkSkipTurn(true)) {
+            if (checkSkipTurn(true, originalAttackId)) {
               // Jugador salta turno
               const selfHitMsg4 = confusionSelfHitMsgRef.current;
               confusionSelfHitMsgRef.current = null;
