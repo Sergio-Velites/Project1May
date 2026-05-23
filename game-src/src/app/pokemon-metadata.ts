@@ -7453,6 +7453,7 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
     types: ["fighting"],
     baseCatchRate: 75,
     growthRate: "medium-fast",
+    evolution: { pokemon: [106, 107, 237], level: 20 },
   },
   "237": {
     baseExperience: 138,
@@ -7515,7 +7516,7 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
       speed: 65,
     },
     types: ["ice", "psychic"],
-    evolution: { pokemon: 237, level: 20 },
+    evolution: { pokemon: 124, level: 30 },
     baseCatchRate: 45,
     growthRate: "medium-fast",
   },
