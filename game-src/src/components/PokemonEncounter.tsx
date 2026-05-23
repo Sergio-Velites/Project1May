@@ -781,13 +781,14 @@ const PokemonEncounter = () => {
   const playerConvertedTypesRef = useRef<string[] | null>(null);
   const enemyConvertedTypesRef  = useRef<string[] | null>(null);
 
-  // ── F4 — Trap moves (Bind/Wrap/Fire-Spin/Clamp) ───────────────────────
-  // Atacante: move y turnos restantes que sigue ejecutándolo automáticamente
+  // ── F4 — Trap moves (Bind/Wrap/Fire-Spin/Clamp/Whirlpool) — Gen II ──────
+  // Atacante: qué move trapeó (para flavor text y fin de trampa). Gen II:
+  // el atacante NO repite el move ni queda lockeado.
   const playerTrapMoveRef    = useRef<string | null>(null);
-  const playerTrapTurnsRef   = useRef(0);
+  const playerTrapTurnsRef   = useRef(0); // ya no se usa, siempre 0
   const enemyTrapMoveRef     = useRef<string | null>(null);
-  const enemyTrapTurnsRef    = useRef(0);
-  // Víctima: turnos restantes que NO puede actuar (skip turn)
+  const enemyTrapTurnsRef    = useRef(0); // ya no se usa, siempre 0
+  // Víctima: turnos restantes de daño al final de turno (Gen II: no bloquea acción)
   const playerTrappedTurnsRef = useRef(0);
   const enemyTrappedTurnsRef  = useRef(0);
 
@@ -1266,12 +1267,11 @@ const PokemonEncounter = () => {
     }
 
     if (stage === 49) {
-      // Trainer envía siguiente pokémon: cualquier trap del jugador termina
-      // (no puede continuar atando a un objetivo distinto).
+      // Trainer envía siguiente pokémon: la trampa del jugador sobre el rival
+      // termina (no puede continuar con un objetivo distinto).
       if (playerTrapMoveRef.current) {
         playerTrapMoveRef.current = null;
-        playerTrapTurnsRef.current = 0;
-        setPlayerLockedReason((prev) => (prev === "trap" ? null : prev));
+        enemyTrappedTurnsRef.current = 0;
       }
       setStage(11);
     }
@@ -1614,14 +1614,6 @@ const PokemonEncounter = () => {
       } else if (playerLockedReason === "recharging") {
         // El branch de recarga al inicio de processBattle ignora el attackId
         processBattleRef.current("__locked_recharge__");
-      } else if (playerLockedReason === "trap" && playerTrapMoveRef.current) {
-        // F4 — Trap moves (Wrap/Fire-Spin/Bind/Clamp): el jugador queda
-        // forzado a repetir el mismo movimiento durante 2-5 turnos. Sin
-        // este auto-advance el menú seguía apareciendo y el jugador podía
-        // elegir otro move — el código lo sobreescribía silenciosamente con
-        // el trap move y daba sensación de que el PP del move elegido no
-        // se gastaba (en realidad nunca se usó).
-        processBattleRef.current(playerTrapMoveRef.current);
       }
     }, 900);
     return () => clearTimeout(t);
@@ -1718,8 +1710,6 @@ const PokemonEncounter = () => {
     if (enemyBideTurnsRef.current > 0) return "bide";
     // F11 — Rage: rival lockeado en Rage
     if (enemyRageActiveRef.current) return "rage";
-    // F4 — Trap activo: rival fuerza repetir el trap move
-    if (enemyTrapTurnsRef.current > 0 && enemyTrapMoveRef.current) return enemyTrapMoveRef.current;
     // Si el rival está en Trashing, continuar con ese move
     if (enemyThrashTurnsRef.current > 0 && enemyThrashMoveRef.current) return enemyThrashMoveRef.current;
     // Si el rival está cargando (2-turno), ejecutar el move pendiente y
@@ -1770,17 +1760,6 @@ const PokemonEncounter = () => {
   // Devuelve `true` si el combatiente NO puede actuar este turno.
   // attackId: si es "snore" o "sleep-talk", el sueño no bloquea el turno.
   const checkSkipTurn = (isPlayer: boolean, attackId?: string): boolean => {
-    // ── F4 — Trap moves: víctima atrapada salta el turno ────────────────
-    const trappedTurns = isPlayer ? playerTrappedTurnsRef.current : enemyTrappedTurnsRef.current;
-    if (trappedTurns > 0) {
-      const newTurns = trappedTurns - 1;
-      if (isPlayer) playerTrappedTurnsRef.current = newTurns;
-      else enemyTrappedTurnsRef.current = newTurns;
-      const nm = isPlayer ? activeMetadata.name.toUpperCase() : `${enemyMetadata.name.toUpperCase()} rival`;
-      setAlertText(`¡${nm} no puede moverse!`);
-      return true;
-    }
-
     if (isPlayer && playerFlinchRef.current) {
       playerFlinchRef.current = false;
       setAlertText(`¡${activeMetadata.name.toUpperCase()} no puede moverse!`);
@@ -2306,14 +2285,11 @@ const PokemonEncounter = () => {
         // ── F8 — Pay Day acumula monedas ───────────────────────────────
         if (payDayCoins) playerPayDayCoinsRef.current += payDayCoins;
 
-        // ── F4 — Trap moves: el jugador atrapa al rival 2-5 turnos ──────
+        // ── F4 — Trap moves (Gen II): el rival queda atrapado 2-5 turnos
+        // recibiendo daño al final de cada turno. El atacante NO se bloquea.
         if (startTrap) {
           playerTrapMoveRef.current = startTrap.move;
-          playerTrapTurnsRef.current = startTrap.turns;
           enemyTrappedTurnsRef.current = startTrap.turns;
-          // Bloquear el menú del jugador: próximos turnos se ejecutan solos
-          // con el trap move (Gen I: el usuario tampoco puede elegir).
-          setPlayerLockedReason("trap");
         }
 
         // ── F12 — Substitute del jugador creado ────────────────────────
@@ -2541,10 +2517,10 @@ const PokemonEncounter = () => {
         // Hyper Beam del rival: si el jugador sigue en pie, activar recarga del rival
         if (result.requiresRecharge) enemyHyperBeamRechargeRef.current = true;
 
-        // ── F4 — Trap moves: el rival atrapa al jugador 2-5 turnos ──────
+        // ── F4 — Trap moves (Gen II): el jugador queda atrapado 2-5 turnos
+        // recibiendo daño al final de cada turno. El rival NO repite el move.
         if (startTrap) {
           enemyTrapMoveRef.current = startTrap.move;
-          enemyTrapTurnsRef.current = startTrap.turns;
           playerTrappedTurnsRef.current = startTrap.turns;
         }
 
@@ -2795,6 +2771,44 @@ const PokemonEncounter = () => {
       dispatchUs(newUsHp);
       dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
       messages.push(`¡${activeMetadata.name.toUpperCase()} pierde PS por Drenadoras!`);
+    }
+
+    // ── F4 — Trap (Gen II): daño 1/16 al final del turno ─────────────────
+    const getTrapMsg = (move: string | null, name: string): string => {
+      switch (move) {
+        case "fire-spin":  return `¡${name} está envuelto en el Giro Fuego!`;
+        case "bind":       return `¡${name} está siendo oprimido por Constricción!`;
+        case "wrap":       return `¡${name} está apretado por Constricción!`;
+        case "clamp":      return `¡${name} está atrapado por las Tenazas!`;
+        case "whirlpool":  return `¡${name} está atrapado en el Torbellino!`;
+        default:           return `¡${name} está atrapado!`;
+      }
+    };
+
+    // Rival atrapado por el jugador
+    if (enemyTrappedTurnsRef.current > 0 && newThemHp > 0) {
+      const trapDmg = Math.max(1, Math.floor(getPokemonStats(currentThem.id, currentThem.level).hp / 16));
+      newThemHp = Math.max(0, newThemHp - trapDmg);
+      dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
+      enemyTrappedTurnsRef.current -= 1;
+      messages.push(getTrapMsg(playerTrapMoveRef.current, `${enemyMetadata.name.toUpperCase()} rival`));
+      if (enemyTrappedTurnsRef.current <= 0) {
+        playerTrapMoveRef.current = null;
+        messages.push(`¡${enemyMetadata.name.toUpperCase()} rival se liberó!`);
+      }
+    }
+
+    // Jugador atrapado por el rival
+    if (playerTrappedTurnsRef.current > 0 && newUsHp > 0) {
+      const trapDmg = Math.max(1, Math.floor(getPokemonStats(trueUsId, currentUs.level).hp / 16));
+      newUsHp = Math.max(0, newUsHp - trapDmg);
+      dispatchUs(newUsHp);
+      playerTrappedTurnsRef.current -= 1;
+      messages.push(getTrapMsg(enemyTrapMoveRef.current, activeMetadata.name.toUpperCase()));
+      if (playerTrappedTurnsRef.current <= 0) {
+        enemyTrapMoveRef.current = null;
+        messages.push(`¡${activeMetadata.name.toUpperCase()} se liberó!`);
+      }
     }
 
     // Limpiar flinch al inicio del próximo turno
@@ -3060,17 +3074,6 @@ const PokemonEncounter = () => {
       playerThrashMoveRef.current = attackId;
     }
 
-    // ── F4 — Trap del jugador: forzar mismo move automáticamente ──────
-    if (playerTrapTurnsRef.current > 0 && playerTrapMoveRef.current) {
-      attackId = playerTrapMoveRef.current;
-      playerTrapTurnsRef.current -= 1;
-      if (playerTrapTurnsRef.current <= 0) {
-        playerTrapMoveRef.current = null;
-        // Último turno del trap: liberar el menú para el siguiente turno.
-        setPlayerLockedReason(null);
-      }
-    }
-
     // ── F11 — Rage: usuario lockeado en Rage tras T1 ──────────────────
     if (playerRageActiveRef.current) {
       attackId = "rage";
@@ -3251,12 +3254,6 @@ const PokemonEncounter = () => {
         enemyThrashMoveRef.current = null;
         enemyConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 3);
       }
-    }
-
-    // ── F4 — Trap del rival: decrementar contador de turnos ───────────
-    if (enemyTrapTurnsRef.current > 0) {
-      enemyTrapTurnsRef.current -= 1;
-      if (enemyTrapTurnsRef.current <= 0) enemyTrapMoveRef.current = null;
     }
 
     // Iniciar carga del rival para moves de 2 turnos (Solar Beam, Razor

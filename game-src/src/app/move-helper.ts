@@ -903,7 +903,7 @@ const processMove = (
     const payDayCoins = move === "pay-day" ? 2 * us.level : undefined;
     // F4 — Trap moves T1 (Bind/Wrap/Fire-Spin/Clamp) atrapan al rival 2-5 turnos
     const startTrap = TRAP_MOVES.has(move)
-      ? { move, turns: 1 + Math.floor(Math.random() * 4) }
+      ? { move, turns: 2 + Math.floor(Math.random() * 4) }
       : undefined;
 
     return {
