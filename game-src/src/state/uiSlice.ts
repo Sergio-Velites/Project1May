@@ -114,6 +114,8 @@ interface UiState {
   playerTurnTick: number;
   /** Indica que la intro de Oak está activa → SoundHandler reproduce la música del profesor. */
   oakIntroActive: boolean;
+  /** Árbol siendo cortado actualmente (activa la animación en CuttableTree.tsx). */
+  activeCutTree: { x: number; y: number; questId: string } | null;
 }
 
 const initialState: UiState = {
@@ -149,6 +151,7 @@ const initialState: UiState = {
   pendingConfusionFromItem: null,
   playerTurnTick: 0,
   oakIntroActive: false,
+  activeCutTree: null,
 };
 
 export const uiSlice = createSlice({
@@ -356,6 +359,12 @@ export const uiSlice = createSlice({
     hideOakIntro: (state) => {
       state.oakIntroActive = false;
     },
+    setActiveCutTree: (state, action: PayloadAction<{ x: number; y: number; questId: string }>) => {
+      state.activeCutTree = action.payload;
+    },
+    clearActiveCutTree: (state) => {
+      state.activeCutTree = null;
+    },
   },
 });
 
@@ -419,6 +428,8 @@ export const {
   consumePendingConfusionFromItem,
   showOakIntro,
   hideOakIntro,
+  setActiveCutTree,
+  clearActiveCutTree,
 } = uiSlice.actions;
 
 export const selectText = (state: RootState) => state.ui.text;
@@ -531,5 +542,7 @@ export const selectPendingConfusionFromItem = (state: RootState) =>
   state.ui.pendingConfusionFromItem;
 
 export const selectOakIntroActive = (state: RootState) => state.ui.oakIntroActive;
+
+export const selectActiveCutTree = (state: RootState) => state.ui.activeCutTree;
 
 export default uiSlice.reducer;

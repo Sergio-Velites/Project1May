@@ -7,7 +7,7 @@ import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
-import { canWalk, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
+import { canWalk, isCuttableTree, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
 import {
   Direction,
   GameState,
@@ -39,6 +39,7 @@ const initialState: GameState = {
   defeatedTrainers: ["pallet-town-lab-5-1", "pallet-town-house-a-1f-6-3", "pallet-town-10-0", "pallet-town-11-0"],
   collectedItems: [],
   completedQuests: [],
+  sessionCutTrees: [] as string[],
   seenPokemon: [],
   caughtPokemon: [],
   npcFacings: {} as Record<string, Direction>,
@@ -99,7 +100,7 @@ export const gameSlice = createSlice({
       state.direction = Direction.Left;
       if (state.pos.x === 0) return;
       if (
-        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0, !!state.onSurfing)
+        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing)
       )
         return;
       state.pos.x -= 1;
@@ -109,7 +110,7 @@ export const gameSlice = createSlice({
       const map = mapData[state.map];
       if (state.pos.x === map.width - 1) return;
       if (
-        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0, !!state.onSurfing)
+        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing)
       )
         return;
       state.pos.x += 1;
@@ -118,7 +119,7 @@ export const gameSlice = createSlice({
       state.direction = Direction.Up;
       if (state.pos.y === 0) return;
       if (
-        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, state.completedQuests, state.pokemon.length > 0, !!state.onSurfing)
+        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing)
       )
         return;
       state.pos.y -= 1;
@@ -140,6 +141,7 @@ export const gameSlice = createSlice({
         return true;
       });
       if (isTrainer(blockingTrainersDown, state.pos.x, state.pos.y + 1)) return;
+      if (isCuttableTree(map.cuttableTrees, state.pos.x, state.pos.y + 1, [...state.completedQuests, ...(state.sessionCutTrees ?? [])])) return;
       if (isStaticPokemon(map.staticPokemon, state.pos.x, state.pos.y + 1, state.completedQuests)) return;
       if (
         isItem(
@@ -162,6 +164,7 @@ export const gameSlice = createSlice({
       const map = mapData[action.payload];
       state.pos = map.start;
       state.npcFacings = {};
+      state.sessionCutTrees = [];
       // Auto-desmonte si el nuevo mapa no permite bici (interiores).
       if (!map.allowBicycle && state.onBicycle) state.onBicycle = false;
       // Auto-desmonte de surf si el nuevo mapa no tiene tiles de agua.
@@ -172,6 +175,7 @@ export const gameSlice = createSlice({
       state.map = action.payload.map;
       state.pos = action.payload.pos;
       state.npcFacings = {};
+      state.sessionCutTrees = [];
       const map = mapData[action.payload.map];
       if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
       if (map && state.onSurfing && !mapHasWater(map)) state.onSurfing = false;
@@ -188,6 +192,7 @@ export const gameSlice = createSlice({
         state.map = map.exitReturnMap;
         state.pos = newPos;
         state.npcFacings = {};
+        state.sessionCutTrees = [];
         if (!previousMap.allowBicycle && state.onBicycle) state.onBicycle = false;
         if (state.onSurfing && !mapHasWater(previousMap)) state.onSurfing = false;
         recordVisit(state, map.exitReturnMap);
@@ -203,6 +208,7 @@ export const gameSlice = createSlice({
       state.pos = action.payload.pos;
       state.direction = Direction.Down;
       state.npcFacings = {};
+      state.sessionCutTrees = [];
       const map = mapData[action.payload.map];
       if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
       // Volar siempre desmonta el surf (el pajarito no nada).
@@ -540,6 +546,12 @@ export const gameSlice = createSlice({
     completeQuest: (state, action: PayloadAction<string>) => {
       state.completedQuests.push(action.payload);
     },
+    markTreeCut: (state, action: PayloadAction<string>) => {
+      if (!state.sessionCutTrees) state.sessionCutTrees = [];
+      if (!state.sessionCutTrees.includes(action.payload)) {
+        state.sessionCutTrees.push(action.payload);
+      }
+    },
     seePokemon: (state, action: PayloadAction<number>) => {
       if (!state.seenPokemon.includes(action.payload)) {
         state.seenPokemon.push(action.payload);
@@ -597,12 +609,13 @@ export const {
   faintToTrainer,
   collectItem,
   completeQuest,
+  markTreeCut,
   seePokemon,
   catchPokemonPokedex,
   setNpcFacing,
   setOnBicycle,
   setOnSurfing,
-    setRsvpInternal,
+  setRsvpInternal,
 } = gameSlice.actions;
 
 export const setRsvp = setRsvpInternal;
@@ -658,6 +671,9 @@ export const selectCollectedItems = (state: RootState) =>
 
 export const selectCompletedQuests = (state: RootState) =>
   state.game.completedQuests;
+
+export const selectSessionCutTrees = (state: RootState) =>
+  state.game.sessionCutTrees ?? [];
 
 /**
  * Pokédex: la lista persistida puede estar incompleta para saves antiguos

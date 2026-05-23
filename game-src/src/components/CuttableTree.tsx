@@ -9,18 +9,24 @@
  * Va DENTRO de BackgroundContainer en Game.tsx.
  */
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import styled, { keyframes } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  completeQuest,
-  selectCompletedQuests,
+  markTreeCut,
   selectDirection,
   selectMapId,
   selectPos,
   selectPokemon,
+  selectSessionCutTrees,
 } from "../state/gameSlice";
-import { selectMenuOpen, showTextThenAction } from "../state/uiSlice";
+import {
+  clearActiveCutTree,
+  selectActiveCutTree,
+  selectMenuOpen,
+  setActiveCutTree,
+  showTextThenAction,
+} from "../state/uiSlice";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import { directionModifier } from "../app/map-helper";
@@ -90,30 +96,23 @@ const StaticImg = styled.img`
 
 // ── Componente ───────────────────────────────────────────────────────────────
 
-interface CuttingState {
-  x: number;
-  y: number;
-  questId: string;
-}
-
 const CuttableTree = () => {
   const dispatch = useDispatch();
-  const completedQuests = useSelector(selectCompletedQuests);
+  const sessionCutTrees = useSelector(selectSessionCutTrees);
+  const activeCutTree = useSelector(selectActiveCutTree);
   const pos = useSelector(selectPos);
   const facing = useSelector(selectDirection);
   const mapId = useSelector(selectMapId);
   const menuOpen = useSelector(selectMenuOpen);
   const pokemon = useSelector(selectPokemon);
 
-  const [cutting, setCutting] = useState<CuttingState | null>(null);
-
   const currentMap = mapData[mapId];
   const trees: CuttableTreeType[] = currentMap?.cuttableTrees ?? [];
 
   const visibleTrees = trees.filter(
     (t) =>
-      !completedQuests.includes(t.questId) &&
-      !(cutting?.questId === t.questId)
+      !sessionCutTrees.includes(t.questId) &&
+      !(activeCutTree?.questId === t.questId)
   );
 
   useEvent(
@@ -153,10 +152,10 @@ const CuttableTree = () => {
         showTextThenAction({
           text: [`¡${cutterName} usó CORTE!`],
           action: () => {
-            setCutting({ x, y, questId });
+            dispatch(setActiveCutTree({ x, y, questId }));
             setTimeout(() => {
-              dispatch(completeQuest(questId));
-              setCutting(null);
+              dispatch(markTreeCut(questId));
+              dispatch(clearActiveCutTree());
             }, CUT_DURATION_MS);
           },
         })
@@ -178,8 +177,8 @@ const CuttableTree = () => {
       ))}
 
       {/* Árbol en animación de corte */}
-      {cutting && (
-        <TreeWrapper $x={cutting.x} $y={cutting.y}>
+      {activeCutTree && (
+        <TreeWrapper $x={activeCutTree.x} $y={activeCutTree.y}>
           <HalfLeft src={bushImg} alt="" />
           <HalfRight src={bushImg} alt="" />
         </TreeWrapper>

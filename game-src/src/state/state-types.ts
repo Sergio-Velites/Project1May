@@ -83,6 +83,8 @@ export interface GameState {
   defeatedTrainers: string[];
   collectedItems: string[];
   completedQuests: string[];
+  /** Árboles cortados en la sesión actual (se reinicia al cambiar de mapa). No se persiste en saves. */
+  sessionCutTrees?: string[];
   seenPokemon: number[];    // IDs vistos en la Pokédex
   caughtPokemon: number[]; // IDs capturados
   npcFacings: Record<string, Direction>;

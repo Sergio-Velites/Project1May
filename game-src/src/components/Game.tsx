@@ -44,6 +44,7 @@ import MapGiftModal from "./MapGiftModal";
 import TextRewardModal from "./TextRewardModal";
 import StaticPokemonNpc from "./StaticPokemonNpc";
 import CuttableTree from "./CuttableTree";
+import SurfHandler from "./SurfHandler";
 import OnlineBattleNpc from "./OnlineBattleNpc";
 import OnlineBattleMenu from "./OnlineBattleMenu";
 import FishingSession from "./FishingSession";
@@ -157,6 +158,7 @@ const Game = () => {
       <PokemonCenter />
       <Pc />
       <PokeMart />
+      <SurfHandler />
       <OnlineBattleNpc />
       <OnlineBattleMenu />
       <FishingSession />

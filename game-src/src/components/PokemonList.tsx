@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import {
+  markTreeCut,
   moveDown,
   moveLeft,
   moveRight,
@@ -11,11 +12,19 @@ import {
   selectOnSurfing,
   selectPokemon,
   selectPos,
+  selectSessionCutTrees,
   selectVisitedMaps,
   setOnSurfing,
   swapPokemonPositions,
 } from "../state/gameSlice";
-import { hideStartMenu, showFlyMenu, showText } from "../state/uiSlice";
+import {
+  clearActiveCutTree,
+  hideStartMenu,
+  setActiveCutTree,
+  showFlyMenu,
+  showText,
+  showTextThenAction,
+} from "../state/uiSlice";
 import { MapId } from "../maps/map-types";
 import { directionModifier, isWater } from "../app/map-helper";
 import { getPokemonMetadata } from "../app/use-pokemon-metadata";
@@ -104,6 +113,7 @@ const PokemonList = ({
   const mapId = useSelector(selectMapId);
   const onSurfing = useSelector(selectOnSurfing);
   const visitedMaps = useSelector(selectVisitedMaps);
+  const sessionCutTrees = useSelector(selectSessionCutTrees);
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState(false);
   const [switching, setSwitching] = useState<number | null>(null);
@@ -240,6 +250,36 @@ const PokemonList = ({
           !onSurfing &&
           reachableFlyTargets.length > 0;
 
+        // ── Opción CORTAR (party screen) ─────────────────────────────────
+        // Aparece si el pokémon tiene "cut" y el jugador mira un árbol cortable
+        // que aún no ha sido cortado en esta sesión.
+        const knowsCut = !!target?.moves?.some((m) => m.id === "cut");
+        const facingTree = (map.cuttableTrees ?? []).find(
+          (t) => t.pos.x === adjX && t.pos.y === adjY && !sessionCutTrees.includes(t.questId)
+        );
+        const canCut = !!target && knowsCut && !!facingTree;
+
+        const cutItem = canCut && {
+          label: "Cortar",
+          action: () => {
+            setSelected(false);
+            const targetName = getPokemonMetadata(target!.id).name.toUpperCase();
+            close();
+            dispatch(hideStartMenu());
+            const { pos: { x, y }, questId } = facingTree!;
+            dispatch(showTextThenAction({
+              text: [`¡${targetName} usó CORTE!`],
+              action: () => {
+                dispatch(setActiveCutTree({ x, y, questId }));
+                setTimeout(() => {
+                  dispatch(markTreeCut(questId));
+                  dispatch(clearActiveCutTree());
+                }, 480);
+              },
+            }));
+          },
+        };
+
         const surfItem = canSurf && {
           label: "Surfear",
           action: () => {
@@ -270,7 +310,7 @@ const PokemonList = ({
           },
         };
 
-        const extras = [surfItem, flyItem].filter(Boolean) as {
+        const extras = [cutItem, surfItem, flyItem].filter(Boolean) as {
           label: string;
           action: () => void;
         }[];
