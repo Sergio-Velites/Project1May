@@ -9,7 +9,7 @@ import { ItemType } from "../app/use-item-data";
 const viridianCity: MapType = {
   name: "SOTO LEZKAIRU",
   allowBicycle: true,
-  image,
+  image: viridianCityImage,
   music: music,
   height: 36,
   width: 40,
