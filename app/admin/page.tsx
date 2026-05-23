@@ -3,6 +3,8 @@
  * Acceso: /admin (protegido por middleware con cookie ADMIN_PASSWORD).
  * Server Component (Next.js App Router) — sin JS de cliente.
  */
+export const dynamic = "force-dynamic"; // siempre server-render, nunca caché estática
+
 import CsvDownload from "./CsvDownload";
 import AdminDashboard from "./AdminDashboard";
 
