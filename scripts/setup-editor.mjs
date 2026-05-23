@@ -614,6 +614,7 @@ const MAP_ID_TO_IMAGE = {
   "veridian-city-npc-house": "viridian-city-npc-house.png",
   "route-22": "route-22.png",
   "gate-house": "gate-house.png",
+  "league-route": "league-route.png",
   "route-2": "route-2.png",
   "route-2-gate": "route-2-gate.png",
   "viridian-forrest": "viridian-forrest.png",
