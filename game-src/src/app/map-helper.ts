@@ -131,15 +131,14 @@ export const canWalk = (
   if (isFence(map.fences, x, y)) return false;
   // Un trainer bloquea el paso siempre, como un muro.
   // La única excepción es hideCondition activa (trainer invisible).
-  const blockingTrainers = (map.trainers ?? []).filter((t) => {
-    if (t.hideCondition === "has-pokemon" && hasPokemon) return false;
+  for (const t of map.trainers ?? []) {
+    if (t.hideCondition === "has-pokemon" && hasPokemon) continue;
     if (t.hideCondition?.startsWith("trainer-defeated:")) {
       const tid = t.hideCondition.slice("trainer-defeated:".length);
-      if (defeatedTrainers.includes(tid)) return false;
+      if (defeatedTrainers.includes(tid)) continue;
     }
-    return true;
-  });
-  if (isTrainer(blockingTrainers, x, y)) return false;
+    if (t.pos.x === x && t.pos.y === y) return false;
+  }
   if (isStaticPokemon(map.staticPokemon, x, y, completedQuests)) return false;
   return true;
 };
@@ -184,6 +183,8 @@ const isEncounter = (
   // proximidad (solo al hablar). undefined = usa TRAINER_VISION.
   const range = trainer.sightRange ?? TRAINER_VISION;
   if (range <= 0) return false;
+  // isTrainer(trainers, pos.x, pos.y) uses constant coordinates — hoist outside loop.
+  if (isTrainer(trainers, pos.x, pos.y)) return false;
   for (let i = 1; i < range; i++) {
     tX += direction.x;
     tY += direction.y;
@@ -191,7 +192,6 @@ const isEncounter = (
     if (tX === pX && tY === pY) return true;
     if (isWall(walls, tX, tY)) return false;
     if (isFence(fences, tX, tY)) return false;
-    if (isTrainer(trainers, pos.x, pos.y)) return false;
   }
   return false;
 };

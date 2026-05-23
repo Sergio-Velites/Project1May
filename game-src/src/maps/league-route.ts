@@ -57,7 +57,7 @@ const leagueRoute: MapType = {
       46: [0, 18, 21],
       47: [0, 18, 21],
       48: [0, 4, 5, 6, 14, 15, 16, 18, 21],
-      49: [0, 1, 2, 3, 4, 6, 7, 8, 9, 14, 16, 17, 18, 21],
+      49: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 16, 17, 18, 21],
       50: [0, 9, 14, 21],
       51: [0, 4, 9, 14, 21],
       52: [0, 9, 14, 21],
@@ -342,7 +342,7 @@ const leagueRoute: MapType = {
       {
         pokemonId: 133,
         level: 15,
-        pos: { x: 8, y: 24 },
+        pos: { x: 20, y: 62 },
         questId: "league-route-gift-8-24",
       },
     ],
@@ -350,8 +350,8 @@ const leagueRoute: MapType = {
     {
     npc: pokeManiac,
     pokemon: [{ id: 19, level: 2 }],
-    facing: Direction.Down,
-    pos: { x: 9, y: 24 },
+    facing: Direction.Up,
+    pos: { x: 19, y: 62 },
     intro: [
 
     ],
