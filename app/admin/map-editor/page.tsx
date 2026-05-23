@@ -2972,13 +2972,37 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
       </div>
 
       {/* Hide condition */}
-      <div style={sectionStyle}>
-        <label style={labelStyle}>Hide Condition</label>
-        <select value={trainer.hideCondition ?? ''} onChange={(e) => onChange({ hideCondition: e.target.value || null })} style={{ ...inputStyle, height: 30 }}>
-          <option value="">— ninguna —</option>
-          <option value="has-pokemon">has-pokemon</option>
-        </select>
-      </div>
+      {(() => {
+        const isDefeated = trainer.hideCondition?.startsWith('trainer-defeated:');
+        const hideType = isDefeated ? 'trainer-defeated' : (trainer.hideCondition ?? '');
+        const defeatedId = isDefeated ? trainer.hideCondition!.slice('trainer-defeated:'.length) : '';
+        return (
+          <div style={sectionStyle}>
+            <label style={labelStyle}>Hide Condition</label>
+            <select
+              value={hideType}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === 'trainer-defeated') onChange({ hideCondition: 'trainer-defeated:' });
+                else onChange({ hideCondition: v || null });
+              }}
+              style={{ ...inputStyle, height: 30 }}
+            >
+              <option value="">— ninguna —</option>
+              <option value="has-pokemon">has-pokemon</option>
+              <option value="trainer-defeated">trainer-defeated: …</option>
+            </select>
+            {hideType === 'trainer-defeated' && (
+              <input
+                value={defeatedId}
+                placeholder="mapId-x-y  (ej: pewter-city-gym-4-1)"
+                onChange={(e) => onChange({ hideCondition: `trainer-defeated:${e.target.value}` })}
+                style={{ ...inputStyle, marginTop: 4 }}
+              />
+            )}
+          </div>
+        );
+      })()}
 
       {/* Sight range */}
       <div style={sectionStyle}>
