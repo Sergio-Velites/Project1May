@@ -10,7 +10,7 @@ const leagueRoute: MapType = {
   music: "/game/music/maps-original/indigo-plateau.mp3",
   height: 162,
   width: 22,
-  start: { x: 9, y: 266 },
+  start: { x: 9, y: 156 },
   walls: {
       4: [9, 10, 11, 12],
       5: [9, 10, 11, 12],

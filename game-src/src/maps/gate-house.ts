@@ -1,4 +1,4 @@
-import { pokeManiac } from "../app/npcs";
+import { pokeManiac, scientist, superNerd } from "../app/npcs";
 import image from "../assets/map/gate-house.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
@@ -53,6 +53,42 @@ const gateHouse: MapType = {
     ],
     money: 0,
     persistent: true,
+  },
+    {
+    npc: superNerd,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Down,
+    pos: { x: 5, y: 1 },
+    intro: [
+
+    ],
+    outtro: [
+      "...",
+      "Estás lejos de ser un buen entrenador ",
+      "como para pasar por aquí...",
+      "Date la vuelta y espabila!"
+    ],
+    money: 0,
+    persistent: true,
+    hideCondition: "has-pokemon",
+  },
+    {
+    npc: scientist,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Down,
+    pos: { x: 4, y: 1 },
+    intro: [
+
+    ],
+    outtro: [
+      "...",
+      "Estás lejos de ser un buen entrenador ",
+      "como para pasar por aquí...",
+      "Date la vuelta y espabila!"
+    ],
+    money: 0,
+    persistent: true,
+    hideCondition: "has-pokemon",
   }
   ],
 }
