@@ -103,6 +103,7 @@ const Row = styled.div`
   width: 100%;
   justify-content: space-between;
   flex: 1;
+  min-height: 0;
 `;
 
 const LeftInfoSection = styled.div`
@@ -210,6 +211,7 @@ interface ImageContainerProps {
 const ImageContainer = styled.div<ImageContainerProps>`
   height: 100%;
   flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3659,7 +3661,7 @@ const PokemonEncounter = () => {
               {/* Flash en el sprite del jugador solo cuando realmente le afecta el movimiento */}
               <PlayerImageContainer $flashing={(stage === 17 || stage === 19) && moveAnim?.target === "player" && moveAnim?.damageClass !== "status"}>
                 <AttackLeft $attacking={stage === 15 && moveAnim?.damageClass === "physical"}>
-                  <ChangePokemon $changing={[3, 25].includes(stage)}>
+                  <ChangePokemon $changing={[3, 4, 25].includes(stage)}>
                     <LeftImage src={leftImage()} style={{ visibility: playerHidden || playerSubVisible ? "hidden" : "visible" }} />
                     {playerSubVisible && <SubImage src={substituteSprite} />}
                   </ChangePokemon>
