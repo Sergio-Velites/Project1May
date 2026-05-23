@@ -804,10 +804,14 @@ const PokemonEncounter = () => {
     if (!processingMetadata) return;
     if (!processingMetadata.evolution) return;
     if (processingPokemon.level < processingMetadata.evolution.level) return;
+    const { pokemon } = processingMetadata.evolution;
+    const evolveToId = Array.isArray(pokemon)
+      ? pokemon[Math.floor(Math.random() * pokemon.length)]
+      : pokemon;
     dispatch(
       showEvolution({
         index: involvedPokemon[processingInvolvedPokemon],
-        evolveToId: processingMetadata.evolution.pokemon,
+        evolveToId,
       })
     );
   };

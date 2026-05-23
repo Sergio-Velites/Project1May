@@ -520,7 +520,7 @@ export interface PokemonMetadata {
     speed: number;
   };
   types: string[];
-  evolution?: { pokemon: number; level: number };
+  evolution?: { pokemon: number | number[]; level: number };
   baseCatchRate: number;
   growthRate: "fast" | "medium-fast" | "medium-slow" | "slow";
 }
@@ -4356,7 +4356,7 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
     },
     types: ["normal"],
     baseCatchRate: 45,
-    evolution: { pokemon: 196, level: 25 },
+    evolution: { pokemon: [196, 197], level: 25 },
     growthRate: "medium-fast",
   },
   "134": {

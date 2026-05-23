@@ -529,10 +529,14 @@ const useItemData = () => {
                 text: [`¡${pokemonName} subió al nivel ${newLevel}!`],
                 action: () => {
                   if (evolves && meta.evolution) {
+                    const { pokemon: evoPokemon } = meta.evolution;
+                    const evolveToId = Array.isArray(evoPokemon)
+                      ? evoPokemon[Math.floor(Math.random() * evoPokemon.length)]
+                      : evoPokemon;
                     dispatch(
                       showEvolution({
                         index,
-                        evolveToId: meta.evolution.pokemon,
+                        evolveToId,
                       })
                     );
                   } else if (newMove) {
