@@ -133,6 +133,10 @@ export const canWalk = (
   // La única excepción es hideCondition activa (trainer invisible).
   const blockingTrainers = (map.trainers ?? []).filter((t) => {
     if (t.hideCondition === "has-pokemon" && hasPokemon) return false;
+    if (t.hideCondition?.startsWith("trainer-defeated:")) {
+      const tid = t.hideCondition.slice("trainer-defeated:".length);
+      if (defeatedTrainers.includes(tid)) return false;
+    }
     return true;
   });
   if (isTrainer(blockingTrainers, x, y)) return false;

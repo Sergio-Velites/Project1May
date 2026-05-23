@@ -17,6 +17,7 @@ export enum MapId {
   ViridianCityNpcHouse = "viridian-city-npc-house",
   Route22 = "route-22",
   GateHouse = "gate-house",
+  LeagueRoute = "league-route",
   Route2 = "route-2",
   Route2Gate = "route-2-gate",
   ViridianForrest = "viridian-forrest",
@@ -92,7 +93,9 @@ export interface TrainerType {
    */
   sightRange?: number;
   persistent?: boolean;
-  hideCondition?: "has-pokemon";
+  /** "has-pokemon": se oculta cuando el jugador tiene ≥1 pokémon.
+   *  "trainer-defeated:<trainerId>": se oculta cuando ese trainer está en defeatedTrainers. */
+  hideCondition?: "has-pokemon" | `trainer-defeated:${string}`;
   isOnline?: boolean;
   /** Para batallas online: nombre real del invitado. Se muestra en lugar de "rival" durante el combate. */
   playerName?: string;

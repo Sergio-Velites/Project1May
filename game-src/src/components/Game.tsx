@@ -124,6 +124,10 @@ const Game = () => {
               .filter((trainer: TrainerType) => {
                 // Ocultar trainers con hideCondition cuando se cumple
                 if (trainer.hideCondition === "has-pokemon" && playerPokemon.length > 0) return false;
+                if (trainer.hideCondition?.startsWith("trainer-defeated:")) {
+                  const tid = trainer.hideCondition.slice("trainer-defeated:".length);
+                  if (defeatedTrainers.includes(tid)) return false;
+                }
                 // Los entrenadores derrotados permanecen visibles en el mapa
                 // (TrainerEncounter.tsx muestra outtro al interactuar con ellos)
                 return true;

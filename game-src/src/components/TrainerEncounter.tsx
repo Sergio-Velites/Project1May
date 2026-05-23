@@ -122,6 +122,10 @@ const TrainerEncounter = () => {
       if (!trainer) throw new Error("Trainer not found");
       // Si el trainer está oculto por condición, ignorar completamente la interacción
       if (trainer.hideCondition === "has-pokemon" && teamPokemon.length > 0) return;
+      if (trainer.hideCondition?.startsWith("trainer-defeated:")) {
+        const tid = trainer.hideCondition.slice("trainer-defeated:".length);
+        if (defeatedTrainers.includes(tid)) return;
+      }
       const trainerId = `${mapId}-${trainer.pos.x}-${trainer.pos.y}`;
       // Girar NPC hacia el jugador
       dispatch(setNpcFacing({ id: trainerId, direction: oppositeDirection(direction) }));
