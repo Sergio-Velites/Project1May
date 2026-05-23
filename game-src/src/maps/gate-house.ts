@@ -70,7 +70,7 @@ const gateHouse: MapType = {
     ],
     money: 0,
     persistent: true,
-    hideCondition: "has-pokemon",
+    hideCondition: "trainer-defeated:pewter-city-gym-4-1",
   },
     {
     npc: scientist,
@@ -88,7 +88,7 @@ const gateHouse: MapType = {
     ],
     money: 0,
     persistent: true,
-    hideCondition: "has-pokemon",
+    hideCondition: "trainer-defeated:pewter-city-gym-4-1",
   }
   ],
 }
