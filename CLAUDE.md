@@ -719,6 +719,16 @@ El campo `expression` del track es la cadena que se almacena en `MapType.music`.
 ### 17. Open redirect en admin login (resuelto)
 **Solución**: `?next=` solo acepta paths internos (`/` y no `//`).
 
+### 18. `canWalk` creaba array intermedia en cada comprobación de colisión (resuelto)
+**Causa**: `blockingTrainers = trainers.filter(...); isTrainer(blockingTrainers, x, y)` hacía dos pasadas y reservaba memoria en cada keypress.
+**Solución** (`map-helper.ts`): un único bucle `for...of` que comprueba hideCondition y posición en la misma pasada, sin array temporal.
+
+### 19. `isEncounter` llamaba `isTrainer` con coords constantes dentro del bucle de visión (resuelto)
+**Causa**: `isTrainer(trainers, pos.x, pos.y)` usa `pos` (posición del jugador, invariante dentro del loop) → computa lo mismo TRAINER_VISION veces.
+**Solución** (`map-helper.ts`): hoist de la llamada fuera del bucle con un early return.
+
+> **Nota de rendimiento**: el juego no tiene problemas de rendimiento medibles. Las dos optimizaciones anteriores son correctas y limpias, pero su impacto real es mínimo (arrays de < 10 elementos, llamadas solo en keypress). No hay trabajo de performance pendiente.
+
 ---
 
 ## Variables de entorno
