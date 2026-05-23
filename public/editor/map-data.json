@@ -6,83 +6,20 @@
     "height": 162,
     "width": 22,
     "trainers": [
-      {
-        "npcKey": "pokeManiac",
-        "pos": {
-          "x": 8,
-          "y": 2
-        },
-        "facing": "up",
-        "money": 0,
-        "persistent": true,
-        "isOnline": false,
-        "hideCondition": null,
-        "sightRange": null,
-        "intro": [],
-        "outtro": [
-          "🎵 Yegare cualquier lugar",
-          "llegaré a cualquier rincón🎵..."
-        ],
-        "pokemon": [
-          {
-            "id": 19,
-            "level": 2
-          }
-        ],
-        "postGame": null
-      }
+
     ],
     "walls": {
-      "0": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9
-      ],
-      "1": [
-        3,
-        6
-      ],
-      "6": [
-        3,
-        6
-      ],
-      "7": [
-        3,
-        6
-      ]
     },
     "fences": {},
     "grass": {},
     "water": {},
     "encounters": null,
     "texts": {
-      "0": {
-        "4": [
-          "La puerta está cerrada."
-        ],
-        "5": [
-          "La puerta está cerrada."
-        ]
-      }
+
     },
     "items": [],
     "gifts": [
-      {
-        "pokemonId": 133,
-        "level": 15,
-        "pos": {
-          "x": 9,
-          "y": 2
-        },
-        "questId": "gate-house-gift-9-2"
-      }
+
     ],
     "staticPokemon": [],
     "pokemonCenter": null,
@@ -92,14 +29,11 @@
     "maps": {},
     "teleports": {},
     "exits": {
-      "7": [
-        4,
-        5
-      ]
+
     },
     "exitReturnMap": "route-22",
     "exitReturnPos": {
-      "x": 8,
+      "x": 11,
       "y": 6
     },
     "sourceFile": "league-route.ts"
