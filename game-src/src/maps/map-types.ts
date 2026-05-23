@@ -145,6 +145,16 @@ export interface SimpleGiftType {
 }
 
 /**
+ * Árbol cortable (HM Corte / Tijera). Bloquea el paso hasta que un Pokémon
+ * del equipo que sepa "cut" lo corte. El estado persiste vía completedQuests.
+ */
+export interface CuttableTreeType {
+  pos: PosType;
+  /** Formato recomendado: "cut-tree-<mapId>-<x>-<y>" */
+  questId: string;
+}
+
+/**
  * Pokémon estático en el mapa (estilo legendarios Gen I: Articuno, Snorlax…).
  * Aparece visualmente como un sprite en world-coords. Al pulsar A frente a él
  * se inicia un combate salvaje. Una vez derrotado o capturado desaparece.
@@ -218,6 +228,8 @@ export interface MapType {
   gifts?: SimpleGiftType[];
   /** Pokémon estáticos en el mapa (estilo legendarios). */
   staticPokemon?: StaticPokemonType[];
+  /** Árboles cortables con la MO Corte. Bloquean el paso hasta ser cortados. */
+  cuttableTrees?: CuttableTreeType[];
   /** Posición del NPC de batallas online en este mapa (centros Pokémon) */
   onlineBattleNpc?: PosType;
   /**

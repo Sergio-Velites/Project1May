@@ -1,5 +1,5 @@
 import mapData from "../maps/map-data";
-import { MapId, MapItemType, SimpleGiftType, StaticPokemonType, TrainerType } from "../maps/map-types";
+import { CuttableTreeType, MapId, MapItemType, SimpleGiftType, StaticPokemonType, TrainerType } from "../maps/map-types";
 import { Direction, PosType } from "../state/state-types";
 import { TRAINER_VISION } from "./constants";
 
@@ -91,6 +91,23 @@ export const isGift = (
   );
 };
 
+export const isCuttableTree = (
+  trees: CuttableTreeType[] | undefined,
+  x: number,
+  y: number,
+  completedQuests: string[]
+): boolean => {
+  return (
+    !!trees &&
+    trees.some(
+      (t) =>
+        t.pos.x === x &&
+        t.pos.y === y &&
+        !completedQuests.includes(t.questId)
+    )
+  );
+};
+
 export const isStaticPokemon = (
   staticPokemon: StaticPokemonType[] | undefined,
   x: number,
@@ -121,6 +138,7 @@ export const canWalk = (
   const map = mapData[mapId];
   if (isItem(map.items, x, y, collectedItems, mapId)) return false;
   if (isGift(map.gifts, x, y, completedQuests)) return false;
+  if (isCuttableTree(map.cuttableTrees, x, y, completedQuests)) return false;
   if (isWall(map.walls, x, y)) return false;
   // Reglas de agua:
   //  - A pie: el agua bloquea como un muro.

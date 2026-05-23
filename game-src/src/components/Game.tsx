@@ -43,6 +43,7 @@ import MapGift from "./MapGift";
 import MapGiftModal from "./MapGiftModal";
 import TextRewardModal from "./TextRewardModal";
 import StaticPokemonNpc from "./StaticPokemonNpc";
+import CuttableTree from "./CuttableTree";
 import OnlineBattleNpc from "./OnlineBattleNpc";
 import OnlineBattleMenu from "./OnlineBattleMenu";
 import FishingSession from "./FishingSession";
@@ -142,6 +143,7 @@ const Game = () => {
           <LabPokeballs />
           <AcademyPokeball />
           <MapGift />
+          <CuttableTree />
           <StaticPokemonNpc />
           <DebugOverlay />
         </BackgroundContainer>

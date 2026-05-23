@@ -105,7 +105,7 @@ type EncountersOverride = Partial<Record<EncounterTableKey, EncounterTable>>;
 
 const EMPTY_TABLE = (): EncounterTable => ({ rate: 0, pokemon: [] });
 
-type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'spots' | 'mechanics' | 'portals' | 'map';
+type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'spots' | 'mechanics' | 'portals' | 'map';
 
 type SpotKey = 'start' | 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation' | 'onlineBattleNpc';
 
@@ -317,6 +317,17 @@ function exportGiftsTS(gifts: GiftEntry[]): string {
     `    },`,
   ].join('\n'));
   return `gifts: [\n${lines.join('\n')}\n  ],`;
+}
+
+function exportCuttableTreesTS(trees: { pos: { x: number; y: number }; questId: string }[]): string {
+  if (trees.length === 0) return 'cuttableTrees: [],';
+  const lines = trees.map((t) => [
+    `    {`,
+    `      pos: { x: ${t.pos.x}, y: ${t.pos.y} },`,
+    `      questId: "${escapeTSString(t.questId)}",`,
+    `    },`,
+  ].join('\n'));
+  return `cuttableTrees: [\n${lines.join('\n')}\n  ],`;
 }
 
 const STATIC_POKEMON_SPRITES = [
@@ -589,6 +600,7 @@ function exportFullMapTypeTS({
   items,
   gifts,
   staticPokemon,
+  cuttableTrees,
   pokemonCenter,
   pc,
   store,
@@ -617,6 +629,7 @@ function exportFullMapTypeTS({
   items: ItemEntry[];
   gifts: GiftEntry[];
   staticPokemon: StaticPokemonEntry[];
+  cuttableTrees: { pos: { x: number; y: number }; questId: string }[];
   pokemonCenter: { x: number; y: number } | null;
   pc: { x: number; y: number } | null;
   store: { x: number; y: number } | null;
@@ -691,6 +704,7 @@ function exportFullMapTypeTS({
   if (items.length > 0) lines.push(exportItemsTS(items));
   if (gifts.length > 0) lines.push(exportGiftsTS(gifts));
   if (staticPokemon.length > 0) lines.push(exportStaticPokemonTS(staticPokemon));
+  if (cuttableTrees.length > 0) lines.push(exportCuttableTreesTS(cuttableTrees));
   lines.push(exportTrainersArrayTS(trainers));
 
   return `{\n${lines.map((line) => indentTS(line)).join('\n')}\n}`;
@@ -755,6 +769,8 @@ export default function MapEditor() {
   const [items, setItems] = useState<ItemEntry[]>([]);
   const [gifts, setGifts] = useState<GiftEntry[]>([]);
   const [staticPokemon, setStaticPokemon] = useState<StaticPokemonEntry[]>([]);
+  interface CuttableTreeEntry { pos: { x: number; y: number }; questId: string; }
+  const [cuttableTrees, setCuttableTrees] = useState<CuttableTreeEntry[]>([]);
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
   const [pokemonCenter, setPokemonCenter] = useState<{ x: number; y: number } | null>(null);
   const [pcPos, setPcPos] = useState<{ x: number; y: number } | null>(null);
@@ -852,6 +868,7 @@ export default function MapEditor() {
     setItems(m.items ?? []);
     setGifts(m.gifts ?? []);
     setStaticPokemon((m as MapEntry & { staticPokemon?: StaticPokemonEntry[] }).staticPokemon ?? []);
+    setCuttableTrees((m as MapEntry & { cuttableTrees?: { pos: { x: number; y: number }; questId: string }[] }).cuttableTrees ?? []);
     setStartPos(m.start ?? null);
     setPokemonCenter(m.pokemonCenter ?? null);
     setPcPos(m.pc ?? null);
@@ -907,6 +924,7 @@ export default function MapEditor() {
             })),
             gifts,
             staticPokemon,
+            cuttableTrees,
             pokemonCenter,
             pc: pcPos,
             store: storePos,
@@ -1096,6 +1114,7 @@ export default function MapEditor() {
       items,
       gifts,
       staticPokemon,
+      cuttableTrees,
       pokemonCenter,
       pc: pcPos,
       store: storePos,
@@ -1722,6 +1741,23 @@ export default function MapEditor() {
       }
       return;
     }
+    if (editMode === 'cuttable-trees') {
+      const idx = cuttableTrees.findIndex((t) => t.pos.x === tile.x && t.pos.y === tile.y);
+      if (idx >= 0) {
+        // Clic en árbol existente → eliminar
+        setCuttableTrees((p) => p.filter((_, i) => i !== idx));
+        setDirty(true);
+      } else {
+        // Clic en tile vacío → añadir árbol
+        const defaultQid = `cut-tree-${selectedMapId}-${tile.x}-${tile.y}`;
+        const qid = window.prompt('questId (único):', defaultQid);
+        if (qid === null) return;
+        if (!qid.trim()) { alert('questId vacío'); return; }
+        setCuttableTrees((p) => [...p, { pos: { x: tile.x, y: tile.y }, questId: qid.trim() }]);
+        setDirty(true);
+      }
+      return;
+    }
     if (editMode === 'spots') {
       const setter =
         activeSpot === 'start' ? setStartPos :
@@ -1886,7 +1922,7 @@ export default function MapEditor() {
 
         {/* Modo edición */}
         <div style={{ display: 'flex', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
-          {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
+          {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
               npc: '#5050b0',
               walls: '#7a3030',
@@ -1897,6 +1933,7 @@ export default function MapEditor() {
               items: '#5a3a7a',
               gifts: '#7a3a5a',
               'static-pokemon': '#3a7a6a',
+              'cuttable-trees': '#5a7a3a',
               spots: '#5a7a30',
               mechanics: '#6a4a8a',
               portals: '#7a3a3a',
@@ -2319,6 +2356,35 @@ export default function MapEditor() {
                 </div>
               ))}
 
+              {/* Cuttable Trees overlay */}
+              {cuttableTrees.map((t, i) => (
+                <div
+                  key={`ct-${i}`}
+                  title={`Árbol cortable · ${t.questId}`}
+                  style={{
+                    position: 'absolute',
+                    left: t.pos.x * zoom,
+                    top: t.pos.y * zoom,
+                    width: zoom,
+                    height: zoom,
+                    background: editMode === 'cuttable-trees'
+                      ? 'rgba(100, 200, 80, 0.55)'
+                      : 'rgba(100, 200, 80, 0.22)',
+                    border: editMode === 'cuttable-trees'
+                      ? '1px solid rgba(120, 220, 80, 0.95)'
+                      : '1px dashed rgba(120, 220, 80, 0.5)',
+                    pointerEvents: 'none',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: Math.max(10, zoom * 0.5),
+                  }}
+                >
+                  🌿
+                </div>
+              ))}
+
               {/* Spots overlay */}
               {([
                 { key: 'start' as SpotKey, pos: startPos, emoji: '▶', color: '#ffffff' },
@@ -2699,6 +2765,21 @@ export default function MapEditor() {
                 ]}
                 count={staticPokemon.length}
                 countLabel="pokémon estáticos"
+                sourceFile={currentMap?.sourceFile}
+              />
+            ) : editMode === 'cuttable-trees' ? (
+              <ModeHelpBlock
+                emoji="🌿"
+                title="Árboles Cortables"
+                color="#88cc55"
+                lines={[
+                  'Click vacío: añadir árbol cortable (bush.png)',
+                  'Click en árbol existente: eliminar',
+                  'Bloquea el paso hasta usar la MO Corte',
+                  'Se persiste via questId en completedQuests',
+                ]}
+                count={cuttableTrees.length}
+                countLabel="árboles cortables"
                 sourceFile={currentMap?.sourceFile}
               />
             ) : editMode === 'spots' ? (
