@@ -107,6 +107,13 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange | StatChange[]> = {
     { stat: "attack", target: "attacker", delta: +1 },
     { stat: "speed",  target: "attacker", delta: +1 },
   ],
+  // ── Gen II stat changes ────────────────────────────────────────────────
+  "charm":         { stat: "attack",  target: "defender", delta: -2 },
+  "howl":          { stat: "attack",  target: "attacker", delta: +1 },
+  "scary-face":    { stat: "speed",   target: "defender", delta: -2 },
+  "cotton-spore":  { stat: "speed",   target: "defender", delta: -2 },
+  "sweet-scent":   { stat: "evasion", target: "defender", delta: -1 },
+  "metal-sound":   { stat: "special", target: "defender", delta: -2 },
 };
 
 // ── Condiciones de estado ────────────────────────────────────────────────────
@@ -142,6 +149,8 @@ const STATUS_APPLY_TABLE: Record<string, StatusApply> = {
   "sing":          { status: "sleep",           target: "defender" },
   "hypnosis":      { status: "sleep",           target: "defender" },
   "lovely-kiss":   { status: "sleep",           target: "defender" },
+  // ── Gen II status moves ────────────────────────────────────────────────
+  "yawn":          { status: "sleep",           target: "defender" },
   // ── Efectos secundarios de movimientos de daño (chance separada abajo) ──
   "poison-sting":  { status: "poison",    target: "defender" },
   "sludge":        { status: "poison",    target: "defender" },
@@ -160,6 +169,13 @@ const STATUS_APPLY_TABLE: Record<string, StatusApply> = {
   "blizzard":      { status: "freeze",    target: "defender" },
   "ice-beam":      { status: "freeze",    target: "defender" },
   "ice-punch":     { status: "freeze",    target: "defender" },
+  // ── Gen II secundarios de daño ─────────────────────────────────────────
+  "spark":         { status: "paralysis", target: "defender" },
+  "zap-cannon":    { status: "paralysis", target: "defender" },
+  "flame-wheel":   { status: "burn",      target: "defender" },
+  "powder-snow":   { status: "freeze",    target: "defender" },
+  "sacred-fire":   { status: "burn",      target: "defender" },
+  "lava-plume":    { status: "burn",      target: "defender" },
 };
 
 /** Probabilidad del efecto secundario de estado para movimientos de daño */
@@ -181,6 +197,13 @@ const SECONDARY_STATUS_CHANCE: Record<string, number> = {
   "blizzard":      0.10,
   "ice-beam":      0.10,
   "ice-punch":     0.10,
+  // ── Gen II ────────────────────────────────────────────────────────────
+  "spark":         0.30,
+  "zap-cannon":    1.00,
+  "flame-wheel":   0.10,
+  "powder-snow":   0.10,
+  "sacred-fire":   0.50,
+  "lava-plume":    0.30,
 };
 
 /** Probabilidad de confusión secundaria de movimientos de daño (Gen I) */
@@ -190,14 +213,27 @@ const SECONDARY_CONFUSE_CHANCE: Record<string, number> = {
   "dizzy-punch": 0.20,
 };
 
-/** Cambio de stat secundario en moves de daño (Gen I) — chance 10% en todos */
-const SECONDARY_STAT_CHANCE: Record<string, { chance: number; change: StatChange }> = {
+/** Cambio de stat secundario en moves de daño — soporta array para ancient-power */
+const SECONDARY_STAT_CHANCE: Record<string, { chance: number; change: StatChange | StatChange[] }> = {
+  // ── Gen I ─────────────────────────────────────────────────────────────
   "acid":        { chance: 0.10, change: { stat: "special", target: "defender", delta: -1 } },
   "psychic":     { chance: 0.10, change: { stat: "special", target: "defender", delta: -1 } },
   "aurora-beam": { chance: 0.10, change: { stat: "attack",  target: "defender", delta: -1 } },
   "bubble":      { chance: 0.10, change: { stat: "speed",   target: "defender", delta: -1 } },
   "bubble-beam": { chance: 0.10, change: { stat: "speed",   target: "defender", delta: -1 } },
   "constrict":   { chance: 0.10, change: { stat: "speed",   target: "defender", delta: -1 } },
+  // ── Gen II ────────────────────────────────────────────────────────────
+  "crunch":        { chance: 0.20, change: { stat: "special",  target: "defender", delta: -1 } },
+  "iron-tail":     { chance: 0.30, change: { stat: "defense",  target: "defender", delta: -1 } },
+  "metal-claw":    { chance: 0.10, change: { stat: "attack",   target: "attacker", delta: +1 } },
+  "steel-wing":    { chance: 0.10, change: { stat: "defense",  target: "attacker", delta: +1 } },
+  "hammer-arm":    { chance: 1.00, change: { stat: "speed",    target: "attacker", delta: -1 } },
+  "ancient-power": { chance: 0.10, change: [
+    { stat: "attack",  target: "attacker", delta: +1 },
+    { stat: "defense", target: "attacker", delta: +1 },
+    { stat: "speed",   target: "attacker", delta: +1 },
+    { stat: "special", target: "attacker", delta: +1 },
+  ]},
 };
 
 // ── Movimientos de efecto especial ──────────────────────────────────────────
@@ -217,9 +253,13 @@ const FIXED_DAMAGE_MOVES: Record<string, (level: number) => number> = {
 
 /** Movimientos de curación — fracción del HP máximo que se restaura */
 const HEAL_FRACTION: Record<string, number> = {
-  "recover":    0.5,
-  "softboiled": 0.5,
-  "milk-drink": 0.5,
+  "recover":      0.5,
+  "softboiled":   0.5,
+  "milk-drink":   0.5,
+  // ── Gen II ── sin sistema de clima: curan siempre 50% (equivale a día soleado)
+  "moonlight":    0.5,
+  "morning-sun":  0.5,
+  "synthesis":    0.5,
   // rest se maneja como caso especial (cura + aplica sueño 2 turnos)
 };
 
@@ -227,7 +267,7 @@ const HEAL_FRACTION: Record<string, number> = {
 const NO_EFFECT_MOVES = new Set(["splash", "teleport", "focus-energy"]);
 
 /** Movimientos que causan confusión (estado volátil real — gestionado en PokemonEncounter) */
-export const CONFUSE_MOVES = new Set(["confuse-ray", "supersonic"]);
+export const CONFUSE_MOVES = new Set(["confuse-ray", "supersonic", "sweet-kiss"]);
 
 /** Movimientos de carga de 2 turnos — T1: cargar, T2: atacar (gestionado en PokemonEncounter) */
 export const CHARGE_MOVES = new Set(["solar-beam", "razor-wind", "sky-attack", "skull-bash"]);
@@ -305,9 +345,11 @@ export const isSelfTargetingStatusMove = (moveId: string): boolean => {
 export interface MoveContext {
   /** Último daño físico recibido por el jugador (para Counter) */
   lastPhysicalDamageTaken: number;
+  /** Último daño especial recibido (para Mirror Coat) */
+  lastSpecialDamageTaken?: number;
   /** ¿El objetivo está dormido? (para Dream Eater) */
   isTargetSleeping: boolean;
-  /** Status del atacante — para penalización Gen I de quemadura */
+  /** Status del atacante — para penalización Gen I de quemadura y Snore */
   attackerStatus?: StatusType | null;
   /** Tipos override del atacante — Conversion (afecta STAB) */
   attackerOverrideTypes?: string[];
@@ -321,6 +363,8 @@ export interface MoveContext {
   defenderSubHp?: number;
   /** BaseSpeed del atacante — fórmula Gen I de crítico */
   attackerBaseSpeed?: number;
+  /** El defensor usó Protect/Detect este turno — el ataque falla automáticamente */
+  defenderIsProtected?: boolean;
 }
 
 export interface MoveResult {
@@ -356,6 +400,10 @@ export interface MoveResult {
   startSubstitute?: { hp: number };           // Substitute creado
   subDamage?: number;         // daño absorbido por el sustituto del defensor
   blockedBySub?: boolean;     // status/stat al defensor bloqueado por su sub
+  // ── Gen II ───────────────────────────────────────────────────────────
+  isProtect?: boolean;        // Protect/Detect — activa escudo este turno
+  isSwagger?: boolean;        // Swagger — +2 atk al rival + confusión
+  isRapidSpin?: boolean;      // Rapid Spin — limpia trampas del usuario
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -400,6 +448,16 @@ const processMove = (
     isDebuff: false,
   };
 
+  // ── Protect/Detect: bloquea todos los ataques del rival este turno ─────────
+  if (move === "protect" || move === "detect") {
+    return { ...defaultReturn, isBuff: true, isProtect: true };
+  }
+
+  // ── Defend check: el defensor usó Protect/Detect → el ataque falla ─────────
+  if (context?.defenderIsProtected && moveMetadata.power) {
+    return { ...defaultReturn, missed: true };
+  }
+
   // ── Accuracy check (incluyendo stages de precisión/evasion) ──────────────────
   if (moveMetadata.accuracy) {
     // El atacante usa su accuracy stage; el defensor su evasion stage
@@ -414,6 +472,59 @@ const processMove = (
       return { ...defaultReturn, missed: true };
     }
   }
+
+  // ── Snore — solo funciona si el atacante está dormido ────────────────────
+  if (move === "snore") {
+    if (context?.attackerStatus !== "sleep") {
+      return { ...defaultReturn, missed: true };
+    }
+    // Si duerme: cae al bloque de daño normal (move físico normal-type)
+  }
+
+  // ── Mirror Coat — devuelve 2× el último daño especial recibido ───────────
+  if (move === "mirror-coat") {
+    const dmg = Math.max(1, (context?.lastSpecialDamageTaken ?? 0) * 2);
+    if (isAttacking) {
+      return { ...defaultReturn, them: { ...them, hp: Math.max(0, them.hp - dmg) } };
+    }
+    return { ...defaultReturn, us: { ...usAfterPP, hp: Math.max(0, us.hp - dmg) } };
+  }
+
+  // ── Swagger — sube ataque rival +2 y lo confunde ─────────────────────────
+  if (move === "swagger") {
+    return {
+      ...defaultReturn,
+      isDebuff: true,
+      isSwagger: true,
+      confuse: true,
+      statChange: { stat: "attack" as const, target: "defender" as const, delta: +2 },
+    };
+  }
+
+  // ── Pain Split — promedia los HP de ambos contendientes ──────────────────
+  if (move === "pain-split") {
+    const myHp   = isAttacking ? us.hp   : them.hp;
+    const foeHp  = isAttacking ? them.hp : us.hp;
+    const myMax  = isAttacking ? ourStats.hp   : theirStats.hp;
+    const foeMax = isAttacking ? theirStats.hp : ourStats.hp;
+    const avg    = Math.floor((myHp + foeHp) / 2);
+    if (isAttacking) {
+      return {
+        ...defaultReturn,
+        us:   { ...usAfterPP, hp: Math.min(myMax, avg) },
+        them: { ...them, hp: Math.min(foeMax, avg) },
+      };
+    }
+    return {
+      ...defaultReturn,
+      us:   { ...usAfterPP, hp: Math.min(myMax, avg) },
+      them: { ...them, hp: Math.min(foeMax, avg) },
+    };
+  }
+
+  // ── Rapid Spin — daño físico + limpia trampas del usuario ────────────────
+  // isRapidSpin flag recogido en PokemonEncounter para limpiar trap refs
+  // La parte de daño cae al bloque estándar; solo inyectamos el flag al final.
 
   // ── Transformación (copia stats/tipos/movimientos del rival) ─────────────
   if (move === "transform") {
@@ -628,6 +739,37 @@ const processMove = (
   //
   // CRITICAL HIT in Gen I: ignores all stat stage modifiers (uses base stats).
 
+  // ── Flail / Reversal — potencia variable según HP restante del atacante ───
+  let overridePower: number | undefined;
+  if (move === "flail" || move === "reversal") {
+    const atkHp    = isAttacking ? us.hp : them.hp;
+    const atkMaxHp = isAttacking ? ourStats.hp : theirStats.hp;
+    const ratio    = atkHp / Math.max(1, atkMaxHp);
+    if      (ratio <= 0.0417) overridePower = 200;
+    else if (ratio <= 0.1042) overridePower = 150;
+    else if (ratio <= 0.2083) overridePower = 100;
+    else if (ratio <= 0.3542) overridePower = 80;
+    else if (ratio <= 0.6875) overridePower = 40;
+    else                      overridePower = 20;
+  }
+
+  // ── Present — potencia aleatoria o cura al rival (Gen II) ────────────────
+  if (move === "present") {
+    const r = Math.random();
+    if (r < 0.40)      overridePower = 40;
+    else if (r < 0.70) overridePower = 80;
+    else if (r < 0.80) overridePower = 120;
+    else {
+      // 20%: cura al rival 80 HP en lugar de dañarlo
+      if (isAttacking) {
+        return { ...defaultReturn, them: { ...them, hp: Math.min(theirStats.hp, them.hp + 80) } };
+      }
+      return { ...defaultReturn, us: { ...usAfterPP, hp: Math.min(ourStats.hp, us.hp + 80) } };
+    }
+  }
+
+  const effectivePower = overridePower ?? moveMetadata.power;
+
   // Random factor: uniform integer in [217, 255] → [0.851, 1.0]
   const randFactor = (217 + Math.floor(Math.random() * 39)) / 255;
 
@@ -676,7 +818,7 @@ const processMove = (
     const notVeryEffective = typeEff < 1;
 
     const baseDamage = Math.max(1, Math.floor(
-      (Math.floor(((2 * us.level) / 5 + 2) * moveMetadata.power * (attack / defense)) / 50 + 2) *
+      (Math.floor(((2 * us.level) / 5 + 2) * effectivePower * (attack / defense)) / 50 + 2) *
         stab * typeEff * critMult * randFactor
     ));
 
@@ -705,21 +847,26 @@ const processMove = (
     // Efecto secundario de estado (body-slam, thunderbolt, flamethrower…)
     const secEntry = STATUS_APPLY_TABLE[move];
     const secChance = SECONDARY_STATUS_CHANCE[move];
-    const secondaryStatus: StatusApply | undefined =
+    let secondaryStatus: StatusApply | undefined =
       subActive
         ? undefined
         : move === "twineedle"
           ? (twineedlePoison ? { status: "poison" as const, target: "defender" as const } : undefined)
           : secEntry && secChance && Math.random() < secChance ? secEntry : undefined;
+    // Tri-attack no va en STATUS_APPLY_TABLE porque el estado es aleatorio; se resuelve aquí
+    if (!secondaryStatus && move === "tri-attack" && !subActive && Math.random() < 0.20) {
+      const statuses = ["paralysis", "burn", "freeze"] as const;
+      secondaryStatus = { status: statuses[Math.floor(Math.random() * 3)], target: "defender" };
+    }
 
     // F2 — Confusión secundaria (Confusion, Psybeam, Dizzy Punch)
     const confChance = SECONDARY_CONFUSE_CHANCE[move];
     const secondaryConfuse =
       !subActive && confChance && Math.random() < confChance ? true : false;
 
-    // F3 — Cambio de stat secundario (Acid, Aurora Beam, Bubble, Constrict, Psychic)
+    // F3 — Cambio de stat secundario (Acid, Aurora Beam, Bubble, Constrict, Psychic…)
     const statSec = SECONDARY_STAT_CHANCE[move];
-    const secondaryStat: StatChange | undefined =
+    const secondaryStat: StatChange | StatChange[] | undefined =
       !subActive && statSec && Math.random() < statSec.chance
         ? statSec.change
         : undefined;
@@ -773,6 +920,7 @@ const processMove = (
       payDayCoins,
       startTrap,
       subDamage: subDamage > 0 ? subDamage : undefined,
+      isRapidSpin: move === "rapid-spin" ? true : undefined,
     };
   }
 
@@ -791,7 +939,7 @@ const processMove = (
   const notVeryEffective = typeEff < 1;
 
   const baseDmg = Math.max(1, Math.floor(
-    (Math.floor(((2 * them.level) / 5 + 2) * moveMetadata.power * (eAttack / eDefense)) / 50 + 2) *
+    (Math.floor(((2 * them.level) / 5 + 2) * effectivePower * (eAttack / eDefense)) / 50 + 2) *
       stab * typeEff * critMult * randFactor
   ));
 
@@ -818,19 +966,23 @@ const processMove = (
   // Efecto secundario de estado del enemigo
   const eSecEntry = STATUS_APPLY_TABLE[move];
   const eSecChance = SECONDARY_STATUS_CHANCE[move];
-  const eSecondaryStatus: StatusApply | undefined =
+  let eSecondaryStatus: StatusApply | undefined =
     eSubActive
       ? undefined
       : move === "twineedle"
         ? (eTwineedlePoison ? { status: "poison" as const, target: "defender" as const } : undefined)
         : eSecEntry && eSecChance && Math.random() < eSecChance ? eSecEntry : undefined;
+  if (!eSecondaryStatus && move === "tri-attack" && !eSubActive && Math.random() < 0.20) {
+    const statuses = ["paralysis", "burn", "freeze"] as const;
+    eSecondaryStatus = { status: statuses[Math.floor(Math.random() * 3)], target: "defender" };
+  }
 
   const eConfChance = SECONDARY_CONFUSE_CHANCE[move];
   const eSecondaryConfuse =
     !eSubActive && eConfChance && Math.random() < eConfChance ? true : false;
 
   const eStatSec = SECONDARY_STAT_CHANCE[move];
-  const eSecondaryStat: StatChange | undefined =
+  const eSecondaryStat: StatChange | StatChange[] | undefined =
     !eSubActive && eStatSec && Math.random() < eStatSec.chance
       ? eStatSec.change
       : undefined;
@@ -877,6 +1029,7 @@ const processMove = (
     requiresRecharge: move === "hyper-beam" ? true : undefined,
     startTrap: eStartTrap,
     subDamage: eSubDamage > 0 ? eSubDamage : undefined,
+    isRapidSpin: move === "rapid-spin" ? true : undefined,
   };
 };
 

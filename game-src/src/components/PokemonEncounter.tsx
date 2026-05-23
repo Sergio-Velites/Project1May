@@ -706,6 +706,11 @@ const PokemonEncounter = () => {
 
   // Último daño físico recibido por el jugador (para Counter)
   const lastPhysicalDamageRef = useRef(0);
+  // Último daño especial recibido (para Mirror Coat)
+  const lastSpecialDamageRef  = useRef(0);
+  // Protect/Detect: flag de escudo activo este turno
+  const playerProtectRef = useRef(false);
+  const enemyProtectRef  = useRef(false);
 
   // Flinch refs — el objetivo de un golpe con flinch no puede actuar ese turno
   const enemyFlinchRef  = useRef(false);
@@ -992,6 +997,9 @@ const PokemonEncounter = () => {
       playerLeechSeededRef.current = false;
       enemyLeechSeededRef.current  = false;
       lastPhysicalDamageRef.current = 0;
+      lastSpecialDamageRef.current  = 0;
+      playerProtectRef.current = false;
+      enemyProtectRef.current  = false;
       enemyFlinchRef.current  = false;
       playerFlinchRef.current = false;
       setEnemyTransformedId(null);
@@ -1969,6 +1977,9 @@ const PokemonEncounter = () => {
     playerThrashTurnsRef.current = 0;
     playerThrashMoveRef.current = null;
     lastPhysicalDamageRef.current = 0;
+    lastSpecialDamageRef.current  = 0;
+    playerProtectRef.current = false;
+    enemyProtectRef.current  = false;
     enemyLeechSeededRef.current = enemyLeechSeededRef.current; // se mantiene en el rival
     // Gen I: Transform revierte cuando el Pokémon sale del campo.
     // Limpiamos la entrada del Pokémon que sale (activePokemonIndex).
@@ -2010,6 +2021,7 @@ const PokemonEncounter = () => {
   // ── Helpers Gen I para construir el contexto del move ───────────────────
   const buildEnemyAttackCtx = (): MoveContext => ({
     lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+    lastSpecialDamageTaken:  lastSpecialDamageRef.current,
     isTargetSleeping: playerStatusRef.current?.type === "sleep",
     attackerStatus: enemyStatusRef.current?.type ?? null,
     attackerOverrideTypes: enemyConvertedTypesRef.current ?? undefined,
@@ -2017,9 +2029,11 @@ const PokemonEncounter = () => {
     defenderHasLightScreen: playerLightScreenRef.current > 0,
     defenderHasSubstitute: playerSubHpRef.current != null,
     defenderSubHp: playerSubHpRef.current ?? 0,
+    defenderIsProtected: playerProtectRef.current,
   });
   const buildPlayerAttackCtx = (): MoveContext => ({
     lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
+    lastSpecialDamageTaken:  lastSpecialDamageRef.current,
     isTargetSleeping: enemyStatusRef.current?.type === "sleep",
     attackerStatus: playerStatusRef.current?.type ?? null,
     attackerOverrideTypes: playerConvertedTypesRef.current ?? undefined,
@@ -2027,6 +2041,7 @@ const PokemonEncounter = () => {
     defenderHasLightScreen: enemyLightScreenRef.current > 0,
     defenderHasSubstitute: enemySubHpRef.current != null,
     defenderSubHp: enemySubHpRef.current ?? 0,
+    defenderIsProtected: enemyProtectRef.current,
   });
 
   const getActiveMovesFirst = (
@@ -2199,6 +2214,9 @@ const PokemonEncounter = () => {
       startSubstitute,
       subDamage,
       blockedBySub,
+      isProtect,
+      isSwagger,
+      isRapidSpin,
     } = result;
     if (isAttacking) {
       if (moveId) {
@@ -2240,6 +2258,9 @@ const PokemonEncounter = () => {
             [activePokemonIndex]: { id: transformedId, moves: us.moves },
           }));
         }
+
+        // Protect del rival se consume después de que el jugador actúe
+        enemyProtectRef.current = false;
 
         // Actualizar lastPhysicalDamageRef si el rival nos ha pegado (para Counter)
         // En este bloque el JUGADOR ataca — no aplica para lastPhysicalDamage del jugador
@@ -2392,6 +2413,20 @@ const PokemonEncounter = () => {
             setAlertText(`¡${activeMetadata.name.toUpperCase()} cambió a tipo ${pickedType.toUpperCase()}!`);
           }
           setStage(17);
+        } else if (isProtect) {
+          playerProtectRef.current = true;
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} se protegió!`);
+          setStage(17);
+        } else if (isSwagger) {
+          // Aplica +2 atk al rival (defender) y lo confunde (ref ya asignado arriba)
+          const swagChange = { stat: "attack" as const, target: "defender" as const, delta: +2 };
+          if (!enemyMistRef.current) applyStatChange(swagChange, isAttacking);
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} se agobió!`);
+          setStage(17);
+        } else if (isRapidSpin) {
+          // Rapid Spin: el jugador se deshace de las trampas que sufre
+          playerTrappedTurnsRef.current = 0;
+          setStage(17);
         } else if (confuse) {
           // Confusión al rival (mensaje; el ref ya se aplicó arriba para que
           // funcione también cuando un crítico/SE/NVE gane este else-if).
@@ -2463,11 +2498,17 @@ const PokemonEncounter = () => {
         const usForDispatch = transformedId !== null ? { ...active, hp: us.hp } : us;
         dispatch(updatePokemon(usForDispatch));
 
-        // Registrar daño físico recibido por el jugador (para Counter en siguiente turno)
+        // Registrar daño físico/especial recibido (para Counter / Mirror Coat siguiente turno)
         const movedUsed = getMoveMetadata(result.moveName) ?? getMoveMetadata("pound");
-        if (movedUsed && movedUsed.damageClass === "physical" && us.hp < active.hp) {
-          lastPhysicalDamageRef.current = active.hp - us.hp;
+        if (movedUsed && us.hp < active.hp) {
+          if (movedUsed.damageClass === "physical") {
+            lastPhysicalDamageRef.current = active.hp - us.hp;
+          } else if (movedUsed.damageClass === "special") {
+            lastSpecialDamageRef.current = active.hp - us.hp;
+          }
         }
+        // Protect del jugador se consume después de que el rival actúe
+        playerProtectRef.current = false;
 
         // Registrar flinch del jugador si el rival le golpea con flinch
         if (result.flinch) playerFlinchRef.current = true;
@@ -2588,6 +2629,20 @@ const PokemonEncounter = () => {
             enemyConvertedTypesRef.current = [pickedType];
             setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival cambió a tipo ${pickedType.toUpperCase()}!`);
           }
+          setStage(19);
+        } else if (isProtect) {
+          enemyProtectRef.current = true;
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} se protegió!`);
+          setStage(19);
+        } else if (isSwagger) {
+          // Aplica +2 atk al jugador (defender cuando es el rival quien ataca) y confunde
+          const swagChange = { stat: "attack" as const, target: "defender" as const, delta: +2 };
+          if (!playerMistRef.current) applyStatChange(swagChange, isAttacking);
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} se agobió!`);
+          setStage(19);
+        } else if (isRapidSpin) {
+          // Rapid Spin del rival: el rival se deshace de sus trampas
+          enemyTrappedTurnsRef.current = 0;
           setStage(19);
         } else if (confuse) {
           // Confusión al jugador (mensaje; el ref ya se aplicó arriba para
