@@ -4356,6 +4356,7 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
     },
     types: ["normal"],
     baseCatchRate: 45,
+    evolution: { pokemon: 196, level: 25 },
     growthRate: "medium-fast",
   },
   "134": {
@@ -5535,6 +5536,7 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
     types: ["electric"],
     // Evolución por felicidad en Gen II (no soportada por el motor).
     baseCatchRate: 190,
+    evolution: { pokemon: 25, level: 15 },
     growthRate: "medium-fast",
   },
   "173": {
@@ -5564,6 +5566,7 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
     types: ["normal"],
     // Evolución por felicidad en Gen II (no soportada por el motor).
     baseCatchRate: 150,
+    evolution: { pokemon: 35, level: 15 },
     growthRate: "fast",
   },
   "174": {
@@ -5593,6 +5596,7 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
     types: ["normal"],
     // Evolución por felicidad en Gen II (no soportada por el motor).
     baseCatchRate: 170,
+    evolution: { pokemon: 39, level: 15 },
     growthRate: "fast",
   },
   "175": {
@@ -5624,6 +5628,7 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
     types: ["normal"],
     // Evolución por felicidad en Gen II (no soportada por el motor).
     baseCatchRate: 190,
+    evolution: { pokemon: 176, level: 20 },
     growthRate: "fast",
   },
   "176": {
@@ -7510,7 +7515,7 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
       speed: 65,
     },
     types: ["ice", "psychic"],
-    evolution: { pokemon: 124, level: 30 },
+    evolution: { pokemon: 237, level: 20 },
     baseCatchRate: 45,
     growthRate: "medium-fast",
   },
