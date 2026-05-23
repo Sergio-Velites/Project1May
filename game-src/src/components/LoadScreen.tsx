@@ -378,8 +378,6 @@ const LoadScreen = () => {
       setMenuReady(false);
       setPhase("registering"); // Mostrar spinner inmediatamente, desactiva el menú
       if (cloudSave.current) {
-        const name = cloudSave.current.name ?? "Blue";
-        localStorage.setItem(name, JSON.stringify(cloudSave.current));
         dispatch(loadFromState(cloudSave.current));
       }
       loadComplete();
