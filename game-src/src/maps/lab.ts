@@ -7,7 +7,7 @@ import music from "../assets/music/maps/oaks-laboratory.mp3";
 
 const lab: MapType = {
   name: "DESTILERÍA DEL PROF. OAK",
-  image,
+  image: labImage,
   music: music,
   height: 12,
   width: 10,
