@@ -309,7 +309,7 @@ const inFromRight = keyframes`
 `;
 
 const LeftImage = styled(PixelImage)`
-  height: 155%;
+  height: 100%;
 
   transform: translate(400%);
   animation: ${inFromRight} ${`${MOVEMENT_ANIMATION}ms`} linear forwards;
