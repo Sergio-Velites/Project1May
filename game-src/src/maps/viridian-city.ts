@@ -5,11 +5,12 @@ import { Direction } from "../state/state-types";
 import music from "../assets/music/maps/pallet-town.mp3";
 import getEncounterData from "./get-location-data";
 import { ItemType } from "../app/use-item-data";
+import image from "../assets/map/viridian-city.png";
 
 const viridianCity: MapType = {
   name: "SOTO LEZKAIRU",
   allowBicycle: true,
-  image: viridianCityImage,
+  image,
   music: music,
   height: 36,
   width: 40,
@@ -201,6 +202,16 @@ const viridianCity: MapType = {
         pos: { x: 12, y: 4 },
         questId: "viridian-city-static-12-4",
         intro: ["Priiii"],
+      },
+    ],
+  cuttableTrees: [
+      {
+        pos: { x: 7, y: 22 },
+        questId: "cut-tree-viridian-city-7-22",
+      },
+      {
+        pos: { x: 15, y: 4 },
+        questId: "cut-tree-viridian-city-15-4",
       },
     ],
   trainers: [
