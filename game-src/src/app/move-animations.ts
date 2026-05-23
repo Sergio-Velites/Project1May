@@ -148,12 +148,14 @@ const TYPE_FALLBACK: Record<string, MoveAnimType> = {
   poison: "toxic-move",
   ghost: "psychic-move",
   dark: "psychic-move",
+  fairy: "sleep-powder",
   dragon: "psychic-move",
   normal: "tackle",
   fighting: "scratch",
   flying: "razor-leaf",
   bug: "razor-leaf",
   steel: "tackle",
+  shadow: "psychic-move",
 };
 
 export function getMoveAnimType(

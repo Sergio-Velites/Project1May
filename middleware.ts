@@ -1,6 +1,20 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+function timingSafeStringEqual(a: string, b: string) {
+  const encoder = new TextEncoder();
+  const aBytes = encoder.encode(a);
+  const bBytes = encoder.encode(b);
+
+  if (aBytes.length !== bBytes.length) return false;
+
+  let diff = 0;
+  for (let i = 0; i < aBytes.length; i += 1) {
+    diff |= aBytes[i] ^ bBytes[i];
+  }
+  return diff === 0;
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -17,10 +31,7 @@ export function middleware(request: NextRequest) {
 
     const tokenMatches = (() => {
       if (!adminPassword || !token) return false;
-      const a = Buffer.from(token.padEnd(adminPassword.length));
-      const b = Buffer.from(adminPassword);
-      if (a.length !== b.length) return false;
-      return crypto.timingSafeEqual(a, b);
+      return timingSafeStringEqual(token, adminPassword);
     })();
 
     if (!tokenMatches) {

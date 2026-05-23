@@ -71,6 +71,13 @@ interface MapEntry {
 
 type MapData = Record<string, MapEntry>;
 
+interface MusicTrack {
+  filename: string;
+  label: string;
+  path: string;
+  expression: string;
+}
+
 /**
  * Pokémon que aparece en una tabla de encuentros (walk / oldRod /
  * goodRod / superRod). Mantenemos el shape de la API original para que
@@ -769,6 +776,7 @@ export default function MapEditor() {
   const [activePortalKind, setActivePortalKind] = useState<PortalKind>('door');
   const [selectedPortalIdx, setSelectedPortalIdx] = useState<number | null>(null);
   const [itemTypeKeys, setItemTypeKeys] = useState<string[]>([]);
+  const [musicTracks, setMusicTracks] = useState<MusicTrack[]>([]);
   const [editMode, setEditMode] = useState<EditMode>('npc');
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [zoom, setZoom] = useState(32);
@@ -811,6 +819,10 @@ export default function MapEditor() {
     fetch('/editor/item-types.json')
       .then((r) => r.json())
       .then((arr: string[]) => setItemTypeKeys(arr))
+      .catch(() => {});
+    fetch('/api/admin/music-tracks')
+      .then((r) => r.json())
+      .then((arr: MusicTrack[]) => setMusicTracks(arr))
       .catch(() => {});
   }, []);
 
@@ -2733,6 +2745,7 @@ export default function MapEditor() {
                 setAllowBicycle={(v) => { setAllowBicycle(v); setDirty(true); }}
                 musicField={musicField}
                 setMusicField={(v) => { setMusicField(v); setDirty(true); }}
+                musicTracks={musicTracks}
                 startPos={startPos}
                 onlineBattleNpc={onlineBattleNpc}
                 spinnersCount={Object.values(spinners).reduce((a, m) => a + Object.keys(m).length, 0)}
@@ -3471,6 +3484,7 @@ function MapMetaInspector({
   setAllowBicycle,
   musicField,
   setMusicField,
+  musicTracks,
   startPos,
   onlineBattleNpc,
   spinnersCount,
@@ -3484,6 +3498,7 @@ function MapMetaInspector({
   setAllowBicycle: (v: boolean) => void;
   musicField: string | null;
   setMusicField: (v: string | null) => void;
+  musicTracks: MusicTrack[];
   startPos: { x: number; y: number } | null;
   onlineBattleNpc: { x: number; y: number } | null;
   spinnersCount: number;
@@ -3508,13 +3523,31 @@ function MapMetaInspector({
         </label>
       </div>
       <div style={sectionStyle}>
+        <label style={labelStyle}>Música del mapa</label>
+        <select
+          value={musicTracks.some((track) => track.expression === musicField) ? musicField ?? '' : ''}
+          onChange={(e) => setMusicField(e.target.value || null)}
+          style={inputStyle}
+        >
+          <option value="">Sin música propia / expresión manual</option>
+          {musicTracks.map((track) => (
+            <option key={track.filename} value={track.expression}>
+              {track.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div style={sectionStyle}>
         <label style={labelStyle}>Music expression</label>
         <input
           value={musicField ?? ''}
-          placeholder="music"
+          placeholder={`music o "/game/music/maps-original/route-1.mp3"`}
           onChange={(e) => setMusicField(e.target.value.trim() ? e.target.value : null)}
           style={inputStyle}
         />
+        <div style={{ color: '#777', fontSize: 11, marginTop: 6 }}>
+          Usa <code>music</code> para conservar un import existente, o una ruta pública entre comillas para mapas nuevos.
+        </div>
       </div>
       <div style={sectionStyle}>
         <div style={{ color: '#888', fontSize: 11 }}>Start: {startPos ? `(${startPos.x}, ${startPos.y})` : 'sin definir'}</div>
