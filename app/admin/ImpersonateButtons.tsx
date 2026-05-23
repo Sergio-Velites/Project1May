@@ -122,7 +122,7 @@ export default function ImpersonateButtons({ userId, playerName }: Props) {
       >
         <strong>Jugar puntualmente:</strong> autoguardado en esta cuenta cloud, sin tocar el Face ID del dispositivo.
         <br />
-        <strong>Recuperar partida:</strong> incluye opción para vincular Face ID/Huella a esta cuenta.
+        <strong>Recuperar partida:</strong> enlace para el invitado. Al abrirlo, solo ve "Vincular Face ID/Huella" y queda vinculado a esta cuenta. Copia y envíalo al invitado que perdió su partida.
       </div>
     </div>
   );

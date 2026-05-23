@@ -395,23 +395,35 @@ const LoadScreen = () => {
       choosingRef.current = true;
       const target = impersonationRef.current?.userId;
       if (!target) return;
+      const isRecover = impersonationRef.current?.mode === "recover";
       setMenuReady(false);
       setPhase("registering");
+      let linkedOk = false;
       try {
         const linkedId = await webauthnRegister(target);
         if (linkedId) {
-          // Dispositivo enlazado: ya no necesitamos impersonar para futuras visitas
           setCurrentUserId(linkedId);
-          setLinkedMsg("¡Dispositivo vinculado! Pulsa A para continuar.");
+          linkedOk = true;
+          setLinkedMsg(
+            isRecover
+              ? "¡Dispositivo vinculado! Cargando tu partida..."
+              : "¡Dispositivo vinculado! Pulsa A para continuar."
+          );
         } else {
           setLinkedMsg("No se pudo vincular. Pulsa A para seguir jugando.");
         }
       } catch {
         setLinkedMsg("Error al vincular. Pulsa A para seguir jugando.");
       }
-      // Tras un breve delay, volver a "choose" sin opción de vincular
-      // (mostraremos solo Continuar / Nueva). Forzamos releer el menú reseteando
-      // el flag de impersonación visual.
+      // En modo recover con éxito: redirigir a URL limpia para que el juego
+      // arranque normalmente con la passkey recién vinculada.
+      if (isRecover && linkedOk) {
+        setTimeout(() => {
+          window.location.href = window.location.origin + "/";
+        }, 2000);
+        return;
+      }
+      // En cualquier otro caso: volver al menú choose
       impersonationRef.current = impersonationRef.current
         ? { ...impersonationRef.current, mode: "play_as" }
         : null;
@@ -429,7 +441,7 @@ const LoadScreen = () => {
       { label: "Nueva partida", action: handleNewGame },
     ];
     const menuItems = isRecoverMode
-      ? [...baseItems, { label: "Vincular Face ID/Huella", action: handleLinkDevice }]
+      ? [{ label: "Vincular Face ID/Huella", action: handleLinkDevice }]
       : baseItems;
 
     return (
