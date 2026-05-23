@@ -6,8 +6,8 @@ import { MapId, MapType } from "./map-types";
 const leagueRoute: MapType = {
   name: "Camino a la liga Pokémon",
   image,
-  height: 8,
-  width: 10,
+  height: 162,
+  width: 22,
   start: {
     x: 4,
     y: 6,

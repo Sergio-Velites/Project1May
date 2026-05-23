@@ -3,8 +3,8 @@
     "id": "league-route",
     "name": "Camino a la liga Pokémon",
     "imageFile": "league-route.png",
-    "height": 8,
-    "width": 10,
+    "height": 162,
+    "width": 22,
     "trainers": [
       {
         "npcKey": "pokeManiac",
