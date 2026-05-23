@@ -47,6 +47,9 @@ import grassA   from "../assets/pokemon/simple/grass-a.png";
 import grassB   from "../assets/pokemon/simple/grass-b.png";
 import monsterA from "../assets/pokemon/simple/monster-a.png";
 import monsterB from "../assets/pokemon/simple/monster-b.png";
+import ball0    from "../assets/pokemon/simple/ball-0.png";
+import ballA    from "../assets/pokemon/simple/ball-a.png";
+import ballB    from "../assets/pokemon/simple/ball-b.png";
 
 const SPRITE_MAP: Record<string, string> = {
   "bird-a":    birdA,
@@ -67,6 +70,9 @@ const SPRITE_MAP: Record<string, string> = {
   "grass-b":   grassB,
   "monster-a": monsterA,
   "monster-b": monsterB,
+  "ball-0":    ball0,
+  "ball-a":    ballA,
+  "ball-b":    ballB,
 };
 
 const StyledNpc = styled.div<{ $x: number; $y: number }>`

@@ -334,6 +334,7 @@ const STATIC_POKEMON_SPRITES = [
   'none','bird-a','bird-b','bug-a','bug-b','cute-a','cute-b',
   'dog-a','dog-b','dragon-a','dragon-b','fish-a','fish-b',
   'fossil-a','fossil-b','grass-a','grass-b','monster-a','monster-b',
+  'ball-0','ball-a','ball-b',
 ];
 
 function exportStaticPokemonTS(staticPokemon: StaticPokemonEntry[]): string {

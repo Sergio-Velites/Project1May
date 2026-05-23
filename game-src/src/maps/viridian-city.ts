@@ -192,19 +192,15 @@ const viridianCity: MapType = {
         item: ItemType.MasterBall,
         pos: { x: 5, y: 23 },
       },
-      {
-        item: ItemType.MasterBall,
-        pos: { x: 10, y: 4 },
-      },
     ],
-  cuttableTrees: [
+  staticPokemon: [
       {
-        pos: { x: 8, y: 22 },
-        questId: "cut-tree-viridian-city-8-22",
-      },
-      {
-        pos: { x: 14, y: 4 },
-        questId: "cut-tree-viridian-city-14-4",
+        pokemonId: 175,
+        level: 5,
+        sprite: "cute-a",
+        pos: { x: 12, y: 4 },
+        questId: "viridian-city-static-12-4",
+        intro: ["Priiii"],
       },
     ],
   trainers: [
