@@ -725,6 +725,10 @@ const PokemonEncounter = () => {
   // y el caller lo comprueba (guardSelfKo) para ir directo a stage 24/20.
   const playerSelfKoRef = useRef(false);
   const enemySelfKoRef  = useRef(false);
+  // Mensaje de autogolpe en confusión del jugador: se muestra tras "está confuso!"
+  const confusionSelfHitMsgRef = useRef<string | null>(null);
+  // El jugador está confuso pero puede actuar: processBattle añade 800ms de delay
+  const confusedActingRef = useRef(false);
 
   // Reflect y Light Screen: número de turnos restantes (0 = inactivo)
   const playerReflectRef      = useRef(0);
@@ -1788,11 +1792,14 @@ const PokemonEncounter = () => {
       if (isPlayer) playerConfusionTurnsRef.current = newTurns;
       else enemyConfusionTurnsRef.current = newTurns;
 
+      const nm = isPlayer ? activeMetadata.name.toUpperCase() : enemyMetadata.name.toUpperCase();
       if (newTurns <= 0) {
-        const nm = isPlayer ? activeMetadata.name.toUpperCase() : enemyMetadata.name.toUpperCase();
         setAlertText(`¡${nm} superó la confusión!`);
+        if (isPlayer) confusedActingRef.current = true;
         return false;
       }
+      // Anunciar confusión siempre antes del chequeo de autogolpe (Gen I)
+      setAlertText(`¡${nm} está confuso!`);
       // 50% de probabilidad de golpearse a sí mismo
       if (Math.random() < 0.5) {
         // Autogolpe: poder 40, Normal, físico, sin STAB ni tipo, sin stage
@@ -1803,7 +1810,8 @@ const PokemonEncounter = () => {
           ));
           const newHp = Math.max(0, active.hp - selfDmg);
           dispatch(updatePokemon({ ...active, hp: newHp }));
-          setAlertText(`¡${activeMetadata.name.toUpperCase()} se golpeó por la confusión!`);
+          // Guardamos el mensaje para mostrarlo tras "está confuso!" (ver processBattle)
+          confusionSelfHitMsgRef.current = `¡${nm} se golpeó por la confusión!`;
           // Gen I: si el autogolpe lleva a 0 HP, el KO es inmediato. El rival no llega a atacar.
           if (newHp <= 0) playerSelfKoRef.current = true;
         } else if (!isPlayer && enemy && active) {
@@ -1813,10 +1821,13 @@ const PokemonEncounter = () => {
           ));
           const newHp = Math.max(0, enemy.hp - selfDmg);
           dispatch(updatePokemonEncounter({ ...enemy, hp: newHp }));
+          setAlertText(`¡${nm} rival se golpeó por la confusión!`);
           if (newHp <= 0) enemySelfKoRef.current = true;
         }
         return true;
       }
+      // No autogolpe — puede actuar, pero el mensaje "está confuso!" debe verse antes del move
+      if (isPlayer) confusedActingRef.current = true;
     }
 
     const status = isPlayer
@@ -3068,7 +3079,42 @@ const PokemonEncounter = () => {
     // Incluye tanto los charge clásicos (Solar Beam, Razor Wind, Sky Attack,
     // Skull Bash) como los movimientos de invulnerabilidad (Dig, Fly), que
     // en Gen I son también de 2 turnos: T1 = desaparecer, T2 = atacar.
+    // IMPORTANTE: comprobar sueño/parálisis/confusión ANTES de iniciar la carga.
+    // Si el jugador está dormido en T1, no debe iniciarse la carga en absoluto.
     if ((CHARGE_MOVES.has(attackId) || INVULNERABLE_MOVES.has(attackId)) && !playerChargingMoveRef.current) {
+      if (checkSkipTurn(true)) {
+        const selfHitMsgC = confusionSelfHitMsgRef.current;
+        confusionSelfHitMsgRef.current = null;
+        setMoveAnim(null);
+        setStage(15);
+        if (selfHitMsgC) setTimeout(() => setAlertText(selfHitMsgC), ATTACK_ANIMATION);
+        setTimeout(() => {
+          setAlertText(null);
+          if (guardSelfKo()) return;
+          const enemyMoveIdSkip = getRandomEnemyMove();
+          const isEnemyRechargingSkip = enemyMoveIdSkip === "__recharge__";
+          const stagesSnap = { us: playerStages, them: enemyStages };
+          const effPlayerSkip = transformedId !== null ? { ...active, id: transformedId, moves: transformedMoves } : active;
+          const enemySkipSkip = checkSkipTurn(false);
+          if (guardSelfKo()) return;
+          if (!enemySkipSkip && !isEnemyRechargingSkip) {
+            const { us: usSkip } = processMoveResult(
+              processMove(effPlayerSkip, enemy, enemyMoveIdSkip, false, stagesSnap, buildEnemyAttackCtx()),
+              false,
+              enemyMoveIdSkip
+            );
+            lastEnemyMoveRef.current = enemyMoveIdSkip;
+            setTimeout(() => {
+              if (usSkip.hp <= 0) setStage(24);
+              else applyEndOfTurnStatus(usSkip, enemy);
+            }, ATTACK_ANIMATION + 1000);
+          } else {
+            applyEndOfTurnStatus(effPlayerSkip, enemy);
+          }
+        }, selfHitMsgC ? ATTACK_ANIMATION * 2 : ATTACK_ANIMATION);
+        return;
+      }
+      // Sin estado bloqueante: proceder con el inicio de la carga
       const moveMeta = getMoveMetadata(attackId);
       const useMsg   = `¡${activeMetadata.name.toUpperCase()} usó ${(moveMeta?.name ?? attackId).toUpperCase()}!`;
       const chargeMsg = CHARGE_MESSAGE[attackId]?.replace("{user}", activeMetadata.name.toUpperCase()) ?? `¡${activeMetadata.name.toUpperCase()} está cargando!`;
@@ -3254,8 +3300,11 @@ const PokemonEncounter = () => {
     if (activeMovesFirst) {
       if (checkSkipTurn(true)) {
         // Jugador salta turno — mostrar mensaje, luego ataca el rival
+        const selfHitMsg1 = confusionSelfHitMsgRef.current;
+        confusionSelfHitMsgRef.current = null;
         setMoveAnim(null);
         setStage(15);
+        if (selfHitMsg1) setTimeout(() => setAlertText(selfHitMsg1), ATTACK_ANIMATION);
         setTimeout(() => {
           setAlertText(null);
           if (guardSelfKo()) return;
@@ -3291,51 +3340,55 @@ const PokemonEncounter = () => {
               else applyEndOfTurnStatus(usNew, enemy);
             }, ATTACK_ANIMATION + 1000);
           }
-        }, ATTACK_ANIMATION);
+        }, selfHitMsg1 ? ATTACK_ANIMATION * 2 : ATTACK_ANIMATION);
       } else {
-        // Jugador ataca normalmente
-        const { us, them } = processMoveResult(
-          processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
-          true,
-          attackId
-        );
-        // waitForBattleSfxThen: espera a que el SFX del jugador termine antes
-        // de iniciar el turno del rival, evitando que los sonidos se solapan.
-        waitForBattleSfxThen(() => {
-          if (them.hp <= 0) {
-            setStage(20);
-          } else if (us.hp <= 0) {
-            setStage(24);
-          } else {
-            if (isEnemyRecharging || checkSkipTurn(false)) {
-              // Rival recarga o salta turno
-              setMoveAnim(null);
-              setStage(18);
-              if (isEnemyRecharging) setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
-              setTimeout(() => {
-                setAlertText(null);
-                if (guardSelfKo()) return;
-                applyEndOfTurnStatus(us, them);
-              }, ATTACK_ANIMATION);
-            } else if (enemyChargeJustStarted) {
-              // Rival inicia carga: solo mensaje, sin daño
-              runEnemyChargeT1(us, them, () => {
-                if (guardSelfKo()) return;
-                applyEndOfTurnStatus(us, them);
-              });
+        const confDelay1 = confusedActingRef.current ? 800 : 0;
+        confusedActingRef.current = false;
+        setTimeout(() => {
+          // Jugador ataca normalmente
+          const { us, them } = processMoveResult(
+            processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
+            true,
+            attackId
+          );
+          // waitForBattleSfxThen: espera a que el SFX del jugador termine antes
+          // de iniciar el turno del rival, evitando que los sonidos se solapan.
+          waitForBattleSfxThen(() => {
+            if (them.hp <= 0) {
+              setStage(20);
+            } else if (us.hp <= 0) {
+              setStage(24);
             } else {
-              const { us: usNew } = processMoveResult(
-                processMove(us, them, enemyMove.id, false, stagesSnapshot, buildEnemyAttackCtx()),
-                false,
-                enemyMove.id
-              );
-              setTimeout(() => {
-                if (usNew.hp <= 0) setStage(24);
-                else applyEndOfTurnStatus(usNew, them);
-              }, ATTACK_ANIMATION + 1000);
+              if (isEnemyRecharging || checkSkipTurn(false)) {
+                // Rival recarga o salta turno
+                setMoveAnim(null);
+                setStage(18);
+                if (isEnemyRecharging) setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival está recargando!`);
+                setTimeout(() => {
+                  setAlertText(null);
+                  if (guardSelfKo()) return;
+                  applyEndOfTurnStatus(us, them);
+                }, ATTACK_ANIMATION);
+              } else if (enemyChargeJustStarted) {
+                // Rival inicia carga: solo mensaje, sin daño
+                runEnemyChargeT1(us, them, () => {
+                  if (guardSelfKo()) return;
+                  applyEndOfTurnStatus(us, them);
+                });
+              } else {
+                const { us: usNew } = processMoveResult(
+                  processMove(us, them, enemyMove.id, false, stagesSnapshot, buildEnemyAttackCtx()),
+                  false,
+                  enemyMove.id
+                );
+                setTimeout(() => {
+                  if (usNew.hp <= 0) setStage(24);
+                  else applyEndOfTurnStatus(usNew, them);
+                }, ATTACK_ANIMATION + 1000);
+              }
             }
-          }
-        }, ATTACK_ANIMATION + 1000);
+          }, ATTACK_ANIMATION + 1000);
+        }, confDelay1);
       }
     }
 
@@ -3351,24 +3404,31 @@ const PokemonEncounter = () => {
           if (guardSelfKo()) return;
           if (checkSkipTurn(true)) {
             // Ambos saltan
+            const selfHitMsg2 = confusionSelfHitMsgRef.current;
+            confusionSelfHitMsgRef.current = null;
             setMoveAnim(null);
             setStage(15);
+            if (selfHitMsg2) setTimeout(() => setAlertText(selfHitMsg2), ATTACK_ANIMATION);
             setTimeout(() => {
               setAlertText(null);
               if (guardSelfKo()) return;
               applyEndOfTurnStatus(effectivePlayer, enemy);
-            }, ATTACK_ANIMATION);
+            }, selfHitMsg2 ? ATTACK_ANIMATION * 2 : ATTACK_ANIMATION);
           } else {
-            const { us: playerAft, them: enemyAft } = processMoveResult(
-              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
-              true,
-              attackId
-            );
+            const confDelay2 = confusedActingRef.current ? 800 : 0;
+            confusedActingRef.current = false;
             setTimeout(() => {
-              if (enemyAft.hp <= 0) setStage(20);
-              else if (playerAft.hp <= 0) setStage(24);
-              else applyEndOfTurnStatus(playerAft, enemyAft);
-            }, ATTACK_ANIMATION + 1000);
+              const { us: playerAft, them: enemyAft } = processMoveResult(
+                processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
+                true,
+                attackId
+              );
+              setTimeout(() => {
+                if (enemyAft.hp <= 0) setStage(20);
+                else if (playerAft.hp <= 0) setStage(24);
+                else applyEndOfTurnStatus(playerAft, enemyAft);
+              }, ATTACK_ANIMATION + 1000);
+            }, confDelay2);
           }
         }, ATTACK_ANIMATION);
       } else if (enemyChargeJustStarted) {
@@ -3377,24 +3437,31 @@ const PokemonEncounter = () => {
         runEnemyChargeT1(effectivePlayer, enemy, () => {
           if (guardSelfKo()) return;
           if (checkSkipTurn(true)) {
+            const selfHitMsg3 = confusionSelfHitMsgRef.current;
+            confusionSelfHitMsgRef.current = null;
             setMoveAnim(null);
             setStage(15);
+            if (selfHitMsg3) setTimeout(() => setAlertText(selfHitMsg3), ATTACK_ANIMATION);
             setTimeout(() => {
               setAlertText(null);
               if (guardSelfKo()) return;
               applyEndOfTurnStatus(effectivePlayer, enemy);
-            }, ATTACK_ANIMATION);
+            }, selfHitMsg3 ? ATTACK_ANIMATION * 2 : ATTACK_ANIMATION);
           } else {
-            const { us: playerAft, them: enemyAft } = processMoveResult(
-              processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
-              true,
-              attackId
-            );
+            const confDelay3 = confusedActingRef.current ? 800 : 0;
+            confusedActingRef.current = false;
             setTimeout(() => {
-              if (enemyAft.hp <= 0) setStage(20);
-              else if (playerAft.hp <= 0) setStage(24);
-              else applyEndOfTurnStatus(playerAft, enemyAft);
-            }, ATTACK_ANIMATION + 1000);
+              const { us: playerAft, them: enemyAft } = processMoveResult(
+                processMove(effectivePlayer, enemy, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
+                true,
+                attackId
+              );
+              setTimeout(() => {
+                if (enemyAft.hp <= 0) setStage(20);
+                else if (playerAft.hp <= 0) setStage(24);
+                else applyEndOfTurnStatus(playerAft, enemyAft);
+              }, ATTACK_ANIMATION + 1000);
+            }, confDelay3);
           }
         });
       } else {
@@ -3417,24 +3484,31 @@ const PokemonEncounter = () => {
           } else {
             if (checkSkipTurn(true)) {
               // Jugador salta turno
+              const selfHitMsg4 = confusionSelfHitMsgRef.current;
+              confusionSelfHitMsgRef.current = null;
               setMoveAnim(null);
               setStage(15);
+              if (selfHitMsg4) setTimeout(() => setAlertText(selfHitMsg4), ATTACK_ANIMATION);
               setTimeout(() => {
                 setAlertText(null);
                 if (guardSelfKo()) return;
                 applyEndOfTurnStatus(us, them);
-              }, ATTACK_ANIMATION);
+              }, selfHitMsg4 ? ATTACK_ANIMATION * 2 : ATTACK_ANIMATION);
             } else {
-              const { us: playerAfterAttack, them: themAfterAttack } = processMoveResult(
-                processMove(us, them, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
-                true,
-                attackId
-              );
+              const confDelay4 = confusedActingRef.current ? 800 : 0;
+              confusedActingRef.current = false;
               setTimeout(() => {
-                if (themAfterAttack.hp <= 0) setStage(20);
-                else if (playerAfterAttack.hp <= 0) setStage(24);
-                else applyEndOfTurnStatus(playerAfterAttack, themAfterAttack);
-              }, ATTACK_ANIMATION + 1000);
+                const { us: playerAfterAttack, them: themAfterAttack } = processMoveResult(
+                  processMove(us, them, attackId, true, stagesSnapshot, buildPlayerAttackCtx()),
+                  true,
+                  attackId
+                );
+                setTimeout(() => {
+                  if (themAfterAttack.hp <= 0) setStage(20);
+                  else if (playerAfterAttack.hp <= 0) setStage(24);
+                  else applyEndOfTurnStatus(playerAfterAttack, themAfterAttack);
+                }, ATTACK_ANIMATION + 1000);
+              }, confDelay4);
             }
           }
         }, ATTACK_ANIMATION + 1000);
