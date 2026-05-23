@@ -654,6 +654,7 @@ El campo `expression` del track es la cadena que se almacena en `MapType.music`.
 | `middleware.ts` | Protección /admin con comparación en tiempo constante (XOR) |
 | `public/editor/original-map-music.json` | Metadatos de música original Gen I (referencia) |
 | `public/game/music/maps-original/` | 20+ tracks originales Gen I (.mp3) |
+| `game-src/src/assets/pokemon/front/` | 251 sprites de frente (56×56 RGBA) — tamaños ajustados por altura oficial |
 
 ---
 
@@ -728,6 +729,19 @@ El campo `expression` del track es la cadena que se almacena en `MapType.music`.
 **Solución** (`map-helper.ts`): hoist de la llamada fuera del bucle con un early return.
 
 > **Nota de rendimiento**: el juego no tiene problemas de rendimiento medibles. Las dos optimizaciones anteriores son correctas y limpias, pero su impacto real es mínimo (arrays de < 10 elementos, llamadas solo en keypress). No hay trabajo de performance pendiente.
+
+### 20. Sprites de frente: todos Pokémon ocupaban el mismo espacio sin importar su tamaño real
+**Problema**: los 251 sprites tenían contenido ~50×50 dentro del canvas 56×56, independientemente de si el Pokémon mide 0.2m (Diglett) o 9.2m (Steelix).
+**Solución**: script Python que redimensiona el contenido de cada sprite con nearest-neighbor (sin pérdida de calidad pixel art) usando escala logarítmica según altura oficial PokéAPI. Canvas sigue siendo 56×56.
+
+```
+Rango: 0.2m → 28px (50% del canvas)  a  9.2m → 50px (89% del canvas)
+Formula: target = round(28 + 22 * (log(h_dm) - log(2)) / (log(92) - log(2)))
+```
+
+Ejemplos resultantes: Pikachu 32px, Charizard 40px, Snorlax 42px, Gyarados 48px, Onix/Steelix 50px.
+
+**Para re-ejecutar** (si se añaden sprites nuevos o se quiere ajustar el rango): el script está en el historial del commit `3343baa`. Modificar `MIN_TARGET`/`MAX_TARGET` para cambiar el rango de escala.
 
 ---
 
