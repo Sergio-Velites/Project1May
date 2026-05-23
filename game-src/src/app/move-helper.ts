@@ -816,8 +816,10 @@ const processMove = (
     const stabTypes      = attackerTypes ?? ourMetadata.types;
     const stab           = stabTypes.includes(moveMetadata.type) ? 1.5 : 1;
     const typeEff        = getTypeEffectiveness(moveMetadata.type, theirMetadata.types);
+    // Inmunidad de tipo: el movimiento no tiene ningún efecto.
+    if (typeEff === 0) return { ...defaultReturn, isNoEffect: true };
     const superEffective  = typeEff > 1;
-    const notVeryEffective = typeEff < 1;
+    const notVeryEffective = typeEff > 0 && typeEff < 1;
 
     const baseDamage = Math.max(1, Math.floor(
       (Math.floor(((2 * us.level) / 5 + 2) * effectivePower * (attack / defense)) / 50 + 2) *
@@ -937,8 +939,10 @@ const processMove = (
   const eStabTypes      = attackerTypes ?? theirMetadata.types;
   const stab           = eStabTypes.includes(moveMetadata.type) ? 1.5 : 1;
   const typeEff        = getTypeEffectiveness(moveMetadata.type, ourMetadata.types);
+  // Inmunidad de tipo: el movimiento no tiene ningún efecto.
+  if (typeEff === 0) return { ...defaultReturn, isNoEffect: true };
   const superEffective  = typeEff > 1;
-  const notVeryEffective = typeEff < 1;
+  const notVeryEffective = typeEff > 0 && typeEff < 1;
 
   const baseDmg = Math.max(1, Math.floor(
     (Math.floor(((2 * them.level) / 5 + 2) * effectivePower * (eAttack / eDefense)) / 50 + 2) *
@@ -1013,7 +1017,7 @@ const processMove = (
       : them.hp;
 
   const eStartTrap = TRAP_MOVES.has(move)
-    ? { move, turns: 1 + Math.floor(Math.random() * 4) }
+    ? { move, turns: 2 + Math.floor(Math.random() * 4) }
     : undefined;
 
   return {
