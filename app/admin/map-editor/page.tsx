@@ -7,6 +7,8 @@ import { parseMapTS } from './parse-ts';
 
 interface Pokemon { id: number; level: number; }
 
+type DirectionName = 'down' | 'up' | 'left' | 'right';
+
 interface Trainer {
   npcKey: string;
   pos: { x: number; y: number };
@@ -35,6 +37,10 @@ interface MapEntry {
   imageFile: string;
   height: number;
   width: number;
+  start?: { x: number; y: number } | null;
+  cave?: boolean;
+  allowBicycle?: boolean;
+  music?: string | null;
   trainers: Trainer[];
   walls: Record<string, number[]>;
   fences?: Record<string, number[]>;
@@ -42,13 +48,18 @@ interface MapEntry {
   water?: Record<string, number[]>;
   encounters?: EncountersOverride | null;
   texts?: Record<string, Record<string, string[]>>;
+  textRewards?: Record<string, Record<string, TextRewardEntry>>;
   items?: { itemKey: string; pos: { x: number; y: number }; hidden?: boolean }[];
   gifts?: { pokemonId: number; level: number; pos: { x: number; y: number }; questId: string }[];
   staticPokemon?: StaticPokemonEntry[];
   pokemonCenter?: { x: number; y: number } | null;
   pc?: { x: number; y: number } | null;
   store?: { x: number; y: number } | null;
+  storeItems?: string[];
   recoverLocation?: { x: number; y: number } | null;
+  onlineBattleNpc?: { x: number; y: number } | null;
+  spinners?: Record<string, Record<string, DirectionName>>;
+  stoppers?: Record<string, number[]>;
   // Portales entre mapas
   maps?: Record<string, Record<string, string>>;
   teleports?: Record<string, Record<string, { map: string; pos: { x: number; y: number } }>>;
@@ -87,9 +98,11 @@ type EncountersOverride = Partial<Record<EncounterTableKey, EncounterTable>>;
 
 const EMPTY_TABLE = (): EncounterTable => ({ rate: 0, pokemon: [] });
 
-type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'spots' | 'portals';
+type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'spots' | 'mechanics' | 'portals' | 'map';
 
-type SpotKey = 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation';
+type SpotKey = 'start' | 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation' | 'onlineBattleNpc';
+
+type MechanicTool = 'spinner-up' | 'spinner-down' | 'spinner-left' | 'spinner-right' | 'stopper';
 
 type PortalKind = 'door' | 'teleport' | 'exit';
 
@@ -179,7 +192,7 @@ function npcBorderColor(t: Trainer) {
 
 // ── Helpers de exportación TS ─────────────────────────────────────────────
 
-function exportTS(trainers: Trainer[], mapId: string): string {
+function exportTrainersArrayTS(trainers: Trainer[]): string {
   const lines = trainers.map((t) => {
     const npc = t.npcKey;
     const pokemon = t.pokemon.map((p) => `{ id: ${p.id}, level: ${p.level} }`).join(', ');
@@ -208,7 +221,11 @@ ${outtro}
 ${opts.join('\n')}
 }`;
   });
-  return `// Trainers para "${mapId}"\ntrainers: [\n${lines.join(',\n')}\n],`;
+  return `trainers: [\n${lines.join(',\n')}\n],`;
+}
+
+function exportTS(trainers: Trainer[], mapId: string): string {
+  return `// Trainers para "${mapId}"\n${exportTrainersArrayTS(trainers)}`;
 }
 
 // Exporta el bloque walls con formato igual al original .ts.
@@ -321,7 +338,8 @@ function exportStaticPokemonTS(staticPokemon: StaticPokemonEntry[]): string {
   return `staticPokemon: [\n${lines.join('\n')}\n  ],`;
 }
 
-function exportSpotTS(field: string, pos: { x: number; y: number } | null | undefined): string {  if (!pos) return `${field}: undefined,`;
+function exportSpotTS(field: string, pos: { x: number; y: number } | null | undefined): string {
+  if (!pos) return `${field}: undefined,`;
   return `${field}: { x: ${pos.x}, y: ${pos.y} },`;
 }
 
@@ -465,6 +483,212 @@ function exportPortalsTS(portals: PortalEntry[], exitReturnMap: string | null, e
   return [mapsTS, teleportsTS, exitsTS, erm, erp].join('\n');
 }
 
+function isRowColMapEmpty(data: Record<string, number[]>) {
+  return Object.values(data).every((cols) => cols.length === 0);
+}
+
+function isNestedMapEmpty(data: Record<string, Record<string, unknown>>) {
+  return Object.values(data).every((cols) => Object.keys(cols).length === 0);
+}
+
+function directionToEnum(direction: DirectionName): string {
+  return `Direction.${direction.charAt(0).toUpperCase() + direction.slice(1)}`;
+}
+
+function exportStoreItemsTS(storeItems: string[]): string {
+  if (storeItems.length === 0) return '';
+  return `storeItems: [\n${storeItems.map((item) => `    ItemType.${item},`).join('\n')}\n  ],`;
+}
+
+function exportSpinnersTS(spinners: Record<string, Record<string, DirectionName>>): string {
+  const rows = Object.keys(spinners)
+    .map((k) => parseInt(k, 10))
+    .filter((n) => !Number.isNaN(n))
+    .sort((a, b) => a - b);
+  if (rows.length === 0) return 'spinners: {},';
+  const rowLines = rows.map((r) => {
+    const cols = Object.keys(spinners[String(r)] ?? {})
+      .map((k) => parseInt(k, 10))
+      .filter((n) => !Number.isNaN(n))
+      .sort((a, b) => a - b);
+    const colLines = cols.map((c) => `      ${c}: ${directionToEnum(spinners[String(r)][String(c)])},`);
+    return `    ${r}: {\n${colLines.join('\n')}\n    },`;
+  });
+  return `spinners: {\n${rowLines.join('\n')}\n  },`;
+}
+
+function exportEncountersBlockTS(encounters: EncountersOverride): string {
+  const empty = '{ rate: 0, pokemon: [] }';
+  const tableTS = (t?: EncounterTable) => {
+    if (!t) return empty;
+    const pokemon = t.pokemon
+      .map(
+        (p) =>
+          `      { id: ${p.id}, chance: ${p.chance}, conditionValues: [], minLevel: ${p.minLevel}, maxLevel: ${p.maxLevel} }`
+      )
+      .join(',\n');
+    return `{\n    rate: ${t.rate},\n    pokemon: [\n${pokemon}\n    ],\n  }`;
+  };
+  return (
+    `encounters: {\n` +
+    `  walk: ${tableTS(encounters.walk)},\n` +
+    `  surf: ${empty},\n` +
+    `  oldRod: ${tableTS(encounters.oldRod)},\n` +
+    `  goodRod: ${tableTS(encounters.goodRod)},\n` +
+    `  superRod: ${tableTS(encounters.superRod)},\n` +
+    `  rockSmash: ${empty}, headbutt: ${empty}, darkGrass: ${empty},\n` +
+    `  grassSpots: ${empty}, caveSpots: ${empty}, bridgeSpots: ${empty},\n` +
+    `  superRodSpots: ${empty}, surfSpots: ${tableTS(encounters.surfSpots)},\n` +
+    `  yellowFlowers: ${empty}, purpleFlowers: ${empty}, redFlowers: ${empty},\n` +
+    `  roughTerrain: ${empty}, gift: ${empty}, giftEgg: ${empty}, onlyOne: ${empty},\n` +
+    `},`
+  );
+}
+
+function hasEncounterTables(encounters: EncountersOverride): boolean {
+  return Object.values(encounters).some((table) => {
+    if (!table) return false;
+    return table.rate !== 0 || table.pokemon.length > 0;
+  });
+}
+
+function indentTS(block: string, spaces = 2): string {
+  const pad = ' '.repeat(spaces);
+  return block
+    .split('\n')
+    .map((line) => (line.length ? `${pad}${line}` : line))
+    .join('\n');
+}
+
+function exportOptionalPosLine(field: string, pos: { x: number; y: number } | null | undefined): string | null {
+  if (!pos) return null;
+  return `${field}: { x: ${pos.x}, y: ${pos.y} },`;
+}
+
+function exportFullMapTypeTS({
+  currentMap,
+  start,
+  cave,
+  allowBicycle,
+  music,
+  trainers,
+  walls,
+  fences,
+  grass,
+  water,
+  encounters,
+  texts,
+  textRewards,
+  items,
+  gifts,
+  staticPokemon,
+  pokemonCenter,
+  pc,
+  store,
+  storeItems,
+  recoverLocation,
+  onlineBattleNpc,
+  portals,
+  exitReturnMap,
+  exitReturnPos,
+  spinners,
+  stoppers,
+}: {
+  currentMap: MapEntry;
+  start: { x: number; y: number } | null;
+  cave: boolean;
+  allowBicycle: boolean;
+  music: string | null;
+  trainers: Trainer[];
+  walls: Record<string, number[]>;
+  fences: Record<string, number[]>;
+  grass: Record<string, number[]>;
+  water: Record<string, number[]>;
+  encounters: EncountersOverride;
+  texts: Record<string, Record<string, string[]>>;
+  textRewards: Record<string, Record<string, TextRewardEntry>>;
+  items: ItemEntry[];
+  gifts: GiftEntry[];
+  staticPokemon: StaticPokemonEntry[];
+  pokemonCenter: { x: number; y: number } | null;
+  pc: { x: number; y: number } | null;
+  store: { x: number; y: number } | null;
+  storeItems: string[];
+  recoverLocation: { x: number; y: number } | null;
+  onlineBattleNpc: { x: number; y: number } | null;
+  portals: PortalEntry[];
+  exitReturnMap: string | null;
+  exitReturnPos: { x: number; y: number } | null;
+  spinners: Record<string, Record<string, DirectionName>>;
+  stoppers: Record<string, number[]>;
+}): string {
+  const { maps, teleports, exits } = nestPortals(portals);
+  const lines: string[] = [
+    `name: "${escapeTSString(currentMap.name)}",`,
+  ];
+  if (allowBicycle) lines.push('allowBicycle: true,');
+  lines.push('image,');
+  if (music?.trim()) lines.push(`music: ${music.trim()},`);
+  if (cave) lines.push('cave: true,');
+  lines.push(`height: ${currentMap.height},`);
+  lines.push(`width: ${currentMap.width},`);
+  const safeStart = start ?? currentMap.start ?? { x: 0, y: 0 };
+  lines.push(`start: { x: ${safeStart.x}, y: ${safeStart.y} },`);
+  lines.push(exportWallsTS(walls));
+  lines.push(exportRowColMapTS(fences, 'fences'));
+  lines.push(exportRowColMapTS(grass, 'grass'));
+  if (!isRowColMapEmpty(water)) lines.push(exportRowColMapTS(water, 'water'));
+  lines.push(exportTextsTS(texts));
+  const rewardsTS = exportTextRewardsTS(textRewards);
+  if (rewardsTS) lines.push(rewardsTS);
+
+  lines.push(exportRowColMapTS(exits, 'exits').replace(/^exits/, 'exits'));
+  const mapsTS = (() => {
+    if (isNestedMapEmpty(maps as Record<string, Record<string, unknown>>)) return 'maps: {},';
+    const rows = Object.keys(maps).map((k) => parseInt(k, 10)).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b);
+    return `maps: {\n${rows.map((r) => {
+      const cols = Object.keys(maps[String(r)]).map((k) => parseInt(k, 10)).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b);
+      return `    ${r}: {\n${cols.map((c) => `      ${c}: MapId.${pascalCaseFromMapId(maps[String(r)][String(c)])},`).join('\n')}\n    },`;
+    }).join('\n')}\n  },`;
+  })();
+  const teleportsTS = (() => {
+    if (isNestedMapEmpty(teleports as unknown as Record<string, Record<string, unknown>>)) return '';
+    const rows = Object.keys(teleports).map((k) => parseInt(k, 10)).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b);
+    return `teleports: {\n${rows.map((r) => {
+      const cols = Object.keys(teleports[String(r)]).map((k) => parseInt(k, 10)).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b);
+      return `    ${r}: {\n${cols.map((c) => {
+        const t = teleports[String(r)][String(c)];
+        return `      ${c}: { map: MapId.${pascalCaseFromMapId(t.map)}, pos: { x: ${t.pos.x}, y: ${t.pos.y} } },`;
+      }).join('\n')}\n    },`;
+    }).join('\n')}\n  },`;
+  })();
+  lines.splice(lines.length - 1, 0, mapsTS);
+  if (teleportsTS) lines.splice(lines.length - 1, 0, teleportsTS);
+  if (exitReturnMap) lines.push(`exitReturnMap: MapId.${pascalCaseFromMapId(exitReturnMap)},`);
+  if (exitReturnPos) lines.push(`exitReturnPos: { x: ${exitReturnPos.x}, y: ${exitReturnPos.y} },`);
+
+  for (const maybeLine of [
+    exportOptionalPosLine('pokemonCenter', pokemonCenter),
+    exportOptionalPosLine('pc', pc),
+    exportOptionalPosLine('store', store),
+    exportOptionalPosLine('recoverLocation', recoverLocation),
+    exportOptionalPosLine('onlineBattleNpc', onlineBattleNpc),
+  ]) {
+    if (maybeLine) lines.push(maybeLine);
+  }
+  const storeItemsTS = exportStoreItemsTS(storeItems);
+  if (storeItemsTS) lines.push(storeItemsTS);
+  if (!isNestedMapEmpty(spinners as unknown as Record<string, Record<string, unknown>>)) lines.push(exportSpinnersTS(spinners));
+  if (!isRowColMapEmpty(stoppers)) lines.push(exportRowColMapTS(stoppers, 'stoppers'));
+  if (hasEncounterTables(encounters)) lines.push(exportEncountersBlockTS(encounters));
+  if (items.length > 0) lines.push(exportItemsTS(items));
+  if (gifts.length > 0) lines.push(exportGiftsTS(gifts));
+  if (staticPokemon.length > 0) lines.push(exportStaticPokemonTS(staticPokemon));
+  lines.push(exportTrainersArrayTS(trainers));
+
+  return `{\n${lines.map((line) => indentTS(line)).join('\n')}\n}`;
+}
+
 // Heurística: convierte "pewter-city-gym" → "PewterCityGym" para el enum MapId
 function pascalCaseFromMapId(id: string): string {
   return id
@@ -524,11 +748,20 @@ export default function MapEditor() {
   const [items, setItems] = useState<ItemEntry[]>([]);
   const [gifts, setGifts] = useState<GiftEntry[]>([]);
   const [staticPokemon, setStaticPokemon] = useState<StaticPokemonEntry[]>([]);
+  const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
   const [pokemonCenter, setPokemonCenter] = useState<{ x: number; y: number } | null>(null);
   const [pcPos, setPcPos] = useState<{ x: number; y: number } | null>(null);
   const [storePos, setStorePos] = useState<{ x: number; y: number } | null>(null);
+  const [storeItems, setStoreItems] = useState<string[]>([]);
   const [recoverLocation, setRecoverLocation] = useState<{ x: number; y: number } | null>(null);
-  const [activeSpot, setActiveSpot] = useState<SpotKey>('pokemonCenter');
+  const [onlineBattleNpc, setOnlineBattleNpc] = useState<{ x: number; y: number } | null>(null);
+  const [activeSpot, setActiveSpot] = useState<SpotKey>('start');
+  const [spinners, setSpinners] = useState<Record<string, Record<string, DirectionName>>>({});
+  const [stoppers, setStoppers] = useState<Record<string, number[]>>({});
+  const [activeMechanic, setActiveMechanic] = useState<MechanicTool>('spinner-up');
+  const [cave, setCave] = useState(false);
+  const [allowBicycle, setAllowBicycle] = useState(false);
+  const [musicField, setMusicField] = useState<string | null>(null);
   // Portales
   const [portals, setPortals] = useState<PortalEntry[]>([]);
   const [exitReturnMap, setExitReturnMap] = useState<string | null>(null);
@@ -607,10 +840,18 @@ export default function MapEditor() {
     setItems(m.items ?? []);
     setGifts(m.gifts ?? []);
     setStaticPokemon((m as MapEntry & { staticPokemon?: StaticPokemonEntry[] }).staticPokemon ?? []);
+    setStartPos(m.start ?? null);
     setPokemonCenter(m.pokemonCenter ?? null);
     setPcPos(m.pc ?? null);
     setStorePos(m.store ?? null);
+    setStoreItems(m.storeItems ?? []);
     setRecoverLocation(m.recoverLocation ?? null);
+    setOnlineBattleNpc(m.onlineBattleNpc ?? null);
+    setSpinners(m.spinners ?? {});
+    setStoppers(m.stoppers ?? {});
+    setCave(!!m.cave);
+    setAllowBicycle(!!m.allowBicycle);
+    setMusicField(m.music ?? null);
     setPortals(flattenPortals(m));
     setExitReturnMap(m.exitReturnMap ?? null);
     setExitReturnPos(m.exitReturnPos ?? null);
@@ -637,6 +878,10 @@ export default function MapEditor() {
           trainers,
           walls,
           overrides: {
+            start: startPos,
+            cave,
+            allowBicycle,
+            music: musicField,
             fences,
             grass,
             water,
@@ -653,7 +898,11 @@ export default function MapEditor() {
             pokemonCenter,
             pc: pcPos,
             store: storePos,
+            storeItems,
             recoverLocation,
+            onlineBattleNpc,
+            spinners,
+            stoppers,
             // Portales (todo en uno: persistimos el shape MapType nativo)
             ...(() => {
               const { maps, teleports, exits } = nestPortals(portals);
@@ -703,13 +952,22 @@ export default function MapEditor() {
             water,
             encounters,
             texts,
+            textRewards,
             items,
             gifts,
             staticPokemon,
+            start: startPos,
+            cave,
+            allowBicycle,
+            music: musicField,
             pokemonCenter,
             pc: pcPos,
             store: storePos,
+            storeItems,
             recoverLocation,
+            onlineBattleNpc,
+            spinners,
+            stoppers,
             maps,
             teleports,
             exits,
@@ -754,34 +1012,7 @@ export default function MapEditor() {
   }
 
   function doExportEncounters() {
-    // Genera un bloque TS literal listo para pegar en el .ts del mapa,
-    // sustituyendo el `encounters: getEncounterData("...")` por un objeto
-    // local. Sólo incluye las 4 tablas editadas (walk + 3 cañas) y deja
-    // las demás vacías para no romper el tipo `EncountersType`.
-    const empty = '{ rate: 0, pokemon: [] }';
-    const tableTS = (t?: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[] }[] }) => {
-      if (!t) return empty;
-      const pokemon = t.pokemon
-        .map(
-          (p) =>
-            `      { id: ${p.id}, chance: ${p.chance}, conditionValues: [], minLevel: ${p.minLevel}, maxLevel: ${p.maxLevel} }`
-        )
-        .join(',\n');
-      return `{\n    rate: ${t.rate},\n    pokemon: [\n${pokemon}\n    ],\n  }`;
-    };
-    const ts =
-      `encounters: {\n` +
-      `  walk: ${tableTS(encounters.walk)},\n` +
-      `  surf: ${empty},\n` +
-      `  oldRod: ${tableTS(encounters.oldRod)},\n` +
-      `  goodRod: ${tableTS(encounters.goodRod)},\n` +
-      `  superRod: ${tableTS(encounters.superRod)},\n` +
-      `  rockSmash: ${empty}, headbutt: ${empty}, darkGrass: ${empty},\n` +
-      `  grassSpots: ${empty}, caveSpots: ${empty}, bridgeSpots: ${empty},\n` +
-      `  superRodSpots: ${empty}, surfSpots: ${tableTS(encounters.surfSpots)},\n` +
-      `  yellowFlowers: ${empty}, purpleFlowers: ${empty}, redFlowers: ${empty},\n` +
-      `  roughTerrain: ${empty}, gift: ${empty}, giftEgg: ${empty}, onlyOne: ${empty},\n` +
-      `},`;
+    const ts = exportEncountersBlockTS(encounters);
     navigator.clipboard.writeText(ts).then(() =>
       alert(
         '¡Encounters copiados!\n\nPega el bloque en el .ts del mapa, reemplazando la línea `encounters: getEncounterData(...)`.'
@@ -813,17 +1044,59 @@ export default function MapEditor() {
 
   function doExportSpots() {
     const parts = [
+      exportSpotTS('start', startPos),
       exportSpotTS('pokemonCenter', pokemonCenter),
       exportSpotTS('pc', pcPos),
       exportSpotTS('store', storePos),
+      exportStoreItemsTS(storeItems),
       exportSpotTS('recoverLocation', recoverLocation),
+      exportSpotTS('onlineBattleNpc', onlineBattleNpc),
     ];
-    navigator.clipboard.writeText(parts.join('\n')).then(() => alert('¡Spots copiados!'));
+    navigator.clipboard.writeText(parts.filter(Boolean).join('\n')).then(() => alert('¡Spots copiados!'));
   }
 
   function doExportPortals() {
     const ts = exportPortalsTS(portals, exitReturnMap, exitReturnPos);
     navigator.clipboard.writeText(ts).then(() => alert('¡Portals copiados!'));
+  }
+
+  function doExportMechanics() {
+    const ts = [exportSpinnersTS(spinners), exportRowColMapTS(stoppers, 'stoppers')].join('\n');
+    navigator.clipboard.writeText(ts).then(() => alert('¡Mechanics copiados!'));
+  }
+
+  function doExportMapType() {
+    if (!currentMap) return;
+    const ts = exportFullMapTypeTS({
+      currentMap,
+      start: startPos,
+      cave,
+      allowBicycle,
+      music: musicField,
+      trainers,
+      walls,
+      fences,
+      grass,
+      water,
+      encounters,
+      texts,
+      textRewards,
+      items,
+      gifts,
+      staticPokemon,
+      pokemonCenter,
+      pc: pcPos,
+      store: storePos,
+      storeItems,
+      recoverLocation,
+      onlineBattleNpc,
+      portals,
+      exitReturnMap,
+      exitReturnPos,
+      spinners,
+      stoppers,
+    });
+    navigator.clipboard.writeText(ts).then(() => alert('¡Objeto MapType completo copiado!'));
   }
 
   // ── Importar .ts ──────────────────────────────────────────────────────
@@ -870,10 +1143,18 @@ export default function MapEditor() {
       setItems(parsed.items);
       setGifts(parsed.gifts);
       setStaticPokemon((parsed as typeof parsed & { staticPokemon?: StaticPokemonEntry[] }).staticPokemon ?? []);
+      setStartPos(parsed.start);
       setPokemonCenter(parsed.pokemonCenter);
       setPcPos(parsed.pc);
       setStorePos(parsed.store);
+      setStoreItems(parsed.storeItems ?? []);
       setRecoverLocation(parsed.recoverLocation);
+      setOnlineBattleNpc(parsed.onlineBattleNpc);
+      setSpinners(parsed.spinners ?? {});
+      setStoppers(parsed.stoppers ?? {});
+      setCave(!!parsed.cave);
+      setAllowBicycle(!!parsed.allowBicycle);
+      setMusicField(parsed.music ?? null);
       setPortals(flattenPortals({
         ...currentMap!,
         maps: parsed.maps,
@@ -962,6 +1243,26 @@ export default function MapEditor() {
     return hasMask(src, x, y);
   }
 
+  function setSpinnerAt(
+    src: Record<string, Record<string, DirectionName>>,
+    x: number,
+    y: number,
+    direction: DirectionName | null,
+  ): Record<string, Record<string, DirectionName>> {
+    const rowKey = String(y);
+    const colKey = String(x);
+    const next = { ...src };
+    const row = { ...(next[rowKey] ?? {}) };
+    if (direction === null) {
+      delete row[colKey];
+    } else {
+      row[colKey] = direction;
+    }
+    if (Object.keys(row).length === 0) delete next[rowKey];
+    else next[rowKey] = row;
+    return next;
+  }
+
   // ── Actualizar campo del NPC seleccionado ───────────────────────────────
   function updateSelected(patch: Partial<Trainer>) {
     if (selectedIdx === null) return;
@@ -969,6 +1270,24 @@ export default function MapEditor() {
     setTrainers(next);
     setDirty(true);
   }
+
+  const tileFromClientPoint = useCallback(
+    (clientX: number, clientY: number, clamp: boolean): { x: number; y: number } | null => {
+      if (!canvasRef.current || !currentMap) return null;
+      const rect = canvasRef.current.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return null;
+      const tileWidth = rect.width / currentMap.width;
+      const tileHeight = rect.height / currentMap.height;
+      let x = Math.floor((clientX - rect.left) / tileWidth);
+      let y = Math.floor((clientY - rect.top) / tileHeight);
+      if (clamp) {
+        x = Math.max(0, Math.min(x, currentMap.width - 1));
+        y = Math.max(0, Math.min(y, currentMap.height - 1));
+      }
+      return { x, y };
+    },
+    [currentMap],
+  );
 
   // ── Drag & drop NPC ────────────────────────────────────────────────────────
   const onPointerDown = useCallback(
@@ -985,15 +1304,10 @@ export default function MapEditor() {
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
-      if (!canvasRef.current) return;
-      const canvas = canvasRef.current;
-      const rect = canvas.getBoundingClientRect();
-      const scrollLeft = canvas.parentElement?.scrollLeft ?? 0;
-      const scrollTop = canvas.parentElement?.scrollTop ?? 0;
-      const relX = e.clientX - rect.left + scrollLeft;
-      const relY = e.clientY - rect.top + scrollTop;
-      const tileX = Math.max(0, Math.min(Math.floor(relX / zoom), (currentMap?.width ?? 20) - 1));
-      const tileY = Math.max(0, Math.min(Math.floor(relY / zoom), (currentMap?.height ?? 20) - 1));
+      const tile = tileFromClientPoint(e.clientX, e.clientY, true);
+      if (!tile) return;
+      const tileX = tile.x;
+      const tileY = tile.y;
 
       // Drag de entidades (texts/items/gifts/portals)
       if (entityDrag.current) {
@@ -1028,7 +1342,7 @@ export default function MapEditor() {
       );
       setDirty(true);
     },
-    [zoom, currentMap, editMode]
+    [tileFromClientPoint, editMode]
   );
 
   const onPointerUp = useCallback(() => {
@@ -1111,17 +1425,7 @@ export default function MapEditor() {
 
   // ── Click en canvas ────────────────────────────────────────────────────────
   function tileFromEvent(e: React.MouseEvent | React.PointerEvent): { x: number; y: number } | null {
-    if (!canvasRef.current) return null;
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const scrollLeft = canvas.parentElement?.scrollLeft ?? 0;
-    const scrollTop = canvas.parentElement?.scrollTop ?? 0;
-    const relX = e.clientX - rect.left + scrollLeft;
-    const relY = e.clientY - rect.top + scrollTop;
-    return {
-      x: Math.floor(relX / zoom),
-      y: Math.floor(relY / zoom),
-    };
+    return tileFromClientPoint(e.clientX, e.clientY, false);
   }
 
   // En modo walls/fences/grass/water: pointerdown en canvas inicia pintura.
@@ -1408,20 +1712,36 @@ export default function MapEditor() {
     }
     if (editMode === 'spots') {
       const setter =
+        activeSpot === 'start' ? setStartPos :
         activeSpot === 'pokemonCenter' ? setPokemonCenter :
         activeSpot === 'pc' ? setPcPos :
         activeSpot === 'store' ? setStorePos :
-        setRecoverLocation;
+        activeSpot === 'recoverLocation' ? setRecoverLocation :
+        setOnlineBattleNpc;
       const current =
+        activeSpot === 'start' ? startPos :
         activeSpot === 'pokemonCenter' ? pokemonCenter :
         activeSpot === 'pc' ? pcPos :
         activeSpot === 'store' ? storePos :
-        recoverLocation;
-      // Click en mismo tile → borra el spot. Click en tile distinto → coloca.
-      if (current && current.x === tile.x && current.y === tile.y) {
+        activeSpot === 'recoverLocation' ? recoverLocation :
+        onlineBattleNpc;
+      // start es obligatorio en MapType; el resto se puede borrar con click repetido.
+      if (activeSpot !== 'start' && current && current.x === tile.x && current.y === tile.y) {
         setter(null);
       } else {
         setter({ x: tile.x, y: tile.y });
+      }
+      setDirty(true);
+      return;
+    }
+    if (editMode === 'mechanics') {
+      if (activeMechanic === 'stopper') {
+        const currentlyOn = hasMask(stoppers, tile.x, tile.y);
+        setStoppers((prev) => setMaskAt(prev, tile.x, tile.y, !currentlyOn));
+      } else {
+        const direction = activeMechanic.replace('spinner-', '') as DirectionName;
+        const currentDirection = spinners[String(tile.y)]?.[String(tile.x)] ?? null;
+        setSpinners((prev) => setSpinnerAt(prev, tile.x, tile.y, currentDirection === direction ? null : direction));
       }
       setDirty(true);
       return;
@@ -1554,7 +1874,7 @@ export default function MapEditor() {
 
         {/* Modo edición */}
         <div style={{ display: 'flex', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
-          {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'spots', 'portals'] as EditMode[]).map((m) => {
+          {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
               npc: '#5050b0',
               walls: '#7a3030',
@@ -1566,7 +1886,9 @@ export default function MapEditor() {
               gifts: '#7a3a5a',
               'static-pokemon': '#3a7a6a',
               spots: '#5a7a30',
+              mechanics: '#6a4a8a',
               portals: '#7a3a3a',
+              map: '#4a4a5a',
             };
             return (
               <button
@@ -1685,6 +2007,14 @@ export default function MapEditor() {
             🚪 Portals
           </button>
         )}
+        {editMode === 'mechanics' && (
+          <button onClick={doExportMechanics} style={{ padding: '4px 12px', background: '#221a2a', border: '1px solid #6a4a8a', borderRadius: 4, color: '#ddb0ff', cursor: 'pointer', fontSize: 12 }}>
+            🧭 Mechanics
+          </button>
+        )}
+        <button onClick={doExportMapType} style={{ padding: '4px 12px', background: '#1a2a3a', border: '1px solid #4a6a8a', borderRadius: 4, color: '#aaddff', cursor: 'pointer', fontSize: 12 }}>
+          📋 MapType
+        </button>
 
         {/* Logout */}
         <button onClick={() => { document.cookie = 'admin_token=; Max-Age=0; path=/'; window.location.href = '/admin/login'; }} style={{ padding: '4px 8px', background: 'none', border: '1px solid #3a3a5a', borderRadius: 4, color: '#666', cursor: 'pointer', fontSize: 12 }}>
@@ -1979,10 +2309,12 @@ export default function MapEditor() {
 
               {/* Spots overlay */}
               {([
+                { key: 'start' as SpotKey, pos: startPos, emoji: '▶', color: '#ffffff' },
                 { key: 'pokemonCenter' as SpotKey, pos: pokemonCenter, emoji: '🏥', color: '#ff6688' },
                 { key: 'pc' as SpotKey, pos: pcPos, emoji: '💻', color: '#88ccff' },
                 { key: 'store' as SpotKey, pos: storePos, emoji: '🛒', color: '#ffcc66' },
                 { key: 'recoverLocation' as SpotKey, pos: recoverLocation, emoji: '✨', color: '#ccff88' },
+                { key: 'onlineBattleNpc' as SpotKey, pos: onlineBattleNpc, emoji: '🌐', color: '#88aaff' },
               ]).map((sp) => sp.pos ? (
                 <div
                   key={`sp-${sp.key}`}
@@ -2011,6 +2343,79 @@ export default function MapEditor() {
                   {sp.emoji}
                 </div>
               ) : null)}
+
+              {/* Mechanics overlay: spinners + stoppers */}
+              {Object.entries(spinners).flatMap(([rowKey, cols]) => {
+                const y = parseInt(rowKey, 10);
+                if (Number.isNaN(y)) return [];
+                return Object.entries(cols).map(([colKey, dir]) => {
+                  const x = parseInt(colKey, 10);
+                  if (Number.isNaN(x)) return null;
+                  const arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : dir === 'left' ? '◀' : '▶';
+                  return (
+                    <div
+                      key={`spin-${y}-${x}`}
+                      title={`spinner ${dir} (${x}, ${y})`}
+                      style={{
+                        position: 'absolute',
+                        left: x * zoom,
+                        top: y * zoom,
+                        width: zoom,
+                        height: zoom,
+                        background: editMode === 'mechanics'
+                          ? 'rgba(204, 136, 255, 0.45)'
+                          : 'rgba(204, 136, 255, 0.18)',
+                        border: editMode === 'mechanics'
+                          ? '1px solid rgba(204, 136, 255, 0.95)'
+                          : '1px dashed rgba(204, 136, 255, 0.45)',
+                        pointerEvents: 'none',
+                        boxSizing: 'border-box',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: Math.max(10, zoom * 0.45),
+                        color: '#f0ccff',
+                        textShadow: '0 0 2px #000',
+                      }}
+                    >
+                      {arrow}
+                    </div>
+                  );
+                }).filter(Boolean);
+              })}
+              {Object.entries(stoppers).flatMap(([rowKey, cols]) => {
+                const y = parseInt(rowKey, 10);
+                if (Number.isNaN(y)) return [];
+                return cols.map((x) => (
+                  <div
+                    key={`stop-${y}-${x}`}
+                    title={`stopper (${x}, ${y})`}
+                    style={{
+                      position: 'absolute',
+                      left: x * zoom,
+                      top: y * zoom,
+                      width: zoom,
+                      height: zoom,
+                      background: editMode === 'mechanics'
+                        ? 'rgba(255, 230, 100, 0.5)'
+                        : 'rgba(255, 230, 100, 0.18)',
+                      border: editMode === 'mechanics'
+                        ? '1px solid rgba(255, 230, 100, 0.95)'
+                        : '1px dashed rgba(255, 230, 100, 0.45)',
+                      pointerEvents: 'none',
+                      boxSizing: 'border-box',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: Math.max(10, zoom * 0.45),
+                      color: '#fff0aa',
+                      textShadow: '0 0 2px #000',
+                    }}
+                  >
+                    ■
+                  </div>
+                ));
+              })}
 
               {/* Portales overlay */}
               {portals.map((p, i) => {
@@ -2288,18 +2693,51 @@ export default function MapEditor() {
               <SpotsInspector
                 activeSpot={activeSpot}
                 setActiveSpot={setActiveSpot}
+                startPos={startPos}
                 pokemonCenter={pokemonCenter}
                 pcPos={pcPos}
                 storePos={storePos}
+                storeItems={storeItems}
+                itemTypeKeys={itemTypeKeys}
                 recoverLocation={recoverLocation}
+                onlineBattleNpc={onlineBattleNpc}
                 onClear={(k) => {
+                  if (k === 'start') return;
                   if (k === 'pokemonCenter') setPokemonCenter(null);
                   else if (k === 'pc') setPcPos(null);
                   else if (k === 'store') setStorePos(null);
-                  else setRecoverLocation(null);
+                  else if (k === 'recoverLocation') setRecoverLocation(null);
+                  else setOnlineBattleNpc(null);
+                  setDirty(true);
+                }}
+                onStoreItemsChange={(next) => {
+                  setStoreItems(next);
                   setDirty(true);
                 }}
                 sourceFile={currentMap?.sourceFile}
+              />
+            ) : editMode === 'mechanics' ? (
+              <MechanicsInspector
+                activeMechanic={activeMechanic}
+                setActiveMechanic={setActiveMechanic}
+                spinners={spinners}
+                stoppers={stoppers}
+                sourceFile={currentMap?.sourceFile}
+              />
+            ) : editMode === 'map' ? (
+              <MapMetaInspector
+                currentMap={currentMap}
+                cave={cave}
+                setCave={(v) => { setCave(v); setDirty(true); }}
+                allowBicycle={allowBicycle}
+                setAllowBicycle={(v) => { setAllowBicycle(v); setDirty(true); }}
+                musicField={musicField}
+                setMusicField={(v) => { setMusicField(v); setDirty(true); }}
+                startPos={startPos}
+                onlineBattleNpc={onlineBattleNpc}
+                spinnersCount={Object.values(spinners).reduce((a, m) => a + Object.keys(m).length, 0)}
+                stoppersCount={Object.values(stoppers).reduce((a, b) => a + b.length, 0)}
+                storeItemsCount={storeItems.length}
               />
             ) : editMode === 'portals' ? (
               <PortalsInspector
@@ -2855,23 +3293,30 @@ function ModeHelpBlock({
 
 function SpotsInspector({
   activeSpot, setActiveSpot,
-  pokemonCenter, pcPos, storePos, recoverLocation,
-  onClear, sourceFile,
+  startPos, pokemonCenter, pcPos, storePos, storeItems, itemTypeKeys, recoverLocation, onlineBattleNpc,
+  onClear, onStoreItemsChange, sourceFile,
 }: {
   activeSpot: SpotKey;
   setActiveSpot: (k: SpotKey) => void;
+  startPos: { x: number; y: number } | null;
   pokemonCenter: { x: number; y: number } | null;
   pcPos: { x: number; y: number } | null;
   storePos: { x: number; y: number } | null;
+  storeItems: string[];
+  itemTypeKeys: string[];
   recoverLocation: { x: number; y: number } | null;
+  onlineBattleNpc: { x: number; y: number } | null;
   onClear: (k: SpotKey) => void;
+  onStoreItemsChange: (next: string[]) => void;
   sourceFile?: string;
 }) {
-  const spots: { key: SpotKey; label: string; emoji: string; color: string; pos: { x: number; y: number } | null }[] = [
+  const spots: { key: SpotKey; label: string; emoji: string; color: string; pos: { x: number; y: number } | null; required?: boolean }[] = [
+    { key: 'start', label: 'Start', emoji: '▶', color: '#ffffff', pos: startPos, required: true },
     { key: 'pokemonCenter', label: 'Pokémon Center', emoji: '🏥', color: '#ff6688', pos: pokemonCenter },
     { key: 'pc', label: 'PC', emoji: '💻', color: '#88ccff', pos: pcPos },
     { key: 'store', label: 'Store', emoji: '🛒', color: '#ffcc66', pos: storePos },
     { key: 'recoverLocation', label: 'Recover Location', emoji: '✨', color: '#ccff88', pos: recoverLocation },
+    { key: 'onlineBattleNpc', label: 'Online Battle NPC', emoji: '🌐', color: '#88aaff', pos: onlineBattleNpc },
   ];
   return (
     <div style={{ color: '#ccc', fontSize: 13, lineHeight: 1.6 }}>
@@ -2879,7 +3324,7 @@ function SpotsInspector({
       <p style={{ color: '#ccff88', fontWeight: 700, marginBottom: 12 }}>Modo Spots activo</p>
       <p style={{ color: '#aaa', fontSize: 12, marginBottom: 16 }}>
         Selecciona qué spot editar y haz click en una casilla del mapa para colocarlo.
-        Click sobre el mismo tile lo elimina.
+        Click sobre el mismo tile lo elimina salvo en Start.
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {spots.map((sp) => (
@@ -2901,10 +3346,10 @@ function SpotsInspector({
             <div style={{ flex: 1 }}>
               <div style={{ color: sp.color, fontWeight: 700, fontSize: 12 }}>{sp.label}</div>
               <div style={{ color: '#666', fontSize: 11 }}>
-                {sp.pos ? `(${sp.pos.x}, ${sp.pos.y})` : '— vacío —'}
+                {sp.pos ? `(${sp.pos.x}, ${sp.pos.y})` : (sp.required ? '— requerido —' : '— vacío —')}
               </div>
             </div>
-            {sp.pos && (
+            {sp.pos && !sp.required && (
               <button
                 onClick={(e) => { e.stopPropagation(); onClear(sp.key); }}
                 style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 14 }}
@@ -2915,8 +3360,170 @@ function SpotsInspector({
           </div>
         ))}
       </div>
+      {(activeSpot === 'store' || storePos || storeItems.length > 0) && (
+        <div style={{ marginTop: 14, padding: 10, background: '#0f0f1a', border: '1px solid #2a2a4a', borderRadius: 4 }}>
+          <div style={{ color: '#ffcc66', fontSize: 12, fontWeight: 700, marginBottom: 8 }}>Store Items</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {storeItems.map((item, idx) => (
+              <div key={`${item}-${idx}`} style={{ display: 'flex', gap: 6 }}>
+                <select
+                  value={item}
+                  onChange={(e) => onStoreItemsChange(storeItems.map((it, i) => i === idx ? e.target.value : it))}
+                  style={{ ...inputStyle, height: 28 }}
+                >
+                  {itemTypeKeys.map((key) => <option key={key} value={key}>{key}</option>)}
+                </select>
+                <button
+                  onClick={() => onStoreItemsChange(storeItems.filter((_, i) => i !== idx))}
+                  style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 14 }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {storeItems.length === 0 && (
+              <div style={{ color: '#555', fontSize: 11, textAlign: 'center', padding: 6 }}>Sin storeItems</div>
+            )}
+            <button
+              onClick={() => onStoreItemsChange([...storeItems, itemTypeKeys[0] ?? 'PokeBall'])}
+              style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', padding: '3px 10px' }}
+            >
+              + Item
+            </button>
+          </div>
+        </div>
+      )}
       <div style={{ marginTop: 16, padding: 12, background: '#1a1530', border: '1px solid #5a3a3a', borderRadius: 4, fontSize: 11, color: '#ff9999' }}>
         ⚠️ Pega el bloque exportado en <code>{sourceFile ?? '*.ts'}</code> dentro del objeto del mapa.
+      </div>
+    </div>
+  );
+}
+
+// ── Inspector de Mechanics (spinners / stoppers) ──
+
+function MechanicsInspector({
+  activeMechanic, setActiveMechanic, spinners, stoppers, sourceFile,
+}: {
+  activeMechanic: MechanicTool;
+  setActiveMechanic: (tool: MechanicTool) => void;
+  spinners: Record<string, Record<string, DirectionName>>;
+  stoppers: Record<string, number[]>;
+  sourceFile?: string;
+}) {
+  const tools: { key: MechanicTool; label: string; icon: string; color: string }[] = [
+    { key: 'spinner-up', label: 'Spinner Up', icon: '▲', color: '#cc88ff' },
+    { key: 'spinner-down', label: 'Spinner Down', icon: '▼', color: '#cc88ff' },
+    { key: 'spinner-left', label: 'Spinner Left', icon: '◀', color: '#cc88ff' },
+    { key: 'spinner-right', label: 'Spinner Right', icon: '▶', color: '#cc88ff' },
+    { key: 'stopper', label: 'Stopper', icon: '■', color: '#ffe664' },
+  ];
+  const spinnersCount = Object.values(spinners).reduce((a, m) => a + Object.keys(m).length, 0);
+  const stoppersCount = Object.values(stoppers).reduce((a, b) => a + b.length, 0);
+  return (
+    <div style={{ color: '#ccc', fontSize: 13, lineHeight: 1.6 }}>
+      <div style={{ fontSize: 32, marginBottom: 8, textAlign: 'center' }}>🧭</div>
+      <p style={{ color: '#ddb0ff', fontWeight: 700, marginBottom: 12 }}>Modo Mechanics activo</p>
+      <p style={{ color: '#aaa', fontSize: 12, marginBottom: 14 }}>
+        Spinners fuerzan dirección. Stoppers detienen el deslizamiento. Click en el mismo spinner con la misma dirección lo borra.
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+        {tools.map((tool) => {
+          const active = activeMechanic === tool.key;
+          return (
+            <button
+              key={tool.key}
+              onClick={() => setActiveMechanic(tool.key)}
+              style={{
+                padding: '6px 4px',
+                background: active ? `${tool.color}33` : '#0f0f1a',
+                border: `2px solid ${active ? tool.color : '#2a2a4a'}`,
+                borderRadius: 4,
+                color: active ? tool.color : '#888',
+                cursor: 'pointer',
+                fontSize: 11,
+                fontWeight: 700,
+              }}
+            >
+              {tool.icon} {tool.label}
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ marginTop: 14, fontSize: 11, color: '#777' }}>
+        Total spinners: <span style={{ color: '#cc88ff', fontWeight: 700 }}>{spinnersCount}</span><br />
+        Total stoppers: <span style={{ color: '#ffe664', fontWeight: 700 }}>{stoppersCount}</span>
+      </div>
+      <div style={{ marginTop: 16, padding: 12, background: '#1a1530', border: '1px solid #5a3a3a', borderRadius: 4, fontSize: 11, color: '#ff9999' }}>
+        ⚠️ Pega el bloque exportado en <code>{sourceFile ?? '*.ts'}</code> dentro del objeto del mapa.
+      </div>
+    </div>
+  );
+}
+
+// ── Inspector de metadatos del mapa ──
+
+function MapMetaInspector({
+  currentMap,
+  cave,
+  setCave,
+  allowBicycle,
+  setAllowBicycle,
+  musicField,
+  setMusicField,
+  startPos,
+  onlineBattleNpc,
+  spinnersCount,
+  stoppersCount,
+  storeItemsCount,
+}: {
+  currentMap?: MapEntry;
+  cave: boolean;
+  setCave: (v: boolean) => void;
+  allowBicycle: boolean;
+  setAllowBicycle: (v: boolean) => void;
+  musicField: string | null;
+  setMusicField: (v: string | null) => void;
+  startPos: { x: number; y: number } | null;
+  onlineBattleNpc: { x: number; y: number } | null;
+  spinnersCount: number;
+  stoppersCount: number;
+  storeItemsCount: number;
+}) {
+  return (
+    <div style={{ color: '#ccc', fontSize: 13, lineHeight: 1.6 }}>
+      <div style={{ fontSize: 32, marginBottom: 8, textAlign: 'center' }}>🗺️</div>
+      <p style={{ color: '#ccccdd', fontWeight: 700, marginBottom: 12 }}>Mapa</p>
+      <div style={{ color: '#888', fontSize: 11, marginBottom: 12 }}>
+        {currentMap ? `${currentMap.sourceFile} · ${currentMap.width}×${currentMap.height}` : 'Sin mapa'}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13 }}>
+          <input type="checkbox" checked={allowBicycle} onChange={(e) => setAllowBicycle(e.target.checked)} style={{ accentColor: '#88ff88' }} />
+          <span>allowBicycle</span>
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13 }}>
+          <input type="checkbox" checked={cave} onChange={(e) => setCave(e.target.checked)} style={{ accentColor: '#cc88ff' }} />
+          <span>cave</span>
+        </label>
+      </div>
+      <div style={sectionStyle}>
+        <label style={labelStyle}>Music expression</label>
+        <input
+          value={musicField ?? ''}
+          placeholder="music"
+          onChange={(e) => setMusicField(e.target.value.trim() ? e.target.value : null)}
+          style={inputStyle}
+        />
+      </div>
+      <div style={sectionStyle}>
+        <div style={{ color: '#888', fontSize: 11 }}>Start: {startPos ? `(${startPos.x}, ${startPos.y})` : 'sin definir'}</div>
+        <div style={{ color: '#888', fontSize: 11 }}>Online NPC: {onlineBattleNpc ? `(${onlineBattleNpc.x}, ${onlineBattleNpc.y})` : 'sin definir'}</div>
+        <div style={{ color: '#888', fontSize: 11 }}>Store items: {storeItemsCount}</div>
+        <div style={{ color: '#888', fontSize: 11 }}>Spinners: {spinnersCount} · Stoppers: {stoppersCount}</div>
+      </div>
+      <div style={{ marginTop: 16, padding: 12, background: '#1a1530', border: '1px solid #5a3a3a', borderRadius: 4, fontSize: 11, color: '#ff9999' }}>
+        ⚠️ Usa <code>📋 MapType</code> para copiar el objeto completo listo para sustituir en el .ts.
       </div>
     </div>
   );

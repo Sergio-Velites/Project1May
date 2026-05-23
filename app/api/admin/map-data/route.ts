@@ -27,7 +27,12 @@ function readBundledData(): Record<string, unknown> {
 }
 
 type OverrideKey =
+  | 'start'
+  | 'cave'
+  | 'allowBicycle'
+  | 'music'
   | 'texts'
+  | 'textRewards'
   | 'items'
   | 'gifts'
   | 'staticPokemon'
@@ -38,7 +43,11 @@ type OverrideKey =
   | 'pokemonCenter'
   | 'pc'
   | 'store'
+  | 'storeItems'
   | 'recoverLocation'
+  | 'onlineBattleNpc'
+  | 'spinners'
+  | 'stoppers'
   | 'maps'
   | 'teleports'
   | 'exits'
@@ -46,7 +55,12 @@ type OverrideKey =
   | 'exitReturnPos';
 
 const OVERRIDE_KEYS: OverrideKey[] = [
+  'start',
+  'cave',
+  'allowBicycle',
+  'music',
   'texts',
+  'textRewards',
   'items',
   'gifts',
   'staticPokemon',
@@ -57,7 +71,11 @@ const OVERRIDE_KEYS: OverrideKey[] = [
   'pokemonCenter',
   'pc',
   'store',
+  'storeItems',
   'recoverLocation',
+  'onlineBattleNpc',
+  'spinners',
+  'stoppers',
   'maps',
   'teleports',
   'exits',
@@ -77,7 +95,7 @@ function applyOverridesToBase(
   for (const key of OVERRIDE_KEYS) {
     if (!(key in overrides)) continue;
     const val = (overrides as Record<string, unknown>)[key];
-    if (val === null || val === undefined) continue;
+    if (val === undefined) continue;
     // `encounters` se MEZCLA con la base en lugar de reemplazarse, para
     // que un override parcial (sólo walk, sólo oldRod, etc.) no borre el
     // resto de tablas (surf, headbutt, etc.) que vienen del JSON original.
@@ -138,12 +156,7 @@ export async function GET() {
         target.trainers = row.trainers;
       }
       if (row.walls !== null && row.walls !== undefined) {
-        if (
-          typeof row.walls === 'object' &&
-          Object.keys(row.walls as object).length > 0
-        ) {
-          target.walls = row.walls;
-        }
+        target.walls = row.walls;
       }
       if (row.overrides !== null && row.overrides !== undefined) {
         applyOverridesToBase(target, row.overrides);
@@ -212,8 +225,8 @@ export async function POST(request: Request) {
     }
 
     // Merge parcial de overrides: las claves enviadas sustituyen, las no
-    // enviadas conservan su valor anterior. Para borrar una clave concreta
-    // enviar `null` explícito en esa clave.
+    // enviadas conservan su valor anterior. `null` se guarda explícitamente
+    // para poder limpiar campos opcionales declarados en el .ts base.
     const mergedOverrides: Record<string, unknown> = isPlainObject(
       existing?.overrides
     )
@@ -224,11 +237,7 @@ export async function POST(request: Request) {
       for (const key of OVERRIDE_KEYS) {
         if (!(key in overrides)) continue;
         const val = overrides[key];
-        if (val === null) {
-          delete mergedOverrides[key];
-        } else {
-          mergedOverrides[key] = val;
-        }
+        mergedOverrides[key] = val;
       }
     }
 

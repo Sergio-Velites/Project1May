@@ -109,6 +109,63 @@ function parsePos(tsText, key) {
   return { x: parseInt(m[1], 10), y: parseInt(m[2], 10) };
 }
 
+function parseBooleanField(tsText, key) {
+  const re = new RegExp(`(?<![\\w])${key}\\s*:\\s*true`);
+  return re.test(tsText);
+}
+
+function parseMusicField(tsText) {
+  const explicit = tsText.match(/(?<![\w])music\s*:\s*([^,\n}]+)/);
+  if (explicit) return explicit[1].trim();
+  const shorthand = tsText.match(/(?<![\w])music\s*,/);
+  return shorthand ? "music" : null;
+}
+
+function parseItemTypeArrayField(tsText, key) {
+  const m = tsText.match(new RegExp(`(?<![\\w])${key}\\s*:\\s*\\[`));
+  if (!m) return [];
+  const startIdx = tsText.indexOf("[", m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, startIdx, "[", "]");
+  if (!blk) return [];
+  const result = [];
+  const re = /ItemType\.(\w+)/g;
+  let itemM;
+  while ((itemM = re.exec(blk.text)) !== null) {
+    result.push(itemM[1]);
+  }
+  return result;
+}
+
+function parseDirectionRowColMap(tsText, key) {
+  const m = tsText.match(new RegExp(`(?<![\\w])${key}\\s*:\\s*\\{`));
+  if (!m || m.index === undefined) return {};
+  const blockStart = tsText.indexOf("{", m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, blockStart);
+  if (!blk) return {};
+  const result = {};
+  const inner = blk.text.slice(1, -1);
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    const rowMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    if (!rowMatch) { i++; continue; }
+    const rowKey = rowMatch[1];
+    i += rowMatch[0].length - 1;
+    const rowBlk = findBalancedBlock(inner, i);
+    if (!rowBlk) break;
+    const row = {};
+    const colRe = /(-?\d+)\s*:\s*Direction\.(Down|Up|Left|Right)/g;
+    let colM;
+    while ((colM = colRe.exec(rowBlk.text)) !== null) {
+      row[colM[1]] = colM[2].toLowerCase();
+    }
+    if (Object.keys(row).length > 0) result[rowKey] = row;
+    i = rowBlk.end + 1;
+  }
+  return result;
+}
+
 // ── Parsers de portales ────────────────────────────────────────────────
 function mapIdEnumToKebab(name) {
   return name
@@ -253,6 +310,64 @@ function parseTextField(tsText) {
     }
     result[rowKey] = cols;
     i = subBlk.end + 1;
+  }
+  return result;
+}
+
+function parseTextRewardsField(tsText) {
+  const m = tsText.match(/(?<![\w])textRewards\s*:\s*\{/);
+  if (!m) return {};
+  const blockStart = tsText.indexOf("{", m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, blockStart);
+  if (!blk) return {};
+
+  const result = {};
+  const inner = blk.text.slice(1, -1);
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    const rowMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    if (!rowMatch) { i++; continue; }
+    const rowKey = rowMatch[1];
+    i += rowMatch[0].length - 1;
+    const rowBlk = findBalancedBlock(inner, i);
+    if (!rowBlk) break;
+
+    const cols = {};
+    const rowInner = rowBlk.text.slice(1, -1);
+    let j = 0;
+    while (j < rowInner.length) {
+      while (j < rowInner.length && /\s|,/.test(rowInner[j])) j++;
+      if (j >= rowInner.length) break;
+      const colMatch = rowInner.slice(j).match(/^(-?\d+)\s*:\s*\{/);
+      if (!colMatch) { j++; continue; }
+      const colKey = colMatch[1];
+      j += colMatch[0].length - 1;
+      const objBlk = findBalancedBlock(rowInner, j);
+      if (!objBlk) break;
+      const obj = objBlk.text;
+      const typeM = obj.match(/type\s*:\s*["']?(pokemon|item)["']?/);
+      const questM = obj.match(/questId\s*:\s*["']([^"']+)["']/);
+      if (typeM && questM) {
+        const reward = { type: typeM[1], questId: questM[1] };
+        if (reward.type === "pokemon") {
+          const pid = obj.match(/pokemonId\s*:\s*(\d+)/);
+          const lvl = obj.match(/level\s*:\s*(\d+)/);
+          if (pid) reward.pokemonId = parseInt(pid[1], 10);
+          if (lvl) reward.level = parseInt(lvl[1], 10);
+        } else {
+          const item = obj.match(/itemKey\s*:\s*ItemType\.(\w+)/);
+          const amount = obj.match(/amount\s*:\s*(\d+)/);
+          if (item) reward.itemKey = item[1];
+          if (amount) reward.amount = parseInt(amount[1], 10);
+        }
+        cols[colKey] = reward;
+      }
+      j = objBlk.end + 1;
+    }
+    if (Object.keys(cols).length > 0) result[rowKey] = cols;
+    i = rowBlk.end + 1;
   }
   return result;
 }
@@ -662,6 +777,10 @@ for (const file of MAP_FILES) {
   const widthM = tsText.match(/width\s*:\s*(\d+)/);
   const height = heightM ? parseInt(heightM[1]) : 20;
   const width = widthM ? parseInt(widthM[1]) : 20;
+  const start = parsePos(tsText, "start");
+  const cave = parseBooleanField(tsText, "cave");
+  const allowBicycle = parseBooleanField(tsText, "allowBicycle");
+  const music = parseMusicField(tsText);
 
   // Extraer imagen
   const imageFile = extractImageFile(tsText) ?? `${file.replace(".ts", ".png")}`;
@@ -685,13 +804,18 @@ for (const file of MAP_FILES) {
     encounters = locationData[encMatch[1]].encounters ?? null;
   }
   const texts = parseTextField(tsText);
+  const textRewards = parseTextRewardsField(tsText);
   const items = parseItemsField(tsText);
   const gifts = parseGiftsField(tsText);
   const staticPokemon = parseStaticPokemonField(tsText);
   const pokemonCenter = parsePos(tsText, "pokemonCenter");
   const pc = parsePos(tsText, "pc");
   const store = parsePos(tsText, "store");
+  const storeItems = parseItemTypeArrayField(tsText, "storeItems");
   const recoverLocation = parsePos(tsText, "recoverLocation");
+  const onlineBattleNpc = parsePos(tsText, "onlineBattleNpc");
+  const spinners = parseDirectionRowColMap(tsText, "spinners");
+  const stoppers = parseRowColMap(tsText, "stoppers");
   const maps = parseMapIdRowCol(tsText);
   const teleports = parseTeleportsField(tsText);
   const exits = parseRowColMap(tsText, "exits");
@@ -751,6 +875,10 @@ for (const file of MAP_FILES) {
     imageFile,
     height,
     width,
+    start,
+    cave,
+    allowBicycle,
+    music,
     trainers,
     walls,
     fences,
@@ -758,13 +886,18 @@ for (const file of MAP_FILES) {
     water,
     encounters,
     texts,
+    textRewards,
     items,
     gifts,
     staticPokemon,
     pokemonCenter,
     pc,
     store,
+    storeItems,
     recoverLocation,
+    onlineBattleNpc,
+    spinners,
+    stoppers,
     maps,
     teleports,
     exits,

@@ -51,6 +51,10 @@ export interface ParsedTextReward {
 }
 
 export interface ParsedMap {
+  start: { x: number; y: number } | null;
+  cave: boolean;
+  allowBicycle: boolean;
+  music: string | null;
   walls: Record<string, number[]>;
   fences: Record<string, number[]>;
   grass: Record<string, number[]>;
@@ -63,7 +67,11 @@ export interface ParsedMap {
   pokemonCenter: { x: number; y: number } | null;
   pc: { x: number; y: number } | null;
   store: { x: number; y: number } | null;
+  storeItems: string[];
   recoverLocation: { x: number; y: number } | null;
+  onlineBattleNpc: { x: number; y: number } | null;
+  spinners: Record<string, Record<string, 'down' | 'up' | 'left' | 'right'>>;
+  stoppers: Record<string, number[]>;
   maps: Record<string, Record<string, string>>;
   teleports: Record<string, Record<string, { map: string; pos: { x: number; y: number } }>>;
   exits: Record<string, number[]>;
@@ -121,6 +129,64 @@ function parsePos(tsText: string, key: string): { x: number; y: number } | null 
   const m = tsText.match(re);
   if (!m) return null;
   return { x: parseInt(m[1], 10), y: parseInt(m[2], 10) };
+}
+
+function parseBooleanField(tsText: string, key: string): boolean {
+  const re = new RegExp(`(?<![\\w])${key}\\s*:\\s*true`);
+  return re.test(tsText);
+}
+
+function parseMusicField(tsText: string): string | null {
+  const explicit = tsText.match(/(?<![\w])music\s*:\s*([^,\n}]+)/);
+  if (explicit) return explicit[1].trim();
+  const shorthand = tsText.match(/(?<![\w])music\s*,/);
+  return shorthand ? 'music' : null;
+}
+
+function parseItemTypeArrayField(tsText: string, key: string): string[] {
+  const m = tsText.match(new RegExp(`(?<![\\w])${key}\\s*:\\s*\\[`));
+  if (!m || m.index === undefined) return [];
+  const startIdx = tsText.indexOf('[', m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, startIdx, '[', ']');
+  if (!blk) return [];
+  const result: string[] = [];
+  const re = /ItemType\.(\w+)/g;
+  let itemM: RegExpExecArray | null;
+  while ((itemM = re.exec(blk.text)) !== null) {
+    result.push(itemM[1]);
+  }
+  return result;
+}
+
+function parseDirectionRowColMap(tsText: string, key: string): Record<string, Record<string, 'down' | 'up' | 'left' | 'right'>> {
+  const m = tsText.match(new RegExp(`(?<![\\w])${key}\\s*:\\s*\\{`));
+  if (!m || m.index === undefined) return {};
+  const blockStart = tsText.indexOf('{', m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, blockStart);
+  if (!blk) return {};
+
+  const result: Record<string, Record<string, 'down' | 'up' | 'left' | 'right'>> = {};
+  const inner = blk.text.slice(1, -1);
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    const rowMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    if (!rowMatch) { i++; continue; }
+    const rowKey = rowMatch[1];
+    i += rowMatch[0].length - 1;
+    const rowBlk = findBalancedBlock(inner, i);
+    if (!rowBlk) break;
+    const row: Record<string, 'down' | 'up' | 'left' | 'right'> = {};
+    const colRe = /(-?\d+)\s*:\s*Direction\.(Down|Up|Left|Right)/g;
+    let colM: RegExpExecArray | null;
+    while ((colM = colRe.exec(rowBlk.text)) !== null) {
+      row[colM[1]] = colM[2].toLowerCase() as 'down' | 'up' | 'left' | 'right';
+    }
+    if (Object.keys(row).length > 0) result[rowKey] = row;
+    i = rowBlk.end + 1;
+  }
+  return result;
 }
 
 function parseTextField(tsText: string): Record<string, Record<string, string[]>> {
@@ -516,6 +582,10 @@ function parseTextRewardsField(tsText: string): Record<string, Record<string, Pa
 
 export function parseMapTS(tsText: string): ParsedMap {
   return {
+    start: parsePos(tsText, 'start'),
+    cave: parseBooleanField(tsText, 'cave'),
+    allowBicycle: parseBooleanField(tsText, 'allowBicycle'),
+    music: parseMusicField(tsText),
     walls: parseRowColMap(tsText, 'walls'),
     fences: parseRowColMap(tsText, 'fences'),
     grass: parseRowColMap(tsText, 'grass'),
@@ -529,7 +599,11 @@ export function parseMapTS(tsText: string): ParsedMap {
     pokemonCenter: parsePos(tsText, 'pokemonCenter'),
     pc: parsePos(tsText, 'pc'),
     store: parsePos(tsText, 'store'),
+    storeItems: parseItemTypeArrayField(tsText, 'storeItems'),
     recoverLocation: parsePos(tsText, 'recoverLocation'),
+    onlineBattleNpc: parsePos(tsText, 'onlineBattleNpc'),
+    spinners: parseDirectionRowColMap(tsText, 'spinners'),
+    stoppers: parseRowColMap(tsText, 'stoppers'),
     maps: parseMapIdRowCol(tsText),
     teleports: parseTeleportsField(tsText),
     exits: parseRowColMap(tsText, 'exits'),
