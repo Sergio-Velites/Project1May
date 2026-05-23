@@ -185,6 +185,16 @@ trainers: [
     9: [4, 5, 6, 7, 8],
     5: [4, 5, 6, 7, 8, 10, 11, 12, 13],
   },
+  staticPokemon: [
+    {
+      pokemonId: 175,
+      level: 5,
+      sprite: "cute-b",
+      pos: { x: 4, y: 6 },
+      questId: "route-1-static-4-6",
+      intro: ["priii"],
+    },
+  ],
 };
 
 export default route1;
