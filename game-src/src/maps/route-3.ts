@@ -151,7 +151,7 @@ const route3: MapType = {
   trainers: [
     {
     npc: oak,
-    pokemon: [{ id: 122, level: 35 }, { id: 125, level: 37 }, { id: 124, level: 37 }, { id: 154, level: 39 }, { id: 157, level: 39 }, { id: 158, level: 40 }],
+    pokemon: [{ id: 122, level: 35 }, { id: 125, level: 37 }, { id: 124, level: 37 }, { id: 154, level: 39 }, { id: 157, level: 39 }, { id: 160, level: 40 }],
     facing: Direction.Right,
     pos: { x: 54, y: 6 },
     intro: [
@@ -161,9 +161,9 @@ const route3: MapType = {
       "Todo llorar..."
     ],
     outtro: [
-      "Aún querras más cosas no??'",
-      "Sigue buscando, se ha habierto nuevos caminos,",
-      "Y nuevos pokemon salvajes hana apareido!"
+      "Aún querrás más cosas no??'",
+      "Sigue buscando, se han abierto nuevos caminos,",
+      "Y nuevos pokémon salvajes han aparecido!"
     ],
     money: 2800,
     persistent: true,
@@ -172,9 +172,14 @@ const route3: MapType = {
     postGame: {
             message: [
               "¡Toma, para que sigas con tus andanzas!",
+              "Otra jodida masterball, y esta MO",
+              "CORTE! Te permitirá cortar los viñedos de monjardin",
+              "y de otros obstáculos de tu vida.",
               "Gracias por contribuir al juego.",
               "Y por supuesto, a la boda!",
               "¡Bebe más anís!",
+              "Que te veo seco",
+              "Más anís, siempre más anís!",
             ],
             items: [ItemType.MasterBall, ItemType.Hm01],
           },
