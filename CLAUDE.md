@@ -730,18 +730,20 @@ El campo `expression` del track es la cadena que se almacena en `MapType.music`.
 
 > **Nota de rendimiento**: el juego no tiene problemas de rendimiento medibles. Las dos optimizaciones anteriores son correctas y limpias, pero su impacto real es mínimo (arrays de < 10 elementos, llamadas solo en keypress). No hay trabajo de performance pendiente.
 
-### 20. Sprites de frente: todos Pokémon ocupaban el mismo espacio sin importar su tamaño real
-**Problema**: los 251 sprites tenían contenido ~50×50 dentro del canvas 56×56, independientemente de si el Pokémon mide 0.2m (Diglett) o 9.2m (Steelix).
-**Solución**: script Python que redimensiona el contenido de cada sprite con nearest-neighbor (sin pérdida de calidad pixel art) usando escala logarítmica según altura oficial PokéAPI. Canvas sigue siendo 56×56.
+### 20. Sprites de frente: escala proporcional a altura oficial (canvas 76×76)
+**Problema original**: los 251 sprites tenían contenido ~50×50 dentro del canvas 56×56, independientemente de si el Pokémon mide 0.2m (Diglett) o 9.2m (Steelix).
+**Solución**: canvas ampliado de 56×56 a **76×76**. El contenido de los Pokémon grandes se escala UP con nearest-neighbor (sin pérdida de calidad). Los pequeños quedan centrados en el canvas mayor sin escalar, apareciendo proporcionalmente más pequeños.
 
 ```
-Rango: 0.2m → 28px (50% del canvas)  a  9.2m → 50px (89% del canvas)
-Formula: target = round(28 + 22 * (log(h_dm) - log(2)) / (log(92) - log(2)))
+Canvas: 76×76 (1:1 ratio → sin impacto en CSS height:100% / object-fit:contain)
+Rango contenido: 0.2m → 50px  /  9.2m → 72px
+Formula: target = round(50 + 22 * (log(h_dm) - log(2)) / (log(92) - log(2)))
+Solo upscaling (nunca downscaling → calidad original preservada en pequeños)
 ```
 
-Ejemplos resultantes: Pikachu 32px, Charizard 40px, Snorlax 42px, Gyarados 48px, Onix/Steelix 50px.
+Ejemplos: Diglett/Natu 50px · Pikachu 54px · Charizard 62px · Snorlax 64px · Gyarados 70px · Onix/Steelix 72px.
 
-**Para re-ejecutar** (si se añaden sprites nuevos o se quiere ajustar el rango): el script está en el historial del commit `3343baa`. Modificar `MIN_TARGET`/`MAX_TARGET` para cambiar el rango de escala.
+**Para re-ejecutar** (nuevos sprites o ajuste de rango): script en commit `67546f5`. Cambiar `MIN_TARGET`/`MAX_TARGET` para ampliar o reducir la diferencia de escala.
 
 ---
 
