@@ -223,6 +223,11 @@ const ImageContainer = styled.div<ImageContainerProps>`
     `};
 `;
 
+const PlayerImageContainer = styled(ImageContainer)`
+  align-items: flex-start;
+  overflow: visible;
+`;
+
 const changePokemon = keyframes`
   0% {
     transform: translateX(0%);
@@ -304,7 +309,7 @@ const inFromRight = keyframes`
 `;
 
 const LeftImage = styled(PixelImage)`
-  height: 100%;
+  height: 155%;
 
   transform: translate(400%);
   animation: ${inFromRight} ${`${MOVEMENT_ANIMATION}ms`} linear forwards;
@@ -3548,7 +3553,7 @@ const PokemonEncounter = () => {
   processBattleRef.current = processBattle;
 
   const leftImage = () => {
-    if (stage <= 3) return playerBack;
+    if (stage <= 4) return playerBack;
     if (stage === 46) return playerBack;
     if (stage === 48) return playerBack;
     if (isThrowingEnemyPokeball && trainerPokemonIndex === 0) return playerBack;
@@ -3652,7 +3657,7 @@ const PokemonEncounter = () => {
               style={{ opacity: [24, 26, 27, 28].includes(stage) ? "0" : "1" }}
             >
               {/* Flash en el sprite del jugador solo cuando realmente le afecta el movimiento */}
-              <ImageContainer $flashing={(stage === 17 || stage === 19) && moveAnim?.target === "player" && moveAnim?.damageClass !== "status"}>
+              <PlayerImageContainer $flashing={(stage === 17 || stage === 19) && moveAnim?.target === "player" && moveAnim?.damageClass !== "status"}>
                 <AttackLeft $attacking={stage === 15 && moveAnim?.damageClass === "physical"}>
                   <ChangePokemon $changing={[3, 25].includes(stage)}>
                     <LeftImage src={leftImage()} style={{ visibility: playerHidden || playerSubVisible ? "hidden" : "visible" }} />
@@ -3664,7 +3669,7 @@ const PokemonEncounter = () => {
                   active={(stage === 15 || stage === 18) && moveAnim?.target === "player"}
                   fromDirection="right"
                 />
-              </ImageContainer>
+              </PlayerImageContainer>
               <RightInfoSection
                 style={{
                   opacity:
