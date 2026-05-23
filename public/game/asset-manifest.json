@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/game/static/css/main.84e6e57a.css",
-    "main.js": "/game/static/js/main.71b17639.js",
+    "main.js": "/game/static/js/main.627a3d45.js",
     "static/media/pewter-city.mp3": "/game/static/media/pewter-city.dbfe2794208a91f807e7.mp3",
     "static/media/mt-moon.mp3": "/game/static/media/mt-moon.d3c96e8c603b742504e6.mp3",
     "static/media/intro.mp4": "/game/static/media/intro.635c67d841e2fe0b7a4e.mp4",
@@ -20,8 +20,8 @@
     "static/media/button-press.wav": "/game/static/media/button-press.8a824ede28efe6b70d20.wav",
     "static/media/viridian-forrest.png": "/game/static/media/viridian-forrest.8fa48ebfd05a497b419d.png",
     "static/media/route-3.png": "/game/static/media/route-3.a91b90fbfbe854c97586.png",
-    "static/media/pewter-city.png": "/game/static/media/pewter-city.2d6fc01e6412ffaa4bbd.png",
-    "static/media/route-2.png": "/game/static/media/route-2.5268416a49ed69de67ac.png",
+    "static/media/pewter-city.png": "/game/static/media/pewter-city.23b98be3f88fc34a2a70.png",
+    "static/media/route-2.png": "/game/static/media/route-2.23f513831f193da81795.png",
     "static/media/viridian-city.png": "/game/static/media/viridian-city.e9fb451830b641b3ca11.png",
     "static/media/mt-moon-2f.png": "/game/static/media/mt-moon-2f.c061760b47cfa4a2342d.png",
     "static/media/mt-moon-1f.png": "/game/static/media/mt-moon-1f.aa00738da6c7531edef5.png",
@@ -34,6 +34,6 @@
   },
   "entrypoints": [
     "static/css/main.84e6e57a.css",
-    "static/js/main.71b17639.js"
+    "static/js/main.627a3d45.js"
   ]
 }

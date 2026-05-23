@@ -1,7 +1,7 @@
 import image from "../assets/map/route-2.png";
 import music from "../assets/music/maps/route-1.mp3";
 import getEncounterData from "./get-location-data";
-import { bugCatcher, jrTrainerMale, lass, youngster } from "../app/npcs";
+import { bugCatcher, jrTrainerMale, lass, youngster, teamRocketGrunt } from "../app/npcs";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 

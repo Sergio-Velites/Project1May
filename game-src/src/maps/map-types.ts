@@ -170,6 +170,7 @@ export type StaticPokemonSprite =
   | "fossil-a"| "fossil-b"
   | "grass-a" | "grass-b"
   | "monster-a"| "monster-b"
+  | "ball-0"   | "ball-a"   | "ball-b"
   | "none";
 
 export interface StaticPokemonType {

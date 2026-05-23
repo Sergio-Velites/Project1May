@@ -1,6 +1,6 @@
 import image from "../assets/map/pewter-city.png";
 import { MapId, MapType } from "./map-types";
-import { aceTrainerMale, beauty, hiker, jrTrainerMale, scientist } from "../app/npcs";
+import { aceTrainerMale, beauty, hiker, jrTrainerMale, scientist, teamRocketGrunt } from "../app/npcs";
 import { Direction } from "../state/state-types";
 import music from "../assets/music/maps/pewter-city.mp3";
 
@@ -133,7 +133,7 @@ const pewterCity: MapType = {
       },
     },
   exits: {},
-  exitReturnMap: MapId.Route2gateNorth,
+  exitReturnMap: MapId.Route2GateNorth,
   exitReturnPos: { x: 5, y: 1 },
   recoverLocation: { x: 13, y: 26 },
   staticPokemon: [
