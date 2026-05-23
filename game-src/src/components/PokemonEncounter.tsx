@@ -913,6 +913,7 @@ const PokemonEncounter = () => {
       setEnemyStages(DEFAULT_STAGES);
       enemyFlinchRef.current = false;
 
+      dispatch(seePokemon(newPokemon.id));
       throwPokeballAtEnemy(49, newPokemon.id);
       return;
     }
