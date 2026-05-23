@@ -99,7 +99,7 @@ const useQuests = () => {
         dispatch(moveLeft());
         dispatch(setBlackScreen(true));
         setTimeout(() => {
-          dispatch(setPos({ x: 14, y: 19 }));
+          dispatch(setPos({ x: 11, y: 18 }));
         }, 300);
         setTimeout(() => {
           dispatch(setBlackScreen(false));

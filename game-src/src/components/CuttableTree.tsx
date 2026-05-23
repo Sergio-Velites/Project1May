@@ -138,7 +138,7 @@ const CuttableTree = () => {
         // Sin Pokémon que sepa Corte: mensaje informativo
         dispatch(
           showTextThenAction({
-            text: ["Necesitas la MO CORTE para esto."],
+            text: ["Este árbol se podría cortar..."],
             action: () => {},
           })
         );
