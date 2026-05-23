@@ -538,7 +538,7 @@ app/admin/page.tsx           → Server Component: fetch RSVPs de Supabase (via 
         └── quest-names.ts   → Labels de quests
 ```
 
-Las credenciales Supabase se leen de `process.env.SUPABASE_URL` y `process.env.SUPABASE_ANON_KEY` (no están hardcodeadas en el código).
+Las credenciales Supabase se leen de `process.env.NEXT_PUBLIC_SUPABASE_URL` y `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` (no están hardcodeadas en el código).
 
 ### Sistema de medallas (admin-medals.ts)
 
@@ -714,7 +714,7 @@ El campo `expression` del track es la cadena que se almacena en `MapType.music`.
 **Solución**: `if (context?.defenderIsProtected)` — bloquea todo.
 
 ### 16. Credenciales Supabase hardcodeadas en admin (resuelto)
-**Solución**: `process.env.SUPABASE_URL` y `process.env.SUPABASE_ANON_KEY` (configuradas en Vercel).
+**Solución**: `process.env.NEXT_PUBLIC_SUPABASE_URL` y `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` (configuradas en Vercel con ese nombre exacto).
 
 ### 17. Open redirect en admin login (resuelto)
 **Solución**: `?next=` solo acepta paths internos (`/` y no `//`).
@@ -733,11 +733,14 @@ REACT_APP_SUPABASE_ANON_KEY=<anon-key>
 ### Vercel (dashboard del proyecto)
 
 ```bash
-SUPABASE_URL=https://<project-ref>.supabase.co
-SUPABASE_ANON_KEY=<anon-key>
+NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co   # ⚠️ con NEXT_PUBLIC_ prefix
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>                     # ⚠️ con NEXT_PUBLIC_ prefix
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 ADMIN_PASSWORD=<contraseña-del-panel-admin>
+ADMIN_SECRET=<secreto-edge-functions>
 ALLOWED_ORIGINS=https://tu-dominio.vercel.app  # Para validación WebAuthn origin
 ```
+
+> **⚠️ IMPORTANTE**: Las variables de Supabase usan el prefijo `NEXT_PUBLIC_` tanto para el juego (React) como para el panel admin (Next.js Server Component). Nunca usar `SUPABASE_URL` ni `SUPABASE_ANON_KEY` sin prefijo — no existen en Vercel.
 
 > **Nota**: La variable del panel admin se llama `ADMIN_PASSWORD` en el middleware (cookie) y `ADMIN_SECRET` en la Edge Function `get-all-rsvp`. Son dos mecanismos distintos: el middleware protege las rutas Next.js; `ADMIN_SECRET` protege la Edge Function de Supabase.
