@@ -264,7 +264,15 @@ const HEAL_FRACTION: Record<string, number> = {
 };
 
 /** Movimientos sin efecto visible en combate */
-const NO_EFFECT_MOVES = new Set(["splash", "teleport", "focus-energy"]);
+const NO_EFFECT_MOVES = new Set([
+  "splash", "teleport", "focus-energy",
+  // Gen II — mecánicas no implementadas (caen a sin-efecto limpiamente)
+  "nightmare", "attract", "encore", "destiny-bond", "future-sight",
+  "rollout", "fury-cutter", "magnitude", "belly-drum", "endure",
+  "safeguard", "sandstorm", "sunny-day", "rain-dance", "spikes",
+  "conversion-2", "spider-web", "mean-look", "lock-on", "psych-up",
+  "perish-song",
+]);
 
 /** Movimientos que causan confusión (estado volátil real — gestionado en PokemonEncounter) */
 export const CONFUSE_MOVES = new Set(["confuse-ray", "supersonic", "sweet-kiss"]);
@@ -275,8 +283,8 @@ export const CHARGE_MOVES = new Set(["solar-beam", "razor-wind", "sky-attack", "
 /** Movimientos de invulnerabilidad de 2 turnos — T1: desaparecer, T2: atacar */
 export const INVULNERABLE_MOVES = new Set(["dig", "fly"]);
 
-/** Trap moves Gen I — atrapan al rival 2-5 turnos sin dejarle actuar */
-export const TRAP_MOVES = new Set(["bind", "wrap", "fire-spin", "clamp"]);
+/** Trap moves Gen I+II — atrapan al rival 2-5 turnos sin dejarle actuar */
+export const TRAP_MOVES = new Set(["bind", "wrap", "fire-spin", "clamp", "whirlpool"]);
 
 /** Movimientos exclusivos de Gen I — usados para el sorteo de Metrónomo */
 export const GEN1_MOVE_IDS: ReadonlyArray<string> = [
@@ -404,6 +412,7 @@ export interface MoveResult {
   isProtect?: boolean;        // Protect/Detect — activa escudo este turno
   isSwagger?: boolean;        // Swagger — +2 atk al rival + confusión
   isRapidSpin?: boolean;      // Rapid Spin — limpia trampas del usuario
+  isPainSplit?: boolean;      // Pain Split — HP promediados (muestra mensaje)
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -454,7 +463,8 @@ const processMove = (
   }
 
   // ── Defend check: el defensor usó Protect/Detect → el ataque falla ─────────
-  if (context?.defenderIsProtected && moveMetadata.power) {
+  // Bloquea TODO movimiento dirigido al defensor (daño, estado, stats)
+  if (context?.defenderIsProtected) {
     return { ...defaultReturn, missed: true };
   }
 
@@ -502,23 +512,15 @@ const processMove = (
   }
 
   // ── Pain Split — promedia los HP de ambos contendientes ──────────────────
+  // us/them siempre son usuario/objetivo independientemente de isAttacking;
+  // ourStats/theirStats son sus máximos respectivos — no necesitamos ternario.
   if (move === "pain-split") {
-    const myHp   = isAttacking ? us.hp   : them.hp;
-    const foeHp  = isAttacking ? them.hp : us.hp;
-    const myMax  = isAttacking ? ourStats.hp   : theirStats.hp;
-    const foeMax = isAttacking ? theirStats.hp : ourStats.hp;
-    const avg    = Math.floor((myHp + foeHp) / 2);
-    if (isAttacking) {
-      return {
-        ...defaultReturn,
-        us:   { ...usAfterPP, hp: Math.min(myMax, avg) },
-        them: { ...them, hp: Math.min(foeMax, avg) },
-      };
-    }
+    const avg = Math.floor((us.hp + them.hp) / 2);
     return {
       ...defaultReturn,
-      us:   { ...usAfterPP, hp: Math.min(myMax, avg) },
-      them: { ...them, hp: Math.min(foeMax, avg) },
+      isPainSplit: true,
+      us:   { ...usAfterPP, hp: Math.min(ourStats.hp,   avg) },
+      them: { ...them,      hp: Math.min(theirStats.hp, avg) },
     };
   }
 

@@ -6,9 +6,8 @@
 import CsvDownload from "./CsvDownload";
 import AdminDashboard from "./AdminDashboard";
 
-const SUPABASE_URL = "https://kplfjrjibjptigvfgdvy.supabase.co";
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwbGZqcmppYmpwdGlndmZnZHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1OTMxNjMsImV4cCI6MjA5MzE2OTE2M30.lOgErwiQHTp98A3a7Z3ZotvYKmdxbwScNFgN_9lOijM";
+const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ?? "";
 
 interface PokemonInst {
   id: number;

@@ -37,7 +37,28 @@ Deno.serve(async (req) => {
       .single();
     if (credErr || !cred) throw new Error("Credential not found");
 
-    // 3. Éxito — devolver el user_id asociado
+    // 3. Validar clientDataJSON: type y origin
+    if (credential.response?.clientDataJSON) {
+      try {
+        const clientData = JSON.parse(
+          new TextDecoder().decode(
+            Uint8Array.from(atob(credential.response.clientDataJSON.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0))
+          )
+        );
+        if (clientData.type !== "webauthn.get") throw new Error("Invalid clientDataJSON type");
+        const allowedOrigins = (Deno.env.get("ALLOWED_ORIGINS") ?? "").split(",").map((o: string) => o.trim()).filter(Boolean);
+        if (allowedOrigins.length > 0 && !allowedOrigins.includes(clientData.origin)) {
+          throw new Error("Origin not allowed");
+        }
+      } catch (e) {
+        const msg = (e as Error).message ?? String(e);
+        if (msg === "Invalid clientDataJSON type" || msg === "Origin not allowed") throw e;
+        // Error de parseo: clientDataJSON malformado — rechazar
+        throw new Error("Invalid clientDataJSON");
+      }
+    }
+
+    // 4. Éxito — devolver el user_id asociado
     return json({ success: true, userId: cred.user_id }, 200, corsHeaders);
   } catch (e) {
     return json({ error: (e as Error).message ?? String(e) }, 400, corsHeaders);

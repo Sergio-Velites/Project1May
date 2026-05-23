@@ -329,6 +329,9 @@ export const gameSlice = createSlice({
         s.visitedMaps && s.visitedMaps.length > 0
           ? s.visitedMaps
           : inferVisitedMaps(s);
+      state.lastHealLocation = s.lastHealLocation ?? undefined;
+      // Guardar al máximo 6 pokémon en equipo (integridad del save)
+      if (state.pokemon.length > 6) state.pokemon = state.pokemon.slice(0, 6);
       recordVisit(state, s.map);
       if (s.rsvp) state.rsvp = s.rsvp;
     },
@@ -511,7 +514,7 @@ export const gameSlice = createSlice({
       state.money += action.payload;
     },
     takeMoney: (state, action: PayloadAction<number>) => {
-      state.money -= action.payload;
+      state.money = Math.max(0, state.money - action.payload);
     },
     encounterTrainer: (state, action: PayloadAction<TrainerType>) => {
       state.trainerEncounter = action.payload;

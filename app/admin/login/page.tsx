@@ -22,7 +22,8 @@ function LoginForm() {
     });
 
     if (res.ok) {
-      const next = searchParams.get('next') ?? '/admin/map-editor';
+      const raw = searchParams.get('next') ?? '';
+      const next = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/admin';
       router.push(next);
     } else {
       setError('Contraseña incorrecta');

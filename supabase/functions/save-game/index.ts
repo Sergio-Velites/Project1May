@@ -7,6 +7,8 @@ Deno.serve(async (req) => {
   try {
     const { userId, gameState } = await req.json();
     if (!userId || !gameState) throw new Error("userId and gameState are required");
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!UUID_RE.test(userId)) throw new Error("Invalid userId format");
 
     const { error } = await db.rpc("upsert_save", {
       p_user_id: userId,

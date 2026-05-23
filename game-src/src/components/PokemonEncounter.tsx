@@ -2217,6 +2217,7 @@ const PokemonEncounter = () => {
       isProtect,
       isSwagger,
       isRapidSpin,
+      isPainSplit,
     } = result;
     if (isAttacking) {
       if (moveId) {
@@ -2421,11 +2422,14 @@ const PokemonEncounter = () => {
           // Aplica +2 atk al rival (defender) y lo confunde (ref ya asignado arriba)
           const swagChange = { stat: "attack" as const, target: "defender" as const, delta: +2 };
           if (!enemyMistRef.current) applyStatChange(swagChange, isAttacking);
-          setAlertText(`¡${enemyMetadata.name.toUpperCase()} se agobió!`);
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} se agobió y quedó confundido!`);
           setStage(17);
         } else if (isRapidSpin) {
           // Rapid Spin: el jugador se deshace de las trampas que sufre
           playerTrappedTurnsRef.current = 0;
+          setStage(17);
+        } else if (isPainSplit) {
+          setAlertText(`¡Los PS se igualaron!`);
           setStage(17);
         } else if (confuse) {
           // Confusión al rival (mensaje; el ref ya se aplicó arriba para que
@@ -2638,11 +2642,14 @@ const PokemonEncounter = () => {
           // Aplica +2 atk al jugador (defender cuando es el rival quien ataca) y confunde
           const swagChange = { stat: "attack" as const, target: "defender" as const, delta: +2 };
           if (!playerMistRef.current) applyStatChange(swagChange, isAttacking);
-          setAlertText(`¡${activeMetadata.name.toUpperCase()} se agobió!`);
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} se agobió y quedó confundido!`);
           setStage(19);
         } else if (isRapidSpin) {
           // Rapid Spin del rival: el rival se deshace de sus trampas
           enemyTrappedTurnsRef.current = 0;
+          setStage(19);
+        } else if (isPainSplit) {
+          setAlertText(`¡Los PS se igualaron!`);
           setStage(19);
         } else if (confuse) {
           // Confusión al jugador (mensaje; el ref ya se aplicó arriba para
