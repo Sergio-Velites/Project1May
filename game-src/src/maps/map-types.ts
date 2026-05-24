@@ -35,6 +35,171 @@ export enum MapId {
   MtMoon1f = "mt-moon-1f",
   MtMoon2f = "mt-moon-2f",
   MtMoon3f = "mt-moon-3f",
+  Route3pokemonCenter = "Route3pokemonCenter",
+
+  // ── Rutas nuevas ──────────────────────────────────────────────────────────
+  Route4 = "route-4",
+  Route5 = "route-5",
+  Route6 = "route-6",
+  Route7 = "route-7",
+  Route8 = "route-8",
+  Route9 = "route-9",
+  Route10 = "route-10",
+  Route11 = "route-11",
+  Route12 = "route-12",
+  Route13 = "route-13",
+  Route14 = "route-14",
+  Route15 = "route-15",
+  Route16 = "route-16",
+  Route17 = "route-17",
+  Route18 = "route-18",
+  Route19 = "route-19",
+  Route20 = "route-20",
+  Route21 = "route-21",
+  Route23 = "route-23",
+  Route24 = "route-24",
+  Route25 = "route-25",
+
+  // ── Casetas / caminos subterráneos ────────────────────────────────────────
+  Route4Gate = "route-4-gate",
+  UndergroundPathNS = "underground-path-ns",
+  UndergroundPathEW = "underground-path-ew",
+  Route12Gate = "route-12-gate",
+  Route15Gate = "route-15-gate",
+  Route16Gate = "route-16-gate",
+
+  // ── Ciudad Celeste ────────────────────────────────────────────────────────
+  CeruleanCity = "cerulean-city",
+  CeruleanCityPokemonCenter = "cerulean-city-pokemon-center",
+  CeruleanCityPokeMart = "cerulean-city-poke-mart",
+  CeruleanCityGym = "cerulean-city-gym",
+  CeruleanCityBikeShop = "cerulean-city-bike-shop",
+  CeruleanCityHouseA = "cerulean-city-house-a",
+  CeruleanCityHouseB = "cerulean-city-house-b",
+
+  // ── Ciudad Carmín ─────────────────────────────────────────────────────────
+  VermilionCity = "vermilion-city",
+  VermilionCityPokemonCenter = "vermilion-city-pokemon-center",
+  VermilionCityPokeMart = "vermilion-city-poke-mart",
+  VermilionCityGym = "vermilion-city-gym",
+  VermilionCityFanClub = "vermilion-city-fan-club",
+  VermilionCityHouseA = "vermilion-city-house-a",
+  VermilionCityHouseB = "vermilion-city-house-b",
+
+  // ── S.S. Aguamarina ───────────────────────────────────────────────────────
+  SsAnneBf1 = "ss-anne-bf1",
+  SsAnne1f = "ss-anne-1f",
+  SsAnne2f = "ss-anne-2f",
+  SsAnne3f = "ss-anne-3f",
+
+  // ── Cueva Diglett ─────────────────────────────────────────────────────────
+  DiglettsCave = "diglets-cave",
+
+  // ── Túnel Roca ────────────────────────────────────────────────────────────
+  RockTunnel1f = "rock-tunnel-1f",
+  RockTunnel2f = "rock-tunnel-2f",
+
+  // ── Pueblo Lavanda ────────────────────────────────────────────────────────
+  LavenderTown = "lavender-town",
+  LavenderTownPokemonCenter = "lavender-town-pokemon-center",
+  LavenderTownPokeMart = "lavender-town-poke-mart",
+  LavenderTownHouseA = "lavender-town-house-a",
+  LavenderTownHouseB = "lavender-town-house-b",
+
+  // ── Torre Pokémon ─────────────────────────────────────────────────────────
+  PokemonTower1f = "pokemon-tower-1f",
+  PokemonTower2f = "pokemon-tower-2f",
+  PokemonTower3f = "pokemon-tower-3f",
+  PokemonTower4f = "pokemon-tower-4f",
+  PokemonTower5f = "pokemon-tower-5f",
+  PokemonTower6f = "pokemon-tower-6f",
+  PokemonTower7f = "pokemon-tower-7f",
+
+  // ── Ciudad Celedón ────────────────────────────────────────────────────────
+  CeladonCity = "celadon-city",
+  CeladonCityPokemonCenter = "celadon-city-pokemon-center",
+  CeladonCityPokeMart = "celadon-city-poke-mart",
+  CeladonCityGym = "celadon-city-gym",
+  CeladonCityDeptStore1f = "celadon-city-dept-store-1f",
+  CeladonCityDeptStore2f = "celadon-city-dept-store-2f",
+  CeladonCityDeptStore3f = "celadon-city-dept-store-3f",
+  CeladonCityDeptStore4f = "celadon-city-dept-store-4f",
+  CeladonCityDeptStore5f = "celadon-city-dept-store-5f",
+  CeladonCityDeptStore6f = "celadon-city-dept-store-6f",
+  CeladonCityGameCorner = "celadon-city-game-corner",
+  CeladonCityPrizeRoom = "celadon-city-prize-room",
+  CeladonCityHouseA = "celadon-city-house-a",
+  CeladonCityHouseB = "celadon-city-house-b",
+
+  // ── Ciudad Fucsia ─────────────────────────────────────────────────────────
+  FuchsiaCity = "fuchsia-city",
+  FuchsiaCityPokemonCenter = "fuchsia-city-pokemon-center",
+  FuchsiaCityPokeMart = "fuchsia-city-poke-mart",
+  FuchsiaCityGym = "fuchsia-city-gym",
+  FuchsiaCityWardenHouse = "fuchsia-city-warden-house",
+  FuchsiaCityHouseA = "fuchsia-city-house-a",
+  FuchsiaCityHouseB = "fuchsia-city-house-b",
+  SafariZoneCenter = "safari-zone-center",
+  SafariZoneArea1 = "safari-zone-area-1",
+  SafariZoneArea2 = "safari-zone-area-2",
+  SafariZoneArea3 = "safari-zone-area-3",
+
+  // ── Central Eléctrica ─────────────────────────────────────────────────────
+  PowerPlant = "power-plant",
+
+  // ── Islas Espuma ──────────────────────────────────────────────────────────
+  SeafoamIslands1f = "seafoam-islands-1f",
+  SeafoamIslands2f = "seafoam-islands-2f",
+  SeafoamIslands3f = "seafoam-islands-3f",
+  SeafoamIslands4f = "seafoam-islands-4f",
+
+  // ── Ciudad Azafrán ────────────────────────────────────────────────────────
+  SaffronCity = "saffron-city",
+  SaffronCityPokemonCenter = "saffron-city-pokemon-center",
+  SaffronCityPokeMart = "saffron-city-poke-mart",
+  SaffronCityGym = "saffron-city-gym",
+  SaffronCityFightingDojo = "saffron-city-fighting-dojo",
+  SaffronCityCopycatHouse = "saffron-city-copycat-house",
+  SaffronCityHouseA = "saffron-city-house-a",
+  SaffronCityHouseB = "saffron-city-house-b",
+  SilphCo1f = "silph-co-1f",
+  SilphCo2f = "silph-co-2f",
+  SilphCo3f = "silph-co-3f",
+  SilphCo4f = "silph-co-4f",
+  SilphCo5f = "silph-co-5f",
+  SilphCo6f = "silph-co-6f",
+  SilphCo7f = "silph-co-7f",
+  SilphCo8f = "silph-co-8f",
+  SilphCo9f = "silph-co-9f",
+  SilphCo10f = "silph-co-10f",
+  SilphCo11f = "silph-co-11f",
+
+  // ── Isla Cinabria ─────────────────────────────────────────────────────────
+  CinnabarIsland = "cinnabar-island",
+  CinnabarIslandPokemonCenter = "cinnabar-island-pokemon-center",
+  CinnabarIslandPokeMart = "cinnabar-island-poke-mart",
+  CinnabarIslandGym = "cinnabar-island-gym",
+  CinnabarIslandLab = "cinnabar-island-lab",
+  PokemonMansion1f = "pokemon-mansion-1f",
+  PokemonMansion2f = "pokemon-mansion-2f",
+  PokemonMansion3f = "pokemon-mansion-3f",
+  PokemonMansion4f = "pokemon-mansion-4f",
+
+  // ── Camino Victoria y Liga Pokémon ────────────────────────────────────────
+  VictoryRoad1f = "victory-road-1f",
+  VictoryRoad2f = "victory-road-2f",
+  VictoryRoad3f = "victory-road-3f",
+  IndigoPlateau = "indigo-plateau",
+  EliteFour1 = "elite-four-1",
+  EliteFour2 = "elite-four-2",
+  EliteFour3 = "elite-four-3",
+  EliteFour4 = "elite-four-4",
+  ChampionRoom = "champion-room",
+
+  // ── Cueva Celeste ─────────────────────────────────────────────────────────
+  CeruleanCave1f = "cerulean-cave-1f",
+  CeruleanCave2f = "cerulean-cave-2f",
+  CeruleanCave3f = "cerulean-cave-3f",
 }
 
 export interface PokemonMinimalType {
