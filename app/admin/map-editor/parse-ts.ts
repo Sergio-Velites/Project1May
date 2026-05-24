@@ -78,6 +78,7 @@ export interface ParsedMap {
   exitReturnMap: string | null;
   exitReturnPos: { x: number; y: number } | null;
   staticPokemon: ParsedStaticPokemon[];
+  minimapPos: { x: number; y: number } | null;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────
@@ -609,6 +610,7 @@ export function parseMapTS(tsText: string): ParsedMap {
     exits: parseRowColMap(tsText, 'exits'),
     exitReturnMap: parseEnumValue(tsText, 'exitReturnMap'),
     exitReturnPos: parsePos(tsText, 'exitReturnPos'),
+    minimapPos: parsePos(tsText, 'minimapPos'),
   };
 }
 

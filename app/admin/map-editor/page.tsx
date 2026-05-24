@@ -613,6 +613,7 @@ function exportFullMapTypeTS({
   exitReturnPos,
   spinners,
   stoppers,
+  minimapPos,
 }: {
   currentMap: MapEntry;
   start: { x: number; y: number } | null;
@@ -642,6 +643,7 @@ function exportFullMapTypeTS({
   exitReturnPos: { x: number; y: number } | null;
   spinners: Record<string, Record<string, DirectionName>>;
   stoppers: Record<string, number[]>;
+  minimapPos: { x: number; y: number } | null;
 }): string {
   const { maps, teleports, exits } = nestPortals(portals);
   const lines: string[] = [
@@ -706,6 +708,7 @@ function exportFullMapTypeTS({
   if (gifts.length > 0) lines.push(exportGiftsTS(gifts));
   if (staticPokemon.length > 0) lines.push(exportStaticPokemonTS(staticPokemon));
   if (cuttableTrees.length > 0) lines.push(exportCuttableTreesTS(cuttableTrees));
+  if (minimapPos) lines.push(`minimapPos: { x: ${minimapPos.x}, y: ${minimapPos.y} },`);
   lines.push(exportTrainersArrayTS(trainers));
 
   return `{\n${lines.map((line) => indentTS(line)).join('\n')}\n}`;
@@ -805,6 +808,8 @@ export default function MapEditor() {
   const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
   const [error, setError] = useState('');
   const [showMinimap, setShowMinimap] = useState(false);
+  const [minimapMode, setMinimapMode] = useState<'edit' | 'navigate'>('navigate');
+  const [minimapPos, setMinimapPos] = useState<{ x: number; y: number } | null>(null);
 
   const dragging = useRef<{ idx: number; startX: number; startY: number } | null>(null);
   // Drag genérico para texts/items/gifts/portals
@@ -886,6 +891,7 @@ export default function MapEditor() {
     setPortals(flattenPortals(m));
     setExitReturnMap(m.exitReturnMap ?? null);
     setExitReturnPos(m.exitReturnPos ?? null);
+    setMinimapPos((m as MapEntry & { minimapPos?: { x: number; y: number } }).minimapPos ?? null);
     setSelectedPortalIdx(null);
   }
 
@@ -946,6 +952,7 @@ export default function MapEditor() {
                 exitReturnPos,
               };
             })(),
+            minimapPos,
           },
         }),
       });
@@ -1005,6 +1012,7 @@ export default function MapEditor() {
             exits,
             exitReturnMap,
             exitReturnPos,
+            minimapPos,
           },
         };
       });
@@ -1128,6 +1136,7 @@ export default function MapEditor() {
       exitReturnPos,
       spinners,
       stoppers,
+      minimapPos,
     });
     navigator.clipboard.writeText(ts).then(() => alert('¡Objeto MapType completo copiado!'));
   }
@@ -1930,7 +1939,6 @@ export default function MapEditor() {
 
   const minimapCoords = getMinimapCoords(selectedMapId);
   const MINIMAP_SCALE = 2;
-  const MINIMAP_DOT = 8;
 
   // ── Render ────────────────────────────────────────────────────────────
   if (error) {
@@ -2179,7 +2187,35 @@ export default function MapEditor() {
           gap: 16,
           padding: '12px 20px',
         }}>
-          <div style={{ position: 'relative', display: 'inline-block', flexShrink: 0 }}>
+          {/* Imagen interactiva */}
+          <div
+            style={{
+              position: 'relative',
+              display: 'inline-block',
+              flexShrink: 0,
+              cursor: minimapMode === 'edit' ? 'crosshair' : 'pointer',
+              outline: minimapMode === 'edit' ? '2px solid #ffaa44' : '2px solid #2a2a4a',
+              borderRadius: 2,
+            }}
+            onClick={(e) => {
+              const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+              const px = Math.round((e.clientX - rect.left) / MINIMAP_SCALE);
+              const py = Math.round((e.clientY - rect.top) / MINIMAP_SCALE);
+              if (minimapMode === 'edit') {
+                setMinimapPos({ x: px, y: py });
+                setDirty(true);
+              } else {
+                // Navegar: buscar el mapa más cercano
+                let bestId = '';
+                let bestDist = Infinity;
+                for (const [id, coord] of Object.entries(MINIMAP_COORDS)) {
+                  const d = Math.hypot(coord.x - px, coord.y - py);
+                  if (d < bestDist) { bestDist = d; bestId = id; }
+                }
+                if (bestId && bestDist < 20) selectMap(bestId);
+              }
+            }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/editor/maps/kanto_region.png"
@@ -2187,29 +2223,94 @@ export default function MapEditor() {
               width={237 * MINIMAP_SCALE}
               height={213 * MINIMAP_SCALE}
               style={{ imageRendering: 'pixelated', display: 'block' }}
+              draggable={false}
             />
-            {minimapCoords && (
-              <div style={{
-                position: 'absolute',
-                left: minimapCoords.x * MINIMAP_SCALE - MINIMAP_DOT / 2,
-                top: minimapCoords.y * MINIMAP_SCALE - MINIMAP_DOT / 2,
-                width: MINIMAP_DOT,
-                height: MINIMAP_DOT,
-                borderRadius: '50%',
-                background: '#ff2222',
-                boxShadow: '0 0 4px 2px rgba(255,60,60,0.7)',
-                pointerEvents: 'none',
-              }} />
-            )}
+            {/* Todos los puntos conocidos (modo navegar) */}
+            {minimapMode === 'navigate' && Object.entries(MINIMAP_COORDS).map(([id, coord]) => {
+              const isCurrent = id === selectedMapId;
+              return (
+                <div key={id} style={{
+                  position: 'absolute',
+                  left: coord.x * MINIMAP_SCALE - (isCurrent ? 5 : 3),
+                  top: coord.y * MINIMAP_SCALE - (isCurrent ? 5 : 3),
+                  width: isCurrent ? 10 : 6,
+                  height: isCurrent ? 10 : 6,
+                  borderRadius: '50%',
+                  background: isCurrent ? '#ff2222' : '#4488ff',
+                  boxShadow: isCurrent ? '0 0 4px 2px rgba(255,60,60,0.7)' : '0 0 2px rgba(80,140,255,0.6)',
+                  pointerEvents: 'none',
+                  opacity: isCurrent ? 1 : 0.75,
+                }} />
+              );
+            })}
+            {/* Punto editable del mapa actual (modo editar) */}
+            {minimapMode === 'edit' && (() => {
+              const dot = minimapPos ?? minimapCoords;
+              if (!dot) return null;
+              const saved = !!minimapPos;
+              return (
+                <div style={{
+                  position: 'absolute',
+                  left: dot.x * MINIMAP_SCALE - 5,
+                  top: dot.y * MINIMAP_SCALE - 5,
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  background: saved ? '#ff2222' : '#ff8800',
+                  boxShadow: `0 0 4px 2px ${saved ? 'rgba(255,60,60,0.7)' : 'rgba(255,140,0,0.6)'}`,
+                  pointerEvents: 'none',
+                  border: saved ? 'none' : '1px dashed #fff',
+                }} />
+              );
+            })()}
           </div>
-          <div style={{ fontSize: 12, color: '#888', paddingTop: 4 }}>
-            <div style={{ color: '#a0a0ff', fontWeight: 700, marginBottom: 6 }}>
+
+          {/* Panel lateral */}
+          <div style={{ fontSize: 12, color: '#888', paddingTop: 4, minWidth: 180 }}>
+            <div style={{ color: '#a0a0ff', fontWeight: 700, marginBottom: 8 }}>
               {mapData[selectedMapId]?.name ?? selectedMapId}
             </div>
-            {minimapCoords
-              ? <div>Posición en el mapa: ({minimapCoords.x}, {minimapCoords.y})</div>
-              : <div style={{ color: '#555' }}>Sin coordenadas para este mapa interior</div>
-            }
+
+            {/* Botones de modo */}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+              {(['navigate', 'edit'] as const).map((mode) => (
+                <button key={mode} onClick={() => setMinimapMode(mode)} style={{
+                  padding: '3px 10px', fontSize: 11, cursor: 'pointer', borderRadius: 4,
+                  background: minimapMode === mode ? (mode === 'edit' ? '#3a2a0a' : '#0a1a3a') : '#1a1a2a',
+                  border: `1px solid ${minimapMode === mode ? (mode === 'edit' ? '#ffaa44' : '#4488ff') : '#3a3a5a'}`,
+                  color: minimapMode === mode ? (mode === 'edit' ? '#ffaa44' : '#88aaff') : '#888',
+                }}>
+                  {mode === 'navigate' ? '🗺️ Navegar' : '📍 Editar pos'}
+                </button>
+              ))}
+            </div>
+
+            {minimapMode === 'edit' ? (
+              <div style={{ color: '#ccc', lineHeight: 1.7 }}>
+                {minimapPos
+                  ? <div style={{ color: '#88ff88' }}>✓ Guardado: ({minimapPos.x}, {minimapPos.y})</div>
+                  : minimapCoords
+                    ? <div style={{ color: '#ff8800' }}>⚠ Auto ({minimapCoords.x}, {minimapCoords.y}) — sin guardar</div>
+                    : <div style={{ color: '#666' }}>Sin posición</div>
+                }
+                <div style={{ color: '#555', fontSize: 11, marginTop: 4 }}>
+                  Click en el mapa para fijar la posición
+                </div>
+                {minimapPos && (
+                  <button onClick={() => { setMinimapPos(null); setDirty(true); }} style={{
+                    marginTop: 8, padding: '2px 8px', fontSize: 11, cursor: 'pointer',
+                    background: '#2a0a0a', border: '1px solid #6a2a2a', borderRadius: 4, color: '#ff8888',
+                  }}>
+                    🗑 Borrar posición
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div style={{ color: '#555', fontSize: 11, lineHeight: 1.7 }}>
+                Click en un punto azul para ir a ese mapa.
+                <br />Puntos azules = mapas conocidos · Rojo = mapa actual.
+              </div>
+            )}
           </div>
         </div>
       )}

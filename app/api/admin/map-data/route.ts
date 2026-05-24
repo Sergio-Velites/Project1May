@@ -53,7 +53,8 @@ type OverrideKey =
   | 'exits'
   | 'exitReturnMap'
   | 'exitReturnPos'
-  | 'cuttableTrees';
+  | 'cuttableTrees'
+  | 'minimapPos';
 
 const OVERRIDE_KEYS: OverrideKey[] = [
   'start',
@@ -83,6 +84,7 @@ const OVERRIDE_KEYS: OverrideKey[] = [
   'exitReturnMap',
   'exitReturnPos',
   'cuttableTrees',
+  'minimapPos',
 ];
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {

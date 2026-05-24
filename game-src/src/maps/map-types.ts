@@ -404,4 +404,6 @@ export interface MapType {
    * sin `allowBicycle`, se desmonta automáticamente.
    */
   allowBicycle?: boolean;
+  /** Posición de este mapa en el minimapa de Kanto (píxeles sobre kanto_region.png 237×213). */
+  minimapPos?: PosType;
 }
