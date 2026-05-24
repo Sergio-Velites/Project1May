@@ -29,6 +29,7 @@ interface RSVPEntry {
   preboda: boolean;
   attended?: boolean | null;
   hasRsvp?: boolean;
+  lastSaved?: string | null;
   pokemon: PokemonInst[];
   pc?: PokemonInst[];
   seenPokemon?: number[];

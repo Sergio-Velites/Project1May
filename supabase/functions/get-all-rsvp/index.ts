@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     // Fetch all saves (for pokemon data)
     const { data: saves, error: savesError } = await db
       .from("saves")
-      .select("user_id, game_state");
+      .select("user_id, game_state, updated_at");
 
     if (savesError) throw savesError;
 
@@ -52,9 +52,9 @@ Deno.serve(async (req) => {
       map?: string;
       pos?: { x: number; y: number };
     } | null;
-    type SaveRow = { user_id: string; game_state: GameState };
+    type SaveRow = { user_id: string; game_state: GameState; updated_at: string | null };
     const savesMap = Object.fromEntries(
-      (saves as SaveRow[]).map((s) => [s.user_id, s.game_state])
+      (saves as SaveRow[]).map((s) => [s.user_id, { game_state: s.game_state, updated_at: s.updated_at }])
     );
 
     // ── Entradas con RSVP (enriquecidas con pokémon) ───────────────────────
@@ -75,11 +75,13 @@ Deno.serve(async (req) => {
     const rsvpUserIds = new Set((rsvps as RsvpRow[]).map((r) => r.user_id));
 
     const rsvpEntries = (rsvps as RsvpRow[]).map((r) => {
-      const gs = savesMap[r.user_id];
+      const saveEntry = savesMap[r.user_id];
+      const gs = saveEntry?.game_state;
       return {
         ...r,
         hasRsvp: true,
         source: "rsvp_table" as const,
+        lastSaved: saveEntry?.updated_at ?? null,
         pokemon: gs?.pokemon ?? [],
         pc: gs?.pc ?? [],
         seenPokemon: gs?.seenPokemon ?? [],
@@ -137,6 +139,7 @@ Deno.serve(async (req) => {
             attended: gsRsvp.attended ?? null,
             hasRsvp: true,
             source: "game_state" as const,
+            lastSaved: s.updated_at ?? null,
             pokemon: s.game_state?.pokemon ?? [],
             pc: s.game_state?.pc ?? [],
             seenPokemon: s.game_state?.seenPokemon ?? [],
@@ -160,6 +163,7 @@ Deno.serve(async (req) => {
           attended: null,
           hasRsvp: false,
           source: "none" as const,
+          lastSaved: s.updated_at ?? null,
           pokemon: s.game_state?.pokemon ?? [],
           pc: s.game_state?.pc ?? [],
           seenPokemon: s.game_state?.seenPokemon ?? [],

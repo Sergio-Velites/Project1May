@@ -32,6 +32,7 @@ export interface EntryForDashboard {
   preboda: boolean;
   attended?: boolean | null;
   hasRsvp?: boolean;
+  lastSaved?: string | null;
   pokemon: PokemonInst[];
   pc?: PokemonInst[];
   seenPokemon?: number[];
@@ -96,9 +97,20 @@ const MAP_NAMES: Record<string, string> = {
   "mt-moon-3f":                    "Monte Luna (3F)",
 };
 
+// ── Helpers visuales ────────────────────────────────────────────────────
+
+function formatLastSaved(iso: string | null | undefined): string {
+  if (!iso) return "–";
+  try {
+    return new Date(iso).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
+  } catch {
+    return iso;
+  }
+}
+
 // ── Tipos de ordenación ──────────────────────────────────────────────────
 
-type SortKey = "index" | "name" | "caught" | "seen" | "quests" | "level";
+type SortKey = "index" | "name" | "caught" | "seen" | "quests" | "level" | "lastSaved";
 type SortDir = "asc" | "desc";
 
 interface SortOption {
@@ -106,12 +118,13 @@ interface SortOption {
   label: string;
 }
 const SORT_OPTIONS: SortOption[] = [
-  { key: "index",  label: "Posición" },
-  { key: "name",   label: "Nombre" },
-  { key: "caught", label: "Capturados" },
-  { key: "seen",   label: "Vistos" },
-  { key: "quests", label: "Logros" },
-  { key: "level",  label: "Nivel máx." },
+  { key: "lastSaved", label: "Último guardado" },
+  { key: "index",     label: "Posición" },
+  { key: "name",      label: "Nombre" },
+  { key: "caught",    label: "Capturados" },
+  { key: "seen",      label: "Vistos" },
+  { key: "quests",    label: "Logros" },
+  { key: "level",     label: "Nivel máx." },
 ];
 
 // ── Colores de rareza de medalla ─────────────────────────────────────────
@@ -158,7 +171,7 @@ interface Props {
 }
 
 export default function AdminDashboard({ entries }: Props) {
-  const [sortKey, setSortKey]   = useState<SortKey>("index");
+  const [sortKey, setSortKey]   = useState<SortKey>("lastSaved");
   const [sortDir, setSortDir]   = useState<SortDir>("desc");
 
   // Pre-calcular medallas globales (una sola vez)
@@ -190,6 +203,9 @@ export default function AdminDashboard({ entries }: Props) {
         const allB = [...(b.e.pokemon ?? []), ...(b.e.pc ?? [])];
         va = allA.reduce((m, p) => Math.max(m, p.level), 0);
         vb = allB.reduce((m, p) => Math.max(m, p.level), 0);
+      } else if (key === "lastSaved") {
+        sa = a.e.lastSaved ?? "";
+        sb = b.e.lastSaved ?? "";
       }
       const cmp = sa !== "" || sb !== "" ? sa.localeCompare(sb) : va - vb;
       return sortDir === "asc" ? cmp : -cmp;
@@ -308,6 +324,11 @@ export default function AdminDashboard({ entries }: Props) {
                       🎮 {caught.size}
                     </span>
                   )}
+                  {e.lastSaved && (
+                    <span className="chip chip-gray" title={`Último guardado: ${formatLastSaved(e.lastSaved)}`} style={{ fontSize: "0.6rem" }}>
+                      🕐 {formatLastSaved(e.lastSaved)}
+                    </span>
+                  )}
                 </span>
                 <span className="summary-arrow">▾</span>
               </summary>
@@ -374,6 +395,12 @@ export default function AdminDashboard({ entries }: Props) {
                           )}
                         </>
                       ) : "Aún no ha empezado a jugar"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="detail-label">Último guardado</div>
+                    <div className={`detail-value${e.lastSaved ? "" : " muted"}`}>
+                      {formatLastSaved(e.lastSaved)}
                     </div>
                   </div>
                 </div>
