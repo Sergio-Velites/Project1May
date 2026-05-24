@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const undergroundPathNS: MapType = {
   name: "Camino Subterráneo N-S",
   image,
-  height: 10,
+  height: 20,
   width: 10,
-  start: { x: 5, y: 5 },
+  start: { x: 5, y: 18 },
   walls: {},
   text: {},
   maps: {},

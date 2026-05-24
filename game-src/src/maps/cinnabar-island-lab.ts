@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const cinnabarIslandLab: MapType = {
   name: "Laboratorio de Cinabria",
   image,
-  height: 10,
-  width: 10,
-  start: { x: 5, y: 5 },
+  height: 18,
+  width: 20,
+  start: { x: 10, y: 16 },
   walls: {},
   text: {},
   maps: {},

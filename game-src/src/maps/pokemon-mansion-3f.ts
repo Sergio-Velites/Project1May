@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const pokemonMansion3f: MapType = {
   name: "Mansion Pokemon 3F",
   image,
-  height: 10,
-  width: 10,
-  start: { x: 5, y: 5 },
+  height: 36,
+  width: 40,
+  start: { x: 20, y: 34 },
   walls: {},
   text: {},
   maps: {},

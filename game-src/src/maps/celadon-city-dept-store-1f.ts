@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const celadonCityDeptStore1f: MapType = {
   name: "Grandes Almacenes 1F",
   image,
-  height: 10,
-  width: 10,
-  start: { x: 5, y: 5 },
+  height: 18,
+  width: 20,
+  start: { x: 10, y: 16 },
   walls: {},
   text: {},
   maps: {},

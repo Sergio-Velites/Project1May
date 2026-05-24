@@ -804,6 +804,7 @@ export default function MapEditor() {
   const [saveFlash, setSaveFlash] = useState(false);
   const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
   const [error, setError] = useState('');
+  const [showMinimap, setShowMinimap] = useState(false);
 
   const dragging = useRef<{ idx: number; startX: number; startY: number } | null>(null);
   // Drag genérico para texts/items/gifts/portals
@@ -1853,6 +1854,84 @@ export default function MapEditor() {
 
   const selected = selectedIdx !== null ? trainers[selectedIdx] : null;
 
+  // ── Minimap ───────────────────────────────────────────────────────────
+  const MINIMAP_COORDS: Record<string, { x: number; y: number }> = {
+    'pallet-town':        { x: 84,  y: 179 },
+    'route-1':            { x: 84,  y: 155 },
+    'viridian-city':      { x: 84,  y: 130 },
+    'route-22':           { x: 55,  y: 130 },
+    'route-2':            { x: 84,  y: 105 },
+    'viridian-forrest':   { x: 84,  y: 90  },
+    'pewter-city':        { x: 84,  y: 75  },
+    'route-3':            { x: 100, y: 75  },
+    'mt-moon-1f':         { x: 126, y: 75  },
+    'mt-moon-2f':         { x: 126, y: 75  },
+    'mt-moon-3f':         { x: 126, y: 75  },
+    'route-4':            { x: 148, y: 75  },
+    'cerulean-city':      { x: 162, y: 75  },
+    'route-5':            { x: 162, y: 93  },
+    'route-6':            { x: 162, y: 113 },
+    'vermilion-city':     { x: 162, y: 130 },
+    'route-9':            { x: 183, y: 75  },
+    'route-10':           { x: 183, y: 87  },
+    'lavender-town':      { x: 200, y: 87  },
+    'route-8':            { x: 183, y: 93  },
+    'route-7':            { x: 140, y: 93  },
+    'celadon-city':       { x: 118, y: 93  },
+    'route-11':           { x: 183, y: 109 },
+    'route-12':           { x: 200, y: 100 },
+    'route-13':           { x: 200, y: 118 },
+    'route-14':           { x: 190, y: 128 },
+    'route-15':           { x: 175, y: 130 },
+    'route-16':           { x: 105, y: 100 },
+    'route-17':           { x: 105, y: 118 },
+    'route-18':           { x: 105, y: 140 },
+    'fuchsia-city':       { x: 118, y: 140 },
+    'safari-zone-center': { x: 118, y: 120 },
+    'route-19':           { x: 118, y: 155 },
+    'route-20':           { x: 100, y: 165 },
+    'cinnabar-island':    { x: 84,  y: 175 },
+    'route-21':           { x: 84,  y: 160 },
+    'saffron-city':       { x: 162, y: 93  },
+    'route-24':           { x: 162, y: 60  },
+    'route-25':           { x: 175, y: 55  },
+    'route-23':           { x: 84,  y: 55  },
+    'indigo-plateau':     { x: 70,  y: 45  },
+    'victory-road-1f':    { x: 77,  y: 55  },
+  };
+
+  /**
+   * Returns pixel coords for the current map on the minimap image (237×213).
+   * For interior maps (gyms, pokemon centers, etc.) it strips known suffixes
+   * and tries to find coords for the parent location.
+   */
+  function getMinimapCoords(mapId: string): { x: number; y: number } | null {
+    if (MINIMAP_COORDS[mapId]) return MINIMAP_COORDS[mapId];
+    // Strip interior suffixes and retry
+    const suffixes = [
+      '-gym', '-pokemon-center', '-pokecenter', '-poke-mart', '-pokemart',
+      '-museum-1f', '-museum-2f', '-museum',
+      '-npc-house', '-npc-a', '-npc-b', '-npc-c',
+      '-1f', '-2f', '-3f', '-4f', '-b1f', '-b2f',
+      '-north', '-south', '-east', '-west',
+      '-gate', '-house-a', '-house-b', '-house',
+      '-lab', '-academy',
+    ];
+    // Sort longest first so "-pokemon-center" matches before "-center"
+    const sorted = [...suffixes].sort((a, b) => b.length - a.length);
+    for (const suffix of sorted) {
+      if (mapId.endsWith(suffix)) {
+        const base = mapId.slice(0, mapId.length - suffix.length);
+        if (MINIMAP_COORDS[base]) return MINIMAP_COORDS[base];
+      }
+    }
+    return null;
+  }
+
+  const minimapCoords = getMinimapCoords(selectedMapId);
+  const MINIMAP_SCALE = 2;
+  const MINIMAP_DOT = 8;
+
   // ── Render ────────────────────────────────────────────────────────────
   if (error) {
     return (
@@ -1908,6 +1987,23 @@ export default function MapEditor() {
             </button>
           ))}
         </div>
+
+        {/* Minimap toggle */}
+        <button
+          onClick={() => setShowMinimap((v) => !v)}
+          title="Ver minimap de Kanto"
+          style={{
+            padding: '2px 8px',
+            fontSize: 12,
+            background: showMinimap ? '#2a4a2a' : '#1a1a3a',
+            border: `1px solid ${showMinimap ? '#4a8a4a' : '#3a3a5a'}`,
+            borderRadius: 4,
+            color: showMinimap ? '#88ff88' : '#e0e0ff',
+            cursor: 'pointer',
+          }}
+        >
+          🗺️ Kanto
+        </button>
 
         {/* Grid toggle */}
         <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13, color: showGrid ? '#a0a0ff' : '#555' }}>
@@ -2071,6 +2167,52 @@ export default function MapEditor() {
           ×
         </button>
       </div>
+
+      {/* ── Minimap panel ────────────────────────────────────────────── */}
+      {showMinimap && (
+        <div style={{
+          flexShrink: 0,
+          background: '#0d0d20',
+          borderBottom: '1px solid #2a2a4a',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 16,
+          padding: '12px 20px',
+        }}>
+          <div style={{ position: 'relative', display: 'inline-block', flexShrink: 0 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/editor/maps/kanto_region.png"
+              alt="Kanto minimap"
+              width={237 * MINIMAP_SCALE}
+              height={213 * MINIMAP_SCALE}
+              style={{ imageRendering: 'pixelated', display: 'block' }}
+            />
+            {minimapCoords && (
+              <div style={{
+                position: 'absolute',
+                left: minimapCoords.x * MINIMAP_SCALE - MINIMAP_DOT / 2,
+                top: minimapCoords.y * MINIMAP_SCALE - MINIMAP_DOT / 2,
+                width: MINIMAP_DOT,
+                height: MINIMAP_DOT,
+                borderRadius: '50%',
+                background: '#ff2222',
+                boxShadow: '0 0 4px 2px rgba(255,60,60,0.7)',
+                pointerEvents: 'none',
+              }} />
+            )}
+          </div>
+          <div style={{ fontSize: 12, color: '#888', paddingTop: 4 }}>
+            <div style={{ color: '#a0a0ff', fontWeight: 700, marginBottom: 6 }}>
+              {mapData[selectedMapId]?.name ?? selectedMapId}
+            </div>
+            {minimapCoords
+              ? <div>Posición en el mapa: ({minimapCoords.x}, {minimapCoords.y})</div>
+              : <div style={{ color: '#555' }}>Sin coordenadas para este mapa interior</div>
+            }
+          </div>
+        </div>
+      )}
 
       {/* ── Cuerpo principal ─────────────────────────────────────────── */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>

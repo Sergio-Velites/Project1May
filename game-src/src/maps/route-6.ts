@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const route6: MapType = {
   name: "Ruta 6",
   image,
-  height: 10,
-  width: 10,
-  start: { x: 5, y: 5 },
+  height: 40,
+  width: 20,
+  start: { x: 10, y: 38 },
   walls: {},
   text: {},
   maps: {},

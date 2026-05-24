@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const celadonCity: MapType = {
   name: "Ciudad Celedon",
   image,
-  height: 10,
-  width: 10,
-  start: { x: 5, y: 5 },
+  height: 50,
+  width: 60,
+  start: { x: 30, y: 48 },
   walls: {},
   text: {},
   maps: {},

@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const route16Gate: MapType = {
   name: "Caseta Ruta 16",
   image,
-  height: 10,
+  height: 8,
   width: 10,
-  start: { x: 5, y: 5 },
+  start: { x: 5, y: 6 },
   walls: {},
   text: {},
   maps: {},

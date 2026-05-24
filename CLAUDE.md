@@ -241,19 +241,62 @@ setTimeout(() => doSomething(), 3000);
 }
 ```
 
-### IDs de los 33 mapas
+### 163 mapas registrados (enum MapId + map-data.ts)
 
+**Kanto — exterior**
 ```
-pallet-town, pallet-town-lab, pallet-town-house-a-1f, pallet-town-house-a-2f, pallet-town-house-b
-route-1, route-2, route-22, route-3
-gate-house, route-2-gate, route-2-gate-north
-viridian-city, viridian-city-gym, viridian-city-pokemon-center, viridian-city-poke-mart,
-  viridian-city-pokemon-acadamy, viridian-city-npc-house
-viridian-forrest
-pewter-city, pewter-city-gym, pewter-city-pokemon-center, pewter-city-poke-mart,
-  pewter-city-npc-a, pewter-city-npc-b, pewter-city-museum-1f, pewter-city-museum-2f
+pallet-town · route-1 · viridian-city · route-22 · route-2 · viridian-forrest
+pewter-city · route-3 · route-4 · cerulean-city · route-24 · route-25
+route-5 · route-6 · vermilion-city · route-11 · route-9 · route-10
+lavender-town · route-8 · route-7 · celadon-city · route-12 · route-13
+route-14 · route-15 · route-16 · route-17 · route-18 · fuchsia-city
+route-19 · route-20 · route-21 · cinnabar-island · route-23 · indigo-plateau
+```
+
+**Kanto — edificios y casas**
+```
+pallet-town-lab · pallet-town-house-a-1f · pallet-town-house-a-2f · pallet-town-house-b
+gate-house · route-2-gate · route-2-gate-north · route-4-gate · route-12-gate
+route-15-gate · route-16-gate · league-route · underground-path-ns · underground-path-ew
+viridian-city-gym · viridian-city-pokemon-center · viridian-city-poke-mart
+  viridian-city-pokemon-acadamy · viridian-city-npc-house
+pewter-city-gym · pewter-city-pokemon-center · pewter-city-poke-mart
+  pewter-city-npc-a · pewter-city-npc-b · pewter-museum-1f · pewter-museum-2f
 route-3-pokemon-center
-mt-moon-1f, mt-moon-2f, mt-moon-3f
+cerulean-city-gym · cerulean-city-pokemon-center · cerulean-city-poke-mart
+  cerulean-city-bike-shop · cerulean-city-house-a · cerulean-city-house-b
+vermilion-city-gym · vermilion-city-pokemon-center · vermilion-city-poke-mart
+  vermilion-city-fan-club · vermilion-city-house-a · vermilion-city-house-b
+lavender-town-pokemon-center · lavender-town-poke-mart
+  lavender-town-house-a · lavender-town-house-b
+celadon-city-gym · celadon-city-pokemon-center · celadon-city-poke-mart
+  celadon-city-dept-store-1f…6f · celadon-city-game-corner · celadon-city-prize-room
+  celadon-city-house-a · celadon-city-house-b
+fuchsia-city-gym · fuchsia-city-pokemon-center · fuchsia-city-poke-mart
+  fuchsia-city-warden-house · fuchsia-city-house-a · fuchsia-city-house-b
+saffron-city-gym · saffron-city-pokemon-center · saffron-city-poke-mart
+  saffron-city-fighting-dojo · saffron-city-copycat-house
+  saffron-city-house-a · saffron-city-house-b
+cinnabar-island-gym · cinnabar-island-pokemon-center · cinnabar-island-poke-mart
+  cinnabar-island-lab
+indigo-plateau-pokemon-center (no stub — usar pokemonCenter field)
+elite-four-1…4 · champion-room
+```
+
+**Dungeons / rutas interiores**
+```
+mt-moon-1f · mt-moon-2f · mt-moon-3f
+rock-tunnel-1f · rock-tunnel-2f
+pokemon-tower-1f…7f
+silph-co-1f…11f
+pokemon-mansion-1f…3f · pokemon-mansion-b1f (stub: pokemon-mansion-4f)
+diglets-cave (stub del juego) / digletts-cave.png
+cerulean-cave-1f · cerulean-cave-2f · cerulean-cave-3f
+safari-zone-center · safari-zone-area-1 · safari-zone-area-2 · safari-zone-area-3
+power-plant
+seafoam-islands-1f…4f
+victory-road-1f · victory-road-2f · victory-road-3f
+ss-anne-1f · ss-anne-2f · ss-anne-3f · ss-anne-bf1
 ```
 
 ### Cómo añadir un mapa nuevo
@@ -655,6 +698,8 @@ El campo `expression` del track es la cadena que se almacena en `MapType.music`.
 | `public/editor/original-map-music.json` | Metadatos de música original Gen I (referencia) |
 | `public/game/music/maps-original/` | 20+ tracks originales Gen I (.mp3) |
 | `game-src/src/assets/pokemon/front/` | 251 sprites de frente (56×56 RGBA) — tamaños ajustados por altura oficial |
+| `game-src/src/assets/map/` | 174 PNGs de mapas — overworld + interiores (escala 16px/tile, estilo FireRed/LeafGreen) |
+| `game-src/src/assets/map/kanto_region.png` | Minimapa 237×213px para el item Mapa y el panel del map-editor |
 
 ---
 
@@ -744,6 +789,35 @@ Solo upscaling (nunca downscaling → calidad original preservada en pequeños)
 Ejemplos: Diglett/Natu 50px · Pikachu 54px · Charizard 62px · Snorlax 64px · Gyarados 70px · Onix/Steelix 72px.
 
 **Para re-ejecutar** (nuevos sprites o ajuste de rango): script en commit `67546f5`. Cambiar `MIN_TARGET`/`MAX_TARGET` para ampliar o reducir la diferencia de escala.
+
+---
+
+## Ideas futuras (no implementadas)
+
+### Item Mapa en el juego
+Implementar el objeto "Mapa" (ItemType.Map) usando `kanto_region.png` (237×213px en `game-src/src/assets/map/kanto_region.png`).
+- Al usarlo desde el menú de mochila, abrir un overlay que muestre el mapa de Kanto.
+- Mostrar la posición actual del jugador como un punto parpadeante.
+- Coordenadas de referencia en `MINIMAP_COORDS` del map-editor (ver `app/admin/map-editor/page.tsx`).
+
+### HM Vuelo (Fly)
+Destinos: lista de ciudades visitadas (`visitedMaps` en gameSlice). Al usar Vuelo, mostrar un menú con las ciudades/mapas exterior disponibles y teletransportar.
+- Usar `recoverLocation` de cada mapa como punto de aterrizaje.
+- Añadir animación de pantalla negra (como `BlackScreen.tsx`) antes del teleporte.
+
+### Pokédex — área de captura
+En la vista detalle de la Pokédex, mostrar en qué mapas se puede encontrar cada Pokémon (hierba, pesca, surf).
+- Requiere índice inverso: `pokemonId → [{ mapId, encounterType }]`.
+- Puede generarse en tiempo de compilación desde los datos de encuentros de cada mapa.
+- Fuente de datos: campo `encounters` de cada `MapType`.
+
+### Cerulean Cave acceso
+Actualmente `cerulean-cave-1f` no tiene acceso desde el mapa. Conectar con `cerulean-city` (tile ~9,3) una vez el jugador haya derrotado a la Elite Four.
+- Usar una quest condicional similar a las existentes para bloquear el acceso antes.
+
+### Editor de mapas — mejoras pendientes
+- Selector de `MapId` en portales (doors/teleports) con autocompletado en vez de campo de texto libre.
+- Vista de conexiones: mostrar qué mapas están conectados entre sí (grafo).
 
 ---
 

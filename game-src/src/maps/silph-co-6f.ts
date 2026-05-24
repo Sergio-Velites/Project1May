@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const silphCo6f: MapType = {
   name: "Silph S.A. 6F",
   image,
-  height: 10,
-  width: 10,
-  start: { x: 5, y: 5 },
+  height: 33,
+  width: 40,
+  start: { x: 20, y: 31 },
   walls: {},
   text: {},
   maps: {},

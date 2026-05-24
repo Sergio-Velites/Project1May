@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const ceruleanCave2f: MapType = {
   name: "Cueva Celeste 2F",
   image,
-  height: 10,
-  width: 10,
-  start: { x: 5, y: 5 },
+  height: 31,
+  width: 40,
+  start: { x: 20, y: 29 },
   walls: {},
   text: {},
   maps: {},

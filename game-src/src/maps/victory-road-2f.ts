@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const victoryRoad2f: MapType = {
   name: "Camino Victoria 2F",
   image,
-  height: 10,
-  width: 10,
-  start: { x: 5, y: 5 },
+  height: 36,
+  width: 40,
+  start: { x: 20, y: 34 },
   walls: {},
   text: {},
   maps: {},

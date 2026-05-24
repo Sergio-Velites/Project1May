@@ -4,9 +4,9 @@ import { MapType } from "./map-types";
 const lavenderTownPokeMart: MapType = {
   name: "Tienda Pokemon",
   image,
-  height: 10,
-  width: 10,
-  start: { x: 5, y: 5 },
+  height: 8,
+  width: 8,
+  start: { x: 4, y: 6 },
   walls: {},
   text: {},
   maps: {},
