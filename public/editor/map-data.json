@@ -14479,5 +14479,2765 @@
       "y": 1
     },
     "sourceFile": "viridian-forrest.ts"
+  },
+  "celadon-city-dept-store-1f": {
+    "id": "celadon-city-dept-store-1f",
+    "name": "Grandes Almacenes 1F",
+    "imageFile": "celadon-city-dept-store-1f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-dept-store-2f": {
+    "id": "celadon-city-dept-store-2f",
+    "name": "Grandes Almacenes 2F",
+    "imageFile": "celadon-city-dept-store-2f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-dept-store-3f": {
+    "id": "celadon-city-dept-store-3f",
+    "name": "Grandes Almacenes 3F",
+    "imageFile": "celadon-city-dept-store-3f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-dept-store-4f": {
+    "id": "celadon-city-dept-store-4f",
+    "name": "Grandes Almacenes 4F",
+    "imageFile": "celadon-city-dept-store-4f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-dept-store-5f": {
+    "id": "celadon-city-dept-store-5f",
+    "name": "Grandes Almacenes 5F",
+    "imageFile": "celadon-city-dept-store-5f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-dept-store-6f": {
+    "id": "celadon-city-dept-store-6f",
+    "name": "Grandes Almacenes 6F",
+    "imageFile": "celadon-city-dept-store-6f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-game-corner": {
+    "id": "celadon-city-game-corner",
+    "name": "Salon Recreativo",
+    "imageFile": "celadon-city-game-corner.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/rocket-game-corner.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-gym": {
+    "id": "celadon-city-gym",
+    "name": "Gimnasio Ciudad Celedon",
+    "imageFile": "celadon-city-gym.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-house-a": {
+    "id": "celadon-city-house-a",
+    "name": "Casa Ciudad Celedon",
+    "imageFile": "celadon-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-house-b": {
+    "id": "celadon-city-house-b",
+    "name": "Casa Ciudad Celedon",
+    "imageFile": "celadon-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-poke-mart": {
+    "id": "celadon-city-poke-mart",
+    "name": "Tienda Pokemon",
+    "imageFile": "celadon-city-game-corner.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-pokemon-center": {
+    "id": "celadon-city-pokemon-center",
+    "name": "Centro Pokemon",
+    "imageFile": "celadon-city-pokemon-center.png",
+    "height": 8,
+    "width": 14,
+    "start": {
+      "x": 7,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-center.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city-prize-room": {
+    "id": "celadon-city-prize-room",
+    "name": "Sala de Premios",
+    "imageFile": "celadon-city-game-corner-prize-room.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "celadon-city": {
+    "id": "celadon-city",
+    "name": "Ciudad Celedon",
+    "imageFile": "celadon-city.png",
+    "height": 50,
+    "width": 60,
+    "start": {
+      "x": 30,
+      "y": 48
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cerulean-cave-1f": {
+    "id": "cerulean-cave-1f",
+    "name": "Cueva Celeste 1F",
+    "imageFile": "cerulean-cave-1f.png",
+    "height": 31,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 29
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cerulean-cave-2f": {
+    "id": "cerulean-cave-2f",
+    "name": "Cueva Celeste 2F",
+    "imageFile": "cerulean-cave-2f.png",
+    "height": 31,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 29
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cerulean-cave-3f": {
+    "id": "cerulean-cave-3f",
+    "name": "Cueva Celeste 3F",
+    "imageFile": "cerulean-cave-3f.png",
+    "height": 31,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 29
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cerulean-city-bike-shop": {
+    "id": "cerulean-city-bike-shop",
+    "name": "Ciclo Club",
+    "imageFile": "cerulean-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/cerulean-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cerulean-city-gym": {
+    "id": "cerulean-city-gym",
+    "name": "Gimnasio Ciudad Celeste",
+    "imageFile": "cerulean-city-gym.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cerulean-city-house-a": {
+    "id": "cerulean-city-house-a",
+    "name": "Casa Ciudad Celeste",
+    "imageFile": "cerulean-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/cerulean-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cerulean-city-house-b": {
+    "id": "cerulean-city-house-b",
+    "name": "Casa Ciudad Celeste",
+    "imageFile": "cerulean-city-npc-b.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/cerulean-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cerulean-city-poke-mart": {
+    "id": "cerulean-city-poke-mart",
+    "name": "Tienda Pokemon",
+    "imageFile": "cerulean-city-poke-mart.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/cerulean-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cerulean-city-pokemon-center": {
+    "id": "cerulean-city-pokemon-center",
+    "name": "Centro Pokemon",
+    "imageFile": "cerulean-city-pokemon-center.png",
+    "height": 8,
+    "width": 14,
+    "start": {
+      "x": 7,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-center.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cerulean-city": {
+    "id": "cerulean-city",
+    "name": "Ciudad Celeste",
+    "imageFile": "cerulean-city.png",
+    "height": 35,
+    "width": 38,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/cerulean-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "champion-room": {
+    "id": "champion-room",
+    "name": "Campeon",
+    "imageFile": "indigo-plateau.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cinnabar-island-gym": {
+    "id": "cinnabar-island-gym",
+    "name": "Gimnasio Isla Cinabria",
+    "imageFile": "cinnabar-island-gym.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cinnabar-island-lab": {
+    "id": "cinnabar-island-lab",
+    "name": "Laboratorio de Cinabria",
+    "imageFile": "cinnabar-island-lab.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-lab.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cinnabar-island-poke-mart": {
+    "id": "cinnabar-island-poke-mart",
+    "name": "Tienda Pokemon",
+    "imageFile": "cinnabar-island-poke-mart.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/cinnabar-island.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cinnabar-island-pokemon-center": {
+    "id": "cinnabar-island-pokemon-center",
+    "name": "Centro Pokemon",
+    "imageFile": "cinnabar-island-pokemon-center.png",
+    "height": 8,
+    "width": 14,
+    "start": {
+      "x": 7,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-center.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "cinnabar-island": {
+    "id": "cinnabar-island",
+    "name": "Isla Cinabria",
+    "imageFile": "cinnabar-island.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/cinnabar-island.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "diglets-cave": {
+    "id": "diglets-cave",
+    "name": "Cueva Diglett",
+    "imageFile": "digletts-cave.png",
+    "height": 25,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 23
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "elite-four-1": {
+    "id": "elite-four-1",
+    "name": "Alto Mando - Sala 1",
+    "imageFile": "indigo-plateau.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "elite-four-2": {
+    "id": "elite-four-2",
+    "name": "Alto Mando - Sala 2",
+    "imageFile": "indigo-plateau.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "elite-four-3": {
+    "id": "elite-four-3",
+    "name": "Alto Mando - Sala 3",
+    "imageFile": "indigo-plateau.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "elite-four-4": {
+    "id": "elite-four-4",
+    "name": "Alto Mando - Sala 4",
+    "imageFile": "indigo-plateau.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "fuchsia-city-gym": {
+    "id": "fuchsia-city-gym",
+    "name": "Gimnasio Ciudad Fucsia",
+    "imageFile": "fuchsia-city-gym.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "fuchsia-city-house-a": {
+    "id": "fuchsia-city-house-a",
+    "name": "Casa Ciudad Fucsia",
+    "imageFile": "fuchsia-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "fuchsia-city-house-b": {
+    "id": "fuchsia-city-house-b",
+    "name": "Casa Ciudad Fucsia",
+    "imageFile": "fuchsia-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "fuchsia-city-poke-mart": {
+    "id": "fuchsia-city-poke-mart",
+    "name": "Tienda Pokemon",
+    "imageFile": "fuchsia-city-poke-mart.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "fuchsia-city-pokemon-center": {
+    "id": "fuchsia-city-pokemon-center",
+    "name": "Centro Pokemon",
+    "imageFile": "fuchsia-city-pokemon-center.png",
+    "height": 8,
+    "width": 14,
+    "start": {
+      "x": 7,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-center.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "fuchsia-city-warden-house": {
+    "id": "fuchsia-city-warden-house",
+    "name": "Casa del Guarda",
+    "imageFile": "fuchsia-city-warden.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "fuchsia-city": {
+    "id": "fuchsia-city",
+    "name": "Ciudad Fucsia",
+    "imageFile": "fuchsia-city.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "get-location-data": {
+    "id": "get-location-data",
+    "name": "get-location-data",
+    "imageFile": "get-location-data.png",
+    "height": null,
+    "width": null,
+    "start": {
+      "x": 0,
+      "y": 0
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "house-a-1f": {
+    "id": "house-a-1f",
+    "name": "Casa 1F",
+    "imageFile": "house-a-1f.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "house-a-2f": {
+    "id": "house-a-2f",
+    "name": "Casa 2F",
+    "imageFile": "house-a-2f.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 6,
+      "y": 2
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "house-b": {
+    "id": "house-b",
+    "name": "Casa B",
+    "imageFile": "house-b.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "indigo-plateau": {
+    "id": "indigo-plateau",
+    "name": "Meseta Anil",
+    "imageFile": "indigo-plateau.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/indigo-plateau.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "lab": {
+    "id": "lab",
+    "name": "DESTILERÍA DEL PROF. OAK",
+    "imageFile": "lab.png",
+    "height": 12,
+    "width": 10,
+    "start": {
+      "x": 5,
+      "y": 10
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "lavender-town-house-a": {
+    "id": "lavender-town-house-a",
+    "name": "Casa Pueblo Lavanda",
+    "imageFile": "lavender-town-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/lavender-town.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "lavender-town-house-b": {
+    "id": "lavender-town-house-b",
+    "name": "Casa Pueblo Lavanda",
+    "imageFile": "lavender-town-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/lavender-town.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "lavender-town-poke-mart": {
+    "id": "lavender-town-poke-mart",
+    "name": "Tienda Pokemon",
+    "imageFile": "lavender-town-poke-mart.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/lavender-town.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "lavender-town-pokemon-center": {
+    "id": "lavender-town-pokemon-center",
+    "name": "Centro Pokemon",
+    "imageFile": "lavender-town-pokemon-center.png",
+    "height": 8,
+    "width": 14,
+    "start": {
+      "x": 7,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-center.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "lavender-town": {
+    "id": "lavender-town",
+    "name": "Pueblo Lavanda",
+    "imageFile": "lavender-town.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/lavender-town.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pewter-museum-1f": {
+    "id": "pewter-museum-1f",
+    "name": "Museo de Villamayor 1F",
+    "imageFile": "pewter-museum-1f.png",
+    "height": 8,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pewter-museum-2f": {
+    "id": "pewter-museum-2f",
+    "name": "Museo de Villamayor 2F",
+    "imageFile": "pewter-museum-2f.png",
+    "height": 8,
+    "width": 14,
+    "start": {
+      "x": 7,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-mansion-1f": {
+    "id": "pokemon-mansion-1f",
+    "name": "Mansion Pokemon 1F",
+    "imageFile": "pokemon-mansion-1f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-mansion.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-mansion-2f": {
+    "id": "pokemon-mansion-2f",
+    "name": "Mansion Pokemon 2F",
+    "imageFile": "pokemon-mansion-2f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-mansion.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-mansion-3f": {
+    "id": "pokemon-mansion-3f",
+    "name": "Mansion Pokemon 3F",
+    "imageFile": "pokemon-mansion-3f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-mansion.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-mansion-4f": {
+    "id": "pokemon-mansion-4f",
+    "name": "Mansion Pokemon 4F",
+    "imageFile": "pokemon-mansion-b1f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-mansion.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-tower-1f": {
+    "id": "pokemon-tower-1f",
+    "name": "Torre Pokemon 1F",
+    "imageFile": "pokemon-tower-1f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-tower.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-tower-2f": {
+    "id": "pokemon-tower-2f",
+    "name": "Torre Pokemon 2F",
+    "imageFile": "pokemon-tower-2f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-tower.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-tower-3f": {
+    "id": "pokemon-tower-3f",
+    "name": "Torre Pokemon 3F",
+    "imageFile": "pokemon-tower-3f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-tower.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-tower-4f": {
+    "id": "pokemon-tower-4f",
+    "name": "Torre Pokemon 4F",
+    "imageFile": "pokemon-tower-4f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-tower.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-tower-5f": {
+    "id": "pokemon-tower-5f",
+    "name": "Torre Pokemon 5F",
+    "imageFile": "pokemon-tower-5f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-tower.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-tower-6f": {
+    "id": "pokemon-tower-6f",
+    "name": "Torre Pokemon 6F",
+    "imageFile": "pokemon-tower-6f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-tower.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "pokemon-tower-7f": {
+    "id": "pokemon-tower-7f",
+    "name": "Torre Pokemon 7F",
+    "imageFile": "pokemon-tower-7f.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-tower.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "power-plant": {
+    "id": "power-plant",
+    "name": "Central Electrica",
+    "imageFile": "power-plant.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "rock-tunnel-1f": {
+    "id": "rock-tunnel-1f",
+    "name": "Tunel Roca 1F",
+    "imageFile": "rock-tunnel-1f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "rock-tunnel-2f": {
+    "id": "rock-tunnel-2f",
+    "name": "Tunel Roca 2F",
+    "imageFile": "rock-tunnel-2f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-10": {
+    "id": "route-10",
+    "name": "Ruta 10",
+    "imageFile": "route-10.png",
+    "height": 40,
+    "width": 25,
+    "start": {
+      "x": 12,
+      "y": 38
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-11.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-11": {
+    "id": "route-11",
+    "name": "Ruta 11",
+    "imageFile": "route-11.png",
+    "height": 20,
+    "width": 50,
+    "start": {
+      "x": 25,
+      "y": 18
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-11.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-12-gate": {
+    "id": "route-12-gate",
+    "name": "Caseta Ruta 12",
+    "imageFile": "gate-house.png",
+    "height": 8,
+    "width": 10,
+    "start": {
+      "x": 5,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-12": {
+    "id": "route-12",
+    "name": "Ruta 12",
+    "imageFile": "route-12.png",
+    "height": 60,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 58
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-11.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-13": {
+    "id": "route-13",
+    "name": "Ruta 13",
+    "imageFile": "route-13.png",
+    "height": 25,
+    "width": 50,
+    "start": {
+      "x": 25,
+      "y": 23
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-11.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-14": {
+    "id": "route-14",
+    "name": "Ruta 14",
+    "imageFile": "route-14.png",
+    "height": 40,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 38
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-11.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-15-gate": {
+    "id": "route-15-gate",
+    "name": "Caseta Ruta 15",
+    "imageFile": "gate-house-route15.png",
+    "height": 8,
+    "width": 10,
+    "start": {
+      "x": 5,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-15": {
+    "id": "route-15",
+    "name": "Ruta 15",
+    "imageFile": "route-15.png",
+    "height": 20,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 18
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-11.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-16-gate": {
+    "id": "route-16-gate",
+    "name": "Caseta Ruta 16",
+    "imageFile": "gate-house-route16.png",
+    "height": 8,
+    "width": 10,
+    "start": {
+      "x": 5,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-16": {
+    "id": "route-16",
+    "name": "Ruta 16",
+    "imageFile": "route-16.png",
+    "height": 20,
+    "width": 30,
+    "start": {
+      "x": 15,
+      "y": 18
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/bicycle.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-17": {
+    "id": "route-17",
+    "name": "Ruta 17",
+    "imageFile": "route-17.png",
+    "height": 80,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 78
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/bicycle.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-18": {
+    "id": "route-18",
+    "name": "Ruta 18",
+    "imageFile": "route-18.png",
+    "height": 20,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 18
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/bicycle.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-19": {
+    "id": "route-19",
+    "name": "Ruta 19",
+    "imageFile": "route-19.png",
+    "height": 50,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 48
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/surf.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-20": {
+    "id": "route-20",
+    "name": "Ruta 20",
+    "imageFile": "route-20.png",
+    "height": 20,
+    "width": 87,
+    "start": {
+      "x": 43,
+      "y": 18
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/surf.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-21": {
+    "id": "route-21",
+    "name": "Ruta 21",
+    "imageFile": "route-21.png",
+    "height": 50,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 48
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/surf.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-23": {
+    "id": "route-23",
+    "name": "Ruta 23",
+    "imageFile": "route-23.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/victory-road.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-24": {
+    "id": "route-24",
+    "name": "Ruta 24",
+    "imageFile": "route-24.png",
+    "height": 27,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 25
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-24-welcome.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-25": {
+    "id": "route-25",
+    "name": "Ruta 25",
+    "imageFile": "route-25.png",
+    "height": 27,
+    "width": 43,
+    "start": {
+      "x": 21,
+      "y": 25
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-24-welcome.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-4-gate": {
+    "id": "route-4-gate",
+    "name": "Caseta Ruta 4",
+    "imageFile": "route-4-gate.png",
+    "height": 8,
+    "width": 10,
+    "start": {
+      "x": 5,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-4": {
+    "id": "route-4",
+    "name": "Ruta 4",
+    "imageFile": "route-4.png",
+    "height": 18,
+    "width": 71,
+    "start": {
+      "x": 43,
+      "y": 23
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-3.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-5": {
+    "id": "route-5",
+    "name": "Ruta 5",
+    "imageFile": "route-5.png",
+    "height": 36,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-3.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-6": {
+    "id": "route-6",
+    "name": "Ruta 6",
+    "imageFile": "route-6.png",
+    "height": 40,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 38
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-3.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-7": {
+    "id": "route-7",
+    "name": "Ruta 7",
+    "imageFile": "route-7.png",
+    "height": 20,
+    "width": 30,
+    "start": {
+      "x": 15,
+      "y": 18
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-11.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-8": {
+    "id": "route-8",
+    "name": "Ruta 8",
+    "imageFile": "route-8.png",
+    "height": 20,
+    "width": 30,
+    "start": {
+      "x": 15,
+      "y": 18
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-11.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "route-9": {
+    "id": "route-9",
+    "name": "Ruta 9",
+    "imageFile": "route-9.png",
+    "height": 25,
+    "width": 50,
+    "start": {
+      "x": 25,
+      "y": 23
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/route-11.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "safari-zone-area-1": {
+    "id": "safari-zone-area-1",
+    "name": "Zona Safari - Area 1",
+    "imageFile": "safari-zone-east.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/safari-zone.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "safari-zone-area-2": {
+    "id": "safari-zone-area-2",
+    "name": "Zona Safari - Area 2",
+    "imageFile": "safari-zone-west.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/safari-zone.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "safari-zone-area-3": {
+    "id": "safari-zone-area-3",
+    "name": "Zona Safari - Area 3",
+    "imageFile": "safari-zone-center.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/safari-zone.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "safari-zone-center": {
+    "id": "safari-zone-center",
+    "name": "Zona Safari - Centro",
+    "imageFile": "safari-zone-center.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/safari-zone.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "saffron-city-copycat-house": {
+    "id": "saffron-city-copycat-house",
+    "name": "Casa Mimica",
+    "imageFile": "saffron-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "saffron-city-fighting-dojo": {
+    "id": "saffron-city-fighting-dojo",
+    "name": "Dojo de Lucha",
+    "imageFile": "saffron-city-fighting-dojo.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "saffron-city-gym": {
+    "id": "saffron-city-gym",
+    "name": "Gimnasio Ciudad Azafran",
+    "imageFile": "saffron-city-gym.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "saffron-city-house-a": {
+    "id": "saffron-city-house-a",
+    "name": "Casa Ciudad Azafran",
+    "imageFile": "saffron-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "saffron-city-house-b": {
+    "id": "saffron-city-house-b",
+    "name": "Casa Ciudad Azafran",
+    "imageFile": "saffron-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "saffron-city-poke-mart": {
+    "id": "saffron-city-poke-mart",
+    "name": "Tienda Pokemon",
+    "imageFile": "saffron-city-poke-mart.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "saffron-city-pokemon-center": {
+    "id": "saffron-city-pokemon-center",
+    "name": "Centro Pokemon",
+    "imageFile": "saffron-city-pokemon-center.png",
+    "height": 8,
+    "width": 14,
+    "start": {
+      "x": 7,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-center.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "saffron-city": {
+    "id": "saffron-city",
+    "name": "Ciudad Azafran",
+    "imageFile": "saffron-city.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/celadon-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "seafoam-islands-1f": {
+    "id": "seafoam-islands-1f",
+    "name": "Islas Espuma 1F",
+    "imageFile": "seafoam-islands-1f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "seafoam-islands-2f": {
+    "id": "seafoam-islands-2f",
+    "name": "Islas Espuma 2F",
+    "imageFile": "seafoam-islands-2f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "seafoam-islands-3f": {
+    "id": "seafoam-islands-3f",
+    "name": "Islas Espuma 3F",
+    "imageFile": "seafoam-islands-3f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "seafoam-islands-4f": {
+    "id": "seafoam-islands-4f",
+    "name": "Islas Espuma 4F",
+    "imageFile": "seafoam-islands-4f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-10f": {
+    "id": "silph-co-10f",
+    "name": "Silph S.A. 10F",
+    "imageFile": "silph-co-10f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-11f": {
+    "id": "silph-co-11f",
+    "name": "Silph S.A. 11F",
+    "imageFile": "silph-co-11f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-1f": {
+    "id": "silph-co-1f",
+    "name": "Silph S.A. 1F",
+    "imageFile": "silph-co-1f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-2f": {
+    "id": "silph-co-2f",
+    "name": "Silph S.A. 2F",
+    "imageFile": "silph-co-2f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-3f": {
+    "id": "silph-co-3f",
+    "name": "Silph S.A. 3F",
+    "imageFile": "silph-co-3f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-4f": {
+    "id": "silph-co-4f",
+    "name": "Silph S.A. 4F",
+    "imageFile": "silph-co-4f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-5f": {
+    "id": "silph-co-5f",
+    "name": "Silph S.A. 5F",
+    "imageFile": "silph-co-5f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-6f": {
+    "id": "silph-co-6f",
+    "name": "Silph S.A. 6F",
+    "imageFile": "silph-co-6f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-7f": {
+    "id": "silph-co-7f",
+    "name": "Silph S.A. 7F",
+    "imageFile": "silph-co-7f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-8f": {
+    "id": "silph-co-8f",
+    "name": "Silph S.A. 8F",
+    "imageFile": "silph-co-8f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "silph-co-9f": {
+    "id": "silph-co-9f",
+    "name": "Silph S.A. 9F",
+    "imageFile": "silph-co-9f.png",
+    "height": 33,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 31
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/silph-co.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "ss-anne-1f": {
+    "id": "ss-anne-1f",
+    "name": "S.S. Aguamarina 1F",
+    "imageFile": "ss-anne-1f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/ss-anne.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "ss-anne-2f": {
+    "id": "ss-anne-2f",
+    "name": "S.S. Aguamarina 2F",
+    "imageFile": "ss-anne-2f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/ss-anne.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "ss-anne-3f": {
+    "id": "ss-anne-3f",
+    "name": "S.S. Aguamarina 3F",
+    "imageFile": "ss-anne-3f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/ss-anne.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "ss-anne-bf1": {
+    "id": "ss-anne-bf1",
+    "name": "S.S. Aguamarina BF1",
+    "imageFile": "ss-anne-b1f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/ss-anne.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "underground-path-ew": {
+    "id": "underground-path-ew",
+    "name": "Camino Subterráneo E-O",
+    "imageFile": "underground-path-ew.png",
+    "height": 10,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 8
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "underground-path-ns": {
+    "id": "underground-path-ns",
+    "name": "Camino Subterráneo N-S",
+    "imageFile": "underground-path-ns.png",
+    "height": 20,
+    "width": 10,
+    "start": {
+      "x": 5,
+      "y": 18
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "vermilion-city-fan-club": {
+    "id": "vermilion-city-fan-club",
+    "name": "Club de Aficionados Pokemon",
+    "imageFile": "vermilion-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/vermilion-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "vermilion-city-gym": {
+    "id": "vermilion-city-gym",
+    "name": "Gimnasio Ciudad Carmin",
+    "imageFile": "vermilion-city-gym.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 16
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-gym.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "vermilion-city-house-a": {
+    "id": "vermilion-city-house-a",
+    "name": "Casa Ciudad Carmin",
+    "imageFile": "vermilion-city-npc-a.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/vermilion-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "vermilion-city-house-b": {
+    "id": "vermilion-city-house-b",
+    "name": "Casa Ciudad Carmin",
+    "imageFile": "vermilion-city-npc-b.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/vermilion-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "vermilion-city-poke-mart": {
+    "id": "vermilion-city-poke-mart",
+    "name": "Tienda Pokemon",
+    "imageFile": "vermilion-city-poke-mart.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/vermilion-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "vermilion-city-pokemon-center": {
+    "id": "vermilion-city-pokemon-center",
+    "name": "Centro Pokemon",
+    "imageFile": "vermilion-city-pokemon-center.png",
+    "height": 8,
+    "width": 14,
+    "start": {
+      "x": 7,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/pokemon-center.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "vermilion-city": {
+    "id": "vermilion-city",
+    "name": "Ciudad Carmin",
+    "imageFile": "vermilion-city.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/vermilion-city.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "victory-road-1f": {
+    "id": "victory-road-1f",
+    "name": "Camino Victoria 1F",
+    "imageFile": "victory-road-1f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/victory-road.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "victory-road-2f": {
+    "id": "victory-road-2f",
+    "name": "Camino Victoria 2F",
+    "imageFile": "victory-road-2f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/victory-road.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "victory-road-3f": {
+    "id": "victory-road-3f",
+    "name": "Camino Victoria 3F",
+    "imageFile": "victory-road-3f.png",
+    "height": 36,
+    "width": 40,
+    "start": {
+      "x": 20,
+      "y": 34
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": "/game/music/maps-original/victory-road.mp3",
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
+  },
+  "viridian-city-acadamy": {
+    "id": "viridian-city-acadamy",
+    "name": "Antigua Casa de Jonny",
+    "imageFile": "viridian-city-pokemon-acadamy.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 2,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "music": null,
+    "grass": {},
+    "fences": {},
+    "water": {},
+    "encounters": null,
+    "trainers": [],
+    "walls": {}
   }
 }

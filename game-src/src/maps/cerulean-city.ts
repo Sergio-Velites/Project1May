@@ -4,8 +4,8 @@ import { MapType } from "./map-types";
 const ceruleanCity: MapType = {
   name: "Ciudad Celeste",
   image,
-  height: 36,
-  width: 40,
+  height: 35,
+  width: 38,
   start: { x: 20, y: 34 },
   walls: {},
   text: {},
