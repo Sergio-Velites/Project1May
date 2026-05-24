@@ -204,8 +204,8 @@ export default function AdminDashboard({ entries }: Props) {
         va = allA.reduce((m, p) => Math.max(m, p.level), 0);
         vb = allB.reduce((m, p) => Math.max(m, p.level), 0);
       } else if (key === "lastSaved") {
-        sa = a.e.lastSaved ?? "";
-        sb = b.e.lastSaved ?? "";
+        va = a.e.lastSaved ? new Date(a.e.lastSaved).getTime() : 0;
+        vb = b.e.lastSaved ? new Date(b.e.lastSaved).getTime() : 0;
       }
       const cmp = sa !== "" || sb !== "" ? sa.localeCompare(sb) : va - vb;
       return sortDir === "asc" ? cmp : -cmp;
