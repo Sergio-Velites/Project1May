@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/vermilion-city-npc-b.png";
 import { MapType } from "./map-types";
 
 const vermilionCityHouseB: MapType = {
@@ -11,6 +11,7 @@ const vermilionCityHouseB: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/vermilion-city.mp3",
   grass: {},
 };
 

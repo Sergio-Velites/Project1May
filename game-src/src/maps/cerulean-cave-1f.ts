@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/cerulean-cave-1f.png";
 import { MapType } from "./map-types";
 
 const ceruleanCave1f: MapType = {

@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/power-plant.png";
 import { MapType } from "./map-types";
 
 const powerPlant: MapType = {

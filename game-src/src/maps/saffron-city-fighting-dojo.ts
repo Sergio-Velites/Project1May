@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/saffron-city-fighting-dojo.png";
 import { MapType } from "./map-types";
 
 const saffronCityFightingDojo: MapType = {
@@ -11,6 +11,7 @@ const saffronCityFightingDojo: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
 };
 

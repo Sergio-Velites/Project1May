@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/ss-anne-b1f.png";
 import { MapType } from "./map-types";
 
 const ssAnneBf1: MapType = {
@@ -11,6 +11,7 @@ const ssAnneBf1: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/ss-anne.mp3",
   grass: {},
 };
 

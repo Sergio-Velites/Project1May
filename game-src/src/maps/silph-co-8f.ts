@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/silph-co-8f.png";
 import { MapType } from "./map-types";
 
 const silphCo8f: MapType = {
@@ -11,6 +11,7 @@ const silphCo8f: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/silph-co.mp3",
   grass: {},
 };
 

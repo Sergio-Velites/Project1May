@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/cerulean-city-npc-b.png";
 import { MapType } from "./map-types";
 
 const ceruleanCityHouseB: MapType = {
@@ -11,6 +11,7 @@ const ceruleanCityHouseB: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/cerulean-city.mp3",
   grass: {},
 };
 

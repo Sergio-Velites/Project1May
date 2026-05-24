@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/safari-zone-center.png";
 import { MapType } from "./map-types";
 
 const safariZoneCenter: MapType = {
@@ -11,6 +11,7 @@ const safariZoneCenter: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/safari-zone.mp3",
   grass: {},
 };
 

@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/celadon-city-game-corner-prize-room.png";
 import { MapType } from "./map-types";
 
 const celadonCityPrizeRoom: MapType = {
@@ -11,6 +11,7 @@ const celadonCityPrizeRoom: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
 };
 

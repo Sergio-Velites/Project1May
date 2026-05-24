@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/lavender-town-pokemon-center.png";
 import { MapType } from "./map-types";
 
 const lavenderTownPokemonCenter: MapType = {
@@ -11,6 +11,7 @@ const lavenderTownPokemonCenter: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
 };
 

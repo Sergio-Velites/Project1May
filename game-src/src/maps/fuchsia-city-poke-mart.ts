@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/fuchsia-city-poke-mart.png";
 import { MapType } from "./map-types";
 
 const fuchsiaCityPokeMart: MapType = {
@@ -11,6 +11,7 @@ const fuchsiaCityPokeMart: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
 };
 

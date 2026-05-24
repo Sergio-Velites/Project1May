@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/underground-path-ew.png";
 import { MapType } from "./map-types";
 
 const undergroundPathEW: MapType = {

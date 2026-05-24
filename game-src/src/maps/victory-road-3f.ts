@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/victory-road-3f.png";
 import { MapType } from "./map-types";
 
 const victoryRoad3f: MapType = {
@@ -11,6 +11,7 @@ const victoryRoad3f: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/victory-road.mp3",
   grass: {},
 };
 

@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/cinnabar-island-poke-mart.png";
 import { MapType } from "./map-types";
 
 const cinnabarIslandPokeMart: MapType = {
@@ -11,6 +11,7 @@ const cinnabarIslandPokeMart: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/cinnabar-island.mp3",
   grass: {},
 };
 

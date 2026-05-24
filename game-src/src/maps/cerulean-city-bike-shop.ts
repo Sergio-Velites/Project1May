@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/cerulean-city-npc-a.png";
 import { MapType } from "./map-types";
 
 const ceruleanCityBikeShop: MapType = {
@@ -11,6 +11,7 @@ const ceruleanCityBikeShop: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/cerulean-city.mp3",
   grass: {},
 };
 

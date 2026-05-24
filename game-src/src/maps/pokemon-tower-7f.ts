@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/pokemon-tower-7f.png";
 import { MapType } from "./map-types";
 
 const pokemonTower7f: MapType = {
@@ -11,6 +11,7 @@ const pokemonTower7f: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/pokemon-tower.mp3",
   grass: {},
 };
 

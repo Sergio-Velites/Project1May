@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/pokemon-mansion-2f.png";
 import { MapType } from "./map-types";
 
 const pokemonMansion2f: MapType = {
@@ -11,6 +11,7 @@ const pokemonMansion2f: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/pokemon-mansion.mp3",
   grass: {},
 };
 

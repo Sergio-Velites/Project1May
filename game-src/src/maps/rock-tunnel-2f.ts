@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/rock-tunnel-2f.png";
 import { MapType } from "./map-types";
 
 const rockTunnel2f: MapType = {

@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/indigo-plateau.png";
 import { MapType } from "./map-types";
 
 const indigoPlateau: MapType = {
@@ -11,6 +11,7 @@ const indigoPlateau: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/indigo-plateau.mp3",
   grass: {},
 };
 

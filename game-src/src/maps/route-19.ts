@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/route-19.png";
 import { MapType } from "./map-types";
 
 const route19: MapType = {
@@ -11,6 +11,7 @@ const route19: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/surf.mp3",
   grass: {},
 };
 

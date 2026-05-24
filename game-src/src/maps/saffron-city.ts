@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/saffron-city.png";
 import { MapType } from "./map-types";
 
 const saffronCity: MapType = {
@@ -11,6 +11,7 @@ const saffronCity: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
 };
 

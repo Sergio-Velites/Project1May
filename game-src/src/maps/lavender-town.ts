@@ -1,4 +1,4 @@
-import image from "../assets/map/gate-house.png";
+import image from "../assets/map/lavender-town.png";
 import { MapType } from "./map-types";
 
 const lavenderTown: MapType = {
@@ -11,6 +11,7 @@ const lavenderTown: MapType = {
   text: {},
   maps: {},
   exits: {},
+  music: "/game/music/maps-original/lavender-town.mp3",
   grass: {},
 };
 
