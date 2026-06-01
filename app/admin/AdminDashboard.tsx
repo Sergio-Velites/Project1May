@@ -6,11 +6,13 @@
  * Recibe los datos ya calculados del Server Component.
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Medal, getMedals, computeGlobalMedals, getCaughtSet, getSeenSet, RSVPForMedals } from "./admin-medals";
 import { isBadgeSlug, itemLabel } from "./item-names";
 import { questLabel } from "./quest-names";
 import ImpersonateButtons from "./ImpersonateButtons";
+import PlayerEditModal from "./PlayerEditModal";
 
 // ── Tipos que vienen del server ──────────────────────────────────────────
 
@@ -171,8 +173,102 @@ interface Props {
 }
 
 export default function AdminDashboard({ entries }: Props) {
-  const [sortKey, setSortKey]   = useState<SortKey>("lastSaved");
-  const [sortDir, setSortDir]   = useState<SortDir>("desc");
+  const router = useRouter();
+
+  // ── Ordenación ───────────────────────────────────────────────────────────
+  const [sortKey, setSortKey] = useState<SortKey>("lastSaved");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  // ── Backup / restore ─────────────────────────────────────────────────────
+  type BackupStatus = "idle" | "loading" | "ok" | "error";
+  const [backupStatus, setBackupStatus] = useState<BackupStatus>("idle");
+  const [backupMsg,    setBackupMsg]    = useState<string | null>(null);
+  const restoreInputRef = useRef<HTMLInputElement>(null);
+
+  const handleBackupDownload = async () => {
+    setBackupStatus("loading");
+    setBackupMsg(null);
+    try {
+      const res = await fetch("/api/admin/backup");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = `weddingboy-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setBackupStatus("idle");
+    } catch (e) {
+      setBackupStatus("error");
+      setBackupMsg("Error al descargar: " + String(e));
+    }
+  };
+
+  const handleRestoreFile = async (file: File) => {
+    let data: Record<string, unknown>;
+    try {
+      data = JSON.parse(await file.text()) as Record<string, unknown>;
+    } catch {
+      setBackupStatus("error");
+      setBackupMsg("El archivo no es un JSON válido.");
+      return;
+    }
+    const nSaves = Array.isArray(data.saves) ? data.saves.length : "?";
+    const nRsvp  = Array.isArray(data.rsvp)  ? data.rsvp.length  : 0;
+    const ok = window.confirm(
+      `¿Restaurar ${nSaves} partida${nSaves !== 1 ? "s" : ""} y ${nRsvp} RSVP?\n\n` +
+      "Las partidas y RSVPs existentes serán sobreescritos con los datos del backup.\n" +
+      "Esta acción NO se puede deshacer."
+    );
+    if (!ok) return;
+
+    setBackupStatus("loading");
+    setBackupMsg(null);
+    try {
+      const res = await fetch("/api/admin/backup", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(data),
+      });
+      const result = await res.json() as { restored?: { saves: number; rsvp: number }; error?: string; errors?: string[] };
+      if (result.error) throw new Error(result.error);
+      const r = result.restored!;
+      setBackupStatus("ok");
+      setBackupMsg(`✓ Restaurado: ${r.saves} partida${r.saves !== 1 ? "s" : ""}, ${r.rsvp} RSVP.${result.errors?.length ? ` (${result.errors.length} errores parciales)` : ""}`);
+      setTimeout(() => { setBackupStatus("idle"); setBackupMsg(null); router.refresh(); }, 2500);
+    } catch (e) {
+      setBackupStatus("error");
+      setBackupMsg("Error al restaurar: " + String(e));
+    }
+  };
+
+  // ── Editar jugador ────────────────────────────────────────────────────────
+  const [editingEntry, setEditingEntry] = useState<EntryForDashboard | null>(null);
+
+  // ── Eliminar jugador ──────────────────────────────────────────────────────
+  const [deletingId,   setDeletingId]   = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError,  setDeleteError]  = useState<string | null>(null);
+
+  const confirmDelete = async () => {
+    if (!deletingId) return;
+    setDeleteLoading(true);
+    setDeleteError(null);
+    try {
+      const res  = await fetch(`/api/admin/players/${deletingId}`, { method: "DELETE" });
+      const data = await res.json() as { deleted?: boolean; error?: string };
+      if (data.error) throw new Error(data.error);
+      setDeletingId(null);
+      router.refresh();
+    } catch (e) {
+      setDeleteError(String(e));
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   // Pre-calcular medallas globales (una sola vez)
   const globalMedals = useMemo(() => computeGlobalMedals(entries as RSVPForMedals[]), [entries]);
@@ -217,10 +313,82 @@ export default function AdminDashboard({ entries }: Props) {
 
   return (
     <>
-      {/* ── CSS de medallas + sort controls ── */}
+      {/* ── CSS ── */}
       <style>{`
-        /* Tooltip nativo del title — complementado por el borde en hover */
         [title]:hover { opacity: 0.85; }
+
+        /* ── Backup bar ── */
+        .backup-bar {
+          display: flex; align-items: center; flex-wrap: wrap;
+          gap: 0.5rem; margin-bottom: 1rem;
+          background: #f8f6f0; border-radius: 12px;
+          padding: 0.7rem 1rem;
+        }
+        .backup-bar-label {
+          font-size: 0.63rem; font-weight: 700; text-transform: uppercase;
+          letter-spacing: 0.07em; color: #aaa; margin-right: 0.2rem;
+        }
+        .backup-btn {
+          display: inline-flex; align-items: center; gap: 0.3rem;
+          padding: 5px 13px; border-radius: 8px; font-size: 0.8rem;
+          font-weight: 700; cursor: pointer; border: 1.5px solid;
+          transition: background 0.12s;
+        }
+        .backup-btn-dl  { background: #fff; border-color: #d1d5db; color: #374151; }
+        .backup-btn-dl:hover  { background: #f3f4f6; }
+        .backup-btn-rst { background: #fff; border-color: #fca5a5; color: #b91c1c; }
+        .backup-btn-rst:hover { background: #fee2e2; }
+        .backup-btn:disabled { opacity: 0.5; cursor: default; }
+        .backup-status-ok    { font-size: 0.76rem; color: #15803d; font-weight: 600; }
+        .backup-status-error { font-size: 0.76rem; color: #b91c1c; font-weight: 600; }
+        .backup-status-load  { font-size: 0.76rem; color: #6b7280; }
+
+        /* ── Delete confirm overlay ── */
+        .delete-overlay {
+          position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+          z-index: 9998; display: flex; align-items: center; justify-content: center;
+          padding: 1rem;
+        }
+        .delete-box {
+          background: #fff; border-radius: 16px; padding: 1.4rem 1.6rem;
+          max-width: 400px; width: 100%;
+          box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+        }
+        .delete-title { font-size: 1rem; font-weight: 800; color: #b91c1c; margin-bottom: 0.6rem; }
+        .delete-body  { font-size: 0.86rem; color: #555; margin-bottom: 1.2rem; line-height: 1.5; }
+        .delete-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+        .delete-cancel-btn {
+          padding: 7px 18px; border-radius: 9px; border: 1.5px solid #e5e7eb;
+          background: #fff; color: #555; font-weight: 600; cursor: pointer; font-size: 0.85rem;
+        }
+        .delete-cancel-btn:hover { background: #f5f5f5; }
+        .delete-confirm-btn {
+          padding: 7px 18px; border-radius: 9px; border: none;
+          background: #b91c1c; color: #fff; font-weight: 700;
+          cursor: pointer; font-size: 0.85rem;
+        }
+        .delete-confirm-btn:hover:not(:disabled) { background: #991b1b; }
+        .delete-confirm-btn:disabled { background: #fca5a5; cursor: default; }
+
+        /* ── Botones de acción por jugador ── */
+        .player-action-bar {
+          display: flex; gap: 0.4rem; flex-wrap: wrap;
+          margin-top: 0.75rem; padding-top: 0.75rem;
+          border-top: 1px solid #f0ede2;
+        }
+        .player-edit-btn {
+          padding: 5px 12px; border-radius: 8px; border: 1.5px solid #d1d5db;
+          background: #fff; color: #374151; font-weight: 700; font-size: 0.76rem;
+          cursor: pointer;
+        }
+        .player-edit-btn:hover { background: #f3f4f6; }
+        .player-delete-btn {
+          padding: 5px 12px; border-radius: 8px; border: 1.5px solid #fca5a5;
+          background: #fff; color: #b91c1c; font-weight: 700; font-size: 0.76rem;
+          cursor: pointer;
+        }
+        .player-delete-btn:hover { background: #fee2e2; }
+
         .sort-bar {
           display: flex;
           align-items: center;
@@ -269,6 +437,72 @@ export default function AdminDashboard({ entries }: Props) {
           border-top: 1px solid #f0ede2;
         }
       `}</style>
+
+      {/* ── Modal de edición ── */}
+      {editingEntry && (
+        <PlayerEditModal
+          userId={editingEntry.user_id}
+          playerName={editingEntry.player_name}
+          onClose={() => setEditingEntry(null)}
+          onSaved={() => { setEditingEntry(null); router.refresh(); }}
+        />
+      )}
+
+      {/* ── Overlay de confirmación de borrado ── */}
+      {deletingId && (
+        <div className="delete-overlay" onClick={(e) => e.target === e.currentTarget && setDeletingId(null)}>
+          <div className="delete-box">
+            <p className="delete-title">🗑 Eliminar jugador</p>
+            <p className="delete-body">
+              ¿Seguro? Se borrarán la partida, el RSVP y las credenciales de acceso de este
+              jugador. <strong>Esta acción no se puede deshacer.</strong>
+            </p>
+            {deleteError && (
+              <p style={{ color: "#b91c1c", fontSize: "0.8rem", marginBottom: "0.8rem" }}>{deleteError}</p>
+            )}
+            <div className="delete-actions">
+              <button className="delete-cancel-btn" onClick={() => { setDeletingId(null); setDeleteError(null); }}>
+                Cancelar
+              </button>
+              <button className="delete-confirm-btn" onClick={confirmDelete} disabled={deleteLoading}>
+                {deleteLoading ? "Eliminando..." : "Eliminar definitivamente"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Barra de backup / restore ── */}
+      <div className="backup-bar">
+        <span className="backup-bar-label">Copia de seguridad</span>
+        <button
+          className="backup-btn backup-btn-dl"
+          onClick={handleBackupDownload}
+          disabled={backupStatus === "loading"}
+        >
+          💾 Descargar backup
+        </button>
+        <button
+          className="backup-btn backup-btn-rst"
+          onClick={() => restoreInputRef.current?.click()}
+          disabled={backupStatus === "loading"}
+        >
+          📥 Restaurar backup
+        </button>
+        <input
+          ref={restoreInputRef}
+          type="file"
+          accept=".json"
+          style={{ display: "none" }}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) { handleRestoreFile(file); e.target.value = ""; }
+          }}
+        />
+        {backupStatus === "loading" && <span className="backup-status-load">⏳ Procesando...</span>}
+        {backupStatus === "ok"      && backupMsg && <span className="backup-status-ok">{backupMsg}</span>}
+        {backupStatus === "error"   && backupMsg && <span className="backup-status-error">{backupMsg}</span>}
+      </div>
 
       {/* ── Barra de ordenación ── */}
       <div className="sort-bar">
@@ -524,6 +758,24 @@ export default function AdminDashboard({ entries }: Props) {
                 {/* ── Acciones de impersonación ── */}
                 {e.user_id && (
                   <ImpersonateButtons userId={e.user_id} playerName={e.player_name} />
+                )}
+
+                {/* ── Editar / Eliminar ── */}
+                {e.user_id && (
+                  <div className="player-action-bar">
+                    <button
+                      className="player-edit-btn"
+                      onClick={() => setEditingEntry(e)}
+                    >
+                      ✏️ Editar partida
+                    </button>
+                    <button
+                      className="player-delete-btn"
+                      onClick={() => { setDeletingId(e.user_id); setDeleteError(null); }}
+                    >
+                      🗑 Eliminar jugador
+                    </button>
+                  </div>
                 )}
               </div>
             </details>

@@ -18,8 +18,11 @@ function timingSafeStringEqual(a: string, b: string) {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // ── Protección de rutas /admin/* ────────────────────────────────────────
-  if (pathname.startsWith('/admin')) {
+  // ── Protección de rutas /admin/* y /api/admin/* ─────────────────────────
+  const isAdminPage = pathname.startsWith('/admin');
+  const isAdminApi  = pathname.startsWith('/api/admin');
+
+  if (isAdminPage || isAdminApi) {
     // La página de login siempre es accesible
     if (pathname === '/admin/login') {
       return NextResponse.next();
@@ -35,7 +38,14 @@ export function middleware(request: NextRequest) {
     })();
 
     if (!tokenMatches) {
-      // Redirigir al login con la URL original como retorno
+      // API routes → 401 JSON en lugar de redirect
+      if (isAdminApi) {
+        return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      // Páginas → redirigir al login
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('next', pathname);
       return NextResponse.redirect(loginUrl);
@@ -53,5 +63,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/admin/:path*'],
+  matcher: ['/', '/admin/:path*', '/api/admin/:path*'],
 };
