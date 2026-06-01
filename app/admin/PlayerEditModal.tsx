@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { itemLabel } from "./item-names";
 
 interface PokemonInst {
   id: number;
@@ -10,10 +11,16 @@ interface PokemonInst {
   [key: string]: unknown;
 }
 
+interface InventoryItem {
+  item: string;
+  amount: number;
+}
+
 type GameState = {
-  pokemon?: PokemonInst[];
-  pc?: PokemonInst[];
-  money?: number;
+  pokemon?:   PokemonInst[];
+  pc?:        PokemonInst[];
+  money?:     number;
+  inventory?: InventoryItem[];
   [key: string]: unknown;
 };
 
@@ -29,14 +36,15 @@ function spriteUrl(id: number) {
 }
 
 export default function PlayerEditModal({ userId, playerName, onClose, onSaved }: Props) {
-  const [loading, setLoading]   = useState(true);
-  const [saving, setSaving]     = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+  const [loading, setLoading]     = useState(true);
+  const [saving, setSaving]       = useState(false);
+  const [error, setError]         = useState<string | null>(null);
   const [fullState, setFullState] = useState<GameState | null>(null);
-  const [team, setTeam]         = useState<PokemonInst[]>([]);
-  const [money, setMoney]       = useState(0);
-  const [tab, setTab]           = useState<"team" | "json">("team");
-  const [jsonText, setJsonText] = useState("");
+  const [team, setTeam]           = useState<PokemonInst[]>([]);
+  const [money, setMoney]         = useState(0);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [tab, setTab]             = useState<"team" | "json">("team");
+  const [jsonText, setJsonText]   = useState("");
   const [jsonError, setJsonError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,6 +56,7 @@ export default function PlayerEditModal({ userId, playerName, onClose, onSaved }
         setFullState(gs);
         setTeam(Array.isArray(gs.pokemon) ? gs.pokemon : []);
         setMoney(typeof gs.money === "number" ? gs.money : 0);
+        setInventory(Array.isArray(gs.inventory) ? gs.inventory : []);
         setJsonText(JSON.stringify(gs, null, 2));
         setLoading(false);
       })
@@ -70,7 +79,7 @@ export default function PlayerEditModal({ userId, playerName, onClose, onSaved }
         return;
       }
     } else {
-      finalState = { ...fullState, pokemon: team, money };
+      finalState = { ...fullState, pokemon: team, money, inventory };
     }
 
     try {
@@ -95,6 +104,15 @@ export default function PlayerEditModal({ userId, playerName, onClose, onSaved }
 
   const removePokemon = (idx: number) => {
     setTeam((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const updateItemAmount = (idx: number, raw: string) => {
+    const amount = Math.min(99, Math.max(0, parseInt(raw, 10) || 0));
+    setInventory((prev) => prev.map((it, i) => (i === idx ? { ...it, amount } : it)));
+  };
+
+  const removeItem = (idx: number) => {
+    setInventory((prev) => prev.filter((_, i) => i !== idx));
   };
 
   return (
@@ -289,6 +307,53 @@ export default function PlayerEditModal({ userId, playerName, onClose, onSaved }
                   </div>
                 </>
               )}
+
+                {/* Inventario */}
+                {inventory.length > 0 && (
+                  <div style={{ marginTop: "1.2rem" }}>
+                    <label className="edit-field-label">
+                      Inventario ({inventory.length} tipos)
+                    </label>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                      {inventory.map((it, idx) => (
+                        <div key={idx} style={{
+                          display: "flex", alignItems: "center", gap: "0.6rem",
+                          background: "#f8f6f0", borderRadius: 10, padding: "0.4rem 0.7rem",
+                        }}>
+                          <span style={{ flex: 1, fontSize: "0.82rem", color: "#1a1a1a", fontWeight: 500 }}>
+                            {itemLabel(it.item)}
+                          </span>
+                          <span style={{ fontSize: "0.68rem", color: "#bbb", marginRight: 2 }}>×</span>
+                          <input
+                            type="number"
+                            min={0}
+                            max={99}
+                            value={it.amount}
+                            onChange={(e) => updateItemAmount(idx, e.target.value)}
+                            style={{
+                              width: 52, border: "1.5px solid #e5e7eb", borderRadius: 6,
+                              padding: "2px 6px", fontSize: "0.85rem", fontWeight: 700,
+                              textAlign: "center", outline: "none",
+                            }}
+                          />
+                          <button
+                            onClick={() => removeItem(idx)}
+                            style={{
+                              background: "#fee2e2", border: "none", borderRadius: 7,
+                              padding: "3px 8px", color: "#b91c1c", fontWeight: 700,
+                              fontSize: "0.72rem", cursor: "pointer",
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: "0.67rem", color: "#bbb", marginTop: "0.4rem" }}>
+                      Cantidad 0 = el objeto permanece pero sin unidades. Usa × para eliminarlo.
+                    </p>
+                  </div>
+                )}
 
               {/* ── Pestaña JSON ── */}
               {tab === "json" && (
