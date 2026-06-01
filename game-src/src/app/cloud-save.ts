@@ -13,6 +13,13 @@ const SUPABASE_ANON_KEY =
 // Se inicializa con el valor de localStorage para que persista entre recargas.
 let currentUserId: string | null = localStorage.getItem("wedding_user_id");
 
+// Clave localStorage para el write_token de escritura en save-game.
+// El servidor lo genera en la primera escritura o lo devuelve al autenticarse.
+const WRITE_TOKEN_KEY = "wedding_write_token";
+
+const getWriteToken = (): string | null => localStorage.getItem(WRITE_TOKEN_KEY);
+const setWriteToken = (token: string): void => localStorage.setItem(WRITE_TOKEN_KEY, token);
+
 // Impersonation: cuando se entra al juego con ?play_as=UUID o ?recover=UUID
 // desde el admin, este ID toma precedencia sobre el de localStorage SIN sobreescribirlo,
 // de forma que la próxima recarga normal vuelve a la cuenta original del dispositivo.
@@ -95,8 +102,22 @@ export const saveToCloud = async (
   gameState: unknown
 ): Promise<void> => {
   if (!SUPABASE_URL) return;
+  // No guardar en la nube durante impersonación (modo lectura)
+  if (isImpersonating()) return;
   try {
-    await callEdge("save-game", { userId, gameState }, SAVE_GAME_TIMEOUT_MS);
+    const writeToken = getWriteToken();
+    const res = await callEdge(
+      "save-game",
+      { userId, gameState, writeToken },
+      SAVE_GAME_TIMEOUT_MS,
+    );
+    // Si el servidor devuelve un writeToken (primera escritura), almacenarlo
+    if (res.ok) {
+      try {
+        const data = await res.json();
+        if (typeof data.writeToken === "string") setWriteToken(data.writeToken);
+      } catch { /* ignorar error de parseo */ }
+    }
   } catch {
     // Silently ignore — local save is still intact
   }
@@ -287,7 +308,9 @@ export const webauthnRegister = async (
         credential: credentialJSON,
       });
       if (finishRes.ok) {
-        const { userId: confirmedId } = await finishRes.json();
+        const { userId: confirmedId, writeToken } = await finishRes.json();
+        // Almacenar write_token si el servidor ya tenía un save para este usuario
+        if (typeof writeToken === "string") setWriteToken(writeToken);
         localStorage.setItem("wedding_user_id", confirmedId);
         return confirmedId;
       }
@@ -370,7 +393,9 @@ export const webauthnAuth = async (credentialId: string): Promise<string | null>
         credential: assertionJSON,
       });
       if (finishRes.ok) {
-        const { userId } = await finishRes.json();
+        const { userId, writeToken } = await finishRes.json();
+        // Almacenar write_token para escrituras posteriores
+        if (typeof writeToken === "string") setWriteToken(writeToken);
         console.info("[WebAuthn] auth-finish OK →", userId);
         return userId;
       } else {

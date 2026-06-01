@@ -1,5 +1,5 @@
 // webauthn-auth-finish: valida que el challenge es válido y que la credential_id
-// existe en la base de datos, y devuelve el user_id asociado.
+// existe en la base de datos, y devuelve el user_id y write_token asociados.
 //
 // La verificación criptográfica de la firma se omite intencionadamente:
 // - El Face ID / huella es obligatorio a nivel del navegador (navigator.credentials.get()
@@ -53,15 +53,24 @@ Deno.serve(async (req) => {
       } catch (e) {
         const msg = (e as Error).message ?? String(e);
         if (msg === "Invalid clientDataJSON type" || msg === "Origin not allowed") throw e;
-        // Error de parseo: clientDataJSON malformado — rechazar
         throw new Error("Invalid clientDataJSON");
       }
     }
 
-    // 4. Éxito — devolver el user_id asociado
-    return json({ success: true, userId: cred.user_id }, 200, corsHeaders);
+    // 4. Obtener el write_token del save de este usuario (puede ser null si aún no tiene save)
+    const { data: saveRow } = await db
+      .from("saves")
+      .select("write_token")
+      .eq("user_id", cred.user_id)
+      .maybeSingle();
+
+    // 5. Éxito — devolver user_id y write_token para que el cliente los almacene
+    return json({
+      success:    true,
+      userId:     cred.user_id,
+      writeToken: saveRow?.write_token ?? null,
+    }, 200, corsHeaders);
   } catch (e) {
     return json({ error: (e as Error).message ?? String(e) }, 400, corsHeaders);
   }
 });
-

@@ -48,8 +48,7 @@ Deno.serve(async (req) => {
 
     const encodedPublicKey = encodeBase64Url(credentialPublicKey);
 
-    // Si el credential ya existe, ACTUALIZAR la public_key (puede haberse guardado
-    // incorrectamente en un deploy anterior) y devolver el user_id existente.
+    // Si el credential ya existe, actualizar la public_key y devolver el user_id + write_token existentes
     const { data: existing } = await db
       .from("webauthn_credentials")
       .select("user_id")
@@ -60,7 +59,18 @@ Deno.serve(async (req) => {
       await db.from("webauthn_credentials")
         .update({ public_key: encodedPublicKey, sign_count: credentialCounter })
         .eq("credential_id", credentialId);
-      return json({ success: true, userId: existing.user_id }, 200, corsHeaders);
+
+      const { data: saveRow } = await db
+        .from("saves")
+        .select("write_token")
+        .eq("user_id", existing.user_id)
+        .maybeSingle();
+
+      return json({
+        success:    true,
+        userId:     existing.user_id,
+        writeToken: saveRow?.write_token ?? null,
+      }, 200, corsHeaders);
     }
 
     const { error: credErr } = await db.from("webauthn_credentials").insert({
@@ -71,7 +81,18 @@ Deno.serve(async (req) => {
     });
     if (credErr) throw credErr;
 
-    return json({ success: true, userId }, 200, corsHeaders);
+    // Devolver write_token si el usuario ya tiene un save (p.ej. modo recover)
+    const { data: saveRow } = await db
+      .from("saves")
+      .select("write_token")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    return json({
+      success:    true,
+      userId,
+      writeToken: saveRow?.write_token ?? null,
+    }, 200, corsHeaders);
   } catch (e) {
     return json({ error: (e as Error).message }, 400, corsHeaders);
   }

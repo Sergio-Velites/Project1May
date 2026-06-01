@@ -23,13 +23,39 @@ Deno.serve(async (req) => {
     let userId: string;
 
     if (providedUserId) {
-      // Asegurar que el row existe en wedding_users (idempotente)
+      // Verificar que el usuario existe
+      const { data: existingUser } = await db
+        .from("wedding_users")
+        .select("id")
+        .eq("id", providedUserId)
+        .maybeSingle();
+
+      if (!existingUser) throw new Error("User not found");
+
+      // Comprobar si ya tiene credenciales activas.
+      // Si las tiene, solo permitir el re-registro con ADMIN_SECRET (flujo de recovery
+      // legítimo gestionado por el panel de administración). Esto impide que cualquier
+      // persona que conozca un UUID ajeno pueda vincular su propia passkey a esa cuenta.
+      const { data: existingCreds } = await db
+        .from("webauthn_credentials")
+        .select("credential_id")
+        .eq("user_id", providedUserId)
+        .limit(1);
+
+      if (existingCreds && existingCreds.length > 0) {
+        const adminSecret = req.headers.get("x-admin-secret");
+        if (!adminSecret || adminSecret !== Deno.env.get("ADMIN_SECRET")) {
+          throw new Error("Cannot register new passkey for a user with existing credentials");
+        }
+      }
+
+      // Upsert del usuario (idempotente)
       await db
         .from("wedding_users")
         .upsert({ id: providedUserId }, { onConflict: "id", ignoreDuplicates: true });
       userId = providedUserId;
     } else {
-      // Create anonymous user
+      // Crear usuario anónimo nuevo
       const { data: user, error: userErr } = await db
         .from("wedding_users")
         .insert({})
