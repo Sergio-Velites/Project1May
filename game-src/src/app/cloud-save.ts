@@ -344,7 +344,15 @@ export const webauthnRegister = async (
 
 // ---- WebAuthn Authentication ----
 
-export const webauthnAuth = async (credentialId: string): Promise<string | null> => {
+// `credentialId` opcional: si se omite (o se pasa null), se inicia una
+// autenticación *discoverable* (usernameless) con allowCredentials vacío. El
+// sistema operativo ofrece cualquier passkey de este RP (sincronizada vía
+// iCloud Keychain / Google Password Manager) aunque localStorage se haya
+// borrado. webauthn-auth-finish recupera el user_id buscando por credential_id,
+// lo que evita crear una cuenta nueva (y por tanto una partida duplicada).
+export const webauthnAuth = async (
+  credentialId?: string | null
+): Promise<string | null> => {
   try {
     const startRes = await callEdge("webauthn-auth-start", { credentialId });
     if (!startRes.ok) return null;
@@ -396,6 +404,10 @@ export const webauthnAuth = async (credentialId: string): Promise<string | null>
         const { userId, writeToken } = await finishRes.json();
         // Almacenar write_token para escrituras posteriores
         if (typeof writeToken === "string") setWriteToken(writeToken);
+        // Re-persistir la credencial usada (importante tras una recuperación
+        // discoverable con localStorage borrado: la próxima visita usará la vía
+        // rápida sin volver a mostrar el selector de passkeys del sistema).
+        localStorage.setItem("wedding_credential_id", assertion.id);
         console.info("[WebAuthn] auth-finish OK →", userId);
         return userId;
       } else {
