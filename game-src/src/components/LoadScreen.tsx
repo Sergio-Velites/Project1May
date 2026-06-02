@@ -296,6 +296,14 @@ const LoadScreen = () => {
                   if (credentialId) {
                     userId = await webauthnAuth(credentialId);
                   }
+                  // Recuperación discoverable (usernameless): si no había
+                  // credencial local (p.ej. Safari borró localStorage por ITP),
+                  // intentar autenticar con CUALQUIER passkey de este RP antes de
+                  // registrar una nueva. Evita crear una cuenta — y por tanto una
+                  // partida — duplicada para la misma persona.
+                  if (!userId) {
+                    userId = await webauthnAuth(null);
+                  }
                   if (!userId) {
                     userId = await webauthnRegister();
                   }
