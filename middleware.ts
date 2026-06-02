@@ -1,29 +1,29 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createHash } from 'crypto';
 
-// La cookie almacena SHA-256(ADMIN_PASSWORD), nunca el texto plano.
-// Al cambiar la contraseña en Vercel + redeploy, el hash cambia y
-// las cookies antiguas quedan invalidadas automáticamente.
-function hashPassword(pw: string): string {
-  return createHash('sha256').update(pw).digest('hex');
+// ⚠️ El middleware corre en Edge Runtime (NO Node.js).
+// `import { createHash } from 'crypto'` no existe en Edge → usar Web Crypto API.
+// La cookie almacena SHA-256(ADMIN_PASSWORD) en hex; al cambiar la contraseña
+// en Vercel + redeploy el hash cambia y las cookies antiguas quedan invalidadas.
+async function hashPassword(pw: string): Promise<string> {
+  const data = new TextEncoder().encode(pw);
+  const buf  = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
-function timingSafeStringEqual(a: string, b: string) {
+function timingSafeStringEqual(a: string, b: string): boolean {
   const encoder = new TextEncoder();
   const aBytes = encoder.encode(a);
   const bBytes = encoder.encode(b);
-
   if (aBytes.length !== bBytes.length) return false;
-
   let diff = 0;
-  for (let i = 0; i < aBytes.length; i += 1) {
-    diff |= aBytes[i] ^ bBytes[i];
-  }
+  for (let i = 0; i < aBytes.length; i++) diff |= aBytes[i] ^ bBytes[i];
   return diff === 0;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Protección de rutas /admin/* y /api/admin/* ─────────────────────────
@@ -31,32 +31,26 @@ export function middleware(request: NextRequest) {
   const isAdminApi  = pathname.startsWith('/api/admin');
 
   if (isAdminPage || isAdminApi) {
-    // La página de login siempre es accesible
-    if (pathname === '/admin/login') {
-      return NextResponse.next();
-    }
+    // Rutas siempre accesibles sin autenticación
+    if (pathname === '/admin/login')   return NextResponse.next();
+    if (pathname === '/api/admin/auth') return NextResponse.next(); // endpoint de login
 
     // Verificar cookie de autenticación admin
-    const token = request.cookies.get('admin_token')?.value;
+    const token         = request.cookies.get('admin_token')?.value;
     const adminPassword = process.env.ADMIN_PASSWORD;
 
-    const tokenMatches = (() => {
-      if (!adminPassword || !token) return false;
-      return timingSafeStringEqual(token, hashPassword(adminPassword));
-    })();
+    const tokenMatches =
+      !!adminPassword && !!token &&
+      timingSafeStringEqual(token, await hashPassword(adminPassword));
 
     if (!tokenMatches) {
-      // API routes → 401 JSON en lugar de redirect
       if (isAdminApi) {
         return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
         });
       }
-      // Páginas → redirigir al login
-      const loginUrl = new URL('/admin/login', request.url);
-      loginUrl.searchParams.set('next', pathname);
-      return NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
     return NextResponse.next();
