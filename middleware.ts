@@ -1,5 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createHash } from 'crypto';
+
+// La cookie almacena SHA-256(ADMIN_PASSWORD), nunca el texto plano.
+// Al cambiar la contraseña en Vercel + redeploy, el hash cambia y
+// las cookies antiguas quedan invalidadas automáticamente.
+function hashPassword(pw: string): string {
+  return createHash('sha256').update(pw).digest('hex');
+}
 
 function timingSafeStringEqual(a: string, b: string) {
   const encoder = new TextEncoder();
@@ -34,7 +42,7 @@ export function middleware(request: NextRequest) {
 
     const tokenMatches = (() => {
       if (!adminPassword || !token) return false;
-      return timingSafeStringEqual(token, adminPassword);
+      return timingSafeStringEqual(token, hashPassword(adminPassword));
     })();
 
     if (!tokenMatches) {
