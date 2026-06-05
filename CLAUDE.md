@@ -299,6 +299,17 @@ victory-road-1f · victory-road-2f · victory-road-3f
 ss-anne-1f · ss-anne-2f · ss-anne-3f · ss-anne-bf1
 ```
 
+### MO Fuerza (HM04 / "strength") y rocas empujables
+
+- **Movimiento**: `strength` ya existe en `move-metadata.ts` (Normal, físico) y funciona en combate como cualquier move de daño. `ItemType.Hm04` lo enseña (`learnMove("strength")`).
+- **Rocas empujables**: `MapType.boulders?: BoulderType[]` (`{ pos, id }`). Bloquean el paso como un muro hasta activar Fuerza.
+- **Activación (fiel a Gen I)**: pulsar A frente a una roca con un Pokémon del equipo que conozca `strength` → "¡X usó FUERZA!" y se activa la Fuerza en ese mapa (`strengthActive`). Sin Pokémon que la sepa → solo mensaje informativo.
+- **Empuje**: con Fuerza activa, caminar contra la roca la empuja 1 tile si el destino está libre (reducers `moveUp/Down/Left/Right` vía `tryBoulderInteraction`).
+- **Estado de sesión (no persiste)**: `boulderPositions` y `strengthActive` viven en `gameSlice` y se reinician al cambiar de mapa o al cargar partida → las rocas vuelven a su sitio (igual que el original).
+- **Colisión**: `canWalk`/`moveDown` bloquean los tiles ocupados por rocas (`isBoulder`/`boulderIdAt` en `map-helper.ts`).
+- **Render**: `components/Boulder.tsx` (dentro de `BackgroundContainer`), sprite SVG inline pixel-art.
+- **Editor**: modo `boulders` en `/admin/map-editor` (botón 🪨). Click para añadir/quitar; export TS `boulders: [...]` para pegar en el `.ts` del mapa. Override key `boulders` en `app/api/admin/map-data/route.ts`.
+
 ### Cómo añadir un mapa nuevo
 
 1. Añadir valor al enum `MapId` en `maps/map-types.ts`

@@ -54,6 +54,7 @@ type OverrideKey =
   | 'exitReturnMap'
   | 'exitReturnPos'
   | 'cuttableTrees'
+  | 'boulders'
   | 'minimapPos';
 
 const OVERRIDE_KEYS: OverrideKey[] = [
@@ -84,6 +85,7 @@ const OVERRIDE_KEYS: OverrideKey[] = [
   'exitReturnMap',
   'exitReturnPos',
   'cuttableTrees',
+  'boulders',
   'minimapPos',
 ];
 

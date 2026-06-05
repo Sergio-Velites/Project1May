@@ -52,6 +52,7 @@ interface MapEntry {
   items?: { itemKey: string; pos: { x: number; y: number }; hidden?: boolean }[];
   gifts?: { pokemonId: number; level: number; pos: { x: number; y: number }; questId: string }[];
   staticPokemon?: StaticPokemonEntry[];
+  boulders?: { pos: { x: number; y: number }; id: string }[];
   pokemonCenter?: { x: number; y: number } | null;
   pc?: { x: number; y: number } | null;
   store?: { x: number; y: number } | null;
@@ -105,7 +106,7 @@ type EncountersOverride = Partial<Record<EncounterTableKey, EncounterTable>>;
 
 const EMPTY_TABLE = (): EncounterTable => ({ rate: 0, pokemon: [] });
 
-type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'spots' | 'mechanics' | 'portals' | 'map';
+type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'boulders' | 'spots' | 'mechanics' | 'portals' | 'map';
 
 type SpotKey = 'start' | 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation' | 'onlineBattleNpc';
 
@@ -328,6 +329,17 @@ function exportCuttableTreesTS(trees: { pos: { x: number; y: number }; questId: 
     `    },`,
   ].join('\n'));
   return `cuttableTrees: [\n${lines.join('\n')}\n  ],`;
+}
+
+function exportBouldersTS(boulders: { pos: { x: number; y: number }; id: string }[]): string {
+  if (boulders.length === 0) return 'boulders: [],';
+  const lines = boulders.map((b) => [
+    `    {`,
+    `      pos: { x: ${b.pos.x}, y: ${b.pos.y} },`,
+    `      id: "${escapeTSString(b.id)}",`,
+    `    },`,
+  ].join('\n'));
+  return `boulders: [\n${lines.join('\n')}\n  ],`;
 }
 
 const STATIC_POKEMON_SPRITES = [
@@ -602,6 +614,7 @@ function exportFullMapTypeTS({
   gifts,
   staticPokemon,
   cuttableTrees,
+  boulders,
   pokemonCenter,
   pc,
   store,
@@ -632,6 +645,7 @@ function exportFullMapTypeTS({
   gifts: GiftEntry[];
   staticPokemon: StaticPokemonEntry[];
   cuttableTrees: { pos: { x: number; y: number }; questId: string }[];
+  boulders: { pos: { x: number; y: number }; id: string }[];
   pokemonCenter: { x: number; y: number } | null;
   pc: { x: number; y: number } | null;
   store: { x: number; y: number } | null;
@@ -708,6 +722,7 @@ function exportFullMapTypeTS({
   if (gifts.length > 0) lines.push(exportGiftsTS(gifts));
   if (staticPokemon.length > 0) lines.push(exportStaticPokemonTS(staticPokemon));
   if (cuttableTrees.length > 0) lines.push(exportCuttableTreesTS(cuttableTrees));
+  if (boulders.length > 0) lines.push(exportBouldersTS(boulders));
   if (minimapPos) lines.push(`minimapPos: { x: ${minimapPos.x}, y: ${minimapPos.y} },`);
   lines.push(exportTrainersArrayTS(trainers));
 
@@ -775,6 +790,8 @@ export default function MapEditor() {
   const [staticPokemon, setStaticPokemon] = useState<StaticPokemonEntry[]>([]);
   interface CuttableTreeEntry { pos: { x: number; y: number }; questId: string; }
   const [cuttableTrees, setCuttableTrees] = useState<CuttableTreeEntry[]>([]);
+  interface BoulderEntry { pos: { x: number; y: number }; id: string; }
+  const [boulders, setBoulders] = useState<BoulderEntry[]>([]);
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
   const [pokemonCenter, setPokemonCenter] = useState<{ x: number; y: number } | null>(null);
   const [pcPos, setPcPos] = useState<{ x: number; y: number } | null>(null);
@@ -876,6 +893,7 @@ export default function MapEditor() {
     setGifts(m.gifts ?? []);
     setStaticPokemon((m as MapEntry & { staticPokemon?: StaticPokemonEntry[] }).staticPokemon ?? []);
     setCuttableTrees((m as MapEntry & { cuttableTrees?: { pos: { x: number; y: number }; questId: string }[] }).cuttableTrees ?? []);
+    setBoulders((m as MapEntry & { boulders?: { pos: { x: number; y: number }; id: string }[] }).boulders ?? []);
     setStartPos(m.start ?? null);
     setPokemonCenter(m.pokemonCenter ?? null);
     setPcPos(m.pc ?? null);
@@ -933,6 +951,7 @@ export default function MapEditor() {
             gifts,
             staticPokemon,
             cuttableTrees,
+            boulders,
             pokemonCenter,
             pc: pcPos,
             store: storePos,
@@ -1082,6 +1101,11 @@ export default function MapEditor() {
     navigator.clipboard.writeText(ts).then(() => alert('¡StaticPokemon copiado!'));
   }
 
+  function doExportBoulders() {
+    const ts = exportBouldersTS(boulders);
+    navigator.clipboard.writeText(ts).then(() => alert('¡Boulders copiados! Pégalo en el .ts del mapa como campo `boulders: [ ... ]`'));
+  }
+
   function doExportSpots() {
     const parts = [
       exportSpotTS('start', startPos),
@@ -1125,6 +1149,7 @@ export default function MapEditor() {
       gifts,
       staticPokemon,
       cuttableTrees,
+      boulders,
       pokemonCenter,
       pc: pcPos,
       store: storePos,
@@ -1769,6 +1794,23 @@ export default function MapEditor() {
       }
       return;
     }
+    if (editMode === 'boulders') {
+      const idx = boulders.findIndex((b) => b.pos.x === tile.x && b.pos.y === tile.y);
+      if (idx >= 0) {
+        // Clic en roca existente → eliminar
+        setBoulders((p) => p.filter((_, i) => i !== idx));
+        setDirty(true);
+      } else {
+        // Clic en tile vacío → añadir roca (MO Fuerza)
+        const defaultId = `boulder-${selectedMapId}-${tile.x}-${tile.y}`;
+        const id = window.prompt('id único de la roca:', defaultId);
+        if (id === null) return;
+        if (!id.trim()) { alert('id vacío'); return; }
+        setBoulders((p) => [...p, { pos: { x: tile.x, y: tile.y }, id: id.trim() }]);
+        setDirty(true);
+      }
+      return;
+    }
     if (editMode === 'spots') {
       const setter =
         activeSpot === 'start' ? setStartPos :
@@ -2027,7 +2069,7 @@ export default function MapEditor() {
 
         {/* Modo edición */}
         <div style={{ display: 'flex', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
-          {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
+          {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'boulders', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
               npc: '#5050b0',
               walls: '#7a3030',
@@ -2039,6 +2081,7 @@ export default function MapEditor() {
               gifts: '#7a3a5a',
               'static-pokemon': '#3a7a6a',
               'cuttable-trees': '#5a7a3a',
+              boulders: '#8a6a3a',
               spots: '#5a7a30',
               mechanics: '#6a4a8a',
               portals: '#7a3a3a',
@@ -2149,6 +2192,11 @@ export default function MapEditor() {
         {editMode === 'static-pokemon' && (
           <button onClick={doExportStaticPokemon} style={{ padding: '4px 12px', background: '#1a2a2a', border: '1px solid #3a7a6a', borderRadius: 4, color: '#50ddb4', cursor: 'pointer', fontSize: 12 }}>
             🐾 StaticPokémon
+          </button>
+        )}
+        {editMode === 'boulders' && (
+          <button onClick={doExportBoulders} style={{ padding: '4px 12px', background: '#2a2010', border: '1px solid #8a6a3a', borderRadius: 4, color: '#d2b482', cursor: 'pointer', fontSize: 12 }}>
+            🪨 Boulders
           </button>
         )}
         {editMode === 'spots' && (
@@ -2629,6 +2677,35 @@ export default function MapEditor() {
                 </div>
               ))}
 
+              {/* Boulders overlay (MO Fuerza) */}
+              {boulders.map((b, i) => (
+                <div
+                  key={`bo-${i}`}
+                  title={`Roca (Fuerza) · ${b.id}`}
+                  style={{
+                    position: 'absolute',
+                    left: b.pos.x * zoom,
+                    top: b.pos.y * zoom,
+                    width: zoom,
+                    height: zoom,
+                    background: editMode === 'boulders'
+                      ? 'rgba(180, 150, 110, 0.6)'
+                      : 'rgba(180, 150, 110, 0.25)',
+                    border: editMode === 'boulders'
+                      ? '1px solid rgba(210, 180, 130, 0.95)'
+                      : '1px dashed rgba(210, 180, 130, 0.5)',
+                    pointerEvents: 'none',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: Math.max(10, zoom * 0.5),
+                  }}
+                >
+                  🪨
+                </div>
+              ))}
+
               {/* Spots overlay */}
               {([
                 { key: 'start' as SpotKey, pos: startPos, emoji: '▶', color: '#ffffff' },
@@ -3024,6 +3101,22 @@ export default function MapEditor() {
                 ]}
                 count={cuttableTrees.length}
                 countLabel="árboles cortables"
+                sourceFile={currentMap?.sourceFile}
+              />
+            ) : editMode === 'boulders' ? (
+              <ModeHelpBlock
+                emoji="🪨"
+                title="Rocas (MO Fuerza)"
+                color="#d2b482"
+                lines={[
+                  'Click vacío: añadir roca empujable',
+                  'Click en roca existente: eliminar',
+                  'Bloquea el paso hasta usar FUERZA (strength)',
+                  'Se empuja 1 tile si el destino está libre',
+                  'No persiste: vuelve a su sitio al recargar el mapa',
+                ]}
+                count={boulders.length}
+                countLabel="rocas"
                 sourceFile={currentMap?.sourceFile}
               />
             ) : editMode === 'spots' ? (
