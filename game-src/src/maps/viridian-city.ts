@@ -53,6 +53,32 @@ const viridianCity: MapType = {
       34: [19, 22],
       35: [19, 22],
     },
+    boulders: [
+    {
+      pos: { x: 32, y: 14 },
+      id: "boulder-viridian-city-32-14",
+    },
+    {
+      pos: { x: 32, y: 15 },
+      id: "boulder-viridian-city-32-15",
+    },
+    {
+      pos: { x: 32, y: 16 },
+      id: "boulder-viridian-city-32-16",
+    },
+    {
+      pos: { x: 33, y: 16 },
+      id: "boulder-viridian-city-33-16",
+    },
+    {
+      pos: { x: 34, y: 16 },
+      id: "boulder-viridian-city-34-16",
+    },
+    {
+      pos: { x: 35, y: 16 },
+      id: "boulder-viridian-city-35-16",
+    },
+  ],
   fences: {
       9: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
       27: [4, 5, 6, 7, 14, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
