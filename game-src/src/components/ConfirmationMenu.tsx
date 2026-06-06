@@ -21,9 +21,9 @@ const Container = styled.div`
 `;
 
 // Fases del flujo de confirmación:
-//   ask     → muestra preMessage + menú SÍ/NO
-//   running → confirm() asíncrono en curso (p.ej. guardado verificado)
-//   done    → muestra el mensaje final (postMessage o el devuelto por confirm)
+//   ask     → preMessage + menú SÍ/NO
+//   running → confirm() asíncrono en curso (pendingMessage)
+//   done    → páginas de resultado (una o varias, avance con A/B)
 type Phase = "ask" | "running" | "done";
 
 const ConfirmationMenu = () => {
@@ -32,41 +32,41 @@ const ConfirmationMenu = () => {
   const data = useSelector(selectConfirmationMenu);
 
   const [phase, setPhase] = useState<Phase>("ask");
-  // Mensaje final dinámico (cuando confirm() resuelve a un string). Si es null
-  // se usa data.postMessage.
-  const [resultMessage, setResultMessage] = useState<string | null>(null);
-  // Evita ejecutar confirm() dos veces (doble A).
+  // Páginas del resultado. Vacío → usar [data.postMessage] como fallback.
+  const [resultPages, setResultPages] = useState<string[]>([]);
+  // Índice de la página actual dentro de resultPages.
+  const [pageIdx, setPageIdx] = useState(0);
   const runningRef = useRef(false);
 
-  const show = !!data;
-
-  // Reinicio total al abrir/cerrar el menú.
+  // Reinicio total al cerrar el menú.
   useEffect(() => {
-    if (!show) {
+    if (!data) {
       setPhase("ask");
-      setResultMessage(null);
+      setResultPages([]);
+      setPageIdx(0);
       runningRef.current = false;
     }
-  }, [show]);
+  }, [data]);
 
-  const preText = data?.preMessage ?? "";
+  const preText     = data?.preMessage ?? "";
   const pendingText = data?.pendingMessage ?? "Guardando...";
-  const postText = resultMessage ?? data?.postMessage ?? "";
 
-  // Texto que se anima según la fase.
+  // Páginas a mostrar en fase done (resultado de confirm() o postMessage fallback).
+  const donePages: string[] =
+    resultPages.length > 0 ? resultPages : [data?.postMessage ?? ""];
+  const postText = donePages[pageIdx] ?? "";
+
   const activeText =
     phase === "ask" ? preText : phase === "running" ? pendingText : postText;
 
-  // Lanza la acción de confirmación. Soporta confirm() síncrono o asíncrono.
   const runConfirm = () => {
     if (!data || runningRef.current) return;
     runningRef.current = true;
 
-    let outcome: void | Promise<string | void>;
+    let outcome: void | Promise<string | string[] | void>;
     try {
       outcome = data.confirm();
     } catch {
-      // confirm() síncrono que lanzó → tratamos como error genérico.
       outcome = undefined;
     }
 
@@ -74,36 +74,41 @@ const ConfirmationMenu = () => {
       !!outcome && typeof (outcome as Promise<unknown>).then === "function";
 
     if (!isPromise) {
-      // Comportamiento clásico: mostrar postMessage directamente.
       setPhase("done");
       return;
     }
 
-    // Asíncrono: mostrar "Guardando..." mientras resolvemos.
     setPhase("running");
-    (outcome as Promise<string | void>)
+    (outcome as Promise<string | string[] | void>)
       .then((msg) => {
-        if (typeof msg === "string" && msg) setResultMessage(msg);
+        if (Array.isArray(msg) && msg.length > 0) {
+          setResultPages(msg as string[]);
+        } else if (typeof msg === "string" && msg) {
+          setResultPages([msg]);
+        }
         setPhase("done");
       })
       .catch(() => {
-        // No debería ocurrir (saveGameVerified no lanza), pero por seguridad
-        // mostramos el postMessage por defecto.
         setPhase("done");
       });
   };
 
   const line = useDialogLine({
     text: activeText,
-    enabled: show,
+    enabled: !!data,
     onAdvance: () => {
-      // Solo se puede cerrar la caja cuando el proceso terminó.
-      // En "running" A/B únicamente completan el typewriter (no cierran).
-      if (phase === "done") dispatch(hideConfirmationMenu());
+      if (phase !== "done") return;
+      // Hay más páginas: avanzar a la siguiente.
+      if (pageIdx < donePages.length - 1) {
+        setPageIdx((p) => p + 1);
+        return;
+      }
+      // Última página: cerrar.
+      dispatch(hideConfirmationMenu());
     },
   });
 
-  if (!show) return null;
+  if (!data) return null;
 
   return (
     <>

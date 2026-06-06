@@ -89,9 +89,8 @@ const StartMenu = () => {
               dispatch(
                 showConfirmationMenu({
                   preMessage: "¿Quieres GUARDAR la partida?",
-                  // Fallback si confirm() no devolviera texto (no debería).
-                  postMessage: `¡${name} guardó la partida!`,
-                  pendingMessage: "Guardando la partida...",
+                  postMessage: `¡Se guardó la partida de ${name}!`,
+                  pendingMessage: "GUARDANDO... ¡NO APAGUES LA CONSOLA!",
                   confirm: async () => {
                     // 1. Copia local inmediata (reducer). La verificación
                     //    posterior detecta si fallara (cuota, modo privado…).

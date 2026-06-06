@@ -264,17 +264,21 @@ export const saveGameVerified = async (
 export const describeSaveResult = (
   name: string,
   result: SaveVerification
-): string => {
+): string | string[] => {
   switch (result.status) {
     case "verified":
-      return `¡${name} guardó la partida! Verificado. ✓`;
     case "local-only":
-      return `¡${name} guardó la partida!`;
+      // Mensaje fiel al original Pokémon España Gen I.
+      return `¡Se guardó la partida de ${name}!`;
     case "error":
       if (result.reason.startsWith("local")) {
-        return `Error al guardar. Revisa el dispositivo.`;
+        return "¡Error al guardar! Prueba de nuevo.";
       }
-      return `¡${name} guardó la partida! (Sin copia en la nube)`;
+      // Local OK, nube falló → 2 páginas para no truncar.
+      return [
+        `¡Se guardó la partida de ${name}!`,
+        "No se guardó en la nube. Revisa tu conexión e inténtalo de nuevo.",
+      ];
   }
 };
 

@@ -24,11 +24,11 @@ interface ConfimationMenuType {
   postMessage: string;
   /**
    * Acción al confirmar (SÍ). Puede ser síncrona (`void`) o asíncrona.
-   * Si devuelve una promesa que resuelve a un `string`, ese texto sustituye al
-   * `postMessage` (p.ej. para mostrar el resultado verificado de un guardado).
+   * Si devuelve un string, sustituye a postMessage (una sola página).
+   * Si devuelve string[], se muestran múltiples páginas que el usuario avanza con A.
    * Mientras la promesa está pendiente se muestra `pendingMessage`.
    */
-  confirm: () => void | Promise<string | void>;
+  confirm: () => void | Promise<string | string[] | void>;
   cancel?: () => void;
   /** Texto a mostrar mientras `confirm` (async) está en curso. */
   pendingMessage?: string;
