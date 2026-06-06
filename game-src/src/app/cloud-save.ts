@@ -267,16 +267,14 @@ export const describeSaveResult = (
 ): string => {
   switch (result.status) {
     case "verified":
-      return `¡${name} guardó la partida! Copia de seguridad verificada. ✓`;
+      return `¡${name} guardó la partida! Verificado. ✓`;
     case "local-only":
-      return `¡${name} guardó la partida en este dispositivo!`;
+      return `¡${name} guardó la partida!`;
     case "error":
       if (result.reason.startsWith("local")) {
-        // El guardado local también falló → problema serio.
-        return `¡PROBLEMA al guardar! No se pudo guardar la partida. Revisa el dispositivo e inténtalo de nuevo.`;
+        return `Error al guardar. Revisa el dispositivo.`;
       }
-      // Local OK, pero la nube no se pudo verificar.
-      return `${name} guardó en el dispositivo, pero NO se pudo verificar la copia en la nube. Inténtalo otra vez con conexión.`;
+      return `¡${name} guardó la partida! (Sin copia en la nube)`;
   }
 };
 
