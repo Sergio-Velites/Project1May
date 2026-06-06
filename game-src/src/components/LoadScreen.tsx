@@ -15,10 +15,11 @@ import {
   webauthnAuth,
   webauthnRegister,
   loadFromCloud,
+  saveToCloud,
   createUser,
   setCurrentUserId,
   setImpersonatedUserId,
-  recoverLocalSaveIfNeeded,
+  findLocalGameState,
 } from "../app/cloud-save";
 import OakIntro from "./OakIntro";
 import { GameState } from "../state/state-types";
@@ -79,6 +80,35 @@ type Phase =
   | "registering"
   | "choose"
   | "oak-intro";
+
+// Cuánto progreso tiene un save (suma de listas persistentes). Devuelve -1 para null.
+const progressScore = (gs: unknown): number => {
+  if (!gs || typeof gs !== "object") return -1;
+  const s = gs as Record<string, unknown>;
+  const len = (a: unknown): number => (Array.isArray(a) ? a.length : 0);
+  return (
+    len(s.defeatedTrainers) +
+    len(s.completedQuests) +
+    len(s.caughtPokemon) +
+    len(s.collectedItems) +
+    len(s.pokemon)
+  );
+};
+
+// Devuelve el save con más progreso (cloud vs local). Si local es mejor y
+// pushCloud es true, lo sube a la nube en background para reparar la nube obsoleta.
+const loadBestSave = (
+  userId: string,
+  cloud: unknown,
+  pushCloud: boolean
+): GameState | null => {
+  const local = findLocalGameState();
+  if (progressScore(local) > progressScore(cloud)) {
+    if (pushCloud && local !== null) saveToCloud(userId, local);
+    return local as GameState;
+  }
+  return (cloud ?? local) as GameState | null;
+};
 
 const LoadScreen = () => {
   const dispatch = useDispatch();
@@ -170,16 +200,10 @@ const LoadScreen = () => {
       const authedId = await webauthnAuth(credentialId);
       if (authedId) {
         setCurrentUserId(authedId);
-        const save = await loadFromCloud(authedId);
-        if (save) {
-          cloudSave.current = save as GameState;
-          transitionTo("choose");
-          return;
-        }
-        // Nube vacía: intentar recuperar partida local huérfana.
-        const recovered = await recoverLocalSaveIfNeeded(authedId);
-        if (recovered) {
-          cloudSave.current = recovered as GameState;
+        const cloudSave1 = await loadFromCloud(authedId);
+        const best1 = loadBestSave(authedId, cloudSave1, true);
+        if (best1) {
+          cloudSave.current = best1;
           transitionTo("choose");
           return;
         }
@@ -193,15 +217,10 @@ const LoadScreen = () => {
     if (!webAuthnOk) {
       if (userId) {
         setCurrentUserId(userId);
-        const save = await loadFromCloud(userId);
-        if (save) {
-          cloudSave.current = save as GameState;
-          transitionTo("choose");
-          return;
-        }
-        const recovered = await recoverLocalSaveIfNeeded(userId);
-        if (recovered) {
-          cloudSave.current = recovered as GameState;
+        const cloudSave2 = await loadFromCloud(userId);
+        const best2 = loadBestSave(userId, cloudSave2, true);
+        if (best2) {
+          cloudSave.current = best2;
           transitionTo("choose");
           return;
         }
@@ -309,15 +328,10 @@ const LoadScreen = () => {
                   }
                   if (userId) {
                     setCurrentUserId(userId);
-                    const save = await loadFromCloud(userId);
-                    if (save) {
-                      cloudSave.current = save as GameState;
-                      transitionTo("choose");
-                      return;
-                    }
-                    const recovered = await recoverLocalSaveIfNeeded(userId);
-                    if (recovered) {
-                      cloudSave.current = recovered as GameState;
+                    const cloudSave3 = await loadFromCloud(userId);
+                    const best3 = loadBestSave(userId, cloudSave3, true);
+                    if (best3) {
+                      cloudSave.current = best3;
                       transitionTo("choose");
                       return;
                     }
@@ -328,15 +342,10 @@ const LoadScreen = () => {
                       localStorage.getItem("wedding_user_id") ?? crypto.randomUUID();
                     localStorage.setItem("wedding_user_id", fallbackId);
                     setCurrentUserId(fallbackId);
-                    const save = await loadFromCloud(fallbackId);
-                    if (save) {
-                      cloudSave.current = save as GameState;
-                      transitionTo("choose");
-                      return;
-                    }
-                    const recovered = await recoverLocalSaveIfNeeded(fallbackId);
-                    if (recovered) {
-                      cloudSave.current = recovered as GameState;
+                    const cloudSave4 = await loadFromCloud(fallbackId);
+                    const best4 = loadBestSave(fallbackId, cloudSave4, true);
+                    if (best4) {
+                      cloudSave.current = best4;
                       transitionTo("choose");
                       return;
                     }
@@ -357,18 +366,13 @@ const LoadScreen = () => {
                 localStorage.setItem("wedding_user_id", localId);
                 setCurrentUserId(localId);
                 // Intentar recuperar save existente aunque no haya passkey
-                const save = await loadFromCloud(localId);
-                if (save) {
-                  cloudSave.current = save as GameState;
+                const cloudSave5 = await loadFromCloud(localId);
+                const best5 = loadBestSave(localId, cloudSave5, false);
+                if (best5) {
+                  cloudSave.current = best5;
                   transitionTo("choose");
                 } else {
-                  const recovered = await recoverLocalSaveIfNeeded(localId);
-                  if (recovered) {
-                    cloudSave.current = recovered as GameState;
-                    transitionTo("choose");
-                  } else {
-                    transitionTo("oak-intro");
-                  }
+                  transitionTo("oak-intro");
                 }
               },
             },

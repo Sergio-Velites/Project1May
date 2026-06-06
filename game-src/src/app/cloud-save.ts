@@ -648,7 +648,7 @@ const looksLikeGameState = (raw: string): unknown | null => {
   return null;
 };
 
-const findLocalGameState = (): unknown | null => {
+export const findLocalGameState = (): unknown | null => {
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (!key) continue;
