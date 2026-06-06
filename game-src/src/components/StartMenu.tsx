@@ -25,7 +25,7 @@ import {
   selectTrainerEncounter,
   updateSpecificPokemon,
 } from "../state/gameSlice";
-import { saveToCloud, getCurrentUserId } from "../app/cloud-save";
+import { saveGameVerified, describeSaveResult, getCurrentUserId } from "../app/cloud-save";
 import PokemonList from "./PokemonList";
 import { DEBUG_MODE } from "../app/constants";
 import { getPokemonStats } from "../app/use-pokemon-stats";
@@ -89,11 +89,26 @@ const StartMenu = () => {
               dispatch(
                 showConfirmationMenu({
                   preMessage: "¿Quieres GUARDAR la partida?",
+                  // Fallback si confirm() no devolviera texto (no debería).
                   postMessage: `¡${name} guardó la partida!`,
-                  confirm: () => {
-                    dispatch(save());
-                    const userId = getCurrentUserId();
-                    if (userId) saveToCloud(userId, gameState);
+                  pendingMessage: "Guardando la partida...",
+                  confirm: async () => {
+                    // 1. Copia local inmediata (reducer). La verificación
+                    //    posterior detecta si fallara (cuota, modo privado…).
+                    try {
+                      dispatch(save());
+                    } catch {
+                      /* lo refleja saveGameVerified */
+                    }
+                    // 2. Guardado seguro y verificado (local + nube con
+                    //    relectura y comparación de huella).
+                    const result = await saveGameVerified(
+                      getCurrentUserId(),
+                      gameState
+                    );
+                    // 3. El texto final confirma la verificación o avisa del
+                    //    problema, dentro de la misma caja de diálogo.
+                    return describeSaveResult(name, result);
                   },
                 })
               );

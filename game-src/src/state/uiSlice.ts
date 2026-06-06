@@ -22,8 +22,16 @@ interface LearningMoveType {
 interface ConfimationMenuType {
   preMessage: string;
   postMessage: string;
-  confirm: () => void;
+  /**
+   * Acción al confirmar (SÍ). Puede ser síncrona (`void`) o asíncrona.
+   * Si devuelve una promesa que resuelve a un `string`, ese texto sustituye al
+   * `postMessage` (p.ej. para mostrar el resultado verificado de un guardado).
+   * Mientras la promesa está pendiente se muestra `pendingMessage`.
+   */
+  confirm: () => void | Promise<string | void>;
   cancel?: () => void;
+  /** Texto a mostrar mientras `confirm` (async) está en curso. */
+  pendingMessage?: string;
 }
 
 interface EvolutionType {

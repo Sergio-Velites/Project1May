@@ -115,7 +115,9 @@ const ItemsMenu = () => {
                   showConfirmationMenu({
                     preMessage: `¿Tirar ${selected.name}?`,
                     postMessage: `${name} tiró ${selected.name}`,
-                    confirm: () => dispatch(consumeItem(selected.type)),
+                    confirm: () => {
+                      dispatch(consumeItem(selected.type));
+                    },
                   })
                 );
               },

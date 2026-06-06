@@ -549,6 +549,21 @@ Si falla el registro / sin WebAuthn
   → registrationFailed = true → opción "Jugar sin guardar"
 ```
 
+### Guardado seguro con verificación (`saveGameVerified`)
+
+El guardado desde el menú Start (StartMenu → "Guardar") usa `saveGameVerified(userId, gameState)` en `cloud-save.ts`, que **verifica que la partida se persistió de verdad** (antes era "fire-and-forget" y podía mostrar "guardó la partida" aunque la nube fallara):
+
+1. **Local**: escribe `localStorage[name]` y lo **relee** comprobando que existe.
+2. **Nube**: tras `save-game`, **relee** con `load-game` y compara una **huella** (`fingerprintGameState`: name, map, pos, dinero, firma del equipo, longitudes de inventario/quests/etc.). Solo si coincide → `verified`.
+
+Devuelve `SaveVerification`: `{ status: "verified" | "local-only" | "error", reason? }`.
+`describeSaveResult(name, result)` traduce el estado al texto de la caja de diálogo:
+- `verified` → "¡{name} guardó la partida! Copia de seguridad verificada. ✓"
+- `local-only` → guardado solo en el dispositivo (sin nube/impersonación, no es error)
+- `error` → avisa del problema (nube no verificada, o fallo local crítico) sin romper la partida local.
+
+**UI (`ConfirmationMenu.tsx`)**: el `confirm` del menú de confirmación ahora puede ser **asíncrono** y devolver un `string` que sustituye al `postMessage`. Fases: `ask` (preMessage + SÍ/NO) → `running` (muestra `pendingMessage`, "Guardando...") → `done` (mensaje final verificado). Todo dentro de la misma caja, sin bloquear ni romper el flujo. Los usos síncronos previos (tirar objeto, quest) siguen funcionando igual.
+
 ### Edge Functions Supabase (Deno)
 
 | Función | Propósito |

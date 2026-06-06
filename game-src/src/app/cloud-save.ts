@@ -123,6 +123,163 @@ export const saveToCloud = async (
   }
 };
 
+// ---- Guardado seguro con verificación ----
+//
+// Problema: `saveToCloud` es "fire-and-forget"; si la nube fallaba (red,
+// cold-start, error de la edge), el juego mostraba igualmente "guardó la
+// partida" aunque la copia en la nube NO se hubiera persistido.
+//
+// Solución: `saveGameVerified` guarda en LOCAL y en la NUBE, y verifica AMBAS:
+//   1. Local: reescribe localStorage y lo relee comprobando que existe.
+//   2. Nube: tras el save, RELEE la partida y compara una huella (fingerprint)
+//      de campos estables. Solo si coincide se considera "verified".
+// Devuelve un estado que la UI usa para confirmar o avisar de un problema,
+// sin romper la experiencia (el guardado local siempre queda intacto).
+
+export type SaveVerification =
+  | { status: "verified" }    // copia en la nube confirmada por relectura
+  | { status: "local-only" }  // sin nube / impersonación → solo copia local (no es error)
+  | { status: "error"; reason: string }; // se intentó pero no se pudo verificar
+
+interface FingerprintState {
+  name?: string;
+  map?: string;
+  money?: number;
+  pos?: { x?: number; y?: number };
+  pokemon?: Array<{ id?: number; level?: number; hp?: number }>;
+  pc?: unknown[];
+  inventory?: Array<{ amount?: number }>;
+  completedQuests?: unknown[];
+  defeatedTrainers?: unknown[];
+  collectedItems?: unknown[];
+  caughtPokemon?: unknown[];
+}
+
+/**
+ * Huella estable de un GameState. Se calcula sobre un subconjunto de campos
+ * que viajan sin transformaciones a través de JSONB (números, longitudes,
+ * firma del equipo), de modo que la copia releída de la nube produzca la
+ * MISMA huella que la que enviamos si —y solo si— se persistió correctamente.
+ */
+const fingerprintGameState = (raw: unknown): string => {
+  const s = (raw ?? {}) as FingerprintState;
+  const team = Array.isArray(s.pokemon) ? s.pokemon : [];
+  const teamSig = team
+    .map((p) => `${p?.id ?? 0}.${p?.level ?? 0}.${p?.hp ?? 0}`)
+    .join(",");
+  const invTotal = (Array.isArray(s.inventory) ? s.inventory : []).reduce(
+    (acc, i) => acc + (i?.amount ?? 0),
+    0
+  );
+  const len = (a: unknown) => (Array.isArray(a) ? a.length : 0);
+  return [
+    s.name ?? "",
+    s.map ?? "",
+    s.pos?.x ?? "",
+    s.pos?.y ?? "",
+    s.money ?? 0,
+    team.length,
+    teamSig,
+    len(s.pc),
+    invTotal,
+    len(s.completedQuests),
+    len(s.defeatedTrainers),
+    len(s.collectedItems),
+    len(s.caughtPokemon),
+  ].join("|");
+};
+
+/**
+ * Guarda la partida de forma segura y verificada (local + nube).
+ * No lanza: cualquier fallo se refleja en el `SaveVerification` devuelto.
+ */
+export const saveGameVerified = async (
+  userId: string | null,
+  gameState: unknown
+): Promise<SaveVerification> => {
+  const s = gameState as { name?: string };
+
+  // 1. Guardado local verificado (relee y comprueba que persistió).
+  let localOk = false;
+  if (s?.name) {
+    try {
+      localStorage.setItem(s.name, JSON.stringify(gameState));
+      const raw = localStorage.getItem(s.name);
+      localOk = !!raw && (JSON.parse(raw) as { name?: string })?.name === s.name;
+    } catch {
+      localOk = false; // p.ej. cuota llena o modo privado
+    }
+  }
+
+  // 2. Sin nube disponible (no configurada, sin usuario o impersonación) →
+  //    el resultado depende solo del guardado local.
+  if (!SUPABASE_URL || !userId || isImpersonating()) {
+    return localOk
+      ? { status: "local-only" }
+      : { status: "error", reason: "local-write-failed" };
+  }
+
+  // 3. Guardado en la nube + verificación por relectura de huella.
+  const expected = fingerprintGameState(gameState);
+  try {
+    const writeToken = getWriteToken();
+    const res = await callEdge(
+      "save-game",
+      { userId, gameState, writeToken },
+      SAVE_GAME_TIMEOUT_MS
+    );
+    if (!res.ok) {
+      return {
+        status: "error",
+        reason: localOk ? `cloud-http-${res.status}` : "local+cloud-failed",
+      };
+    }
+    try {
+      const data = await res.json();
+      if (typeof data.writeToken === "string") setWriteToken(data.writeToken);
+    } catch {
+      /* respuesta sin writeToken — no crítico */
+    }
+
+    const cloud = await loadFromCloud(userId);
+    if (!cloud) {
+      return { status: "error", reason: localOk ? "cloud-empty-readback" : "local+cloud-failed" };
+    }
+    if (fingerprintGameState(cloud) !== expected) {
+      return { status: "error", reason: localOk ? "cloud-mismatch" : "local+cloud-failed" };
+    }
+    return { status: "verified" };
+  } catch {
+    return {
+      status: "error",
+      reason: localOk ? "cloud-network" : "local+cloud-failed",
+    };
+  }
+};
+
+/**
+ * Traduce el resultado de `saveGameVerified` al mensaje que se muestra en la
+ * caja de confirmación del juego (mismo estilo Game Boy, sin tecnicismos).
+ */
+export const describeSaveResult = (
+  name: string,
+  result: SaveVerification
+): string => {
+  switch (result.status) {
+    case "verified":
+      return `¡${name} guardó la partida! Copia de seguridad verificada. ✓`;
+    case "local-only":
+      return `¡${name} guardó la partida en este dispositivo!`;
+    case "error":
+      if (result.reason.startsWith("local")) {
+        // El guardado local también falló → problema serio.
+        return `¡PROBLEMA al guardar! No se pudo guardar la partida. Revisa el dispositivo e inténtalo de nuevo.`;
+      }
+      // Local OK, pero la nube no se pudo verificar.
+      return `${name} guardó en el dispositivo, pero NO se pudo verificar la copia en la nube. Inténtalo otra vez con conexión.`;
+  }
+};
+
 export const loadFromCloud = async (userId: string): Promise<unknown | null> => {
   if (!SUPABASE_URL) return null;
   const ctrl = new AbortController();
