@@ -89,7 +89,7 @@ const StartMenu = () => {
               dispatch(
                 showConfirmationMenu({
                   preMessage: "¿Quieres GUARDAR la partida?",
-                  postMessage: `¡Se guardó la partida de ${name}!`,
+                  postMessage: `¡${name} guardó la partida!`,
                   pendingMessage: "GUARDANDO... ¡NO APAGUES LA CONSOLA!",
                   confirm: async () => {
                     // 1. Copia local inmediata (reducer). La verificación

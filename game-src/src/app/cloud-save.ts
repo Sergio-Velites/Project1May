@@ -268,15 +268,14 @@ export const describeSaveResult = (
   switch (result.status) {
     case "verified":
     case "local-only":
-      // Mensaje fiel al original Pokémon España Gen I.
-      return `¡Se guardó la partida de ${name}!`;
+      return `¡${name} guardó la partida!`;
     case "error":
       if (result.reason.startsWith("local")) {
         return "¡Error al guardar! Prueba de nuevo.";
       }
       // Local OK, nube falló → 2 páginas para no truncar.
       return [
-        `¡Se guardó la partida de ${name}!`,
+        `¡${name} guardó la partida!`,
         "No se guardó en la nube. Revisa tu conexión e inténtalo de nuevo.",
       ];
   }
