@@ -19,6 +19,7 @@
 
 import { useCallback } from "react";
 import styled from "styled-components";
+import boulderImg from "../assets/map/boulder-strength.png";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectBoulderPositions,
@@ -41,24 +42,6 @@ import { xToPx, yToPx } from "../app/position-helper";
 import mapData from "../maps/map-data";
 import pokemonMetadata from "../app/pokemon-metadata";
 
-// Sprite de la roca como SVG inline (data URI) — evita añadir un asset binario
-// y mantiene el estilo pixel-art clásico de la roca de FUERZA Gen I.
-const BOULDER_SVG = encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" shape-rendering="crispEdges">
-  <rect x="3"  y="2"  width="10" height="2" fill="#a89078"/>
-  <rect x="2"  y="4"  width="12" height="2" fill="#c0a888"/>
-  <rect x="1"  y="6"  width="14" height="5" fill="#b09870"/>
-  <rect x="2"  y="11" width="12" height="2" fill="#8a7458"/>
-  <rect x="3"  y="13" width="10" height="2" fill="#6e5a44"/>
-  <rect x="3"  y="4"  width="4"  height="3" fill="#d8c4a4"/>
-  <rect x="8"  y="7"  width="2"  height="4" fill="#7a6650"/>
-  <rect x="10" y="6"  width="2"  height="2" fill="#7a6650"/>
-  <rect x="5"  y="9"  width="2"  height="2" fill="#7a6650"/>
-  <rect x="1"  y="6"  width="2"  height="5" fill="#8a7458"/>
-  <rect x="13" y="6"  width="2"  height="5" fill="#8a7458"/>
-</svg>
-`);
-const boulderImg = `data:image/svg+xml,${BOULDER_SVG}`;
 
 const BoulderWrapper = styled.div<{ $x: number; $y: number }>`
   position: absolute;
