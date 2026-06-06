@@ -320,6 +320,24 @@ export interface CuttableTreeType {
 }
 
 /**
+ * Roca empujable con la MO Fuerza (HM04 / "strength"), estilo Gen I.
+ * Bloquea el paso como un muro hasta que el jugador activa FUERZA (pulsando A
+ * frente a la roca con un Pokémon del equipo que conozca el movimiento
+ * "strength"). Una vez activada, el jugador puede empujar la roca un tile en
+ * la dirección de avance, siempre que el tile de destino esté libre.
+ *
+ * Fiel al original: la posición de las rocas NO se persiste — al salir y volver
+ * a entrar al mapa las rocas vuelven a su posición inicial (`pos`).
+ */
+export interface BoulderType {
+  /** Posición inicial de la roca (a la que vuelve al recargar el mapa). */
+  pos: PosType;
+  /** Identificador único y estable de la roca dentro del mapa.
+   *  Formato recomendado: "boulder-<mapId>-<x>-<y>". */
+  id: string;
+}
+
+/**
  * Pokémon estático en el mapa (estilo legendarios Gen I: Articuno, Snorlax…).
  * Aparece visualmente como un sprite en world-coords. Al pulsar A frente a él
  * se inicia un combate salvaje. Una vez derrotado o capturado desaparece.
@@ -396,6 +414,8 @@ export interface MapType {
   staticPokemon?: StaticPokemonType[];
   /** Árboles cortables con la MO Corte. Bloquean el paso hasta ser cortados. */
   cuttableTrees?: CuttableTreeType[];
+  /** Rocas empujables con la MO Fuerza (strength). Bloquean el paso. */
+  boulders?: BoulderType[];
   /** Posición del NPC de batallas online en este mapa (centros Pokémon) */
   onlineBattleNpc?: PosType;
   /**

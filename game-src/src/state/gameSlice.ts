@@ -7,7 +7,7 @@ import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
-import { canWalk, isCuttableTree, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
+import { boulderIdAt, canWalk, isCuttableTree, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
 import {
   Direction,
   GameState,
@@ -40,6 +40,8 @@ const initialState: GameState = {
   collectedItems: [],
   completedQuests: [],
   sessionCutTrees: [] as string[],
+  boulderPositions: {} as Record<string, PosType>,
+  strengthActive: false,
   seenPokemon: [],
   caughtPokemon: [],
   npcFacings: {} as Record<string, Direction>,
@@ -92,6 +94,62 @@ const inferVisitedMaps = (s: GameState): MapId[] => {
   return Array.from(visited);
 };
 
+/** ¿Algún Pokémon del equipo conoce el movimiento Fuerza ("strength")? */
+const teamKnowsStrength = (state: GameState): boolean =>
+  state.pokemon.some((p) => p.moves?.some((m) => m.id === "strength"));
+
+/**
+ * Intenta interactuar con una roca (MO Fuerza) situada en el tile frente al
+ * jugador, en la dirección (dx,dy). Devuelve:
+ *   - "none"    → no hay roca delante (el reducer sigue con su lógica normal).
+ *   - "blocked" → hay roca pero no se puede mover (Fuerza inactiva, sin Pokémon
+ *                 que la sepa, o destino bloqueado) → el jugador no avanza.
+ *   - "pushed"  → la roca se empujó un tile; el jugador debe avanzar a su hueco.
+ *
+ * Mutamos `state.boulderPositions` directamente (Immer) al empujar.
+ */
+const tryBoulderInteraction = (
+  state: GameState,
+  dx: number,
+  dy: number
+): "none" | "blocked" | "pushed" => {
+  const map = mapData[state.map];
+  if (!map.boulders || map.boulders.length === 0) return "none";
+
+  const positions = state.boulderPositions ?? {};
+  const tx = state.pos.x + dx;
+  const ty = state.pos.y + dy;
+  const id = boulderIdAt(map.boulders, tx, ty, positions);
+  if (!id) return "none";
+
+  // Hay una roca delante. Sin Fuerza activada (o sin Pokémon que la sepa) la
+  // roca bloquea como un muro.
+  if (!state.strengthActive || !teamKnowsStrength(state)) return "blocked";
+
+  // Tile al otro lado de la roca en la misma dirección.
+  const bx = tx + dx;
+  const by = ty + dy;
+  const map2 = mapData[state.map];
+  if (bx < 0 || by < 0 || bx >= map2.width || by >= map2.height) return "blocked";
+
+  const destinationWalkable = canWalk(
+    bx,
+    by,
+    state.map,
+    state.collectedItems,
+    state.defeatedTrainers,
+    [...state.completedQuests, ...(state.sessionCutTrees ?? [])],
+    state.pokemon.length > 0,
+    !!state.onSurfing,
+    positions
+  );
+  // No se puede empujar la roca al agua, sobre otra roca, muro, etc.
+  if (!destinationWalkable) return "blocked";
+
+  state.boulderPositions = { ...positions, [id]: { x: bx, y: by } };
+  return "pushed";
+};
+
 export const gameSlice = createSlice({
   name: "game",
   initialState,
@@ -99,8 +157,14 @@ export const gameSlice = createSlice({
     moveLeft: (state) => {
       state.direction = Direction.Left;
       if (state.pos.x === 0) return;
+      const boulder = tryBoulderInteraction(state, -1, 0);
+      if (boulder === "blocked") return;
+      if (boulder === "pushed") {
+        state.pos.x -= 1;
+        return;
+      }
       if (
-        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing)
+        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {})
       )
         return;
       state.pos.x -= 1;
@@ -109,8 +173,14 @@ export const gameSlice = createSlice({
       state.direction = Direction.Right;
       const map = mapData[state.map];
       if (state.pos.x === map.width - 1) return;
+      const boulder = tryBoulderInteraction(state, 1, 0);
+      if (boulder === "blocked") return;
+      if (boulder === "pushed") {
+        state.pos.x += 1;
+        return;
+      }
       if (
-        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing)
+        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {})
       )
         return;
       state.pos.x += 1;
@@ -118,8 +188,14 @@ export const gameSlice = createSlice({
     moveUp: (state) => {
       state.direction = Direction.Up;
       if (state.pos.y === 0) return;
+      const boulder = tryBoulderInteraction(state, 0, -1);
+      if (boulder === "blocked") return;
+      if (boulder === "pushed") {
+        state.pos.y -= 1;
+        return;
+      }
       if (
-        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing)
+        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {})
       )
         return;
       state.pos.y -= 1;
@@ -128,6 +204,12 @@ export const gameSlice = createSlice({
       state.direction = Direction.Down;
       const map = mapData[state.map];
       if (state.pos.y === map.height - 1) return;
+      const boulder = tryBoulderInteraction(state, 0, 1);
+      if (boulder === "blocked") return;
+      if (boulder === "pushed") {
+        state.pos.y += 1;
+        return;
+      }
       if (isFence(map.fences, state.pos.x, state.pos.y + 1)) {
         state.jumping = true;
       }
@@ -165,6 +247,8 @@ export const gameSlice = createSlice({
       state.pos = map.start;
       state.npcFacings = {};
       state.sessionCutTrees = [];
+      state.boulderPositions = {};
+      state.strengthActive = false;
       // Auto-desmonte si el nuevo mapa no permite bici (interiores).
       if (!map.allowBicycle && state.onBicycle) state.onBicycle = false;
       // Auto-desmonte de surf si el nuevo mapa no tiene tiles de agua.
@@ -176,6 +260,8 @@ export const gameSlice = createSlice({
       state.pos = action.payload.pos;
       state.npcFacings = {};
       state.sessionCutTrees = [];
+      state.boulderPositions = {};
+      state.strengthActive = false;
       const map = mapData[action.payload.map];
       if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
       if (map && state.onSurfing && !mapHasWater(map)) state.onSurfing = false;
@@ -193,6 +279,8 @@ export const gameSlice = createSlice({
         state.pos = newPos;
         state.npcFacings = {};
         state.sessionCutTrees = [];
+      state.boulderPositions = {};
+      state.strengthActive = false;
         if (!previousMap.allowBicycle && state.onBicycle) state.onBicycle = false;
         if (state.onSurfing && !mapHasWater(previousMap)) state.onSurfing = false;
         recordVisit(state, map.exitReturnMap);
@@ -209,6 +297,8 @@ export const gameSlice = createSlice({
       state.direction = Direction.Down;
       state.npcFacings = {};
       state.sessionCutTrees = [];
+      state.boulderPositions = {};
+      state.strengthActive = false;
       const map = mapData[action.payload.map];
       if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
       // Volar siempre desmonta el surf (el pajarito no nada).
@@ -294,6 +384,10 @@ export const gameSlice = createSlice({
       state.caughtPokemon = savedGameState.caughtPokemon ?? [];
       state.onBicycle = savedGameState.onBicycle ?? false;
       state.onSurfing = savedGameState.onSurfing ?? false;
+      // Estado de sesión de rocas (MO Fuerza): siempre se reinicia al cargar.
+      state.boulderPositions = {};
+      state.strengthActive = false;
+      state.sessionCutTrees = [];
       state.visitedMaps =
         savedGameState.visitedMaps && savedGameState.visitedMaps.length > 0
           ? savedGameState.visitedMaps
@@ -331,6 +425,10 @@ export const gameSlice = createSlice({
       state.caughtPokemon = s.caughtPokemon ?? [];
       state.onBicycle = s.onBicycle ?? false;
       state.onSurfing = s.onSurfing ?? false;
+      // Estado de sesión de rocas (MO Fuerza): siempre se reinicia al cargar.
+      state.boulderPositions = {};
+      state.strengthActive = false;
+      state.sessionCutTrees = [];
       state.visitedMaps =
         s.visitedMaps && s.visitedMaps.length > 0
           ? s.visitedMaps
@@ -552,6 +650,10 @@ export const gameSlice = createSlice({
         state.sessionCutTrees.push(action.payload);
       }
     },
+    /** Activa/desactiva la MO Fuerza en el mapa actual (mover rocas). */
+    setStrengthActive: (state, action: PayloadAction<boolean>) => {
+      state.strengthActive = action.payload;
+    },
     seePokemon: (state, action: PayloadAction<number>) => {
       if (!state.seenPokemon.includes(action.payload)) {
         state.seenPokemon.push(action.payload);
@@ -610,6 +712,7 @@ export const {
   collectItem,
   completeQuest,
   markTreeCut,
+  setStrengthActive,
   seePokemon,
   catchPokemonPokedex,
   setNpcFacing,
@@ -674,6 +777,12 @@ export const selectCompletedQuests = (state: RootState) =>
 
 export const selectSessionCutTrees = (state: RootState) =>
   state.game.sessionCutTrees ?? [];
+
+export const selectBoulderPositions = (state: RootState) =>
+  state.game.boulderPositions ?? {};
+
+export const selectStrengthActive = (state: RootState) =>
+  state.game.strengthActive ?? false;
 
 /**
  * Pokédex: la lista persistida puede estar incompleta para saves antiguos

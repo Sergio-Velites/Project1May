@@ -1,5 +1,5 @@
 import mapData from "../maps/map-data";
-import { CuttableTreeType, MapId, MapItemType, SimpleGiftType, StaticPokemonType, TrainerType } from "../maps/map-types";
+import { BoulderType, CuttableTreeType, MapId, MapItemType, SimpleGiftType, StaticPokemonType, TrainerType } from "../maps/map-types";
 import { Direction, PosType } from "../state/state-types";
 import { TRAINER_VISION } from "./constants";
 
@@ -125,6 +125,33 @@ export const isStaticPokemon = (
   );
 };
 
+/**
+ * Devuelve el `id` de la roca (MO Fuerza) que ocupa el tile (x,y) en su
+ * posición ACTUAL, o null si no hay ninguna. La posición actual de cada roca
+ * vive en `boulderPositions` (estado de sesión); si una roca aún no se ha
+ * empujado, se usa su posición inicial `pos`.
+ */
+export const boulderIdAt = (
+  boulders: BoulderType[] | undefined,
+  x: number,
+  y: number,
+  boulderPositions: Record<string, PosType> = {}
+): string | null => {
+  if (!boulders) return null;
+  for (const b of boulders) {
+    const cur = boulderPositions[b.id] ?? b.pos;
+    if (cur.x === x && cur.y === y) return b.id;
+  }
+  return null;
+};
+
+export const isBoulder = (
+  boulders: BoulderType[] | undefined,
+  x: number,
+  y: number,
+  boulderPositions: Record<string, PosType> = {}
+): boolean => boulderIdAt(boulders, x, y, boulderPositions) !== null;
+
 export const canWalk = (
   x: number,
   y: number,
@@ -133,12 +160,14 @@ export const canWalk = (
   defeatedTrainers: string[] = [],
   completedQuests: string[] = [],
   hasPokemon: boolean = false,
-  onSurfing: boolean = false
+  onSurfing: boolean = false,
+  boulderPositions: Record<string, PosType> = {}
 ) => {
   const map = mapData[mapId];
   if (isItem(map.items, x, y, collectedItems, mapId)) return false;
   if (isGift(map.gifts, x, y, completedQuests)) return false;
   if (isCuttableTree(map.cuttableTrees, x, y, completedQuests)) return false;
+  if (isBoulder(map.boulders, x, y, boulderPositions)) return false;
   if (isWall(map.walls, x, y)) return false;
   // Reglas de agua:
   //  - A pie: el agua bloquea como un muro.

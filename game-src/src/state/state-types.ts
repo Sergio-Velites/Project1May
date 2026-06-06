@@ -85,6 +85,12 @@ export interface GameState {
   completedQuests: string[];
   /** Árboles cortados en la sesión actual (se reinicia al cambiar de mapa). No se persiste en saves. */
   sessionCutTrees?: string[];
+  /** Posición actual de cada roca empujable (MO Fuerza), por `id`. Estado de
+   *  sesión: se reinicia al cambiar de mapa (las rocas vuelven a su sitio). */
+  boulderPositions?: Record<string, PosType>;
+  /** ¿La MO Fuerza está activada en el mapa actual? Se activa pulsando A frente
+   *  a una roca con un Pokémon que sepa "strength". Se reinicia al cambiar de mapa. */
+  strengthActive?: boolean;
   seenPokemon: number[];    // IDs vistos en la Pokédex
   caughtPokemon: number[]; // IDs capturados
   npcFacings: Record<string, Direction>;

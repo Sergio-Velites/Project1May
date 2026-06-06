@@ -299,6 +299,17 @@ victory-road-1f · victory-road-2f · victory-road-3f
 ss-anne-1f · ss-anne-2f · ss-anne-3f · ss-anne-bf1
 ```
 
+### MO Fuerza (HM04 / "strength") y rocas empujables
+
+- **Movimiento**: `strength` ya existe en `move-metadata.ts` (Normal, físico) y funciona en combate como cualquier move de daño. `ItemType.Hm04` lo enseña (`learnMove("strength")`).
+- **Rocas empujables**: `MapType.boulders?: BoulderType[]` (`{ pos, id }`). Bloquean el paso como un muro hasta activar Fuerza.
+- **Activación (fiel a Gen I)**: pulsar A frente a una roca con un Pokémon del equipo que conozca `strength` → "¡X usó FUERZA!" y se activa la Fuerza en ese mapa (`strengthActive`). Sin Pokémon que la sepa → solo mensaje informativo.
+- **Empuje**: con Fuerza activa, caminar contra la roca la empuja 1 tile si el destino está libre (reducers `moveUp/Down/Left/Right` vía `tryBoulderInteraction`).
+- **Estado de sesión (no persiste)**: `boulderPositions` y `strengthActive` viven en `gameSlice` y se reinician al cambiar de mapa o al cargar partida → las rocas vuelven a su sitio (igual que el original).
+- **Colisión**: `canWalk`/`moveDown` bloquean los tiles ocupados por rocas (`isBoulder`/`boulderIdAt` en `map-helper.ts`).
+- **Render**: `components/Boulder.tsx` (dentro de `BackgroundContainer`), sprite SVG inline pixel-art.
+- **Editor**: modo `boulders` en `/admin/map-editor` (botón 🪨). Click para añadir/quitar; export TS `boulders: [...]` para pegar en el `.ts` del mapa. Override key `boulders` en `app/api/admin/map-data/route.ts`.
+
 ### Cómo añadir un mapa nuevo
 
 1. Añadir valor al enum `MapId` en `maps/map-types.ts`
@@ -537,6 +548,21 @@ Si falla el registro / sin WebAuthn
   → crypto.randomUUID() → UUID local (sin nube)
   → registrationFailed = true → opción "Jugar sin guardar"
 ```
+
+### Guardado seguro con verificación (`saveGameVerified`)
+
+El guardado desde el menú Start (StartMenu → "Guardar") usa `saveGameVerified(userId, gameState)` en `cloud-save.ts`, que **verifica que la partida se persistió de verdad** (antes era "fire-and-forget" y podía mostrar "guardó la partida" aunque la nube fallara):
+
+1. **Local**: escribe `localStorage[name]` y lo **relee** comprobando que existe.
+2. **Nube**: tras `save-game`, **relee** con `load-game` y compara una **huella** (`fingerprintGameState`: name, map, pos, dinero, firma del equipo, longitudes de inventario/quests/etc.). Solo si coincide → `verified`.
+
+Devuelve `SaveVerification`: `{ status: "verified" | "local-only" | "error", reason? }`.
+`describeSaveResult(name, result)` traduce el estado al texto de la caja de diálogo:
+- `verified` → "¡{name} guardó la partida! Copia de seguridad verificada. ✓"
+- `local-only` → guardado solo en el dispositivo (sin nube/impersonación, no es error)
+- `error` → avisa del problema (nube no verificada, o fallo local crítico) sin romper la partida local.
+
+**UI (`ConfirmationMenu.tsx`)**: el `confirm` del menú de confirmación ahora puede ser **asíncrono** y devolver un `string` que sustituye al `postMessage`. Fases: `ask` (preMessage + SÍ/NO) → `running` (muestra `pendingMessage`, "Guardando...") → `done` (mensaje final verificado). Todo dentro de la misma caja, sin bloquear ni romper el flujo. Los usos síncronos previos (tirar objeto, quest) siguen funcionando igual.
 
 ### Edge Functions Supabase (Deno)
 
