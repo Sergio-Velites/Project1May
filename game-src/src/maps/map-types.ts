@@ -213,6 +213,13 @@ export interface PokemonEncounterData {
   conditionValues: { name: string; url: string }[];
   maxLevel: number;
   minLevel: number;
+  /**
+   * Tramos horarios (Gen II) en los que este Pokémon puede aparecer.
+   * - undefined o [] → disponible las 24 h (por defecto: no rompe nada).
+   * - subconjunto de ["morning","day","night"] → solo en esos tramos.
+   * Ver `app/time-helper.ts` para los rangos de hora exactos.
+   */
+  timesOfDay?: ("morning" | "day" | "night")[];
 }
 
 export interface EncounterData {
@@ -387,6 +394,14 @@ export interface MapType {
   teleports?: Record<number, Record<number, MapWithPos>>;
   exits: Record<number, number[]>;
   cave?: boolean;
+  /**
+   * Mapa oscuro (cuevas tipo Túnel Roca, Gen I): sin la MO Destello activa solo
+   * se ve un pequeño radio alrededor del jugador. Al usar DESTELLO (Pokémon que
+   * conozca "flash") el mapa se ilumina por completo. Fiel al original, la luz
+   * se mantiene al pasar de un mapa `dark` a otro `dark`, y se apaga al salir a
+   * un mapa no-oscuro. Por defecto (undefined) el mapa NO es oscuro.
+   */
+  dark?: boolean;
   exitReturnMap?: MapId;
   exitReturnPos?: PosType;
   music?: string;
