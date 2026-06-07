@@ -910,6 +910,35 @@ const PokemonEncounter = () => {
       enemyStatusRef.current = null;
       setEnemyStages(DEFAULT_STAGES);
       enemyFlinchRef.current = false;
+      // ── Reset COMPLETO de los efectos volátiles del rival al cambiar de
+      // Pokémon (espejo de performSwitchTo para el jugador). Antes solo se
+      // limpiaba un subconjunto, de modo que un "lock" de movimiento del
+      // Pokémon saliente (p. ej. FURIA/Rage, que en Gen I obliga a repetir el
+      // movimiento hasta debilitarse) se quedaba activo y forzaba al SIGUIENTE
+      // Pokémon del rival a usar ese mismo movimiento durante todo el combate.
+      enemyRageActiveRef.current       = false;
+      enemyConfusionTurnsRef.current   = 0;
+      enemySelfKoRef.current           = false;
+      enemyChargingMoveRef.current     = null;
+      enemyInvulnerableRef.current     = false;
+      setEnemyHidden(false);
+      enemyHyperBeamRechargeRef.current = false;
+      enemyBideTurnsRef.current        = 0;
+      enemyBideDmgRef.current          = 0;
+      enemyThrashTurnsRef.current      = 0;
+      enemyThrashMoveRef.current       = null;
+      enemyDisabledMoveRef.current     = null;
+      enemyDisabledTurnsRef.current    = 0;
+      enemyTrapMoveRef.current         = null;
+      enemyTrapTurnsRef.current        = 0;
+      enemyTrappedTurnsRef.current     = 0;
+      enemyReflectRef.current          = 0;
+      enemyLightScreenRef.current      = 0;
+      enemyMistRef.current             = false;
+      enemyProtectRef.current          = false;
+      enemyConvertedTypesRef.current   = null;
+      enemySubHpRef.current            = null;
+      setEnemySubVisible(false);
 
       dispatch(seePokemon(newPokemon.id));
       throwPokeballAtEnemy(49, newPokemon.id);
@@ -1473,6 +1502,12 @@ const PokemonEncounter = () => {
       setStage(33);
     }
 
+    // F: "¿Dejar de aprender X?" → SÍ confirmado: anunciamos que no lo aprendió
+    // (stage 61) y, al pulsar A, continuamos con el bucle de subida de nivel.
+    if (stage === 61) {
+      goToNextLevelOrEnd();
+    }
+
     if ([42, 43, 44].includes(stage)) {
       // Tras un fallo de Poké Ball (Gen I), se consume el turno: el rival
       // ataca antes de devolver el control al menú de combate.
@@ -1686,6 +1721,13 @@ const PokemonEncounter = () => {
     }
     if (stage === 31) return `Pero no puede aprender más de 4 movimientos`;
     if (stage === 32) return `Elige el movimiento que quieres olvidar`;
+    if (stage === 60 || stage === 61) {
+      if (!processingMetadata) throw new Error("No processing metadata found");
+      const move = getLearnedMove(processingPokemon);
+      const moveName = (getMoveMetadata(move?.id ?? "")?.name ?? move?.id ?? "").toUpperCase();
+      if (stage === 60) return `¿Dejar de aprender ${moveName}?`;
+      return `${processingMetadata.name.toUpperCase()} no aprendió ${moveName}.`;
+    }
     if (stage === 42) return `¡Vaya! ¡El POKéMON se escapó!`;
     if (stage === 43) return `¡Casi! ¡Parecía que iba a quedar atrapado!`;
     if (stage === 44) return `¡Uf! ¡Por tan poco!`;
@@ -3849,11 +3891,28 @@ const PokemonEncounter = () => {
               {
                 label: "NO APRENDER",
                 action: () => {
-                  goToNextLevelOrEnd();
+                  // Fiel a Gen I/II: no se abandona en silencio; se pide
+                  // confirmación "¿Dejar de aprender X?" (stage 60).
+                  setStage(60);
                 },
               },
             ]}
-            close={() => goToNextLevelOrEnd()}
+            close={() => setStage(60)}
+            bottom="0"
+            right="0"
+          />
+          {/* "¿Dejar de aprender X?" — SÍ: no lo aprende (stage 61). NO: vuelve
+              al menú de olvido (stage 33), dando otra oportunidad de sustituir. */}
+          <Menu
+            noExitOption
+            disabled={startMenuOpen}
+            padding={isMobile ? "100px" : "40vw"}
+            show={stage === 60}
+            menuItems={[
+              { label: "SÍ", action: () => setStage(61) },
+              { label: "NO", action: () => setStage(33) },
+            ]}
+            close={() => setStage(33)}
             bottom="0"
             right="0"
           />
