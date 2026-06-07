@@ -90,6 +90,8 @@ const LearnMove = () => {
     if (stage === 4) setStage(5);
     if (stage === 5) setStage(6);
     if (stage === 7) end();
+    // Stage 9: "{POKÉMON} no aprendió X." → cerrar el flujo al pulsar A.
+    if (stage === 9) end();
   });
 
   if (!move) return null;
@@ -109,6 +111,12 @@ const LearnMove = () => {
       return `¡${getPokemonMetadata(
         pokemon[pokemonIndex].id
       ).name.toUpperCase()} aprendió ${moveData.name.toUpperCase()}!`;
+    if (stage === 8)
+      return `¿Dejar de aprender ${moveData.name.toUpperCase()}?`;
+    if (stage === 9)
+      return `${getPokemonMetadata(
+        pokemon[pokemonIndex].id
+      ).name.toUpperCase()} no aprendió ${moveData.name.toUpperCase()}.`;
   };
 
   return (
@@ -197,10 +205,26 @@ const LearnMove = () => {
           }),
           {
             label: moveData?.name || "Error",
-            action: () => end(),
+            // Fiel a Gen I/II: declinar no cancela en silencio; pide
+            // confirmación "¿Dejar de aprender X?" (stage 8).
+            action: () => setStage(8),
           },
         ]}
-        close={() => end()}
+        close={() => setStage(8)}
+        bottom="0"
+        right="0"
+      />
+      {/* "¿Dejar de aprender X?" — SÍ: no lo aprende (stage 9). NO: vuelve al
+          menú de olvido (stage 6) para dar otra oportunidad de sustituir. */}
+      <Menu
+        noExitOption
+        padding={isMobile ? "100px" : "40vw"}
+        show={stage === 8}
+        menuItems={[
+          { label: "SÍ", action: () => setStage(9) },
+          { label: "NO", action: () => setStage(6) },
+        ]}
+        close={() => setStage(6)}
         bottom="0"
         right="0"
       />
