@@ -67,6 +67,7 @@ import { MoveMetadata } from "../app/move-metadata";
 import processMove, { MoveResult, MoveContext, StatStages, DEFAULT_STAGES, getStageMult, StatusApply, isSelfTargetingStatusMove, CHARGE_MOVES, INVULNERABLE_MOVES, CHARGE_MESSAGE, TRAP_MOVES } from "../app/move-helper";
 import getXp from "../app/xp-helper";
 import getLevelData, { getLearnedMove, getHpDeltaOnLevelUp, getSingleLevelUp, xpForNextLevel } from "../app/level-helper";
+import { resolveEvolution, friendshipOnLevelUp, getFriendship } from "../app/evolution-helper";
 import MoveSelect from "./MoveSelect";
 import catchesPokemon from "../app/pokeball-helper";
 import { getMoveSfxPath } from "../app/move-sfx-map";
@@ -817,12 +818,9 @@ const PokemonEncounter = () => {
 
   const handleEvolution = () => {
     if (!processingMetadata) return;
-    if (!processingMetadata.evolution) return;
-    if (processingPokemon.level < processingMetadata.evolution.level) return;
-    const { pokemon } = processingMetadata.evolution;
-    const evolveToId = Array.isArray(pokemon)
-      ? pokemon[Math.floor(Math.random() * pokemon.length)]
-      : pokemon;
+    // Resuelve nivel + amistad + hora del día (Gen II) en un solo sitio.
+    const evolveToId = resolveEvolution(processingPokemon, processingMetadata);
+    if (evolveToId === null) return;
     dispatch(
       showEvolution({
         index: involvedPokemon[processingInvolvedPokemon],
@@ -1394,6 +1392,9 @@ const PokemonEncounter = () => {
             level,
             xp: remainingXp,
             hp: processingPokemon.hp + hpDelta,
+            // Amistad ganada al subir de nivel (Gen II). Es uno de los
+            // motores de las evoluciones por amistad/hora del día.
+            friendship: friendshipOnLevelUp(getFriendship(processingPokemon)),
           },
         })
       );
