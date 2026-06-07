@@ -45,6 +45,7 @@ import TextRewardModal from "./TextRewardModal";
 import StaticPokemonNpc from "./StaticPokemonNpc";
 import CuttableTree from "./CuttableTree";
 import Boulder from "./Boulder";
+import DarknessOverlay from "./DarknessOverlay";
 import SurfHandler from "./SurfHandler";
 import OnlineBattleNpc from "./OnlineBattleNpc";
 import OnlineBattleMenu from "./OnlineBattleMenu";
@@ -154,6 +155,7 @@ const Game = () => {
       </StyledGame>
 
       <ColorOverlay />
+      <DarknessOverlay />
       <TrainerEncounter />
       <PokemonEncounter />
       <Text />

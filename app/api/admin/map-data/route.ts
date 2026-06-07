@@ -29,6 +29,7 @@ function readBundledData(): Record<string, unknown> {
 type OverrideKey =
   | 'start'
   | 'cave'
+  | 'dark'
   | 'allowBicycle'
   | 'music'
   | 'texts'
@@ -60,6 +61,7 @@ type OverrideKey =
 const OVERRIDE_KEYS: OverrideKey[] = [
   'start',
   'cave',
+  'dark',
   'allowBicycle',
   'music',
   'texts',

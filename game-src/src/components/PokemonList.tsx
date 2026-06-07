@@ -14,7 +14,11 @@ import {
   selectPos,
   selectSessionCutTrees,
   selectVisitedMaps,
+  selectStrengthActive,
+  selectFlashActive,
   setOnSurfing,
+  setStrengthActive,
+  setFlashActive,
   swapPokemonPositions,
 } from "../state/gameSlice";
 import {
@@ -114,6 +118,8 @@ const PokemonList = ({
   const onSurfing = useSelector(selectOnSurfing);
   const visitedMaps = useSelector(selectVisitedMaps);
   const sessionCutTrees = useSelector(selectSessionCutTrees);
+  const strengthActive = useSelector(selectStrengthActive);
+  const flashActive = useSelector(selectFlashActive);
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState(false);
   const [switching, setSwitching] = useState<number | null>(null);
@@ -310,7 +316,49 @@ const PokemonList = ({
           },
         };
 
-        const extras = [cutItem, surfItem, flyItem].filter(Boolean) as {
+        // ── Opción FUERZA (party screen) ─────────────────────────────────
+        // Aparece si el pokémon conoce "strength", el mapa tiene rocas
+        // empujables y la Fuerza aún no está activa en este mapa. Activa la
+        // Fuerza (fiel a Gen I: se puede usar desde el menú Pokémon), y a
+        // partir de entonces el jugador puede empujar las rocas caminando.
+        const knowsStrength = !!target?.moves?.some((m) => m.id === "strength");
+        const canUseStrength =
+          !!target &&
+          knowsStrength &&
+          (map.boulders?.length ?? 0) > 0 &&
+          !strengthActive;
+
+        const strengthItem = canUseStrength && {
+          label: "Fuerza",
+          action: () => {
+            setSelected(false);
+            const targetName = getPokemonMetadata(target!.id).name.toUpperCase();
+            close();
+            dispatch(hideStartMenu());
+            dispatch(setStrengthActive(true));
+            dispatch(showText([`¡${targetName} usó FUERZA!`, "¡Ahora puede mover rocas!"]));
+          },
+        };
+
+        // ── Opción DESTELLO (party screen) ───────────────────────────────
+        // Aparece si el pokémon conoce "flash", el mapa es oscuro (`dark`) y
+        // la luz aún no está activa. Ilumina la cueva por completo.
+        const knowsFlash = !!target?.moves?.some((m) => m.id === "flash");
+        const canUseFlash = !!target && knowsFlash && !!map.dark && !flashActive;
+
+        const flashItem = canUseFlash && {
+          label: "Destello",
+          action: () => {
+            setSelected(false);
+            const targetName = getPokemonMetadata(target!.id).name.toUpperCase();
+            close();
+            dispatch(hideStartMenu());
+            dispatch(setFlashActive(true));
+            dispatch(showText([`¡${targetName} usó DESTELLO!`, "¡Un destello cegador ilumina la zona!"]));
+          },
+        };
+
+        const extras = [cutItem, surfItem, flyItem, strengthItem, flashItem].filter(Boolean) as {
           label: string;
           action: () => void;
         }[];

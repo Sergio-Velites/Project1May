@@ -39,6 +39,7 @@ interface MapEntry {
   width: number;
   start?: { x: number; y: number } | null;
   cave?: boolean;
+  dark?: boolean;
   allowBicycle?: boolean;
   music?: string | null;
   trainers: Trainer[];
@@ -84,12 +85,16 @@ interface MusicTrack {
  * goodRod / superRod). Mantenemos el shape de la API original para que
  * el override sea compatible 1:1 con `EncountersType` del juego.
  */
+type EditorTimeSegment = 'morning' | 'day' | 'night';
+
 interface EncounterPokemon {
   id: number;
   chance: number;
   conditionValues: { name: string; url: string }[];
   maxLevel: number;
   minLevel: number;
+  /** Tramos horarios (Gen II) en los que aparece. Vacío/undefined = 24 h. */
+  timesOfDay?: EditorTimeSegment[];
 }
 
 interface EncounterTable {
@@ -553,10 +558,13 @@ function exportEncountersBlockTS(encounters: EncountersOverride): string {
   const tableTS = (t?: EncounterTable) => {
     if (!t) return empty;
     const pokemon = t.pokemon
-      .map(
-        (p) =>
-          `      { id: ${p.id}, chance: ${p.chance}, conditionValues: [], minLevel: ${p.minLevel}, maxLevel: ${p.maxLevel} }`
-      )
+      .map((p) => {
+        const tod =
+          p.timesOfDay && p.timesOfDay.length
+            ? `, timesOfDay: [${p.timesOfDay.map((s) => `"${s}"`).join(', ')}]`
+            : '';
+        return `      { id: ${p.id}, chance: ${p.chance}, conditionValues: [], minLevel: ${p.minLevel}, maxLevel: ${p.maxLevel}${tod} }`;
+      })
       .join(',\n');
     return `{\n    rate: ${t.rate},\n    pokemon: [\n${pokemon}\n    ],\n  }`;
   };
@@ -600,6 +608,7 @@ function exportFullMapTypeTS({
   currentMap,
   start,
   cave,
+  dark,
   allowBicycle,
   music,
   trainers,
@@ -631,6 +640,7 @@ function exportFullMapTypeTS({
   currentMap: MapEntry;
   start: { x: number; y: number } | null;
   cave: boolean;
+  dark: boolean;
   allowBicycle: boolean;
   music: string | null;
   trainers: Trainer[];
@@ -667,6 +677,7 @@ function exportFullMapTypeTS({
   lines.push('image,');
   if (music?.trim()) lines.push(`music: ${music.trim()},`);
   if (cave) lines.push('cave: true,');
+  if (dark) lines.push('dark: true,');
   lines.push(`height: ${currentMap.height},`);
   lines.push(`width: ${currentMap.width},`);
   const safeStart = start ?? currentMap.start ?? { x: 0, y: 0 };
@@ -804,6 +815,7 @@ export default function MapEditor() {
   const [stoppers, setStoppers] = useState<Record<string, number[]>>({});
   const [activeMechanic, setActiveMechanic] = useState<MechanicTool>('spinner-up');
   const [cave, setCave] = useState(false);
+  const [dark, setDark] = useState(false);
   const [allowBicycle, setAllowBicycle] = useState(false);
   const [musicField, setMusicField] = useState<string | null>(null);
   // Portales
@@ -904,6 +916,7 @@ export default function MapEditor() {
     setSpinners(m.spinners ?? {});
     setStoppers(m.stoppers ?? {});
     setCave(!!m.cave);
+    setDark(!!m.dark);
     setAllowBicycle(!!m.allowBicycle);
     setMusicField(m.music ?? null);
     setPortals(flattenPortals(m));
@@ -935,6 +948,7 @@ export default function MapEditor() {
           overrides: {
             start: startPos,
             cave,
+            dark,
             allowBicycle,
             music: musicField,
             fences,
@@ -1016,6 +1030,7 @@ export default function MapEditor() {
             staticPokemon,
             start: startPos,
             cave,
+            dark,
             allowBicycle,
             music: musicField,
             pokemonCenter,
@@ -1135,6 +1150,7 @@ export default function MapEditor() {
       currentMap,
       start: startPos,
       cave,
+      dark,
       allowBicycle,
       music: musicField,
       trainers,
@@ -1220,6 +1236,7 @@ export default function MapEditor() {
       setSpinners(parsed.spinners ?? {});
       setStoppers(parsed.stoppers ?? {});
       setCave(!!parsed.cave);
+      setDark(!!parsed.dark);
       setAllowBicycle(!!parsed.allowBicycle);
       setMusicField(parsed.music ?? null);
       setPortals(flattenPortals({
@@ -3159,6 +3176,8 @@ export default function MapEditor() {
                 currentMap={currentMap}
                 cave={cave}
                 setCave={(v) => { setCave(v); setDirty(true); }}
+                dark={dark}
+                setDark={(v) => { setDark(v); setDirty(true); }}
                 allowBicycle={allowBicycle}
                 setAllowBicycle={(v) => { setAllowBicycle(v); setDirty(true); }}
                 musicField={musicField}
@@ -3527,9 +3546,9 @@ function EncountersTableEditor({
 }: {
   title: string;
   tableKey: 'walk' | 'oldRod' | 'goodRod' | 'superRod' | 'surfSpots';
-  table: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[] }[] };
+  table: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[]; timesOfDay?: ('morning' | 'day' | 'night')[] }[] };
   onChange: (
-    next: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[] }[] }
+    next: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[]; timesOfDay?: ('morning' | 'day' | 'night')[] }[] }
   ) => void;
 }) {
   const totalChance = table.pokemon.reduce((a, b) => a + (b.chance || 0), 0) || 1;
@@ -3540,6 +3559,24 @@ function EncountersTableEditor({
 
   function remove(idx: number) {
     onChange({ ...table, pokemon: table.pokemon.filter((_, i) => i !== idx) });
+  }
+
+  // Alterna un tramo horario (Gen II) en la entrada `idx`. Si tras alternar
+  // quedan los 3 tramos o ninguno, se deja `timesOfDay` sin definir (= 24 h).
+  const ALL_SEGMENTS: ('morning' | 'day' | 'night')[] = ['morning', 'day', 'night'];
+  function toggleTime(idx: number, seg: 'morning' | 'day' | 'night') {
+    onChange({
+      ...table,
+      pokemon: table.pokemon.map((p, i) => {
+        if (i !== idx) return p;
+        const cur = p.timesOfDay && p.timesOfDay.length ? p.timesOfDay : ALL_SEGMENTS;
+        const has = cur.includes(seg);
+        const next = has ? cur.filter((s) => s !== seg) : ALL_SEGMENTS.filter((s) => cur.includes(s) || s === seg);
+        // 24 h (todos o ninguno) → sin restricción (timesOfDay undefined).
+        const restricted = next.length > 0 && next.length < ALL_SEGMENTS.length;
+        return { ...p, timesOfDay: restricted ? next : undefined };
+      }),
+    });
   }
 
   function add() {
@@ -3697,6 +3734,42 @@ function EncountersTableEditor({
                       <span style={{ position: 'relative', zIndex: 1, fontSize: 8, color: '#fff', width: '100%', display: 'block', textAlign: 'center', lineHeight: '14px', fontWeight: 700, textShadow: '0 0 3px #000' }}>{pct}%</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Fila 3: tramos horarios (Gen II). Ninguno marcado = 24 h. */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ fontSize: 10, color: '#666', flexShrink: 0, minWidth: 14 }} title="Tramos horarios en que aparece (Gen II). Vacío = 24 h.">⏰</span>
+                  {([
+                    ['morning', 'Mañana'],
+                    ['day', 'Día'],
+                    ['night', 'Noche'],
+                  ] as ['morning' | 'day' | 'night', string][]).map(([seg, label]) => {
+                    const restricted = !!(p.timesOfDay && p.timesOfDay.length);
+                    const on = restricted ? p.timesOfDay!.includes(seg) : true;
+                    return (
+                      <button
+                        key={seg}
+                        onClick={() => toggleTime(i, seg)}
+                        title={restricted ? '' : '24 h — pulsa para restringir'}
+                        style={{
+                          flex: 1,
+                          padding: '3px 0',
+                          fontSize: 10,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          borderRadius: 4,
+                          border: on ? '1px solid #3a7a3a' : '1px solid #2a2a4a',
+                          background: on ? (restricted ? '#16361a' : '#101a28') : '#0a0a20',
+                          color: on ? (restricted ? '#88ff88' : '#5577aa') : '#445',
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                  <span style={{ fontSize: 9, color: '#555', flexShrink: 0, minWidth: 40, textAlign: 'right' }}>
+                    {p.timesOfDay && p.timesOfDay.length ? `${p.timesOfDay.length}/3` : '24 h'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -3922,6 +3995,8 @@ function MapMetaInspector({
   currentMap,
   cave,
   setCave,
+  dark,
+  setDark,
   allowBicycle,
   setAllowBicycle,
   musicField,
@@ -3936,6 +4011,8 @@ function MapMetaInspector({
   currentMap?: MapEntry;
   cave: boolean;
   setCave: (v: boolean) => void;
+  dark: boolean;
+  setDark: (v: boolean) => void;
   allowBicycle: boolean;
   setAllowBicycle: (v: boolean) => void;
   musicField: string | null;
@@ -3962,6 +4039,10 @@ function MapMetaInspector({
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13 }}>
           <input type="checkbox" checked={cave} onChange={(e) => setCave(e.target.checked)} style={{ accentColor: '#cc88ff' }} />
           <span>cave</span>
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13 }}>
+          <input type="checkbox" checked={dark} onChange={(e) => setDark(e.target.checked)} style={{ accentColor: '#ffcc44' }} />
+          <span>dark (oscuro · requiere Destello)</span>
         </label>
       </div>
       <div style={sectionStyle}>

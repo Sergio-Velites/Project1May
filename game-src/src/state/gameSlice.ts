@@ -43,6 +43,7 @@ const initialState: GameState = {
   sessionCutTrees: [] as string[],
   boulderPositions: {} as Record<string, PosType>,
   strengthActive: false,
+  flashActive: false,
   seenPokemon: [],
   caughtPokemon: [],
   npcFacings: {} as Record<string, Direction>,
@@ -272,6 +273,9 @@ export const gameSlice = createSlice({
       state.sessionCutTrees = [];
       state.boulderPositions = {};
       state.strengthActive = false;
+      // MO Destello: la luz se mantiene al pasar entre mapas oscuros y se apaga
+      // al entrar en uno no-oscuro (fiel a Pokémon Rojo/Azul).
+      state.flashActive = map.dark ? (state.flashActive ?? false) : false;
       // Auto-desmonte si el nuevo mapa no permite bici (interiores).
       if (!map.allowBicycle && state.onBicycle) state.onBicycle = false;
       // Auto-desmonte de surf si el nuevo mapa no tiene tiles de agua.
@@ -286,6 +290,7 @@ export const gameSlice = createSlice({
       state.boulderPositions = {};
       state.strengthActive = false;
       const map = mapData[action.payload.map];
+      state.flashActive = map && map.dark ? (state.flashActive ?? false) : false;
       if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
       if (map && state.onSurfing && !mapHasWater(map)) state.onSurfing = false;
       recordVisit(state, action.payload.map);
@@ -304,6 +309,7 @@ export const gameSlice = createSlice({
         state.sessionCutTrees = [];
       state.boulderPositions = {};
       state.strengthActive = false;
+      state.flashActive = previousMap.dark ? (state.flashActive ?? false) : false;
         if (!previousMap.allowBicycle && state.onBicycle) state.onBicycle = false;
         if (state.onSurfing && !mapHasWater(previousMap)) state.onSurfing = false;
         recordVisit(state, map.exitReturnMap);
@@ -323,6 +329,7 @@ export const gameSlice = createSlice({
       state.boulderPositions = {};
       state.strengthActive = false;
       const map = mapData[action.payload.map];
+      state.flashActive = map && map.dark ? (state.flashActive ?? false) : false;
       if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
       // Volar siempre desmonta el surf (el pajarito no nada).
       state.onSurfing = false;
@@ -410,6 +417,7 @@ export const gameSlice = createSlice({
       // Estado de sesión de rocas (MO Fuerza): siempre se reinicia al cargar.
       state.boulderPositions = {};
       state.strengthActive = false;
+      state.flashActive = false;
       state.sessionCutTrees = [];
       state.visitedMaps =
         savedGameState.visitedMaps && savedGameState.visitedMaps.length > 0
@@ -451,6 +459,7 @@ export const gameSlice = createSlice({
       // Estado de sesión de rocas (MO Fuerza): siempre se reinicia al cargar.
       state.boulderPositions = {};
       state.strengthActive = false;
+      state.flashActive = false;
       state.sessionCutTrees = [];
       state.visitedMaps =
         s.visitedMaps && s.visitedMaps.length > 0
@@ -681,6 +690,9 @@ export const gameSlice = createSlice({
     setStrengthActive: (state, action: PayloadAction<boolean>) => {
       state.strengthActive = action.payload;
     },
+    setFlashActive: (state, action: PayloadAction<boolean>) => {
+      state.flashActive = action.payload;
+    },
     seePokemon: (state, action: PayloadAction<number>) => {
       if (!state.seenPokemon.includes(action.payload)) {
         state.seenPokemon.push(action.payload);
@@ -740,6 +752,7 @@ export const {
   completeQuest,
   markTreeCut,
   setStrengthActive,
+  setFlashActive,
   seePokemon,
   catchPokemonPokedex,
   setNpcFacing,
@@ -810,6 +823,8 @@ export const selectBoulderPositions = (state: RootState) =>
 
 export const selectStrengthActive = (state: RootState) =>
   state.game.strengthActive ?? false;
+export const selectFlashActive = (state: RootState) =>
+  state.game.flashActive ?? false;
 
 /**
  * Pokédex: la lista persistida puede estar incompleta para saves antiguos

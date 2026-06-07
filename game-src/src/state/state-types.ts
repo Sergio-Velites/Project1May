@@ -97,6 +97,11 @@ export interface GameState {
   /** ¿La MO Fuerza está activada en el mapa actual? Se activa pulsando A frente
    *  a una roca con un Pokémon que sepa "strength". Se reinicia al cambiar de mapa. */
   strengthActive?: boolean;
+  /** ¿La MO Destello está activa? Ilumina los mapas oscuros (`dark`). Se activa
+   *  desde el menú Pokémon con un Pokémon que sepa "flash". Fiel al original:
+   *  persiste al pasar entre mapas `dark` y se apaga al entrar en uno no-oscuro.
+   *  Se reinicia al cargar partida. */
+  flashActive?: boolean;
   seenPokemon: number[];    // IDs vistos en la Pokédex
   caughtPokemon: number[]; // IDs capturados
   npcFacings: Record<string, Direction>;

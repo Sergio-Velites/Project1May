@@ -53,6 +53,7 @@ export interface ParsedTextReward {
 export interface ParsedMap {
   start: { x: number; y: number } | null;
   cave: boolean;
+  dark: boolean;
   allowBicycle: boolean;
   music: string | null;
   walls: Record<string, number[]>;
@@ -585,6 +586,7 @@ export function parseMapTS(tsText: string): ParsedMap {
   return {
     start: parsePos(tsText, 'start'),
     cave: parseBooleanField(tsText, 'cave'),
+    dark: parseBooleanField(tsText, 'dark'),
     allowBicycle: parseBooleanField(tsText, 'allowBicycle'),
     music: parseMusicField(tsText),
     walls: parseRowColMap(tsText, 'walls'),

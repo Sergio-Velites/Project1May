@@ -6,6 +6,7 @@ import { DEBUG_MODE } from "../app/constants";
 import { isGrass, isWater } from "../app/map-helper";
 import { PokemonEncounterType } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
+import { getTimeSegment, matchesTimeSegment } from "../app/time-helper";
 
 const shouldEncounter = (rate: number) => {
   const random = Math.random() * 255;
@@ -45,6 +46,12 @@ const EncounterHandler = () => {
   useEffect(() => {
     if (!map.encounters || DEBUG_MODE) return;
 
+    // Tramo horario actual (Gen II). Filtramos las entradas cuyo `timesOfDay`
+    // no incluya este tramo. Sin `timesOfDay` → disponible las 24 h (default).
+    const seg = getTimeSegment();
+    const byTime = (list: PokemonEncounterData[]) =>
+      list.filter((p) => matchesTimeSegment(p.timesOfDay, seg));
+
     // Surf: encuentros sobre tiles de agua si el mapa define `surfSpots`.
     // Si la tabla está vacía → sin encuentros (decisión segura).
     if (onSurfing && isWater(map.water, pos.x, pos.y)) {
@@ -52,7 +59,7 @@ const EncounterHandler = () => {
       if (surfTable && surfTable.pokemon.length > 0) {
         const encounter = shouldEncounter(surfTable.rate);
         if (encounter) {
-          const pokemon = getPokemon(surfTable.pokemon);
+          const pokemon = getPokemon(byTime(surfTable.pokemon));
           if (pokemon) {
             dispatch(encounterPokemon(pokemon));
           }
@@ -66,7 +73,7 @@ const EncounterHandler = () => {
     if (isWalk) {
       const encounter = shouldEncounter(map.encounters.walk.rate);
       if (encounter) {
-        const pokemon = getPokemon(map.encounters.walk.pokemon);
+        const pokemon = getPokemon(byTime(map.encounters.walk.pokemon));
         if (pokemon) {
           dispatch(encounterPokemon(pokemon));
         }
