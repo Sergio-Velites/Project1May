@@ -520,7 +520,18 @@ export interface PokemonMetadata {
     speed: number;
   };
   types: string[];
-  evolution?: { pokemon: number | number[]; level: number };
+  evolution?: {
+    pokemon: number | number[];
+    /** Nivel mínimo. Para evoluciones por amistad actúa como suelo (1 = sin suelo). */
+    level: number;
+    /** Cómo se dispara. "level" (por defecto) o "friendship" (Gen II). */
+    trigger?: "level" | "friendship";
+    /**
+     * Evolución ramificada por hora del día (Eevee → Espeon de día / Umbreon
+     * de noche). Sólo se usa con trigger "friendship".
+     */
+    timeOfDay?: { day: number; night: number };
+  };
   baseCatchRate: number;
   growthRate: "fast" | "medium-fast" | "medium-slow" | "slow";
 }
@@ -1729,6 +1740,8 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
     },
     types: ["poison", "flying"],
     baseCatchRate: 90,
+    // Gen II: Golbat → Crobat por amistad alta.
+    evolution: { pokemon: 169, level: 1, trigger: "friendship" },
     growthRate: "medium-fast",
   },
   "43": {
@@ -3791,6 +3804,8 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
     },
     types: ["normal"],
     baseCatchRate: 30,
+    // Gen II: Chansey → Blissey por amistad alta.
+    evolution: { pokemon: 242, level: 1, trigger: "friendship" },
     growthRate: "fast",
   },
   "114": {
@@ -4356,7 +4371,13 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
     },
     types: ["normal"],
     baseCatchRate: 45,
-    evolution: { pokemon: [196, 197], level: 25 },
+    // Gen II: por amistad + hora del día → Espeon (día) / Umbreon (noche).
+    evolution: {
+      pokemon: [196, 197],
+      level: 1,
+      trigger: "friendship",
+      timeOfDay: { day: 196, night: 197 },
+    },
     growthRate: "medium-fast",
   },
   "134": {
@@ -5534,9 +5555,9 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
       speed: 60,
     },
     types: ["electric"],
-    // Evolución por felicidad en Gen II (no soportada por el motor).
+    // Gen II: Pichu → Pikachu por amistad alta.
     baseCatchRate: 190,
-    evolution: { pokemon: 25, level: 15 },
+    evolution: { pokemon: 25, level: 1, trigger: "friendship" },
     growthRate: "medium-fast",
   },
   "173": {
@@ -5564,9 +5585,9 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
       speed: 15,
     },
     types: ["normal"],
-    // Evolución por felicidad en Gen II (no soportada por el motor).
+    // Gen II: Cleffa → Clefairy por amistad alta.
     baseCatchRate: 150,
-    evolution: { pokemon: 35, level: 15 },
+    evolution: { pokemon: 35, level: 1, trigger: "friendship" },
     growthRate: "fast",
   },
   "174": {
@@ -5594,9 +5615,9 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
       speed: 15,
     },
     types: ["normal"],
-    // Evolución por felicidad en Gen II (no soportada por el motor).
+    // Gen II: Igglybuff → Jigglypuff por amistad alta.
     baseCatchRate: 170,
-    evolution: { pokemon: 39, level: 15 },
+    evolution: { pokemon: 39, level: 1, trigger: "friendship" },
     growthRate: "fast",
   },
   "175": {
@@ -5626,9 +5647,9 @@ const pokemonMetadata: Record<number, PokemonMetadata> = {
       speed: 20,
     },
     types: ["normal"],
-    // Evolución por felicidad en Gen II (no soportada por el motor).
+    // Gen II: Togepi → Togetic por amistad alta.
     baseCatchRate: 190,
-    evolution: { pokemon: 176, level: 20 },
+    evolution: { pokemon: 176, level: 1, trigger: "friendship" },
     growthRate: "fast",
   },
   "176": {

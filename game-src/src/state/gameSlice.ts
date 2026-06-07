@@ -8,6 +8,7 @@ import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
 import { boulderIdAt, canWalk, isCuttableTree, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
+import { BASE_FRIENDSHIP, STEPS_PER_FRIENDSHIP, friendshipOnWalk, getFriendship } from "../app/evolution-helper";
 import {
   Direction,
   GameState,
@@ -59,6 +60,24 @@ const initialState: GameState = {
     MapId.PalletTownLab,
   ],
   rsvp: undefined,
+};
+
+/**
+ * Acumula un paso caminado y, cada STEPS_PER_FRIENDSHIP pasos, reparte
+ * amistad a todo el equipo (Gen II). Debe llamarse SOLO cuando el jugador
+ * se mueve de tile con éxito (no en movimientos bloqueados).
+ */
+const accrueWalkFriendship = (state: GameState) => {
+  if (state.pokemon.length === 0) return;
+  const counter = (state.friendshipStepCounter ?? 0) + 1;
+  if (counter < STEPS_PER_FRIENDSHIP) {
+    state.friendshipStepCounter = counter;
+    return;
+  }
+  state.friendshipStepCounter = 0;
+  for (const p of state.pokemon) {
+    p.friendship = friendshipOnWalk(getFriendship(p));
+  }
 };
 
 // Registra un MapId como visitado en `state.visitedMaps` (idempotente).
@@ -168,6 +187,7 @@ export const gameSlice = createSlice({
       )
         return;
       state.pos.x -= 1;
+      accrueWalkFriendship(state);
     },
     moveRight: (state) => {
       state.direction = Direction.Right;
@@ -184,6 +204,7 @@ export const gameSlice = createSlice({
       )
         return;
       state.pos.x += 1;
+      accrueWalkFriendship(state);
     },
     moveUp: (state) => {
       state.direction = Direction.Up;
@@ -199,6 +220,7 @@ export const gameSlice = createSlice({
       )
         return;
       state.pos.y -= 1;
+      accrueWalkFriendship(state);
     },
     moveDown: (state) => {
       state.direction = Direction.Down;
@@ -237,6 +259,7 @@ export const gameSlice = createSlice({
         return;
       if (isGift(map.gifts, state.pos.x, state.pos.y + 1, state.completedQuests)) return;
       state.pos.y += 1;
+      accrueWalkFriendship(state);
     },
     setPos: (state, action: PayloadAction<PosType>) => {
       state.pos = action.payload;
@@ -585,6 +608,10 @@ export const gameSlice = createSlice({
       // Esto evita tener que duplicar dispatches en cada componente que llame
       // a addPokemon.
       const id = action.payload.id;
+      // Amistad base (Gen II) si quien lo crea no la especificó.
+      if (action.payload.friendship === undefined) {
+        action.payload.friendship = BASE_FRIENDSHIP;
+      }
       if (!state.seenPokemon.includes(id)) state.seenPokemon.push(id);
       if (!state.caughtPokemon.includes(id)) state.caughtPokemon.push(id);
       if (state.pokemon.length === 6) {

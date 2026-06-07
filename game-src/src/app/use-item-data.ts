@@ -31,6 +31,7 @@ import { directionModifier, isFence, isTrainer, isWall, isWater } from "./map-he
 import { getMoveMetadata } from "./use-move-metadata";
 import { getHpDeltaOnLevelUp, getLearnedMove } from "./level-helper";
 import { getPokemonMetadata } from "./use-pokemon-metadata";
+import { resolveEvolution, friendshipOnLevelUp, getFriendship } from "./evolution-helper";
 
 export enum ItemType {
   MasterBall = "master-ball", // DONE
@@ -500,7 +501,13 @@ const useItemData = () => {
             }
             const newLevel = p.level + 1;
             const hpDelta = getHpDeltaOnLevelUp(p.id, p.level, newLevel);
-            const updatedPokemon = { ...p, level: newLevel, hp: p.hp + hpDelta };
+            const updatedPokemon = {
+              ...p,
+              level: newLevel,
+              hp: p.hp + hpDelta,
+              // Amistad ganada al subir de nivel (Gen II).
+              friendship: friendshipOnLevelUp(getFriendship(p)),
+            };
             dispatch(updateSpecificPokemon({ index, pokemon: updatedPokemon }));
             dispatch(consumeItem(ItemType.RareCandy));
 
@@ -514,9 +521,8 @@ const useItemData = () => {
             dispatch(hideStartMenu());
 
             const meta = getPokemonMetadata(p.id);
-            // ¿Evoluciona a este nivel? (sólo evoluciones por nivel)
-            const evolves =
-              !!meta.evolution && newLevel >= meta.evolution.level;
+            // ¿Evoluciona ahora? Resuelve nivel + amistad + hora del día (Gen II).
+            const evolveToId = resolveEvolution(updatedPokemon, meta);
             const newMove = getLearnedMove(updatedPokemon);
 
             // Orden fiel al original Pokémon Rojo/Azul:
@@ -528,11 +534,7 @@ const useItemData = () => {
               showTextThenAction({
                 text: [`¡${pokemonName} subió al nivel ${newLevel}!`],
                 action: () => {
-                  if (evolves && meta.evolution) {
-                    const { pokemon: evoPokemon } = meta.evolution;
-                    const evolveToId = Array.isArray(evoPokemon)
-                      ? evoPokemon[Math.floor(Math.random() * evoPokemon.length)]
-                      : evoPokemon;
+                  if (evolveToId !== null) {
                     dispatch(
                       showEvolution({
                         index,

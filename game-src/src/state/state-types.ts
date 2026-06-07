@@ -55,6 +55,12 @@ export interface PokemonInstance {
   moves: MoveState[];
   /** Estado persistente entre combates (poison, burn, paralysis, sleep, freeze). */
   status?: BattleStatus | null;
+  /**
+   * Amistad / felicidad (Gen II, 0–255). Sube al subir de nivel y al caminar;
+   * a partir de 220 dispara las evoluciones por amistad (Crobat, Blissey,
+   * Espeon/Umbreon, etc.). Indefinido en saves antiguos → se trata como base 70.
+   */
+  friendship?: number;
 }
 
 export interface PokemonEncounterType {
@@ -106,6 +112,9 @@ export interface GameState {
   visitedMaps?: MapId[];
   /** Datos de confirmación de asistencia a la boda */
   rsvp?: RSVPData;
+  /** Contador de pasos para la ganancia de amistad al caminar (Gen II). Cada
+   *  STEPS_PER_FRIENDSHIP pasos, el equipo gana amistad. Persistido. */
+  friendshipStepCounter?: number;
 }
 
 export interface RSVPData {
