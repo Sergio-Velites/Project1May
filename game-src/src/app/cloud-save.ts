@@ -286,13 +286,21 @@ export const loadFromCloud = async (userId: string): Promise<unknown | null> => 
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), EDGE_TIMEOUT_MS);
   try {
+    // El servidor redacta los datos personales (rsvp) salvo que se demuestre
+    // posesión de la cuenta con el write_token. Lo enviamos por cabecera (no en
+    // la URL, para no filtrarlo en logs): al cargar la PROPIA partida el token
+    // coincide y se recibe el estado íntegro; al cargar el equipo de un rival
+    // de batalla online no coincide y el rsvp ajeno queda redactado.
+    const headers: Record<string, string> = {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    };
+    const writeToken = getWriteToken();
+    if (writeToken) headers["x-write-token"] = writeToken;
     const res = await fetch(
       `${SUPABASE_URL}/functions/v1/load-game?userId=${userId}`,
       {
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        },
+        headers,
         signal: ctrl.signal,
       }
     );

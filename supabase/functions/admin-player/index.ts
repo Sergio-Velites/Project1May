@@ -7,6 +7,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { db, json } from "../_shared/db.ts";
 
 const ADMIN_SECRET = Deno.env.get("ADMIN_SECRET") ?? "";
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -23,6 +24,7 @@ Deno.serve(async (req) => {
     if (req.method === "GET") {
       const userId = url.searchParams.get("userId");
       if (!userId) return json({ error: "userId requerido" }, 400, corsHeaders);
+      if (!UUID_RE.test(userId)) return json({ error: "userId inválido" }, 400, corsHeaders);
 
       const { data, error } = await db
         .from("saves")
@@ -43,6 +45,7 @@ Deno.serve(async (req) => {
       const gameState = body.gameState;
 
       if (!userId)    return json({ error: "userId requerido" }, 400, corsHeaders);
+      if (!UUID_RE.test(userId)) return json({ error: "userId inválido" }, 400, corsHeaders);
       if (!gameState || typeof gameState !== "object" || Array.isArray(gameState))
         return json({ error: "gameState requerido y debe ser un objeto" }, 400, corsHeaders);
 
@@ -75,6 +78,7 @@ Deno.serve(async (req) => {
       const body = await req.json();
       const userId = body.userId ?? url.searchParams.get("userId");
       if (!userId) return json({ error: "userId requerido" }, 400, corsHeaders);
+      if (!UUID_RE.test(userId)) return json({ error: "userId inválido" }, 400, corsHeaders);
 
       const { error } = await db
         .from("wedding_users")

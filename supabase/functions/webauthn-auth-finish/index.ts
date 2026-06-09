@@ -15,6 +15,9 @@ Deno.serve(async (req) => {
 
   try {
     const { challengeId, credential } = await req.json();
+    if (!challengeId || !credential || typeof credential.id !== "string") {
+      throw new Error("challengeId and credential are required");
+    }
 
     // 1. Validar challenge (existencia, uso único, expiración)
     const { data: ch, error: chErr } = await db
@@ -37,23 +40,45 @@ Deno.serve(async (req) => {
       .single();
     if (credErr || !cred) throw new Error("Credential not found");
 
-    // 3. Validar clientDataJSON: type y origin
-    if (credential.response?.clientDataJSON) {
+    // 3. Validar clientDataJSON: type, origin y — CRÍTICO — que el challenge
+    //    firmado coincida con el que emitió el servidor para este challengeId.
+    //
+    //    El clientDataJSON es OBLIGATORIO: sin él no hay forma de vincular la
+    //    respuesta con el challenge emitido y cualquiera que conozca un
+    //    credential_id podría obtener el user_id + write_token ajenos. Antes
+    //    era opcional (`if (...clientDataJSON)`), de modo que un atacante podía
+    //    omitirlo y saltarse TODAS las comprobaciones.
+    if (!credential?.response?.clientDataJSON) {
+      throw new Error("Missing clientDataJSON");
+    }
+    {
+      let clientData: { type?: string; origin?: string; challenge?: string };
       try {
-        const clientData = JSON.parse(
+        clientData = JSON.parse(
           new TextDecoder().decode(
             Uint8Array.from(atob(credential.response.clientDataJSON.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0))
           )
         );
-        if (clientData.type !== "webauthn.get") throw new Error("Invalid clientDataJSON type");
-        const allowedOrigins = (Deno.env.get("ALLOWED_ORIGINS") ?? "").split(",").map((o: string) => o.trim()).filter(Boolean);
-        if (allowedOrigins.length > 0 && !allowedOrigins.includes(clientData.origin)) {
-          throw new Error("Origin not allowed");
-        }
-      } catch (e) {
-        const msg = (e as Error).message ?? String(e);
-        if (msg === "Invalid clientDataJSON type" || msg === "Origin not allowed") throw e;
+      } catch {
         throw new Error("Invalid clientDataJSON");
+      }
+
+      if (clientData.type !== "webauthn.get") throw new Error("Invalid clientDataJSON type");
+
+      // El challenge firmado por el dispositivo debe ser exactamente el que
+      // el servidor generó y guardó en webauthn_challenges (uso único). Esto
+      // impide reutilizar un clientDataJSON capturado con un challenge nuevo.
+      const challengeB64Url = (clientData.challenge ?? "")
+        .replace(/-/g, "+").replace(/_/g, "/");
+      const expectedB64Url = (ch.challenge ?? "")
+        .replace(/-/g, "+").replace(/_/g, "/");
+      if (!clientData.challenge || challengeB64Url !== expectedB64Url) {
+        throw new Error("Challenge mismatch");
+      }
+
+      const allowedOrigins = (Deno.env.get("ALLOWED_ORIGINS") ?? "").split(",").map((o: string) => o.trim()).filter(Boolean);
+      if (allowedOrigins.length > 0 && !allowedOrigins.includes(clientData.origin ?? "")) {
+        throw new Error("Origin not allowed");
       }
     }
 
