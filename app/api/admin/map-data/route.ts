@@ -31,6 +31,8 @@ type OverrideKey =
   | 'cave'
   | 'dark'
   | 'allowBicycle'
+  | 'flyable'
+  | 'flySpot'
   | 'music'
   | 'texts'
   | 'textRewards'
@@ -63,6 +65,8 @@ const OVERRIDE_KEYS: OverrideKey[] = [
   'cave',
   'dark',
   'allowBicycle',
+  'flyable',
+  'flySpot',
   'music',
   'texts',
   'textRewards',

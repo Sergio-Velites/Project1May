@@ -41,6 +41,9 @@ interface MapEntry {
   cave?: boolean;
   dark?: boolean;
   allowBicycle?: boolean;
+  /** Editor-only: prepara futuros destinos de Vuelo. El juego aún no lo consume. */
+  flyable?: boolean;
+  flySpot?: { x: number; y: number } | null;
   music?: string | null;
   trainers: Trainer[];
   walls: Record<string, number[]>;
@@ -68,6 +71,7 @@ interface MapEntry {
   exits?: Record<string, number[]>;
   exitReturnMap?: string | null;
   exitReturnPos?: { x: number; y: number } | null;
+  minimapPos?: { x: number; y: number } | null;
   sourceFile: string;
 }
 
@@ -752,6 +756,9 @@ function pascalCaseFromMapId(id: string): string {
 // ── Constantes UI ─────────────────────────────────────────────────────────
 
 const ZOOM_LEVELS = [16, 24, 32, 48];
+const MINIMAP_WIDTH = 237;
+const MINIMAP_HEIGHT = 213;
+const MINIMAP_DISPLAY_SCALE = 2;
 
 // ── Estilos compartidos ───────────────────────────────────────────────────
 
@@ -766,6 +773,19 @@ const inputStyle: React.CSSProperties = {
   outline: 'none',
   width: '100%',
   boxSizing: 'border-box',
+};
+
+const navBtnStyle: React.CSSProperties = {
+  padding: 0,
+  minWidth: 24,
+  height: '100%',
+  background: '#1a1a3a',
+  border: '1px solid #3a3a5a',
+  borderRadius: 4,
+  color: '#c8c8ff',
+  cursor: 'pointer',
+  fontSize: 11,
+  lineHeight: 1,
 };
 
 const labelStyle: React.CSSProperties = {
@@ -817,6 +837,8 @@ export default function MapEditor() {
   const [cave, setCave] = useState(false);
   const [dark, setDark] = useState(false);
   const [allowBicycle, setAllowBicycle] = useState(false);
+  const [flyable, setFlyable] = useState(false);
+  const [flySpot, setFlySpot] = useState<{ x: number; y: number } | null>(null);
   const [musicField, setMusicField] = useState<string | null>(null);
   // Portales
   const [portals, setPortals] = useState<PortalEntry[]>([]);
@@ -918,16 +940,22 @@ export default function MapEditor() {
     setCave(!!m.cave);
     setDark(!!m.dark);
     setAllowBicycle(!!m.allowBicycle);
+    setFlyable(!!m.flyable);
+    setFlySpot(m.flySpot ?? null);
     setMusicField(m.music ?? null);
     setPortals(flattenPortals(m));
     setExitReturnMap(m.exitReturnMap ?? null);
     setExitReturnPos(m.exitReturnPos ?? null);
-    setMinimapPos((m as MapEntry & { minimapPos?: { x: number; y: number } }).minimapPos ?? null);
+    setMinimapPos(m.minimapPos ?? null);
     setSelectedPortalIdx(null);
   }
 
   // ── Cambiar mapa ──────────────────────────────────────────────────────
   function selectMap(id: string) {
+    if (dirty && id !== selectedMapId) {
+      const ok = window.confirm('Hay cambios sin guardar en el mapa actual. ¿Cambiar de mapa y descartarlos en pantalla?');
+      if (!ok) return;
+    }
     setSelectedMapId(id);
     if (mapData[id]) loadFromEntry(mapData[id]);
     setSelectedIdx(null);
@@ -950,6 +978,8 @@ export default function MapEditor() {
             cave,
             dark,
             allowBicycle,
+            flyable,
+            flySpot,
             music: musicField,
             fences,
             grass,
@@ -1032,6 +1062,8 @@ export default function MapEditor() {
             cave,
             dark,
             allowBicycle,
+            flyable,
+            flySpot,
             music: musicField,
             pokemonCenter,
             pc: pcPos,
@@ -1238,6 +1270,8 @@ export default function MapEditor() {
       setCave(!!parsed.cave);
       setDark(!!parsed.dark);
       setAllowBicycle(!!parsed.allowBicycle);
+      setFlyable(false);
+      setFlySpot(null);
       setMusicField(parsed.music ?? null);
       setPortals(flattenPortals({
         ...currentMap!,
@@ -1247,6 +1281,7 @@ export default function MapEditor() {
       } as MapEntry));
       setExitReturnMap(parsed.exitReturnMap);
       setExitReturnPos(parsed.exitReturnPos);
+      setMinimapPos(parsed.minimapPos);
       setSelectedPortalIdx(null);
       setSelectedIdx(null);
       setDirty(true);
@@ -1864,6 +1899,12 @@ export default function MapEditor() {
       setDirty(true);
       return;
     }
+    if (editMode === 'map') {
+      if (!flyable) return;
+      setFlySpot({ x: tile.x, y: tile.y });
+      setDirty(true);
+      return;
+    }
     if (editMode === 'portals') {
       const idx = portals.findIndex((p) => p.pos.x === tile.x && p.pos.y === tile.y);
       if (idx !== -1) {
@@ -1923,7 +1964,7 @@ export default function MapEditor() {
   const selected = selectedIdx !== null ? trainers[selectedIdx] : null;
 
   // ── Minimap ───────────────────────────────────────────────────────────
-  const MINIMAP_COORDS: Record<string, { x: number; y: number }> = {
+  const BASE_MINIMAP_COORDS: Record<string, { x: number; y: number }> = {
     'pallet-town':        { x: 84,  y: 179 },
     'route-1':            { x: 84,  y: 155 },
     'viridian-city':      { x: 84,  y: 130 },
@@ -1974,7 +2015,8 @@ export default function MapEditor() {
    * and tries to find coords for the parent location.
    */
   function getMinimapCoords(mapId: string): { x: number; y: number } | null {
-    if (MINIMAP_COORDS[mapId]) return MINIMAP_COORDS[mapId];
+    if (mapData[mapId]?.minimapPos) return mapData[mapId].minimapPos ?? null;
+    if (BASE_MINIMAP_COORDS[mapId]) return BASE_MINIMAP_COORDS[mapId];
     // Strip interior suffixes and retry
     const suffixes = [
       '-gym', '-pokemon-center', '-pokecenter', '-poke-mart', '-pokemart',
@@ -1990,14 +2032,88 @@ export default function MapEditor() {
     for (const suffix of sorted) {
       if (mapId.endsWith(suffix)) {
         const base = mapId.slice(0, mapId.length - suffix.length);
-        if (MINIMAP_COORDS[base]) return MINIMAP_COORDS[base];
+        if (mapData[base]?.minimapPos) return mapData[base].minimapPos ?? null;
+        if (BASE_MINIMAP_COORDS[base]) return BASE_MINIMAP_COORDS[base];
       }
     }
     return null;
   }
 
-  const minimapCoords = getMinimapCoords(selectedMapId);
-  const MINIMAP_SCALE = 2;
+  const minimapCoords = minimapPos ?? getMinimapCoords(selectedMapId);
+  const minimapEntries = Object.keys(mapData)
+    .filter((id) => !!mapData[id]?.minimapPos || !!BASE_MINIMAP_COORDS[id])
+    .map((id) => ({ id, coord: mapData[id]?.minimapPos ?? BASE_MINIMAP_COORDS[id], name: mapData[id]?.name ?? id }))
+    .filter((entry): entry is { id: string; coord: { x: number; y: number }; name: string } => !!entry.coord);
+
+  const sortedMapIds = Object.keys(mapData).sort((a, b) =>
+    (mapData[a]?.name ?? a).localeCompare(mapData[b]?.name ?? b),
+  );
+  const selectedSortedIdx = sortedMapIds.indexOf(selectedMapId);
+  const prevMapId = selectedSortedIdx > 0 ? sortedMapIds[selectedSortedIdx - 1] : null;
+  const nextMapId = selectedSortedIdx >= 0 && selectedSortedIdx < sortedMapIds.length - 1
+    ? sortedMapIds[selectedSortedIdx + 1]
+    : null;
+
+  function directionalMapId(direction: 'up' | 'down' | 'left' | 'right'): string | null {
+    const current = minimapCoords;
+    if (!current) return null;
+    const candidates = minimapEntries
+      .filter(({ id }) => id !== selectedMapId)
+      .map(({ id, coord }) => {
+        const dx = coord.x - current.x;
+        const dy = coord.y - current.y;
+        const valid =
+          direction === 'up' ? dy < -2 :
+          direction === 'down' ? dy > 2 :
+          direction === 'left' ? dx < -2 :
+          dx > 2;
+        if (!valid) return null;
+        const primary = direction === 'up' || direction === 'down' ? Math.abs(dy) : Math.abs(dx);
+        const secondary = direction === 'up' || direction === 'down' ? Math.abs(dx) : Math.abs(dy);
+        return { id, score: primary + secondary * 1.75 };
+      })
+      .filter((v): v is { id: string; score: number } => !!v)
+      .sort((a, b) => a.score - b.score);
+    return candidates[0]?.id ?? null;
+  }
+
+  const mapNavTargets = {
+    up: directionalMapId('up'),
+    down: directionalMapId('down'),
+    left: directionalMapId('left'),
+    right: directionalMapId('right'),
+  };
+
+  function jumpToMap(id: string | null) {
+    if (!id) return;
+    selectMap(id);
+  }
+
+  useEffect(() => {
+    const isTextInput = (target: EventTarget | null): boolean => {
+      if (!(target instanceof HTMLElement)) return false;
+      const tag = target.tagName.toLowerCase();
+      return tag === 'input' || tag === 'textarea' || tag === 'select' || target.isContentEditable;
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (isTextInput(e.target) || dragging.current || entityDrag.current || wallPaint.current?.active) return;
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        jumpToMap(mapNavTargets.up);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        jumpToMap(mapNavTargets.down);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        jumpToMap(mapNavTargets.left);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        jumpToMap(mapNavTargets.right);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mapNavTargets.up, mapNavTargets.down, mapNavTargets.left, mapNavTargets.right, dirty, selectedMapId]);
 
   // ── Render ────────────────────────────────────────────────────────────
   if (error) {
@@ -2044,6 +2160,15 @@ export default function MapEditor() {
             <option key={m.id} value={m.id}>{m.name}</option>
           ))}
         </select>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '24px 24px 24px', gridTemplateRows: '22px 22px', gap: 2, alignItems: 'center' }} title="Moverse por mapas usando posiciones del minimapa">
+          <button onClick={() => jumpToMap(prevMapId)} disabled={!prevMapId} style={{ ...navBtnStyle, gridColumn: 1, gridRow: '1 / span 2' }}>‹</button>
+          <button onClick={() => jumpToMap(mapNavTargets.up)} disabled={!mapNavTargets.up} style={{ ...navBtnStyle, gridColumn: 2, gridRow: 1 }}>▲</button>
+          <button onClick={() => jumpToMap(nextMapId)} disabled={!nextMapId} style={{ ...navBtnStyle, gridColumn: 3, gridRow: '1 / span 2' }}>›</button>
+          <button onClick={() => jumpToMap(mapNavTargets.left)} disabled={!mapNavTargets.left} style={{ ...navBtnStyle, gridColumn: 1, gridRow: 2 }}>◀</button>
+          <button onClick={() => jumpToMap(mapNavTargets.down)} disabled={!mapNavTargets.down} style={{ ...navBtnStyle, gridColumn: 2, gridRow: 2 }}>▼</button>
+          <button onClick={() => jumpToMap(mapNavTargets.right)} disabled={!mapNavTargets.right} style={{ ...navBtnStyle, gridColumn: 3, gridRow: 2 }}>▶</button>
+        </div>
 
         {/* Zoom */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -2264,8 +2389,8 @@ export default function MapEditor() {
             }}
             onClick={(e) => {
               const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-              const px = Math.round((e.clientX - rect.left) / MINIMAP_SCALE);
-              const py = Math.round((e.clientY - rect.top) / MINIMAP_SCALE);
+              const px = Math.max(0, Math.min(MINIMAP_WIDTH, Math.round(((e.clientX - rect.left) / rect.width) * MINIMAP_WIDTH)));
+              const py = Math.max(0, Math.min(MINIMAP_HEIGHT, Math.round(((e.clientY - rect.top) / rect.height) * MINIMAP_HEIGHT)));
               if (minimapMode === 'edit') {
                 setMinimapPos({ x: px, y: py });
                 setDirty(true);
@@ -2273,7 +2398,7 @@ export default function MapEditor() {
                 // Navegar: buscar el mapa más cercano
                 let bestId = '';
                 let bestDist = Infinity;
-                for (const [id, coord] of Object.entries(MINIMAP_COORDS)) {
+                for (const { id, coord } of minimapEntries) {
                   const d = Math.hypot(coord.x - px, coord.y - py);
                   if (d < bestDist) { bestDist = d; bestId = id; }
                 }
@@ -2285,26 +2410,27 @@ export default function MapEditor() {
             <img
               src="/editor/maps/kanto_region.png"
               alt="Kanto minimap"
-              width={237 * MINIMAP_SCALE}
-              height={213 * MINIMAP_SCALE}
+              width={MINIMAP_WIDTH * MINIMAP_DISPLAY_SCALE}
+              height={MINIMAP_HEIGHT * MINIMAP_DISPLAY_SCALE}
               style={{ imageRendering: 'pixelated', display: 'block' }}
               draggable={false}
             />
             {/* Todos los puntos conocidos (modo navegar) */}
-            {minimapMode === 'navigate' && Object.entries(MINIMAP_COORDS).map(([id, coord]) => {
+            {minimapMode === 'navigate' && minimapEntries.map(({ id, coord, name }) => {
               const isCurrent = id === selectedMapId;
               return (
-                <div key={id} style={{
+                <div key={id} title={`${name} · ${id} (${coord.x}, ${coord.y})`} style={{
                   position: 'absolute',
-                  left: coord.x * MINIMAP_SCALE - (isCurrent ? 5 : 3),
-                  top: coord.y * MINIMAP_SCALE - (isCurrent ? 5 : 3),
+                  left: `${(coord.x / MINIMAP_WIDTH) * 100}%`,
+                  top: `${(coord.y / MINIMAP_HEIGHT) * 100}%`,
+                  transform: 'translate(-50%, -50%)',
                   width: isCurrent ? 10 : 6,
                   height: isCurrent ? 10 : 6,
                   borderRadius: '50%',
-                  background: isCurrent ? '#ff2222' : '#4488ff',
+                  background: isCurrent ? '#ff2222' : (mapData[id]?.minimapPos ? '#4488ff' : '#7788aa'),
                   boxShadow: isCurrent ? '0 0 4px 2px rgba(255,60,60,0.7)' : '0 0 2px rgba(80,140,255,0.6)',
                   pointerEvents: 'none',
-                  opacity: isCurrent ? 1 : 0.75,
+                  opacity: isCurrent ? 1 : (mapData[id]?.minimapPos ? 0.78 : 0.48),
                 }} />
               );
             })}
@@ -2316,8 +2442,9 @@ export default function MapEditor() {
               return (
                 <div style={{
                   position: 'absolute',
-                  left: dot.x * MINIMAP_SCALE - 5,
-                  top: dot.y * MINIMAP_SCALE - 5,
+                  left: `${(dot.x / MINIMAP_WIDTH) * 100}%`,
+                  top: `${(dot.y / MINIMAP_HEIGHT) * 100}%`,
+                  transform: 'translate(-50%, -50%)',
                   width: 10,
                   height: 10,
                   borderRadius: '50%',
@@ -2361,6 +2488,48 @@ export default function MapEditor() {
                 <div style={{ color: '#555', fontSize: 11, marginTop: 4 }}>
                   Click en el mapa para fijar la posición
                 </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 8 }}>
+                  <label style={{ color: '#888', fontSize: 10 }}>
+                    X
+                    <input
+                      type="number"
+                      min={0}
+                      max={MINIMAP_WIDTH}
+                      value={(minimapPos ?? minimapCoords)?.x ?? ''}
+                      onChange={(e) => {
+                        const current = minimapPos ?? minimapCoords ?? { x: 0, y: 0 };
+                        const x = Math.max(0, Math.min(MINIMAP_WIDTH, parseInt(e.target.value, 10) || 0));
+                        setMinimapPos({ ...current, x });
+                        setDirty(true);
+                      }}
+                      style={{ ...inputStyle, fontSize: 11, padding: '2px 6px' }}
+                    />
+                  </label>
+                  <label style={{ color: '#888', fontSize: 10 }}>
+                    Y
+                    <input
+                      type="number"
+                      min={0}
+                      max={MINIMAP_HEIGHT}
+                      value={(minimapPos ?? minimapCoords)?.y ?? ''}
+                      onChange={(e) => {
+                        const current = minimapPos ?? minimapCoords ?? { x: 0, y: 0 };
+                        const y = Math.max(0, Math.min(MINIMAP_HEIGHT, parseInt(e.target.value, 10) || 0));
+                        setMinimapPos({ ...current, y });
+                        setDirty(true);
+                      }}
+                      style={{ ...inputStyle, fontSize: 11, padding: '2px 6px' }}
+                    />
+                  </label>
+                </div>
+                {!minimapPos && minimapCoords && (
+                  <button onClick={() => { setMinimapPos(minimapCoords); setDirty(true); }} style={{
+                    marginTop: 8, marginRight: 6, padding: '2px 8px', fontSize: 11, cursor: 'pointer',
+                    background: '#2a210a', border: '1px solid #7a5a2a', borderRadius: 4, color: '#ffd188',
+                  }}>
+                    Guardar auto
+                  </button>
+                )}
                 {minimapPos && (
                   <button onClick={() => { setMinimapPos(null); setDirty(true); }} style={{
                     marginTop: 8, padding: '2px 8px', fontSize: 11, cursor: 'pointer',
@@ -2372,8 +2541,8 @@ export default function MapEditor() {
               </div>
             ) : (
               <div style={{ color: '#555', fontSize: 11, lineHeight: 1.7 }}>
-                Click en un punto azul para ir a ese mapa.
-                <br />Puntos azules = mapas conocidos · Rojo = mapa actual.
+                Click cerca de un punto para ir a ese mapa. También puedes usar las flechas del teclado.
+                <br />Azul = posición guardada · Gris = fallback · Rojo = mapa actual.
               </div>
             )}
           </div>
@@ -2759,6 +2928,32 @@ export default function MapEditor() {
                   {sp.emoji}
                 </div>
               ) : null)}
+
+              {/* Future fly destination overlay (editor-only) */}
+              {flyable && flySpot && (
+                <div
+                  title={`flySpot futuro (${flySpot.x}, ${flySpot.y})`}
+                  style={{
+                    position: 'absolute',
+                    left: flySpot.x * zoom,
+                    top: flySpot.y * zoom,
+                    width: zoom,
+                    height: zoom,
+                    background: editMode === 'map' ? 'rgba(88, 183, 255, 0.5)' : 'rgba(88, 183, 255, 0.22)',
+                    border: editMode === 'map' ? '2px solid #58b7ff' : '1px dashed #58b7ff',
+                    pointerEvents: 'none',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: Math.max(10, zoom * 0.45),
+                    textShadow: '0 0 2px #000',
+                    zIndex: 8,
+                  }}
+                >
+                  ✈
+                </div>
+              )}
 
               {/* Mechanics overlay: spinners + stoppers */}
               {Object.entries(spinners).flatMap(([rowKey, cols]) => {
@@ -3180,6 +3375,10 @@ export default function MapEditor() {
                 setDark={(v) => { setDark(v); setDirty(true); }}
                 allowBicycle={allowBicycle}
                 setAllowBicycle={(v) => { setAllowBicycle(v); setDirty(true); }}
+                flyable={flyable}
+                setFlyable={(v) => { setFlyable(v); setDirty(true); }}
+                flySpot={flySpot}
+                setFlySpot={(v) => { setFlySpot(v); setDirty(true); }}
                 musicField={musicField}
                 setMusicField={(v) => { setMusicField(v); setDirty(true); }}
                 musicTracks={musicTracks}
@@ -3999,6 +4198,10 @@ function MapMetaInspector({
   setDark,
   allowBicycle,
   setAllowBicycle,
+  flyable,
+  setFlyable,
+  flySpot,
+  setFlySpot,
   musicField,
   setMusicField,
   musicTracks,
@@ -4015,6 +4218,10 @@ function MapMetaInspector({
   setDark: (v: boolean) => void;
   allowBicycle: boolean;
   setAllowBicycle: (v: boolean) => void;
+  flyable: boolean;
+  setFlyable: (v: boolean) => void;
+  flySpot: { x: number; y: number } | null;
+  setFlySpot: (v: { x: number; y: number } | null) => void;
   musicField: string | null;
   setMusicField: (v: string | null) => void;
   musicTracks: MusicTrack[];
@@ -4044,6 +4251,63 @@ function MapMetaInspector({
           <input type="checkbox" checked={dark} onChange={(e) => setDark(e.target.checked)} style={{ accentColor: '#ffcc44' }} />
           <span>dark (oscuro · requiere Destello)</span>
         </label>
+      </div>
+      <div style={{ ...sectionStyle, background: '#111a24', border: '1px solid #2d5674', borderRadius: 4, padding: 10 }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: flyable ? '#8fd3ff' : '#888' }}>
+          <input type="checkbox" checked={flyable} onChange={(e) => setFlyable(e.target.checked)} style={{ accentColor: '#58b7ff' }} />
+          <span>Disponible para Vuelo (futuro)</span>
+        </label>
+        <div style={{ color: '#789', fontSize: 11, marginTop: 6, lineHeight: 1.5 }}>
+          Editor-only. El juego deberá mostrar este destino solo si <code>visitedMaps.includes(mapId)</code>.
+          <br />Documentado en <code>docs/future-fly-map-editor.md</code>.
+          <br />Con este modo activo, click en el canvas fija el tile ✈.
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
+          <label style={{ color: '#888', fontSize: 10 }}>
+            Fly X
+            <input
+              type="number"
+              value={flySpot?.x ?? ''}
+              placeholder={startPos ? String(startPos.x) : '0'}
+              onChange={(e) => {
+                const x = parseInt(e.target.value, 10);
+                if (Number.isNaN(x)) setFlySpot(null);
+                else setFlySpot({ x, y: flySpot?.y ?? startPos?.y ?? 0 });
+              }}
+              style={{ ...inputStyle, fontSize: 11, padding: '2px 6px' }}
+            />
+          </label>
+          <label style={{ color: '#888', fontSize: 10 }}>
+            Fly Y
+            <input
+              type="number"
+              value={flySpot?.y ?? ''}
+              placeholder={startPos ? String(startPos.y) : '0'}
+              onChange={(e) => {
+                const y = parseInt(e.target.value, 10);
+                if (Number.isNaN(y)) setFlySpot(null);
+                else setFlySpot({ x: flySpot?.x ?? startPos?.x ?? 0, y });
+              }}
+              style={{ ...inputStyle, fontSize: 11, padding: '2px 6px' }}
+            />
+          </label>
+        </div>
+        <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+          <button
+            type="button"
+            onClick={() => setFlySpot(startPos ?? { x: 0, y: 0 })}
+            style={{ padding: '2px 8px', background: '#102638', border: '1px solid #2d6a94', color: '#9fdcff', borderRadius: 4, cursor: 'pointer', fontSize: 11 }}
+          >
+            Usar start
+          </button>
+          <button
+            type="button"
+            onClick={() => setFlySpot(null)}
+            style={{ padding: '2px 8px', background: '#261014', border: '1px solid #6a2a34', color: '#ff9aa8', borderRadius: 4, cursor: 'pointer', fontSize: 11 }}
+          >
+            Limpiar
+          </button>
+        </div>
       </div>
       <div style={sectionStyle}>
         <label style={labelStyle}>Música del mapa</label>
