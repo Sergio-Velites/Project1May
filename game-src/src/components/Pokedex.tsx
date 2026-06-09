@@ -1,7 +1,7 @@
 /**
  * Pokédex — estilo Gen I (Rojo/Azul)
  *
- * Pantalla 1: lista de los 151 (vistos / capturados / desconocido)
+ * Pantalla 1: lista de los 251 (vistos / capturados / desconocido)
  * Pantalla 2: ficha detallada — sprite, tipo, altura, descripción basada en tipo
  *
  * Navegación:
@@ -10,7 +10,7 @@
  *   B  → cerrar lista / volver desde ficha
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styled, { css } from "styled-components";
 import { useSelector } from "react-redux";
 import { selectSeenPokemon, selectCaughtPokemon } from "../state/gameSlice";
@@ -40,6 +40,8 @@ const TYPE_DESC: Record<string, string> = {
   rock:     "Pokémon de tipo ROCA. Su cuerpo es duro como la piedra.",
   ghost:    "Pokémon de tipo FANTASMA. Aterroriza a sus enemigos.",
   dragon:   "Pokémon de tipo DRAGÓN. Pokémon de élite difícil de capturar.",
+  dark:     "Pokémon de tipo SINIESTRO. Ataca con astucia desde las sombras.",
+  steel:    "Pokémon de tipo ACERO. Su cuerpo metálico resiste casi todo.",
 };
 
 const getDesc = (id: number, types: string[]): string => {
@@ -71,10 +73,18 @@ const TYPE_ES: Record<string, string> = {
   grass: "PLANTA",    ice: "HIELO",    fighting: "LUCHA", poison: "VENENO",
   ground: "TIERRA",   flying: "VOLAD.", psychic: "PSÍQUI.", bug: "BICHO",
   rock: "ROCA",       ghost: "FANTAS.", dragon: "DRAGÓN",
+  dark: "SINIE.",      steel: "ACERO",
 };
 
-const TOTAL = 151;
+const TOTAL = 251;
 const PAGE_SIZE = 7; // visible rows
+
+const normalizeSearch = (value: string): string =>
+  value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
 // ── Styled components ────────────────────────────────────────────────────────
 
@@ -143,6 +153,40 @@ const NavHint = styled.div`
   border-top: 1px solid #aaa;
   color: #555;
   flex-shrink: 0;
+`;
+
+const SearchBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-bottom: 2px solid #181010;
+  flex-shrink: 0;
+`;
+
+const SearchInput = styled.input`
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #181010;
+  font-family: "PokemonGB", monospace;
+  font-size: 0.85em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  caret-color: #181010;
+
+  &::placeholder {
+    color: #706860;
+    opacity: 1;
+  }
+`;
+
+const EmptyState = styled.div`
+  padding: 10px 4px;
+  font-size: 0.8em;
+  line-height: 1.6;
 `;
 
 // Detail screen
@@ -252,10 +296,35 @@ interface Props { onClose: () => void; }
 const Pokedex = ({ onClose }: Props) => {
   const seen   = useSelector(selectSeenPokemon);
   const caught = useSelector(selectCaughtPokemon);
+  const searchRef = useRef<HTMLInputElement>(null);
 
-  const [cursor, setCursor] = useState(0); // 0-based index into 1..151
+  const [cursor, setCursor] = useState(0); // 0-based index into filteredIds
   const [scroll, setScroll]  = useState(0);
   const [detail, setDetail]  = useState<number | null>(null);
+  const [query, setQuery] = useState("");
+
+  const filteredIds = useMemo(() => {
+    const normalized = normalizeSearch(query);
+    const ids = Array.from({ length: TOTAL }, (_, i) => i + 1);
+    if (!normalized) return ids;
+
+    return ids.filter((id) => {
+      const meta = getPokemonMetadata(id);
+      return (
+        String(id).includes(normalized) ||
+        String(id).padStart(3, "0").includes(normalized) ||
+        normalizeSearch(meta.name).includes(normalized)
+      );
+    });
+  }, [query]);
+
+  const listSize = filteredIds.length;
+  const maxScroll = Math.max(0, listSize - PAGE_SIZE);
+
+  useEffect(() => {
+    setCursor(0);
+    setScroll(0);
+  }, [query]);
 
   // Cargar overrides de descripciones desde el servidor (una sola vez por
   // sesión). El JSON base ya está bundleado; getFlavor() devuelve el
@@ -274,23 +343,33 @@ const Pokedex = ({ onClose }: Props) => {
 
   useEvent(Event.Down, useCallback(() => {
     if (detail !== null) return;
-    if (cursor === TOTAL - 1) return;
+    if (cursor >= listSize - 1) return;
     if (cursor - scroll === PAGE_SIZE - 1) {
-      setScroll((p) => Math.min(TOTAL - PAGE_SIZE, p + 1));
+      setScroll((p) => Math.min(maxScroll, p + 1));
     }
-    setCursor((p) => Math.min(TOTAL - 1, p + 1));
-  }, [detail, cursor, scroll]));
+    setCursor((p) => Math.min(listSize - 1, p + 1));
+  }, [detail, cursor, scroll, listSize, maxScroll]));
 
   useEvent(Event.A, useCallback(() => {
     if (detail !== null) return;
-    const id = cursor + 1;
+    const id = filteredIds[cursor];
     if (seen.includes(id)) setDetail(id);
-  }, [detail, cursor, seen]));
+  }, [detail, cursor, filteredIds, seen]));
 
   useEvent(Event.B, useCallback(() => {
     if (detail !== null) return;
+    if (query) {
+      setQuery("");
+      searchRef.current?.blur();
+      return;
+    }
     onClose();
-  }, [detail, onClose]));
+  }, [detail, onClose, query]));
+
+  useEvent(Event.Select, useCallback(() => {
+    if (detail !== null) return;
+    searchRef.current?.focus();
+  }, [detail]));
 
   if (detail !== null) {
     return <Detail id={detail} caught={caught.includes(detail)} onBack={() => setDetail(null)} />;
@@ -304,13 +383,45 @@ const Pokedex = ({ onClose }: Props) => {
     <Screen>
       <HeaderBar>
         <Txt $size={0.85}>POKéDEX</Txt>
-        <Txt $size={0.85}>V.{seenCount}  C.{caughtCount}</Txt>
+        <Txt $size={0.85}>V.{seenCount}/{TOTAL}  C.{caughtCount}</Txt>
       </HeaderBar>
 
+      <SearchBar>
+        <Txt $size={0.8}>BUSCAR</Txt>
+        <SearchInput
+          ref={searchRef}
+          value={query}
+          placeholder="NOMBRE / Nº"
+          maxLength={12}
+          autoCapitalize="characters"
+          autoCorrect="off"
+          spellCheck={false}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              setQuery("");
+              searchRef.current?.blur();
+            }
+            if (e.key === "Enter") {
+              e.preventDefault();
+              searchRef.current?.blur();
+            }
+          }}
+        />
+      </SearchBar>
+
       <ListArea>
-        {rows.map((idx) => {
-          const id = idx + 1;
-          if (id > TOTAL) return null;
+        {listSize === 0 && (
+          <EmptyState>
+            NO HAY DATOS.<br />
+            PRUEBA OTRO NOMBRE.
+          </EmptyState>
+        )}
+
+        {listSize > 0 && rows.map((idx) => {
+          const id = filteredIds[idx];
+          if (!id) return null;
           const isSeen   = seen.includes(id);
           const isCaught = caught.includes(id);
           const isActive = idx === cursor;
@@ -331,7 +442,7 @@ const Pokedex = ({ onClose }: Props) => {
       </ListArea>
 
       <HRule />
-      <NavHint>↑↓ navegar  A: ver  B: salir</NavHint>
+      <NavHint>↑↓ navegar  A: ver  B: {query ? "limpiar" : "salir"}  SELECT: buscar</NavHint>
     </Screen>
   );
 };

@@ -6,7 +6,15 @@ const KeyboardHandler = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    const isTextInput = (target: EventTarget | null): boolean => {
+      if (!(target instanceof HTMLElement)) return false;
+      const tag = target.tagName.toLowerCase();
+      return tag === "input" || tag === "textarea" || target.isContentEditable;
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isTextInput(e.target)) return;
+
       switch (e.key) {
         case "ArrowUp":
           emitter.emit(Event.Up);
@@ -46,6 +54,8 @@ const KeyboardHandler = () => {
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      if (isTextInput(e.target)) return;
+
       switch (e.key) {
         case "ArrowUp":
           emitter.emit(Event.StopUp);
