@@ -170,11 +170,22 @@ export default function PlayerEditModal({ userId, playerName, onClose, onSaved }
         .edit-pokemon-sub { font-size: 0.68rem; color: #999; margin-bottom: 3px; }
         .edit-level-row { display: flex; align-items: center; gap: 0.4rem; }
         .edit-level-label { font-size: 0.72rem; color: #666; font-weight: 600; }
-        .edit-level-input {
-          width: 60px; border: 1.5px solid #e5e7eb; border-radius: 6px;
-          padding: 3px 8px; font-size: 0.88rem; font-weight: 700; outline: none;
+        .edit-stepper {
+          display: flex; align-items: center;
+          border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden;
         }
-        .edit-level-input:focus { border-color: #1a3a2a; }
+        .edit-step-btn {
+          background: #f3f4f6; border: none; padding: 7px 13px;
+          font-size: 0.9rem; cursor: pointer; color: #444; line-height: 1;
+          touch-action: manipulation; user-select: none; transition: background 0.1s;
+        }
+        .edit-step-btn:active { background: #d1fae5; color: #1a3a2a; }
+        .edit-step-val {
+          min-width: 40px; text-align: center;
+          font-size: 0.92rem; font-weight: 700; color: #1a1a1a;
+          padding: 0 6px; border-left: 1.5px solid #e5e7eb;
+          border-right: 1.5px solid #e5e7eb;
+        }
         .edit-remove-btn {
           background: #fee2e2; border: none; border-radius: 8px;
           padding: 5px 10px; color: #b91c1c; font-weight: 700;
@@ -286,14 +297,21 @@ export default function PlayerEditModal({ userId, playerName, onClose, onSaved }
                           </div>
                           <div className="edit-level-row">
                             <span className="edit-level-label">Nv.</span>
-                            <input
-                              className="edit-level-input"
-                              type="number"
-                              min={1}
-                              max={100}
-                              value={p.level}
-                              onChange={(e) => updateLevel(idx, e.target.value)}
-                            />
+                            <div className="edit-stepper">
+                              <button
+                                className="edit-step-btn"
+                                onClick={() => updateLevel(idx, String(p.level - 1))}
+                                disabled={p.level <= 1}
+                                aria-label="Bajar nivel"
+                              >▼</button>
+                              <span className="edit-step-val">{p.level}</span>
+                              <button
+                                className="edit-step-btn"
+                                onClick={() => updateLevel(idx, String(p.level + 1))}
+                                disabled={p.level >= 100}
+                                aria-label="Subir nivel"
+                              >▲</button>
+                            </div>
                           </div>
                         </div>
                         <button
