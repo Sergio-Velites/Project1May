@@ -75,14 +75,14 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange | StatChange[]> = {
   "kinesis":       { stat: "accuracy", target: "defender", delta: -1 },
 
   // Lower enemy speed
-  "string-shot":   { stat: "speed",   target: "defender", delta: -2 },
+  "string-shot":   { stat: "speed",   target: "defender", delta: -1 },
   // disable: en Gen I bloquea 1 movimiento aleatorio; gestionado en PokemonEncounter
 
   // Raise own attack
   "sharpen":       { stat: "attack",  target: "attacker", delta: +1 },
   "meditate":      { stat: "attack",  target: "attacker", delta: +1 },
   "swords-dance":  { stat: "attack",  target: "attacker", delta: +2 },
-  // focus-energy: bug Gen I — reduce crits a ÷4 en lugar de ×4; implementado como no-op
+  // focus-energy: se maneja aparte para aplicar +1 crit ratio (Gen II)
 
   // Raise own defense
   "harden":        { stat: "defense", target: "attacker", delta: +1 },
@@ -91,9 +91,9 @@ const STATUS_MOVE_EFFECTS: Record<string, StatChange | StatChange[]> = {
   "acid-armor":    { stat: "defense", target: "attacker", delta: +2 },
   "barrier":       { stat: "defense", target: "attacker", delta: +2 },
 
-  // Raise own evasion (Gen I correcto)
+  // Raise own evasion (Gen II: Minimize sube +1)
   "double-team":   { stat: "evasion", target: "attacker", delta: +1 },
-  "minimize":      { stat: "evasion", target: "attacker", delta: +2 },
+  "minimize":      { stat: "evasion", target: "attacker", delta: +1 },
 
   // Raise own speed
   "agility":       { stat: "speed",   target: "attacker", delta: +2 },
@@ -265,7 +265,7 @@ const HEAL_FRACTION: Record<string, number> = {
 
 /** Movimientos sin efecto visible en combate */
 const NO_EFFECT_MOVES = new Set([
-  "splash", "teleport", "focus-energy",
+  "splash",
   // Gen II — mecánicas no implementadas (caen a sin-efecto limpiamente)
   "nightmare", "attract", "encore", "destiny-bond", "future-sight",
   "rollout", "fury-cutter", "magnitude", "belly-drum", "endure",
@@ -373,6 +373,8 @@ export interface MoveContext {
   attackerBaseSpeed?: number;
   /** El defensor usó Protect/Detect este turno — el ataque falla automáticamente */
   defenderIsProtected?: boolean;
+  /** Focus Energy activo en el atacante (Gen II: +1 crit ratio) */
+  attackerHasFocusEnergy?: boolean;
 }
 
 export interface MoveResult {
@@ -413,6 +415,7 @@ export interface MoveResult {
   isSwagger?: boolean;        // Swagger — +2 atk al rival + confusión
   isRapidSpin?: boolean;      // Rapid Spin — limpia trampas del usuario
   isPainSplit?: boolean;      // Pain Split — HP promediados (muestra mensaje)
+  isFocusEnergy?: boolean;    // Focus Energy — +1 crit ratio en el usuario
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -560,7 +563,17 @@ const processMove = (
     const dmg = Math.max(1, Math.floor(us.hp / 2));
     return { ...defaultReturn, us: { ...usAfterPP, hp: Math.max(0, us.hp - dmg) } };
   }
-  // ── Sin efecto (Splash, Teleport) ──────────────────────────────────────
+  // ── Focus Energy (Gen II): +1 crit ratio ───────────────────────────────
+  if (move === "focus-energy") {
+    return { ...defaultReturn, isBuff: true, isFocusEnergy: true };
+  }
+
+  // ── Teleport: huida en salvajes, sin efecto vs entrenadores ─────────────
+  if (move === "teleport") {
+    return { ...defaultReturn, forceFlee: true };
+  }
+
+  // ── Sin efecto (Splash y no implementados) ──────────────────────────────
   if (NO_EFFECT_MOVES.has(move)) {
     return { ...defaultReturn, isNoEffect: true };
   }
@@ -783,9 +796,9 @@ const processMove = (
     ? ourMetadata.baseStats.speed
     : theirMetadata.baseStats.speed;
   const highCrit = moveMetadata.meta?.critRate === 1;
-  const critThreshold = highCrit
-    ? Math.min(255, Math.floor((attackerBaseSpeed * 8) / 2))
-    : Math.floor(attackerBaseSpeed / 2);
+  const critStage = (highCrit ? 1 : 0) + (context?.attackerHasFocusEnergy ? 1 : 0);
+  const critMultiplierByStage = critStage >= 2 ? 32 : critStage === 1 ? 8 : 1;
+  const critThreshold = Math.min(255, Math.floor((attackerBaseSpeed * critMultiplierByStage) / 2));
   const isCrit = Math.floor(Math.random() * 256) < critThreshold;
   const critMult = isCrit ? CRITICAL_HIT_MULTIPLIER : 1;
 
@@ -807,7 +820,11 @@ const processMove = (
     // Player attacking enemy
     // If critical hit, ignore stat stages (Gen I behaviour)
     const rawAtk = isPhysical ? ourStats.attack    : ourStats.special;
-    const rawDef = isPhysical ? theirStats.defense : theirStats.special;
+    const baseRawDef = isPhysical ? theirStats.defense : theirStats.special;
+    const rawDef =
+      isPhysical && (move === "self-destruct" || move === "explosion")
+        ? Math.max(1, Math.floor(baseRawDef / 2))
+        : baseRawDef;
     const atkStage  = isCrit ? 0 : (isPhysical ? myStages.attack    : myStages.special);
     const defStage  = isCrit ? 0 : (isPhysical ? theirStages.defense : theirStages.special);
     const attack  = rawAtk * getStageMult(atkStage) * burnPenalty;
@@ -930,7 +947,11 @@ const processMove = (
 
   // Enemy attacking player
   const eRawAtk = isPhysical ? theirStats.attack    : theirStats.special;
-  const eRawDef = isPhysical ? ourStats.defense     : ourStats.special;
+  const eBaseRawDef = isPhysical ? ourStats.defense : ourStats.special;
+  const eRawDef =
+    isPhysical && (move === "self-destruct" || move === "explosion")
+      ? Math.max(1, Math.floor(eBaseRawDef / 2))
+      : eBaseRawDef;
   const eAtkStage  = isCrit ? 0 : (isPhysical ? theirStages.attack    : theirStages.special);
   const eDefStage  = isCrit ? 0 : (isPhysical ? myStages.defense      : myStages.special);
   const eAttack  = eRawAtk * getStageMult(eAtkStage) * burnPenalty;

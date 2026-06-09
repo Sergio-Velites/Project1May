@@ -584,7 +584,7 @@ const moveMetadata: Record<string, MoveMetadata> = {
   },
   bind: {
     id: "bind",
-    accuracy: 85,
+    accuracy: 75,
     damageClass: "physical",
     effect:
       "Prevents the target from fleeing and inflicts damage for 2-5 turns.",

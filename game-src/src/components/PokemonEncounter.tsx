@@ -804,6 +804,9 @@ const PokemonEncounter = () => {
   // ── F11 — Rage: bloquea al usuario en Rage tras T1 ────────────────────
   const playerRageActiveRef = useRef(false);
   const enemyRageActiveRef  = useRef(false);
+  // ── Gen II — Focus Energy (+1 crit ratio) ──────────────────────────────
+  const playerFocusEnergyRef = useRef(false);
+  const enemyFocusEnergyRef  = useRef(false);
 
   // ── F12 — Substitute: HP del sustituto (null = sin sustituto) ─────────
   const playerSubHpRef  = useRef<number | null>(null);
@@ -917,6 +920,7 @@ const PokemonEncounter = () => {
       // movimiento hasta debilitarse) se quedaba activo y forzaba al SIGUIENTE
       // Pokémon del rival a usar ese mismo movimiento durante todo el combate.
       enemyRageActiveRef.current       = false;
+      enemyFocusEnergyRef.current      = false;
       enemyConfusionTurnsRef.current   = 0;
       enemySelfKoRef.current           = false;
       enemyChargingMoveRef.current     = null;
@@ -1095,6 +1099,8 @@ const PokemonEncounter = () => {
       playerPayDayCoinsRef.current = 0;
       playerRageActiveRef.current = false;
       enemyRageActiveRef.current  = false;
+      playerFocusEnergyRef.current = false;
+      enemyFocusEnergyRef.current  = false;
       playerSubHpRef.current = null;
       enemySubHpRef.current  = null;
       setPlayerSubVisible(false);
@@ -2011,6 +2017,7 @@ const PokemonEncounter = () => {
     playerTrappedTurnsRef.current = 0;
     // F11 — Rage
     playerRageActiveRef.current = false;
+    playerFocusEnergyRef.current = false;
     // F12 — Substitute
     playerSubHpRef.current = null;
     setPlayerSubVisible(false);
@@ -2079,6 +2086,7 @@ const PokemonEncounter = () => {
     defenderHasSubstitute: playerSubHpRef.current != null,
     defenderSubHp: playerSubHpRef.current ?? 0,
     defenderIsProtected: playerProtectRef.current,
+    attackerHasFocusEnergy: enemyFocusEnergyRef.current,
   });
   const buildPlayerAttackCtx = (): MoveContext => ({
     lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2091,6 +2099,7 @@ const PokemonEncounter = () => {
     defenderHasSubstitute: enemySubHpRef.current != null,
     defenderSubHp: enemySubHpRef.current ?? 0,
     defenderIsProtected: enemyProtectRef.current,
+    attackerHasFocusEnergy: playerFocusEnergyRef.current,
   });
 
   const getActiveMovesFirst = (
@@ -2267,6 +2276,7 @@ const PokemonEncounter = () => {
       isSwagger,
       isRapidSpin,
       isPainSplit,
+      isFocusEnergy,
     } = result;
     if (isAttacking) {
       if (moveId) {
@@ -2381,11 +2391,15 @@ const PokemonEncounter = () => {
           enemyConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 4);
         }
 
-        // ── F7 — Roar/Whirlwind: vs salvaje termina el combate ─────────
+        // ── F7 — Roar/Whirlwind/Teleport vs salvaje ─────────────────────
         if (forceFlee && !isTrainer) {
-          setAlertText(`¡${enemyMetadata.name.toUpperCase()} salvaje huyó!`);
-          setStage(17);
-          setTimeout(() => endEncounter_(true), 1500);
+          if (moveId === "teleport") {
+            setStage(12);
+          } else {
+            setAlertText(`¡${enemyMetadata.name.toUpperCase()} salvaje huyó!`);
+            setStage(17);
+            setTimeout(() => endEncounter_(), 1500);
+          }
           return { us, them };
         }
 
@@ -2463,6 +2477,10 @@ const PokemonEncounter = () => {
         } else if (isProtect) {
           playerProtectRef.current = true;
           setAlertText(`¡${activeMetadata.name.toUpperCase()} se protegió!`);
+          setStage(17);
+        } else if (isFocusEnergy) {
+          playerFocusEnergyRef.current = true;
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} se concentró!`);
           setStage(17);
         } else if (isSwagger) {
           // Aplica +2 atk al rival (defender) y lo confunde (ref ya asignado arriba)
@@ -2608,12 +2626,15 @@ const PokemonEncounter = () => {
           playerConfusionTurnsRef.current = 2 + Math.floor(Math.random() * 4);
         }
 
-        // ── F7 — Roar/Whirlwind del rival vs salvaje: termina combate ───
+        // ── F7 — Roar/Whirlwind/Teleport del rival vs salvaje ───────────
         if (forceFlee && !isTrainer) {
-          // Vs salvaje: termina (pero el rival es el que huye, raro)
-          setAlertText(`¡El combate termina!`);
+          if (moveId === "teleport") {
+            setAlertText(`¡${enemyMetadata.name.toUpperCase()} salvaje huyó!`);
+          } else {
+            setAlertText(`¡El combate termina!`);
+          }
           setStage(19);
-          setTimeout(() => endEncounter_(true), 1500);
+          setTimeout(() => endEncounter_(), 1500);
           return { us, them };
         }
 
@@ -2683,6 +2704,10 @@ const PokemonEncounter = () => {
         } else if (isProtect) {
           enemyProtectRef.current = true;
           setAlertText(`¡${enemyMetadata.name.toUpperCase()} se protegió!`);
+          setStage(19);
+        } else if (isFocusEnergy) {
+          enemyFocusEnergyRef.current = true;
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} se concentró!`);
           setStage(19);
         } else if (isSwagger) {
           // Aplica +2 atk al jugador (defender cuando es el rival quien ataca) y confunde
