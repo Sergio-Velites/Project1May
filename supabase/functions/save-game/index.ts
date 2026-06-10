@@ -99,6 +99,28 @@ Deno.serve(async (req) => {
 
     validateGameState(gameState as Record<string, unknown>);
 
+    // ─── Defensa de integridad del rsvp ──────────────────────────────────────
+    // El rsvp es de solo-escritura en el juego: se fija una vez en OakIntro y
+    // nunca se borra desde la partida. load-game lo redacta para lecturas que
+    // no prueban posesión, así que un cliente con bundle CACHEADO (service
+    // worker antiguo) podría cargar un estado sin rsvp y blanquearlo al volver
+    // a guardar. Para que el despliegue sea inmune al orden Vercel/Supabase y
+    // al cacheo, si llega un gameState SIN rsvp pero ya había uno guardado, lo
+    // conservamos. Solo se hace la lectura extra en ese caso (poco común).
+    const gs = gameState as Record<string, unknown>;
+    const incomingRsvp = gs.rsvp;
+    if (!incomingRsvp || typeof incomingRsvp !== "object") {
+      const { data: prev } = await db
+        .from("saves")
+        .select("game_state")
+        .eq("user_id", userId)
+        .maybeSingle();
+      const prevRsvp = (prev?.game_state as Record<string, unknown> | null)?.rsvp;
+      if (prevRsvp && typeof prevRsvp === "object") {
+        gs.rsvp = prevRsvp;
+      }
+    }
+
     const { data: returnedToken, error } = await db.rpc("upsert_save", {
       p_user_id:     userId,
       p_game_state:  gameState,
