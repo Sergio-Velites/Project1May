@@ -44,6 +44,7 @@ import MapGiftModal from "./MapGiftModal";
 import TextRewardModal from "./TextRewardModal";
 import StaticPokemonNpc from "./StaticPokemonNpc";
 import CuttableTree from "./CuttableTree";
+import BerryTree from "./BerryTree";
 import Boulder from "./Boulder";
 import DarknessOverlay from "./DarknessOverlay";
 import SurfHandler from "./SurfHandler";
@@ -147,6 +148,7 @@ const Game = () => {
           <AcademyPokeball />
           <MapGift />
           <CuttableTree />
+          <BerryTree />
           <Boulder />
           <StaticPokemonNpc />
           <DebugOverlay />

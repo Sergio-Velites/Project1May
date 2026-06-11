@@ -27,6 +27,7 @@ import {
 import { PokemonEncounterData } from "../maps/map-types";
 import { PokemonEncounterType } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
+import { getTimeSegment, matchesTimeSegment } from "../app/time-helper";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import Frame from "./Frame";
@@ -36,9 +37,14 @@ const randBetween = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1) + min);
 
 const pickFromTable = (
-  options: PokemonEncounterData[]
+  allOptions: PokemonEncounterData[]
 ): PokemonEncounterType | null => {
-  if (!options || options.length === 0) return null;
+  if (!allOptions || allOptions.length === 0) return null;
+  // Franja horaria (Gen II): mismas reglas que EncounterHandler — una entrada
+  // sin `timesOfDay` está disponible las 24 h.
+  const seg = getTimeSegment();
+  const options = allOptions.filter((p) => matchesTimeSegment(p.timesOfDay, seg));
+  if (options.length === 0) return null;
   const total = options.reduce((acc, cur) => acc + cur.chance, 0);
   let r = Math.random() * total;
   for (const opt of options) {

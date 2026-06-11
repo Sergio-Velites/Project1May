@@ -137,6 +137,10 @@ export interface GameState {
   /** Contador de pasos para la ganancia de amistad al caminar (Gen II). Cada
    *  STEPS_PER_FRIENDSHIP pasos, el equipo gana amistad. Persistido. */
   friendshipStepCounter?: number;
+  /** Árboles de bayas recogidos (Gen II): clave "<mapId>-<x>-<y>" → fecha
+   *  local de la última recogida. El árbol rebrota al cambiar de día
+   *  (medianoche, hora del dispositivo). Persistido en el save. */
+  berryTreesPicked?: Record<string, string>;
 }
 
 export interface RSVPData {
