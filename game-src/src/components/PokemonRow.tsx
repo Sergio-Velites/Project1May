@@ -26,6 +26,7 @@ import ballA from "../assets/pokemon/simple/ball-a.png";
 import ballB from "../assets/pokemon/simple/ball-b.png";
 import usePokemonStats from "../app/use-pokemon-stats";
 import { PokemonInstance } from "../state/state-types";
+import { genderSymbol } from "../app/gender-helper";
 import { MoveMetadata } from "../app/move-metadata";
 import PixelImage from "../styles/PixelImage";
 
@@ -119,6 +120,13 @@ const Name = styled.div`
   text-transform: uppercase;
 `;
 
+// El glifo ♂/♀ no existe en la fuente PokemonGB: el fallback per-glyph del
+// navegador lo toma de sans-serif sin afectar al resto del nombre.
+const GenderSymbol = styled.span`
+  font-family: "PokemonGB", sans-serif;
+  margin-left: 0.5cqw;
+`;
+
 const HealthBarContainer = styled.div`
   margin-left: 2.7cqw;
 `;
@@ -191,7 +199,12 @@ const PokemonRow = ({ pokemon, active, swapMarked, moveData }: Props) => {
       <Image src={icons.a} />
 
       <InfoContainer>
-        <Name>{metadata.name}</Name>
+        <Name>
+          {metadata.name}
+          {pokemon.gender && (
+            <GenderSymbol>{genderSymbol(pokemon.gender)}</GenderSymbol>
+          )}
+        </Name>
         <HealthBarContainer>
           <HealthBar maxHealth={stats.hp} currentHealth={pokemon.hp} />
         </HealthBarContainer>

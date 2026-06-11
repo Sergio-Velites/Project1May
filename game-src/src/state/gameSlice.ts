@@ -9,6 +9,7 @@ import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
 import { boulderIdAt, canWalk, isCuttableTree, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
 import { BASE_FRIENDSHIP, STEPS_PER_FRIENDSHIP, friendshipOnWalk, getFriendship } from "../app/evolution-helper";
+import { rollGender } from "../app/gender-helper";
 import {
   Direction,
   GameState,
@@ -468,6 +469,11 @@ export const gameSlice = createSlice({
       state.lastHealLocation = s.lastHealLocation ?? undefined;
       // Guardar al máximo 6 pokémon en equipo (integridad del save)
       if (state.pokemon.length > 6) state.pokemon = state.pokemon.slice(0, 6);
+      // Migración Gen II: los saves anteriores al sistema de género no traen
+      // el campo → se sortea aquí una vez y queda persistido al guardar.
+      for (const p of [...state.pokemon, ...state.pc]) {
+        if (p.gender === undefined) p.gender = rollGender(p.id);
+      }
       recordVisit(state, s.map);
       if (s.rsvp) state.rsvp = s.rsvp;
     },
@@ -504,6 +510,15 @@ export const gameSlice = createSlice({
       action: PayloadAction<{ index: number; pokemon: PokemonInstance }>
     ) => {
       state.pokemon[action.payload.index] = action.payload.pokemon;
+    },
+    /** Equipa o retira (item: null) el objeto de un Pokémon del equipo (Gen II). */
+    setHeldItem: (
+      state,
+      action: PayloadAction<{ index: number; item: ItemType | null }>
+    ) => {
+      const p = state.pokemon[action.payload.index];
+      if (!p) return;
+      p.heldItem = action.payload.item;
     },
     /**
      * Intercambia dos movimientos del pokémon activo (estilo Select de Gen I).
@@ -621,6 +636,10 @@ export const gameSlice = createSlice({
       if (action.payload.friendship === undefined) {
         action.payload.friendship = BASE_FRIENDSHIP;
       }
+      // Género (Gen II): se sortea una única vez al obtener el Pokémon.
+      if (action.payload.gender === undefined) {
+        action.payload.gender = rollGender(id);
+      }
       if (!state.seenPokemon.includes(id)) state.seenPokemon.push(id);
       if (!state.caughtPokemon.includes(id)) state.caughtPokemon.push(id);
       if (state.pokemon.length === 6) {
@@ -735,6 +754,7 @@ export const {
   updatePokemonEncounter,
   updatePokemon,
   updateSpecificPokemon,
+  setHeldItem,
   swapMoves,
   setPokemonStatus,
   recoverFromFainting,

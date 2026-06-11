@@ -1,4 +1,6 @@
 import { BattleStatus, PokemonEncounterType } from "../state/state-types";
+import { GEN2_SPECIES_DATA } from "./gen2-species-data";
+import { Gender, areOppositeGenders } from "./gender-helper";
 import { ItemType } from "./use-item-data";
 import { getPokemonMetadata } from "./use-pokemon-metadata";
 import { getPokemonStats } from "./use-pokemon-stats";
@@ -34,6 +36,83 @@ const ballParams: Partial<Record<ItemType, BallParams>> = {
   [ItemType.PokeBall]: { max: 255, div: 12 },
   [ItemType.GreatBall]: { max: 200, div: 8 },
   [ItemType.UltraBall]: { max: 150, div: 12 },
+  // Balls de Kurt (Gen II): chasis de Poké Ball normal. Su ventaja se aplica
+  // como modificador sobre el catch rate base (ver kurtBallCatchRate).
+  [ItemType.FastBall]: { max: 255, div: 12 },
+  [ItemType.FriendBall]: { max: 255, div: 12 },
+  [ItemType.HeavyBall]: { max: 255, div: 12 },
+  [ItemType.LevelBall]: { max: 255, div: 12 },
+  [ItemType.LoveBall]: { max: 255, div: 12 },
+  [ItemType.LureBall]: { max: 255, div: 12 },
+  [ItemType.MoonBall]: { max: 255, div: 12 },
+};
+
+/** Contexto adicional para los modificadores de las balls de Kurt. */
+export interface CatchContext {
+  /** Nivel del Pokémon activo del jugador (Nivel Ball). */
+  playerLevel?: number;
+  /** Especie del Pokémon activo del jugador (Amor Ball). */
+  activeSpeciesId?: number;
+  /** Género del Pokémon activo del jugador (Amor Ball). */
+  activeGender?: Gender;
+  /** ¿El encuentro empezó pescando? (Cebo Ball). */
+  fromFishing?: boolean;
+}
+
+/** Especies que evolucionan con Piedra Lunar (Luna Ball ×4). */
+const MOON_STONE_EVOLVERS = new Set([30, 33, 35, 39]);
+
+// Modificadores de las balls de Kurt sobre el catch rate base, con el
+// comportamiento PREVISTO en Gen II (el original tenía varias balls rotas:
+// la Luna Ball comprobaba BURN_HEAL, la Amor Ball comparaba el género
+// equivocado y la Veloz Ball solo cubría 3 especies — aquí van corregidas).
+const kurtBallCatchRate = (
+  ball: ItemType,
+  pokemon: PokemonEncounterType,
+  baseCatchRate: number,
+  ctx?: CatchContext
+): number => {
+  const clamp = (rate: number) => Math.max(1, Math.min(255, Math.floor(rate)));
+  switch (ball) {
+    case ItemType.FastBall:
+      // Pensada para Pokémon huidizos; criterio corregido: velocidad base ≥ 100
+      return getPokemonMetadata(pokemon.id).baseStats.speed >= 100
+        ? clamp(baseCatchRate * 4)
+        : baseCatchRate;
+    case ItemType.LevelBall: {
+      const lv = ctx?.playerLevel ?? 0;
+      if (lv >= pokemon.level * 4) return clamp(baseCatchRate * 8);
+      if (lv >= pokemon.level * 2) return clamp(baseCatchRate * 4);
+      if (lv > pokemon.level) return clamp(baseCatchRate * 2);
+      return baseCatchRate;
+    }
+    case ItemType.LoveBall: {
+      // Misma especie y géneros opuestos → ×8
+      const wildGender = pokemon.gender;
+      return ctx?.activeSpeciesId === pokemon.id &&
+        areOppositeGenders(ctx?.activeGender, wildGender)
+        ? clamp(baseCatchRate * 8)
+        : baseCatchRate;
+    }
+    case ItemType.LureBall:
+      return ctx?.fromFishing ? clamp(baseCatchRate * 3) : baseCatchRate;
+    case ItemType.MoonBall:
+      return MOON_STONE_EVOLVERS.has(pokemon.id)
+        ? clamp(baseCatchRate * 4)
+        : baseCatchRate;
+    case ItemType.HeavyBall: {
+      // Modificador aditivo por peso (hectogramos): ≥409.6kg +40 · ≥307.2kg +30
+      // · ≥204.8kg +20 · más ligero −20 (tabla de Gen II)
+      const weight = GEN2_SPECIES_DATA[pokemon.id]?.weight ?? 0;
+      const delta =
+        weight >= 4096 ? 40 : weight >= 3072 ? 30 : weight >= 2048 ? 20 : -20;
+      return clamp(baseCatchRate + delta);
+    }
+    // FriendBall: captura como una Poké Ball; su efecto (amistad 200) se
+    // aplica tras la captura en PokemonEncounter.
+    default:
+      return baseCatchRate;
+  }
 };
 
 const statusBonusFor = (status: BattleStatus | null | undefined): number => {
@@ -49,14 +128,20 @@ const randInt = (n: number): number => Math.floor(Math.random() * (n + 1));
 const catchesPokemon = (
   pokemon: PokemonEncounterType,
   pokeball: ItemType,
-  enemyStatus: BattleStatus | null | undefined = null
+  enemyStatus: BattleStatus | null | undefined = null,
+  ctx?: CatchContext
 ): boolean => {
   if (pokeball === ItemType.MasterBall) return true;
 
   const params = ballParams[pokeball];
   if (!params) return false;
 
-  const baseCatchRate = getPokemonMetadata(pokemon.id).baseCatchRate;
+  const baseCatchRate = kurtBallCatchRate(
+    pokeball,
+    pokemon,
+    getPokemonMetadata(pokemon.id).baseCatchRate,
+    ctx
+  );
   const statusBonus = statusBonusFor(enemyStatus);
 
   // Paso 4: N en [0, ballMax]

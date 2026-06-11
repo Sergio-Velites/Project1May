@@ -1,7 +1,17 @@
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
 import { CRITICAL_HIT_MULTIPLIER, CRITICAL_HIT_PERCENTAGE } from "./constants";
+import {
+  BRIGHTPOWDER_ACC_DROP,
+  FOCUS_BAND_CHANCE,
+  KINGS_ROCK_CHANCE,
+  getCritItemBonus,
+  getSpeciesAttackMult,
+  getSpeciesDefenseMult,
+  getTypeBoostMult,
+} from "./held-item-helper";
 import moveMetadataAll from "./move-metadata";
 import getTypeEffectiveness from "./type-effectiveness";
+import { ItemType } from "./use-item-data";
 import { getMoveMetadata } from "./use-move-metadata";
 import { getPokemonMetadata } from "./use-pokemon-metadata";
 import { getPokemonStats } from "./use-pokemon-stats";
@@ -375,6 +385,12 @@ export interface MoveContext {
   defenderIsProtected?: boolean;
   /** Focus Energy activo en el atacante (Gen II: +1 crit ratio) */
   attackerHasFocusEnergy?: boolean;
+  /** Objeto equipado del atacante (Gen II) — potenciadores de tipo ×1.1,
+   *  objetos de especie, Periscopio, Roca del Rey. */
+  attackerHeldItem?: ItemType | null;
+  /** Objeto equipado del defensor (Gen II) — Polvo Brillo, Cinta Focus,
+   *  Polvo Metálico. En este juego solo el equipo del jugador lleva objetos. */
+  defenderHeldItem?: ItemType | null;
 }
 
 export interface MoveResult {
@@ -416,6 +432,7 @@ export interface MoveResult {
   isRapidSpin?: boolean;      // Rapid Spin — limpia trampas del usuario
   isPainSplit?: boolean;      // Pain Split — HP promediados (muestra mensaje)
   isFocusEnergy?: boolean;    // Focus Energy — +1 crit ratio en el usuario
+  focusBandSaved?: boolean;   // Cinta Focus — el defensor sobrevivió con 1 PS
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -476,7 +493,12 @@ const processMove = (
     // El atacante usa su accuracy stage; el defensor su evasion stage
     const attAccStage  = isAttacking ? myStages.accuracy  : theirStages.accuracy;
     const defEvaStage  = isAttacking ? theirStages.evasion : myStages.evasion;
-    const effectiveAcc = moveMetadata.accuracy * getStageMult(attAccStage) / getStageMult(defEvaStage);
+    // Polvo Brillo del defensor: −20/256 puntos de precisión (Gen II)
+    const brightPowderDrop =
+      context?.defenderHeldItem === ItemType.BrightPowder ? BRIGHTPOWDER_ACC_DROP : 0;
+    const effectiveAcc =
+      moveMetadata.accuracy * getStageMult(attAccStage) / getStageMult(defEvaStage) -
+      brightPowderDrop;
     if (effectiveAcc < Math.random() * 100) {
       // F5 — Jump Kick / High Jump Kick: 1 HP de daño al fallar (Gen I RBY)
       if (move === "jump-kick" || move === "high-jump-kick") {
@@ -795,8 +817,13 @@ const processMove = (
   const attackerBaseSpeed = isAttacking
     ? ourMetadata.baseStats.speed
     : theirMetadata.baseStats.speed;
+  const attackerSpeciesId = isAttacking ? us.id : them.id;
+  const defenderSpeciesId = isAttacking ? them.id : us.id;
   const highCrit = moveMetadata.meta?.critRate === 1;
-  const critStage = (highCrit ? 1 : 0) + (context?.attackerHasFocusEnergy ? 1 : 0);
+  const critStage =
+    (highCrit ? 1 : 0) +
+    (context?.attackerHasFocusEnergy ? 1 : 0) +
+    getCritItemBonus(context?.attackerHeldItem, attackerSpeciesId);
   const critMultiplierByStage = critStage >= 2 ? 32 : critStage === 1 ? 8 : 1;
   const critThreshold = Math.min(255, Math.floor((attackerBaseSpeed * critMultiplierByStage) / 2));
   const isCrit = Math.floor(Math.random() * 256) < critThreshold;
@@ -815,6 +842,23 @@ const processMove = (
       : 1;
   // F10 Conversion — STAB usa los tipos override del atacante
   const attackerTypes = context?.attackerOverrideTypes ?? null;
+  // Objetos equipados (Gen II): potenciador de tipo ×1.1 + objetos de especie
+  // (Bola Luminosa, Hueso Grueso) en ataque; Polvo Metálico en defensa.
+  const itemAtkMult =
+    getTypeBoostMult(context?.attackerHeldItem, moveMetadata.type) *
+    getSpeciesAttackMult(context?.attackerHeldItem, attackerSpeciesId, isPhysical);
+  const itemDefMult = getSpeciesDefenseMult(context?.defenderHeldItem, defenderSpeciesId);
+  // Roca del Rey: 30/256 de flinch en moves de daño sin flinch propio (Gen II)
+  const kingsRockFlinch = (inherentFlinch: number): boolean =>
+    inherentFlinch === 0 &&
+    context?.attackerHeldItem === ItemType.KingsRock &&
+    Math.random() < KINGS_ROCK_CHANCE;
+  // Cinta Focus: 30/256 de sobrevivir un golpe letal con 1 PS (Gen II)
+  const focusBandSaves = (prevHp: number, newHp: number): boolean =>
+    newHp <= 0 &&
+    prevHp > 0 &&
+    context?.defenderHeldItem === ItemType.FocusBand &&
+    Math.random() < FOCUS_BAND_CHANCE;
 
   if (isAttacking) {
     // Player attacking enemy
@@ -827,8 +871,8 @@ const processMove = (
         : baseRawDef;
     const atkStage  = isCrit ? 0 : (isPhysical ? myStages.attack    : myStages.special);
     const defStage  = isCrit ? 0 : (isPhysical ? theirStages.defense : theirStages.special);
-    const attack  = rawAtk * getStageMult(atkStage) * burnPenalty;
-    const defense = rawDef * getStageMult(defStage) * screenMult;
+    const attack  = rawAtk * getStageMult(atkStage) * burnPenalty * itemAtkMult;
+    const defense = rawDef * getStageMult(defStage) * screenMult * itemDefMult;
 
     const stabTypes      = attackerTypes ?? ourMetadata.types;
     const stab           = stabTypes.includes(moveMetadata.type) ? 1.5 : 1;
@@ -909,9 +953,11 @@ const processMove = (
       drainHpDelta = (drainHpDelta ?? 0) + recoil;
     }
 
-    // Flinch: el objetivo no puede actuar este turno
+    // Flinch: el objetivo no puede actuar este turno (propio o Roca del Rey)
     const flinchChance = (moveMetadata.meta?.flinchChance ?? 0) / 100;
-    const flinch = !subActive && flinchChance > 0 && Math.random() < flinchChance ? true : undefined;
+    const flinch = !subActive &&
+      ((flinchChance > 0 && Math.random() < flinchChance) || kingsRockFlinch(flinchChance))
+        ? true : undefined;
 
     const newUsHp = selfDestructs ? 0
       : drainHpDelta !== undefined
@@ -925,10 +971,19 @@ const processMove = (
       ? { move, turns: 2 + Math.floor(Math.random() * 4) }
       : undefined;
 
+    // Cinta Focus del defensor: sobrevive el golpe letal con 1 PS
+    let finalThemHp = Math.max(0, them.hp - damageToHp);
+    let themFocusBandSaved = false;
+    if (focusBandSaves(them.hp, finalThemHp)) {
+      finalThemHp = 1;
+      themFocusBandSaved = true;
+    }
+
     return {
       ...defaultReturn,
-      them: { ...them, hp: Math.max(0, them.hp - damageToHp) },
+      them: { ...them, hp: finalThemHp },
       us: { ...usAfterPP, hp: newUsHp },
+      focusBandSaved: themFocusBandSaved || undefined,
       superEffective,
       notVeryEffective,
       critical: isCrit,
@@ -954,8 +1009,8 @@ const processMove = (
       : eBaseRawDef;
   const eAtkStage  = isCrit ? 0 : (isPhysical ? theirStages.attack    : theirStages.special);
   const eDefStage  = isCrit ? 0 : (isPhysical ? myStages.defense      : myStages.special);
-  const eAttack  = eRawAtk * getStageMult(eAtkStage) * burnPenalty;
-  const eDefense = eRawDef * getStageMult(eDefStage) * screenMult;
+  const eAttack  = eRawAtk * getStageMult(eAtkStage) * burnPenalty * itemAtkMult;
+  const eDefense = eRawDef * getStageMult(eDefStage) * screenMult * itemDefMult;
 
   const eStabTypes      = attackerTypes ?? theirMetadata.types;
   const stab           = eStabTypes.includes(moveMetadata.type) ? 1.5 : 1;
@@ -1030,7 +1085,9 @@ const processMove = (
   }
 
   const eFlinchChance = (moveMetadata.meta?.flinchChance ?? 0) / 100;
-  const eFlinch = !eSubActive && eFlinchChance > 0 && Math.random() < eFlinchChance ? true : undefined;
+  const eFlinch = !eSubActive &&
+    ((eFlinchChance > 0 && Math.random() < eFlinchChance) || kingsRockFlinch(eFlinchChance))
+      ? true : undefined;
 
   const newThemHp = enemyExplodes ? 0
     : eDrainHpDelta !== undefined
@@ -1041,10 +1098,19 @@ const processMove = (
     ? { move, turns: 2 + Math.floor(Math.random() * 4) }
     : undefined;
 
+  // Cinta Focus del jugador: sobrevive el golpe letal con 1 PS (Gen II)
+  let finalUsHp = Math.max(0, us.hp - eDamageToHp);
+  let usFocusBandSaved = false;
+  if (focusBandSaves(us.hp, finalUsHp)) {
+    finalUsHp = 1;
+    usFocusBandSaved = true;
+  }
+
   return {
     ...defaultReturn,
-    us: { ...usAfterPP, hp: Math.max(0, us.hp - eDamageToHp) },
+    us: { ...usAfterPP, hp: finalUsHp },
     them: { ...them, hp: newThemHp },
+    focusBandSaved: usFocusBandSaved || undefined,
     superEffective,
     notVeryEffective,
     critical: isCrit,

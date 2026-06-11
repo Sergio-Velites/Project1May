@@ -157,7 +157,8 @@ const FishingSession = () => {
         const fb = FALLBACK_BY_ROD[fishing.rod];
         pkmn = getPokemonEncounter(fb.id, randBetween(fb.min, fb.max));
       }
-      dispatch(encounterPokemon(pkmn));
+      // Marcar el origen del encuentro: la Cebo Ball (Lure Ball) multiplica ×3
+      dispatch(encounterPokemon({ ...pkmn, fromFishing: true }));
       // endFishing se dispara desde el efecto al detectar encounter
       return;
     }

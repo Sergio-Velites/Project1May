@@ -86,6 +86,12 @@ export const resolveEvolution = (
   const evo = meta.evolution;
   if (!evo) return null;
 
+  // Piedra Eterna (Gen II): mientras la lleve equipada, no evoluciona.
+  // Comparación por el valor del enum (ItemType.Everstone === "everstone")
+  // sin importar use-item-data: evitamos el ciclo
+  // use-item-data → evolution-helper → use-item-data.
+  if ((pokemon.heldItem as string | null | undefined) === "everstone") return null;
+
   const trigger = evo.trigger ?? "level";
 
   if (trigger === "friendship") {

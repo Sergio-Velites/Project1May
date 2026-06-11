@@ -21,10 +21,20 @@ import {
   updatePokemon,
   updatePokemonEncounter,
   updateSpecificPokemon,
+  setHeldItem,
   setPokemonStatus,
   seePokemon,
   catchPokemonPokedex,
 } from "../state/gameSlice";
+import { ItemType } from "../app/use-item-data";
+import {
+  HP_BERRIES,
+  HP_BERRY_THRESHOLD,
+  LEFTOVERS_FRACTION,
+  QUICK_CLAW_CHANCE,
+  berryCuresStatus,
+  curesConfusion,
+} from "../app/held-item-helper";
 import usePokemonMetadata, { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import Frame from "./Frame";
 import HealthBar from "./HealthBar";
@@ -77,6 +87,7 @@ import { playCry, isCryActive, waitForCry, cancelCry } from "../app/pokemon-cry"
 import { MoveAnimation } from "./MoveAnimation";
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
+import { genderSymbol } from "../app/gender-helper";
 import PixelImage from "../styles/PixelImage";
 
 const MOVEMENT_ANIMATION = 1300;
@@ -750,6 +761,8 @@ const PokemonEncounter = () => {
   const lastEnemyMoveRef = useRef<string | null>(null);
   // Último move usado por el jugador (para Disable del rival)
   const lastPlayerMoveRef = useRef<string | null>(null);
+  // Última Poké Ball lanzada (la Amigo Ball fija amistad 200 al capturar)
+  const lastBallUsedRef = useRef<ItemType | null>(null);
 
   // Disable: move inhabilitado del rival + turnos restantes
   const enemyDisabledMoveRef  = useRef<string | null>(null);
@@ -864,9 +877,7 @@ const PokemonEncounter = () => {
               ...pokemon[involvedPokemon[nextIndex]],
               xp:
                 pokemon[involvedPokemon[nextIndex]].xp +
-                Math.round(
-                  getXp(enemy.id, enemy.level, isTrainer) / aliveCount
-                ),
+                earnedXpFor(pokemon[involvedPokemon[nextIndex]], aliveCount),
             },
           })
         );
@@ -1258,7 +1269,15 @@ const PokemonEncounter = () => {
       };
 
       throwPokeballAtEnemy();
-      const caught = catchesPokemon(enemy, pokeballThrowing, enemyStatusRef.current);
+      // Recordar la ball usada: la Amigo Ball fija amistad 200 tras capturar
+      // (pokeballThrowing ya estará a null cuando lleguemos al stage 45).
+      lastBallUsedRef.current = pokeballThrowing;
+      const caught = catchesPokemon(enemy, pokeballThrowing, enemyStatusRef.current, {
+        playerLevel: active?.level,
+        activeSpeciesId: active?.id,
+        activeGender: active?.gender,
+        fromFishing: enemy.fromFishing,
+      });
       setTimeout(() => {
         if (caught) {
           shakePokeball(3, caught);
@@ -1357,9 +1376,7 @@ const PokemonEncounter = () => {
         }
         if (firstIdx !== 0) setProcessingInvolvedPokemon(firstIdx);
         const targetPokemon = pokemon[involvedPokemon[firstIdx]];
-        const earnedXp = Math.round(
-          getXp(enemy.id, enemy.level, isTrainer) / divisor
-        );
+        const earnedXp = earnedXpFor(targetPokemon, divisor);
         const updatedXp = targetPokemon.xp + earnedXp;
         dispatch(
           updateSpecificPokemon({
@@ -1539,6 +1556,11 @@ const PokemonEncounter = () => {
           }),
           // Keep current HP (Gen I behaviour: caught pokemon retains battle HP)
           hp: Math.max(1, enemy.hp),
+          // Conservar el género visto durante el combate (Gen II).
+          gender: enemy.gender,
+          // Amigo Ball (Gen II): el Pokémon capturado llega con amistad 200.
+          friendship:
+            lastBallUsedRef.current === ItemType.FriendBall ? 200 : undefined,
         })
       );
       // Cambiar stage para evitar re-entrada mientras se muestra el texto
@@ -1582,7 +1604,11 @@ const PokemonEncounter = () => {
 
     if (stage === 52) {
       if (!trainer) throw new Error("No trainer found");
-      dispatch(gainMoney(trainer.money || 0));
+      // Moneda Amuleto (Gen II): ×2 dinero si un participante la llevaba.
+      const hasAmuletCoin = involvedPokemon.some(
+        (i) => pokemon[i]?.heldItem === ItemType.AmuletCoin
+      );
+      dispatch(gainMoney((trainer.money || 0) * (hasAmuletCoin ? 2 : 1)));
       endEncounter_();
     }
   });
@@ -1693,8 +1719,9 @@ const PokemonEncounter = () => {
         1,
         involvedPokemon.filter((i) => pokemon[i].hp > 0).length
       );
-      return `${processingMetadata.name.toUpperCase()} ganó ${Math.round(
-        getXp(enemy.id, enemy.level, isTrainer) / aliveCount
+      return `${processingMetadata.name.toUpperCase()} ganó ${earnedXpFor(
+        processingPokemon,
+        aliveCount
       )} puntos EXP.`;
     }
     if (stage === 22) {
@@ -2087,6 +2114,8 @@ const PokemonEncounter = () => {
     defenderSubHp: playerSubHpRef.current ?? 0,
     defenderIsProtected: playerProtectRef.current,
     attackerHasFocusEnergy: enemyFocusEnergyRef.current,
+    // Los rivales de este juego no llevan objetos; el defensor es el jugador.
+    defenderHeldItem: active?.heldItem ?? null,
   });
   const buildPlayerAttackCtx = (): MoveContext => ({
     lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2100,7 +2129,21 @@ const PokemonEncounter = () => {
     defenderSubHp: enemySubHpRef.current ?? 0,
     defenderIsProtected: enemyProtectRef.current,
     attackerHasFocusEnergy: playerFocusEnergyRef.current,
+    attackerHeldItem: active?.heldItem ?? null,
   });
+
+  // XP que recibe un participante concreto al repartir: el Huevo Suerte
+  // (Gen II) multiplica ×1.5 la parte de su portador.
+  const earnedXpFor = (
+    recipient: PokemonInstance | undefined,
+    divisor: number
+  ): number => {
+    if (!enemy) return 0;
+    const base = Math.round(getXp(enemy.id, enemy.level, isTrainer) / divisor);
+    return recipient?.heldItem === ItemType.LuckyEgg
+      ? Math.floor(base * 1.5)
+      : base;
+  };
 
   const getActiveMovesFirst = (
     activeMove: MoveMetadata,
@@ -2108,6 +2151,14 @@ const PokemonEncounter = () => {
   ) => {
     if (activeMove.priority > enemyMove.priority) return true;
     if (activeMove.priority < enemyMove.priority) return false;
+    // Garra Rápida (Gen II): 60/256 de actuar primero dentro del mismo
+    // bracket de prioridad, ignorando la velocidad.
+    if (
+      active?.heldItem === ItemType.QuickClaw &&
+      Math.random() < QUICK_CLAW_CHANCE
+    ) {
+      return true;
+    }
     // Apply speed stat stages for priority calculation (Gen I)
     // Paralysis reduces speed by 50% (Gen I mechanic)
     const paralysisMult = (s: typeof playerStatusRef.current) =>
@@ -2736,6 +2787,10 @@ const PokemonEncounter = () => {
             applyStatChange(statChange, isAttacking);
           }
           setStage(19);
+        } else if (result.focusBandSaved) {
+          // Cinta Focus (Gen II): el jugador aguantó el golpe letal con 1 PS
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} resistió con su CINTA FOCUS!`);
+          setStage(19);
         } else if (critical) {
           setAlertText(`¡Golpe crítico!`);
           setStage(19);
@@ -2913,6 +2968,52 @@ const PokemonEncounter = () => {
       enemyLightScreenRef.current -= 1;
       if (enemyLightScreenRef.current === 0) {
         messages.push(`¡La PANTALLA LUZ del rival desapareció!`);
+      }
+    }
+
+    // ── Gen II: objetos equipados del jugador al final del turno ──────────
+    // (los rivales de este juego no llevan objetos)
+    const usMaxHp = getPokemonStats(trueUsId, currentUs.level).hp;
+    const heldItem = active?.heldItem ?? null;
+    if (heldItem && newUsHp > 0) {
+      let berryConsumed = false;
+      // Restos: cura 1/16 del HP máximo cada turno
+      if (heldItem === ItemType.Leftovers && newUsHp < usMaxHp) {
+        newUsHp = Math.min(
+          usMaxHp,
+          newUsHp + Math.max(1, Math.floor(usMaxHp * LEFTOVERS_FRACTION))
+        );
+        dispatchUs(newUsHp);
+        messages.push(`¡${activeMetadata.name.toUpperCase()} recuperó PS con sus RESTOS!`);
+      }
+      // Baya (+10) / Baya Dorada (+30): se consume al caer a mitad de PS
+      const berryHeal = HP_BERRIES[heldItem];
+      if (berryHeal && newUsHp <= usMaxHp * HP_BERRY_THRESHOLD) {
+        newUsHp = Math.min(usMaxHp, newUsHp + berryHeal);
+        dispatchUs(newUsHp);
+        berryConsumed = true;
+        messages.push(`¡${activeMetadata.name.toUpperCase()} se comió su BAYA y recuperó PS!`);
+      }
+      // Bayas curaestados (Antipar, Antitóx, Menta, Hielo, Tostada, Milagro)
+      const curStatus = playerStatusRef.current;
+      if (curStatus && berryCuresStatus(heldItem, curStatus.type)) {
+        setPlayerStatus(null);
+        playerStatusRef.current = null;
+        dispatch(setPokemonStatus({ index: activePokemonIndex, status: null }));
+        berryConsumed = true;
+        messages.push(`¡La BAYA de ${activeMetadata.name.toUpperCase()} curó su estado!`);
+      }
+      // Baya Amarga / Baya Milagro: curan la confusión
+      if (playerConfusionTurnsRef.current > 0 && curesConfusion(heldItem)) {
+        playerConfusionTurnsRef.current = 0;
+        berryConsumed = true;
+        messages.push(`¡La BAYA de ${activeMetadata.name.toUpperCase()} curó su confusión!`);
+      }
+      // IMPORTANTE: consumir la baya DESPUÉS de los dispatchUs de arriba —
+      // dispatchUs reescribe el Pokémon completo (con heldItem stale) y
+      // resucitaría la baya si el orden fuera el inverso.
+      if (berryConsumed) {
+        dispatch(setHeldItem({ index: activePokemonIndex, item: null }));
       }
     }
 
@@ -3684,7 +3785,7 @@ const PokemonEncounter = () => {
                       : "0",
                 }}
               >
-                <Name>{enemyMetadata.name}</Name>
+                <Name>{`${enemyMetadata.name}${genderSymbol(enemy.gender)}`}</Name>
                 <Level>{`:L${enemy.level}`}</Level>
                 <HealthBarContainer>
                   <HealthBar
@@ -3749,7 +3850,7 @@ const PokemonEncounter = () => {
                       : "0",
                 }}
               >
-                <Name>{activeMetadata.name}</Name>
+                <Name>{`${activeMetadata.name}${genderSymbol(active.gender)}`}</Name>
                 <Level>{`:L${active.level}`}</Level>
                 <HealthBarContainer>
                   <HealthBar

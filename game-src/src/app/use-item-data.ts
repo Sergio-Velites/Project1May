@@ -32,6 +32,7 @@ import { getMoveMetadata } from "./use-move-metadata";
 import { getHpDeltaOnLevelUp, getLearnedMove } from "./level-helper";
 import { getPokemonMetadata } from "./use-pokemon-metadata";
 import { resolveEvolution, friendshipOnLevelUp, getFriendship } from "./evolution-helper";
+import { StatusType } from "../state/state-types";
 
 export enum ItemType {
   MasterBall = "master-ball", // DONE
@@ -177,6 +178,66 @@ export enum ItemType {
   /** Vino Monjardín — cura 40 HP (×2 que Poción) pero confunde al pokémon
    *  si se usa en combate sobre el activo. */
   VinoMonjardin = "vino-monjardin",
+  // ── Gen II: objetos equipados — potenciadores de tipo (×1.1) ──
+  PinkBow = "pink-bow",
+  Charcoal = "charcoal",
+  MysticWater = "mystic-water",
+  Magnet = "magnet",
+  MiracleSeed = "miracle-seed",
+  NeverMeltIce = "nevermeltice",
+  BlackBelt = "black-belt",
+  PoisonBarb = "poison-barb",
+  SoftSand = "soft-sand",
+  SharpBeak = "sharp-beak",
+  TwistedSpoon = "twisted-spoon",
+  SilverPowder = "silver-powder",
+  HardStone = "hard-stone",
+  SpellTag = "spell-tag",
+  DragonFang = "dragon-fang",
+  BlackGlasses = "black-glasses",
+  // ── Gen II: objetos equipados — efectos de combate ──
+  Leftovers = "leftovers",
+  ScopeLens = "scope-lens",
+  FocusBand = "focus-band",
+  QuickClaw = "quick-claw",
+  KingsRock = "kings-rock",
+  BrightPowder = "brightpowder",
+  // ── Gen II: objetos equipados — economía y especie ──
+  AmuletCoin = "amulet-coin",
+  LuckyEgg = "lucky-egg",
+  Everstone = "everstone",
+  LightBall = "light-ball",
+  ThickClub = "thick-club",
+  LuckyPunch = "lucky-punch",
+  Stick = "stick",
+  MetalPowder = "metal-powder",
+  // ── Gen II: bayas (usables y equipables — se autoconsumen en combate) ──
+  Berry = "berry",
+  GoldBerry = "gold-berry",
+  PrzCureBerry = "przcureberry",
+  PsnCureBerry = "psncureberry",
+  MintBerry = "mint-berry",
+  IceBerry = "ice-berry",
+  BurntBerry = "burnt-berry",
+  BitterBerry = "bitter-berry",
+  MiracleBerry = "miracleberry",
+  MysteryBerry = "mysteryberry",
+  // ── Gen II: objetos de evolución ──
+  SunStone = "sun-stone",
+  MetalCoat = "metal-coat",
+  DragonScale = "dragon-scale",
+  UpGrade = "up-grade",
+  /** Cable Unión — sustituye al intercambio para las evoluciones de Gen I
+   *  (Kadabra, Machoke, Graveler, Haunter) en un juego sin trading. */
+  LinkCable = "link-cable",
+  // ── Gen II: balls de Kurt ──
+  FastBall = "fast-ball",
+  FriendBall = "friend-ball",
+  HeavyBall = "heavy-ball",
+  LevelBall = "level-ball",
+  LoveBall = "love-ball",
+  LureBall = "lure-ball",
+  MoonBall = "moon-ball",
 }
 
 export interface ItemData {
@@ -302,7 +363,240 @@ const useItemData = () => {
     dispatch(showText(["¡A montar en BICI!"]));
   };
 
+  // ── Gen II: fábricas de entradas ──────────────────────────────────────────
+  // Objeto solo-equipable: no se "usa" desde la mochila (la opción Dar del
+  // menú de items es quien lo equipa). "Usar" muestra el aviso de Oak.
+  const heldOnly = (
+    type: ItemType,
+    name: string,
+    cost: number | null,
+    sellPrice: number | null
+  ): ItemData => ({
+    type,
+    name,
+    countable: true,
+    consumable: false,
+    usableInBattle: false,
+    pokeball: false,
+    badge: false,
+    cost,
+    sellPrice,
+    action: () => {},
+  });
+
+  // Baya de curación de PS (usable desde la mochila como una poción).
+  const healBerry = (type: ItemType, name: string, amount: number): ItemData => ({
+    type,
+    name,
+    countable: true,
+    consumable: true,
+    usableInBattle: true,
+    pokeball: false,
+    badge: false,
+    cost: null,
+    sellPrice: 10,
+    action: () => {
+      dispatch(
+        showActionOnPokemon((index: number) => {
+          dispatch(
+            updateSpecificPokemon({
+              index,
+              pokemon: {
+                ...pokemon[index],
+                hp: Math.min(
+                  getPokemonStats(pokemon[index].id, pokemon[index].level).hp,
+                  pokemon[index].hp + amount
+                ),
+              },
+            })
+          );
+          dispatch(consumeItem(type));
+        })
+      );
+    },
+  });
+
+  // Baya que cura estados persistentes (usable como un Antídoto/Cura Total).
+  const statusBerry = (
+    type: ItemType,
+    name: string,
+    cures: StatusType[]
+  ): ItemData => ({
+    type,
+    name,
+    countable: true,
+    consumable: true,
+    usableInBattle: true,
+    pokeball: false,
+    badge: false,
+    cost: null,
+    sellPrice: 10,
+    action: () => {
+      dispatch(
+        showActionOnPokemon((index: number) => {
+          const p = pokemon[index];
+          if (!p.status || !cures.includes(p.status.type)) return;
+          dispatch(setPokemonStatus({ index, status: null }));
+          dispatch(consumeItem(type));
+        })
+      );
+    },
+  });
+
+  // Objeto de evolución (patrón Piedra Fuego): usable sobre el Pokémon
+  // correcto → evoluciona. Para las evoluciones por intercambio de Gen I/II
+  // (sin trading real en este juego) el objeto sustituye al intercambio.
+  const evolutionItem = (
+    type: ItemType,
+    name: string,
+    evolutions: Record<number, number>,
+    cost: number | null = null,
+    sellPrice: number | null = 1050
+  ): ItemData => ({
+    type,
+    name,
+    countable: true,
+    consumable: true,
+    usableInBattle: false,
+    pokeball: false,
+    badge: false,
+    cost,
+    sellPrice,
+    action: () => {
+      dispatch(
+        showActionOnPokemon((index: number) => {
+          const evolveToId = evolutions[pokemon[index].id];
+          if (!evolveToId) return;
+          // Piedra Eterna: bloquea cualquier evolución mientras se lleve.
+          if (pokemon[index].heldItem === ItemType.Everstone) return;
+          dispatch(showEvolution({ index, evolveToId }));
+          dispatch(consumeItem(type));
+        })
+      );
+    },
+  });
+
+  // Ball de Kurt (patrón Poké Ball: lanzar + consumir).
+  const kurtBall = (type: ItemType, name: string): ItemData => ({
+    type,
+    name,
+    countable: true,
+    consumable: true,
+    usableInBattle: true,
+    pokeball: true,
+    badge: false,
+    cost: null,
+    sellPrice: 75,
+    action: () => {
+      dispatch(hideItemsMenu());
+      dispatch(throwPokeball(type));
+      dispatch(consumeItem(type));
+    },
+  });
+
   const data: Record<string, ItemData> = {
+    // ── Gen II: potenciadores de tipo (×1.1 al daño de su tipo) ─────────────
+    [ItemType.PinkBow]: heldOnly(ItemType.PinkBow, "Lazo Rosa", null, 50),
+    [ItemType.Charcoal]: heldOnly(ItemType.Charcoal, "Carbón", 9800, 4900),
+    [ItemType.MysticWater]: heldOnly(ItemType.MysticWater, "Agua Mística", null, 1500),
+    [ItemType.Magnet]: heldOnly(ItemType.Magnet, "Imán", null, 50),
+    [ItemType.MiracleSeed]: heldOnly(ItemType.MiracleSeed, "Semilla Milagro", null, 1500),
+    [ItemType.NeverMeltIce]: heldOnly(ItemType.NeverMeltIce, "Antiderretir", null, 1500),
+    [ItemType.BlackBelt]: heldOnly(ItemType.BlackBelt, "Cinturón Negro", null, 1500),
+    [ItemType.PoisonBarb]: heldOnly(ItemType.PoisonBarb, "Flecha Venenosa", null, 1500),
+    [ItemType.SoftSand]: heldOnly(ItemType.SoftSand, "Arena Fina", null, 1500),
+    [ItemType.SharpBeak]: heldOnly(ItemType.SharpBeak, "Pico Afilado", null, 1500),
+    [ItemType.TwistedSpoon]: heldOnly(ItemType.TwistedSpoon, "Cuchara Torcida", null, 1500),
+    [ItemType.SilverPowder]: heldOnly(ItemType.SilverPowder, "Polvo Plata", null, 1500),
+    [ItemType.HardStone]: heldOnly(ItemType.HardStone, "Piedra Dura", null, 1500),
+    [ItemType.SpellTag]: heldOnly(ItemType.SpellTag, "Hechizo", null, 1500),
+    [ItemType.DragonFang]: heldOnly(ItemType.DragonFang, "Colmillo Dragón", null, 1500),
+    [ItemType.BlackGlasses]: heldOnly(ItemType.BlackGlasses, "Gafas de Sol", null, 1500),
+    // ── Gen II: objetos equipados con efecto de combate ─────────────────────
+    [ItemType.Leftovers]: heldOnly(ItemType.Leftovers, "Restos", null, 100),
+    [ItemType.ScopeLens]: heldOnly(ItemType.ScopeLens, "Periscopio", null, 100),
+    [ItemType.FocusBand]: heldOnly(ItemType.FocusBand, "Cinta Focus", null, 100),
+    [ItemType.QuickClaw]: heldOnly(ItemType.QuickClaw, "Garra Rápida", null, 100),
+    [ItemType.BrightPowder]: heldOnly(ItemType.BrightPowder, "Polvo Brillo", null, 10),
+    [ItemType.AmuletCoin]: heldOnly(ItemType.AmuletCoin, "Moneda Amuleto", null, 100),
+    [ItemType.LuckyEgg]: heldOnly(ItemType.LuckyEgg, "Huevo Suerte", null, 100),
+    [ItemType.Everstone]: heldOnly(ItemType.Everstone, "Piedra Eterna", null, 100),
+    [ItemType.LightBall]: heldOnly(ItemType.LightBall, "Bola Luminosa", null, 50),
+    [ItemType.ThickClub]: heldOnly(ItemType.ThickClub, "Hueso Grueso", null, 250),
+    [ItemType.LuckyPunch]: heldOnly(ItemType.LuckyPunch, "Puño Suerte", null, 50),
+    [ItemType.Stick]: heldOnly(ItemType.Stick, "Palo", null, 100),
+    [ItemType.MetalPowder]: heldOnly(ItemType.MetalPowder, "Polvo Metálico", null, 5),
+    // ── Gen II: bayas ────────────────────────────────────────────────────────
+    [ItemType.Berry]: healBerry(ItemType.Berry, "Baya", 10),
+    [ItemType.GoldBerry]: healBerry(ItemType.GoldBerry, "Baya Dorada", 30),
+    [ItemType.PrzCureBerry]: statusBerry(ItemType.PrzCureBerry, "Baya Antipar", ["paralysis"]),
+    [ItemType.PsnCureBerry]: statusBerry(ItemType.PsnCureBerry, "Baya Antitóx", ["poison", "badly-poisoned"]),
+    [ItemType.MintBerry]: statusBerry(ItemType.MintBerry, "Baya Menta", ["sleep"]),
+    // Fieles a Gen II: la Baya Hielo cura QUEMADURA y la Tostada CONGELACIÓN.
+    [ItemType.IceBerry]: statusBerry(ItemType.IceBerry, "Baya Hielo", ["burn"]),
+    [ItemType.BurntBerry]: statusBerry(ItemType.BurntBerry, "Baya Tostada", ["freeze"]),
+    // La confusión es volátil (solo en combate): desde la mochila, la Baya
+    // Amarga no tiene efecto fuera de combate; como objeto equipado sí cura
+    // la confusión automáticamente.
+    [ItemType.BitterBerry]: heldOnly(ItemType.BitterBerry, "Baya Amarga", null, 10),
+    [ItemType.MiracleBerry]: statusBerry(ItemType.MiracleBerry, "Baya Milagro", [
+      "poison", "badly-poisoned", "burn", "paralysis", "sleep", "freeze",
+    ]),
+    [ItemType.MysteryBerry]: {
+      type: ItemType.MysteryBerry,
+      name: "Baya Misterio",
+      countable: true,
+      consumable: true,
+      usableInBattle: true,
+      pokeball: false,
+      badge: false,
+      cost: null,
+      sellPrice: 10,
+      action: () => {
+        dispatch(
+          showActionOnPokemon((index: number) => {
+            dispatch(
+              updateSpecificPokemon({
+                index,
+                pokemon: {
+                  ...pokemon[index],
+                  moves: pokemon[index].moves.map((move) => ({
+                    ...move,
+                    pp: Math.min(
+                      getMoveMetadata(move.id).pp || 0,
+                      Math.round(move.pp + 5)
+                    ),
+                  })),
+                },
+              })
+            );
+            dispatch(consumeItem(ItemType.MysteryBerry));
+          })
+        );
+      },
+    },
+    // ── Gen II: objetos de evolución ─────────────────────────────────────────
+    // Gloom→Bellossom · Sunkern→Sunflora
+    [ItemType.SunStone]: evolutionItem(ItemType.SunStone, "Piedra Solar", { 44: 182, 191: 192 }, 2100),
+    // Onix→Steelix · Scyther→Scizor (por intercambio con objeto en Gen II)
+    [ItemType.MetalCoat]: evolutionItem(ItemType.MetalCoat, "Rev. Metálico", { 95: 208, 123: 212 }),
+    // Seadra→Kingdra (por intercambio con objeto en Gen II)
+    [ItemType.DragonScale]: evolutionItem(ItemType.DragonScale, "Escama Dragón", { 117: 230 }),
+    // Porygon→Porygon2 (por intercambio con objeto en Gen II)
+    [ItemType.UpGrade]: evolutionItem(ItemType.UpGrade, "Mejora", { 137: 233 }),
+    // Roca del Rey: evoluciona Poliwhirl→Politoed y Slowpoke→Slowking; además
+    // es equipable (30/256 de flinch). El doble uso es intencional.
+    [ItemType.KingsRock]: evolutionItem(ItemType.KingsRock, "Roca del Rey", { 61: 186, 79: 199 }),
+    // Cable Unión: evoluciones por intercambio de Gen I sin trading real.
+    [ItemType.LinkCable]: evolutionItem(ItemType.LinkCable, "Cable Unión", { 64: 65, 67: 68, 75: 76, 93: 94 }),
+    // ── Gen II: balls de Kurt (comportamiento corregido, sin bugs GSC) ──────
+    [ItemType.FastBall]: kurtBall(ItemType.FastBall, "Veloz Ball"),
+    [ItemType.FriendBall]: kurtBall(ItemType.FriendBall, "Amigo Ball"),
+    [ItemType.HeavyBall]: kurtBall(ItemType.HeavyBall, "Peso Ball"),
+    [ItemType.LevelBall]: kurtBall(ItemType.LevelBall, "Nivel Ball"),
+    [ItemType.LoveBall]: kurtBall(ItemType.LoveBall, "Amor Ball"),
+    [ItemType.LureBall]: kurtBall(ItemType.LureBall, "Cebo Ball"),
+    [ItemType.MoonBall]: kurtBall(ItemType.MoonBall, "Luna Ball"),
     [ItemType.MaxPotion]: {
       type: ItemType.MaxPotion,
       name: "Poción Máx.",
