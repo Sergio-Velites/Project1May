@@ -310,6 +310,28 @@ ss-anne-1f · ss-anne-2f · ss-anne-3f · ss-anne-bf1
 - **Render**: `components/Boulder.tsx` (dentro de `BackgroundContainer`), sprite SVG inline pixel-art.
 - **Editor**: modo `boulders` en `/admin/map-editor` (botón 🪨). Click para añadir/quitar; export TS `boulders: [...]` para pegar en el `.ts` del mapa. Override key `boulders` en `app/api/admin/map-data/route.ts`.
 
+### Árboles de bayas (Gen II)
+
+- **Mapa**: `MapType.berryTrees?: BerryTreeType[]` (`{ pos, item }` — `item` es
+  la baya, p. ej. `ItemType.Berry`). Bloquean SIEMPRE el paso (el árbol no
+  desaparece; solo se recoge la baya).
+- **Recogida**: pulsar A de frente → "¡Hay una BAYA en el árbol!" → se añade a
+  la mochila. UNA baya por árbol y día; rebrota a medianoche (hora local del
+  dispositivo, como el reloj de Oro/Plata).
+- **Persistencia**: `GameState.berryTreesPicked` (`Record<"mapId-x-y", fecha>`)
+  — persiste en el save; `loadFromState` lo restaura con default `{}`.
+- **Render**: `components/BerryTree.tsx` (dentro de `BackgroundContainer`),
+  SVG pixel-art; las bayas rojas solo se dibujan si quedan por recoger.
+- **Editor**: modo `berry-trees` (botón 🍒). Click vacío añade árbol (prompt
+  con la baya: Berry, GoldBerry, PrzCureBerry, PsnCureBerry, MintBerry,
+  IceBerry, BurntBerry, BitterBerry, MiracleBerry, MysteryBerry); click en
+  árbol lo elimina. Export TS `berryTrees: [...]`; override key `berryTrees`
+  en `app/api/admin/map-data/route.ts`.
+- **Distribución de referencia (Cristal, Kanto)**: Ruta 1 Baya Amarga ·
+  Ruta 2 Baya Antitóx · Ruta 8 Baya Antipar · Ruta 11 Baya · Pewter ×2 (Baya
+  Hielo + Baya Menta) · Fuchsia Baya Tostada. Colocarlos visualmente con el
+  editor (las posiciones no están hardcodeadas).
+
 ### Cómo añadir un mapa nuevo
 
 1. Añadir valor al enum `MapId` en `maps/map-types.ts`
@@ -420,10 +442,57 @@ Archivos principales: `game-src/src/app/move-helper.ts`, `game-src/src/component
 - **Secondary effects Gen II**: Crunch (−1 sp.def), Iron Tail (−1 def), Ancient Power (+all stats 10%), etc.
 - **Variable power**: Flail/Reversal (200→20 según HP%), Present (40/80/120 o cura)
 - **Whirlpool**: trampa de 2-5 turnos (añadido a TRAP_MOVES)
+- **Clima (5 turnos)**: Rain Dance / Sunny Day / Sandstorm (`weatherRef` en
+  PokemonEncounter + `context.weather` en move-helper). Agua/Fuego ×1.5/×0.5,
+  Trueno no falla con lluvia (50% acc con sol), Rayo Solar sin carga con sol y
+  ½ potencia con lluvia/arena, chip 1/8 de arena (inmunes Roca/Tierra/Acero).
+  Moonlight/Morning Sun/Synthesis: ¼ base, ×2 en su franja horaria, ½ con sol,
+  ⅛ con otro clima (`timeWeatherHealFraction`).
+- **Género (Gen II)**: `PokemonInstance.gender` sorteado por ratio oficial
+  (`gen2-species-data.ts` + `gender-helper.ts`), migración perezosa en
+  `loadFromState`. Símbolo ♂/♀ en combate, party y pantalla de datos.
+- **Atracción**: solo géneros opuestos; 50% de no actuar (checkSkipTurn).
+- **Más moves Gen II**: Encore (repite último move 2-6 turnos, fuerza la
+  selección de ambos bandos), Nightmare (¼/turno dormido), Perish Song
+  (cuenta de 3; si ambos llegan a 0 a la vez cae primero el rival — el motor
+  no soporta KO mutuo), Spikes (⅛ al entrar, clamp a 1 PS), Mean Look/Spider
+  Web, Lock-On/Mind Reader (siguiente ataque no falla), Psych Up, Endure
+  (sobrevive con 1 PS), Safeguard (5 turnos sin estados/confusión), Belly
+  Drum (½ PS → atk +6), Conversion2, Future Sight (golpea a los 2 turnos,
+  sin tipo), Magnitude (tabla 4-10), Rollout/Fury Cutter (rampa ×2, cap ×16).
+- **Estados Gen II**: sueño 1-6 turnos; Tóxico → veneno normal al cambiar de
+  Pokémon; descongelación 20% por turno (decisión de diseño, Gen II usa 10%).
+- **Objetos equipados** (`held-item-helper.ts`, valores de pret/pokecrystal):
+  `PokemonInstance.heldItem`. Dar desde la mochila (ItemsMenu → "Dar"),
+  Quitar desde el menú Pokémon ("Quitar obj."), visible en PokemonSummary.
+  En combate (solo el equipo del jugador; los rivales no llevan objetos):
+  potenciadores de tipo ×1.1 (17 items), Restos 1/16/turno, Cinta Focus
+  30/256, Garra Rápida 60/256, Roca del Rey 30/256, Polvo Brillo −20/256 acc,
+  Periscopio +1 crit (Puño Suerte/Palo +2 para Chansey/Farfetch'd), Bola
+  Luminosa/Hueso Grueso ×2, Polvo Metálico ×1.5 (Ditto), bayas autoconsumibles
+  al final del turno (PS ≤ ½ → Baya/Baya Dorada; estados → su baya; confusión
+  → Baya Amarga/Milagro), Moneda Amuleto ×2 dinero, Huevo Suerte ×1.5 XP,
+  Piedra Eterna bloquea evolución (gate en `resolveEvolution`).
+- **Balls de Kurt** (`pokeball-helper.ts`, corregidas sin los bugs GSC):
+  Veloz (×4 si velocidad base ≥100), Nivel (×8/×4/×2), Amor (×8 misma especie
+  + género opuesto), Cebo (×3 pescando — `PokemonEncounterType.fromFishing`),
+  Luna (×4 evolución por Piedra Lunar), Peso (±20/+30/+40 por peso), Amigo
+  (amistad 200 al capturar — `lastBallUsedRef`).
+- **Objetos de evolución Gen II**: Piedra Solar, Rev. Metálico (Steelix,
+  Scizor), Escama Dragón (Kingdra), Mejora (Porygon2), Roca del Rey
+  (Politoed, Slowking) y Cable Unión (sustituye al intercambio Gen I:
+  Alakazam, Machamp, Golem, Gengar). Patrón `evolutionItem` en use-item-data.
+- **Día/noche (`time-helper.ts`)**: franjas mañana 4-10h / día 10-18h /
+  noche 18-4h. Los encuentros (hierba, surf y pesca) filtran por
+  `timesOfDay` en cada entrada (vacío = 24 h). El editor tiene toggles por
+  franja en la tabla de encuentros.
 
-### Moves Gen II sin mecánica (caen a "sin efecto" limpiamente)
+### Moves sin mecánica (caen a "sin efecto" limpiamente)
 
-`NO_EFFECT_MOVES` incluye: `nightmare, attract, encore, destiny-bond, future-sight, rollout, fury-cutter, magnitude, belly-drum, endure, safeguard, sandstorm, sunny-day, rain-dance, spikes, conversion-2, spider-web, mean-look, lock-on, psych-up, perish-song`
+`NO_EFFECT_MOVES` incluye solo: `splash, destiny-bond, foresight`.
+**Destiny Bond queda fuera a propósito**: su KO mutuo simultáneo no es
+representable en el enrutamiento de stages del motor (riesgo de combate
+colgado). No implementar sin rediseñar el flujo de KO.
 
 ### Pokédex Gen I+II
 
