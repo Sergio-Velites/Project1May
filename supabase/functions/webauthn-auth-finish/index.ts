@@ -68,11 +68,11 @@ Deno.serve(async (req) => {
       // El challenge firmado por el dispositivo debe ser exactamente el que
       // el servidor generó y guardó en webauthn_challenges (uso único). Esto
       // impide reutilizar un clientDataJSON capturado con un challenge nuevo.
-      const challengeB64Url = (clientData.challenge ?? "")
-        .replace(/-/g, "+").replace(/_/g, "/");
-      const expectedB64Url = (ch.challenge ?? "")
-        .replace(/-/g, "+").replace(/_/g, "/");
-      if (!clientData.challenge || challengeB64Url !== expectedB64Url) {
+      // Comparamos en forma canónica base64url sin padding para tolerar
+      // cualquier diferencia de codificación (+/ vs -_, con o sin '=').
+      const canon = (s: string) =>
+        s.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      if (!clientData.challenge || canon(clientData.challenge) !== canon(ch.challenge ?? "")) {
         throw new Error("Challenge mismatch");
       }
 
