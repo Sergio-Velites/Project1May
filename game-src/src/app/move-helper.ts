@@ -1,5 +1,7 @@
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
 import { CRITICAL_HIT_MULTIPLIER, CRITICAL_HIT_PERCENTAGE } from "./constants";
+import { getTimeOfDay } from "./evolution-helper";
+import { areOppositeGenders } from "./gender-helper";
 import {
   BRIGHTPOWDER_ACC_DROP,
   FOCUS_BAND_CHANCE,
@@ -261,28 +263,37 @@ const FIXED_DAMAGE_MOVES: Record<string, (level: number) => number> = {
 };
 // counter y super-fang se manejan aparte (necesitan HP/daño recibido actual)
 
-/** Movimientos de curación — fracción del HP máximo que se restaura */
+/** Movimientos de curación — fracción del HP máximo que se restaura.
+ *  Moonlight/Morning Sun/Synthesis se calculan aparte (dependen del clima
+ *  y de la hora del día en Gen II). */
 const HEAL_FRACTION: Record<string, number> = {
   "recover":      0.5,
   "softboiled":   0.5,
   "milk-drink":   0.5,
-  // ── Gen II ── sin sistema de clima: curan siempre 50% (equivale a día soleado)
-  "moonlight":    0.5,
-  "morning-sun":  0.5,
-  "synthesis":    0.5,
   // rest se maneja como caso especial (cura + aplica sueño 2 turnos)
 };
 
-/** Movimientos sin efecto visible en combate */
-const NO_EFFECT_MOVES = new Set([
-  "splash",
-  // Gen II — mecánicas no implementadas (caen a sin-efecto limpiamente)
-  "nightmare", "attract", "encore", "destiny-bond", "future-sight",
-  "rollout", "fury-cutter", "magnitude", "belly-drum", "endure",
-  "safeguard", "sandstorm", "sunny-day", "rain-dance", "spikes",
-  "conversion-2", "spider-web", "mean-look", "lock-on", "psych-up",
-  "perish-song",
-]);
+/**
+ * Curación de Moonlight / Morning Sun / Synthesis (Gen II, verificado en
+ * Bulbapedia/pokecrystal): base ¼ · con sol ½ · con otro clima ⅛; y se
+ * DUPLICA en la franja horaria preferida del movimiento (Moonlight de
+ * noche; Morning Sun y Synthesis de día — este juego usa día/noche).
+ */
+const timeWeatherHealFraction = (
+  move: string,
+  weather: "rain" | "sun" | "sandstorm" | null | undefined
+): number => {
+  let fraction = weather === "sun" ? 0.5 : weather ? 0.125 : 0.25;
+  const preferred = move === "moonlight" ? "night" : "day";
+  if (getTimeOfDay() === preferred) fraction = Math.min(1, fraction * 2);
+  return fraction;
+};
+
+/** Movimientos sin efecto visible en combate.
+ *  destiny-bond queda fuera de la implementación a propósito: su KO mutuo
+ *  simultáneo no es representable en el enrutamiento de stages del motor
+ *  (riesgo de combate colgado). */
+const NO_EFFECT_MOVES = new Set(["splash", "destiny-bond", "foresight"]);
 
 /** Movimientos que causan confusión (estado volátil real — gestionado en PokemonEncounter) */
 export const CONFUSE_MOVES = new Set(["confuse-ray", "supersonic", "sweet-kiss"]);
@@ -391,6 +402,18 @@ export interface MoveContext {
   /** Objeto equipado del defensor (Gen II) — Polvo Brillo, Cinta Focus,
    *  Polvo Metálico. En este juego solo el equipo del jugador lleva objetos. */
   defenderHeldItem?: ItemType | null;
+  /** Clima activo en el campo (Gen II): lluvia / sol / tormenta de arena. */
+  weather?: "rain" | "sun" | "sandstorm" | null;
+  /** El defensor usó Aguante (Endure) este turno: sobrevive con 1 PS. */
+  defenderIsEnduring?: boolean;
+  /** El atacante usó Fijar Blanco el turno anterior: este ataque no falla. */
+  guaranteedHit?: boolean;
+  /** Último movimiento usado por el defensor (Encore / Conversión2). */
+  defenderLastMoveId?: string | null;
+  /** Usos consecutivos previos de Rodar/Corte Furia (rampa de potencia ×2). */
+  attackerConsecutiveHits?: number;
+  /** El bando del defensor tiene Velo Sagrado: bloquea estados y confusión. */
+  defenderHasSafeguard?: boolean;
 }
 
 export interface MoveResult {
@@ -433,6 +456,21 @@ export interface MoveResult {
   isPainSplit?: boolean;      // Pain Split — HP promediados (muestra mensaje)
   isFocusEnergy?: boolean;    // Focus Energy — +1 crit ratio en el usuario
   focusBandSaved?: boolean;   // Cinta Focus — el defensor sobrevivió con 1 PS
+  // ── Gen II (fase clima + movimientos) ────────────────────────────────
+  startWeather?: "rain" | "sun" | "sandstorm"; // Danza Lluvia / Día Soleado / Tormenta Arena
+  isAttract?: boolean;        // Atracción — el defensor queda enamorado
+  isEncore?: boolean;         // Bis — el defensor repite su último move 2-6 turnos
+  isNightmare?: boolean;      // Pesadilla — el defensor dormido pierde ¼ por turno
+  isPerishSong?: boolean;     // Canto Mortal — cuenta de 3 para ambos
+  isSpikes?: boolean;         // Púas — en el lado del defensor
+  isNoEscape?: boolean;       // Mal de Ojo / Red Viva — el defensor no puede huir
+  isLockOn?: boolean;         // Fijar Blanco — el siguiente ataque no falla
+  isPsychUp?: boolean;        // Autosugestión — copia los stages del rival
+  isEndure?: boolean;         // Aguante — sobrevive con 1 PS este turno
+  isSafeguard?: boolean;      // Velo Sagrado — 5 turnos sin estados
+  conversion2Type?: string;   // Conversión2 — nuevo tipo del usuario
+  futureSightDamage?: number; // Premonición — daño que golpeará en 2 turnos
+  enduredHit?: boolean;       // El defensor aguantó el golpe con Aguante
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -489,7 +527,15 @@ const processMove = (
   }
 
   // ── Accuracy check (incluyendo stages de precisión/evasion) ──────────────────
-  if (moveMetadata.accuracy) {
+  // Trueno (Gen II): con lluvia nunca falla; con sol su precisión cae al 50%.
+  let baseAccuracy: number | null = moveMetadata.accuracy;
+  if (move === "thunder") {
+    if (context?.weather === "rain") baseAccuracy = null;
+    else if (context?.weather === "sun") baseAccuracy = 50;
+  }
+  // Fijar Blanco (Lock-On): el siguiente ataque del usuario no puede fallar.
+  if (context?.guaranteedHit) baseAccuracy = null;
+  if (baseAccuracy) {
     // El atacante usa su accuracy stage; el defensor su evasion stage
     const attAccStage  = isAttacking ? myStages.accuracy  : theirStages.accuracy;
     const defEvaStage  = isAttacking ? theirStages.evasion : myStages.evasion;
@@ -497,7 +543,7 @@ const processMove = (
     const brightPowderDrop =
       context?.defenderHeldItem === ItemType.BrightPowder ? BRIGHTPOWDER_ACC_DROP : 0;
     const effectiveAcc =
-      moveMetadata.accuracy * getStageMult(attAccStage) / getStageMult(defEvaStage) -
+      baseAccuracy * getStageMult(attAccStage) / getStageMult(defEvaStage) -
       brightPowderDrop;
     if (effectiveAcc < Math.random() * 100) {
       // F5 — Jump Kick / High Jump Kick: 1 HP de daño al fallar (Gen I RBY)
@@ -595,6 +641,129 @@ const processMove = (
     return { ...defaultReturn, forceFlee: true };
   }
 
+  // ── Clima (Gen II): Danza Lluvia / Día Soleado / Tormenta Arena ──────────
+  if (move === "rain-dance" || move === "sunny-day" || move === "sandstorm") {
+    const target =
+      move === "rain-dance" ? "rain" : move === "sunny-day" ? "sun" : "sandstorm";
+    if (context?.weather === target) {
+      return { ...defaultReturn, isNoEffect: true };
+    }
+    return { ...defaultReturn, isBuff: true, startWeather: target };
+  }
+
+  // ── Atracción (Gen II): solo entre géneros opuestos ──────────────────────
+  if (move === "attract") {
+    const attGender = isAttacking ? us.gender : them.gender;
+    const defGender = isAttacking ? them.gender : us.gender;
+    if (!areOppositeGenders(attGender, defGender)) {
+      return { ...defaultReturn, missed: true };
+    }
+    return { ...defaultReturn, isDebuff: true, isAttract: true };
+  }
+
+  // ── Bis (Encore): el defensor repite su último movimiento ────────────────
+  if (move === "encore") {
+    if (!context?.defenderLastMoveId) {
+      return { ...defaultReturn, missed: true };
+    }
+    return { ...defaultReturn, isDebuff: true, isEncore: true };
+  }
+
+  // ── Pesadilla: solo afecta a objetivos dormidos ──────────────────────────
+  if (move === "nightmare") {
+    if (!context?.isTargetSleeping) {
+      return { ...defaultReturn, missed: true };
+    }
+    return { ...defaultReturn, isDebuff: true, isNightmare: true };
+  }
+
+  // ── Canto Mortal: ambos contendientes se debilitan en 3 turnos ───────────
+  if (move === "perish-song") {
+    return { ...defaultReturn, isPerishSong: true };
+  }
+
+  // ── Púas: trampa en el lado del defensor (afecta a sus cambios) ──────────
+  if (move === "spikes") {
+    return { ...defaultReturn, isBuff: true, isSpikes: true };
+  }
+
+  // ── Mal de Ojo / Red Viva: el defensor no puede huir ni cambiar ──────────
+  if (move === "mean-look" || move === "spider-web") {
+    return { ...defaultReturn, isDebuff: true, isNoEscape: true };
+  }
+
+  // ── Fijar Blanco / Telépata: el siguiente ataque del usuario no falla ────
+  if (move === "lock-on" || move === "mind-reader") {
+    return { ...defaultReturn, isBuff: true, isLockOn: true };
+  }
+
+  // ── Autosugestión: copia los stat stages del rival ───────────────────────
+  if (move === "psych-up") {
+    return { ...defaultReturn, isBuff: true, isPsychUp: true };
+  }
+
+  // ── Aguante: sobrevive cualquier golpe de este turno con 1 PS ────────────
+  if (move === "endure") {
+    return { ...defaultReturn, isBuff: true, isEndure: true };
+  }
+
+  // ── Velo Sagrado: 5 turnos sin estados ni confusión para el usuario ──────
+  if (move === "safeguard") {
+    return { ...defaultReturn, isBuff: true, isSafeguard: true };
+  }
+
+  // ── Tambor (Belly Drum): paga ½ PS máx y maximiza el ataque ──────────────
+  if (move === "belly-drum") {
+    const userMax = isAttacking ? ourStats.hp : theirStats.hp;
+    const userHp  = isAttacking ? us.hp       : them.hp;
+    const cost = Math.floor(userMax / 2);
+    if (userHp <= cost) {
+      return { ...defaultReturn, isNoEffect: true };
+    }
+    // delta +12 → applyStatChange ya recorta al máximo (+6)
+    const maximize: StatChange = { stat: "attack", target: "attacker", delta: +12 };
+    if (isAttacking) {
+      return { ...defaultReturn, isBuff: true, us: { ...usAfterPP, hp: userHp - cost }, statChange: maximize };
+    }
+    return { ...defaultReturn, isBuff: true, them: { ...them, hp: userHp - cost }, statChange: maximize };
+  }
+
+  // ── Conversión2: el usuario adopta un tipo que resista el último move ────
+  if (move === "conversion-2") {
+    const lastMove = context?.defenderLastMoveId;
+    if (!lastMove) {
+      return { ...defaultReturn, missed: true };
+    }
+    const lastType = getMoveMetadata(lastMove).type;
+    const ALL_TYPES = [
+      "normal", "fire", "water", "electric", "grass", "ice", "fighting",
+      "poison", "ground", "flying", "psychic", "bug", "rock", "ghost",
+      "dragon", "dark", "steel",
+    ];
+    const resists = ALL_TYPES.filter((t) => getTypeEffectiveness(lastType, [t]) < 1);
+    if (resists.length === 0) {
+      return { ...defaultReturn, isNoEffect: true };
+    }
+    return {
+      ...defaultReturn,
+      isBuff: true,
+      conversion2Type: resists[Math.floor(Math.random() * resists.length)],
+    };
+  }
+
+  // ── Premonición (Future Sight): golpea 2 turnos después ──────────────────
+  // Gen II: 80 de poder, SIN tipo (sin STAB ni efectividad), stats especiales.
+  if (move === "future-sight") {
+    const lvl    = isAttacking ? us.level : them.level;
+    const atkSpc = isAttacking ? ourStats.special : theirStats.special;
+    const defSpc = isAttacking ? theirStats.special : ourStats.special;
+    const rnd = (217 + Math.floor(Math.random() * 39)) / 255;
+    const dmg = Math.max(1, Math.floor(
+      (Math.floor(((2 * lvl) / 5 + 2) * 80 * (atkSpc / Math.max(1, defSpc))) / 50 + 2) * rnd
+    ));
+    return { ...defaultReturn, futureSightDamage: dmg };
+  }
+
   // ── Sin efecto (Splash y no implementados) ──────────────────────────────
   if (NO_EFFECT_MOVES.has(move)) {
     return { ...defaultReturn, isNoEffect: true };
@@ -602,6 +771,10 @@ const processMove = (
 
   // ── Confusión (estado volátil — procesado en PokemonEncounter) ──────────
   if (CONFUSE_MOVES.has(move)) {
+    // Velo Sagrado (Gen II) también bloquea la confusión
+    if (context?.defenderHasSafeguard) {
+      return { ...defaultReturn, isNoEffect: true };
+    }
     return { ...defaultReturn, isDebuff: true, confuse: true };
   }
 
@@ -697,8 +870,11 @@ const processMove = (
     return { ...defaultReturn, isBuff: true, them: { ...them, hp: theirStats.hp }, statusApply: sleepApply };
   }
 
-  // ── Curación (Recover, Softboiled, Milk Drink) ───────────────────────────
-  const healFraction = HEAL_FRACTION[move];
+  // ── Curación (Recover, Softboiled, Milk Drink, y las de clima/hora) ──────
+  const healFraction =
+    move === "moonlight" || move === "morning-sun" || move === "synthesis"
+      ? timeWeatherHealFraction(move, context?.weather)
+      : HEAL_FRACTION[move];
   if (healFraction !== undefined) {
     if (isAttacking) {
       const healed = Math.min(ourStats.hp, us.hp + Math.floor(ourStats.hp * healFraction));
@@ -726,11 +902,33 @@ const processMove = (
     return { ...defaultReturn, us: { ...usAfterPP, hp: Math.max(0, us.hp - dmg) } };
   }
 
+  // ── Magnitud (Gen II): nivel y potencia aleatorios ────────────────────────
+  // (power es null en la metadata; hay que resolverlo ANTES del branch de
+  // movimientos de estado para que caiga a la rama de daño)
+  let overridePower: number | undefined;
+  if (move === "magnitude") {
+    const r = Math.random();
+    const [magLevel, magPower] =
+      r < 0.05 ? [4, 10]
+      : r < 0.15 ? [5, 30]
+      : r < 0.35 ? [6, 50]
+      : r < 0.65 ? [7, 70]
+      : r < 0.85 ? [8, 90]
+      : r < 0.95 ? [9, 110]
+      : [10, 150];
+    overridePower = magPower;
+    defaultReturn.moveName = `Magnitud ${magLevel}`;
+  }
+
   // ── Movimientos de estado (sin daño) ─────────────────────────────────────
-  if (!moveMetadata.power) {
+  if (!moveMetadata.power && overridePower === undefined) {
     // Condición de estado real (sueño, parálisis, veneno…)
     const statusEntry = STATUS_APPLY_TABLE[move];
     if (statusEntry) {
+      // Velo Sagrado (Gen II): bloquea los estados dirigidos al defensor
+      if (statusEntry.target === "defender" && context?.defenderHasSafeguard) {
+        return { ...defaultReturn, isNoEffect: true };
+      }
       // F13.7 — Thunder-wave (y solo thunder-wave) falla vs Pokémon tipo Ground
       if (move === "thunder-wave") {
         const defenderTypes = isAttacking ? theirMetadata.types : ourMetadata.types;
@@ -776,8 +974,16 @@ const processMove = (
   //
   // CRITICAL HIT in Gen I: ignores all stat stage modifiers (uses base stats).
 
+  // ── Rodar / Corte Furia (Gen II): potencia ×2 por uso consecutivo (cap ×16)
+  if (
+    (move === "rollout" || move === "fury-cutter") &&
+    (context?.attackerConsecutiveHits ?? 0) > 0
+  ) {
+    const n = Math.min(context?.attackerConsecutiveHits ?? 0, 4);
+    overridePower = (moveMetadata.power ?? 10) * Math.pow(2, n);
+  }
+
   // ── Flail / Reversal — potencia variable según HP restante del atacante ───
-  let overridePower: number | undefined;
   if (move === "flail" || move === "reversal") {
     const atkHp    = isAttacking ? us.hp : them.hp;
     const atkMaxHp = isAttacking ? ourStats.hp : theirStats.hp;
@@ -805,7 +1011,8 @@ const processMove = (
     }
   }
 
-  const effectivePower = overridePower ?? moveMetadata.power;
+  // power puede ser null en metadata (p. ej. Magnitud) — overridePower lo cubre
+  const effectivePower = overridePower ?? moveMetadata.power ?? 0;
 
   // Random factor: uniform integer in [217, 255] → [0.851, 1.0]
   const randFactor = (217 + Math.floor(Math.random() * 39)) / 255;
@@ -859,6 +1066,20 @@ const processMove = (
     prevHp > 0 &&
     context?.defenderHeldItem === ItemType.FocusBand &&
     Math.random() < FOCUS_BAND_CHANCE;
+  // Clima (Gen II): lluvia potencia Agua ×1.5 y debilita Fuego ×0.5; el sol,
+  // al revés. Rayo Solar pega a la mitad con lluvia o tormenta de arena.
+  const weatherNow = context?.weather ?? null;
+  let weatherMult = 1;
+  if (weatherNow === "rain") {
+    if (moveMetadata.type === "water") weatherMult = 1.5;
+    else if (moveMetadata.type === "fire") weatherMult = 0.5;
+    if (move === "solar-beam") weatherMult *= 0.5;
+  } else if (weatherNow === "sun") {
+    if (moveMetadata.type === "fire") weatherMult = 1.5;
+    else if (moveMetadata.type === "water") weatherMult = 0.5;
+  } else if (weatherNow === "sandstorm" && move === "solar-beam") {
+    weatherMult *= 0.5;
+  }
 
   if (isAttacking) {
     // Player attacking enemy
@@ -884,7 +1105,7 @@ const processMove = (
 
     const baseDamage = Math.max(1, Math.floor(
       (Math.floor(((2 * us.level) / 5 + 2) * effectivePower * (attack / defense)) / 50 + 2) *
-        stab * typeEff * critMult * randFactor
+        stab * typeEff * critMult * randFactor * weatherMult
     ));
 
     // Movimientos multihit (Double Slap, Fury Attack, Pin Missile, etc.)
@@ -923,11 +1144,16 @@ const processMove = (
       const statuses = ["paralysis", "burn", "freeze"] as const;
       secondaryStatus = { status: statuses[Math.floor(Math.random() * 3)], target: "defender" };
     }
+    // Velo Sagrado del defensor: bloquea estados y confusión secundarios
+    if (context?.defenderHasSafeguard && secondaryStatus?.target === "defender") {
+      secondaryStatus = undefined;
+    }
 
     // F2 — Confusión secundaria (Confusion, Psybeam, Dizzy Punch)
     const confChance = SECONDARY_CONFUSE_CHANCE[move];
     const secondaryConfuse =
-      !subActive && confChance && Math.random() < confChance ? true : false;
+      !subActive && !context?.defenderHasSafeguard && confChance && Math.random() < confChance
+        ? true : false;
 
     // F3 — Cambio de stat secundario (Acid, Aurora Beam, Bubble, Constrict, Psychic…)
     const statSec = SECONDARY_STAT_CHANCE[move];
@@ -971,10 +1197,16 @@ const processMove = (
       ? { move, turns: 2 + Math.floor(Math.random() * 4) }
       : undefined;
 
-    // Cinta Focus del defensor: sobrevive el golpe letal con 1 PS
+    // Aguante del defensor: sobrevive el golpe con 1 PS (determinista)
     let finalThemHp = Math.max(0, them.hp - damageToHp);
+    let themEndured = false;
+    if (finalThemHp === 0 && them.hp > 0 && context?.defenderIsEnduring) {
+      finalThemHp = 1;
+      themEndured = true;
+    }
+    // Cinta Focus del defensor: sobrevive el golpe letal con 1 PS
     let themFocusBandSaved = false;
-    if (focusBandSaves(them.hp, finalThemHp)) {
+    if (!themEndured && focusBandSaves(them.hp, finalThemHp)) {
       finalThemHp = 1;
       themFocusBandSaved = true;
     }
@@ -984,6 +1216,7 @@ const processMove = (
       them: { ...them, hp: finalThemHp },
       us: { ...usAfterPP, hp: newUsHp },
       focusBandSaved: themFocusBandSaved || undefined,
+      enduredHit: themEndured || undefined,
       superEffective,
       notVeryEffective,
       critical: isCrit,
@@ -1022,7 +1255,7 @@ const processMove = (
 
   const baseDmg = Math.max(1, Math.floor(
     (Math.floor(((2 * them.level) / 5 + 2) * effectivePower * (eAttack / eDefense)) / 50 + 2) *
-      stab * typeEff * critMult * randFactor
+      stab * typeEff * critMult * randFactor * weatherMult
   ));
 
   // Movimientos multihit
@@ -1058,10 +1291,15 @@ const processMove = (
     const statuses = ["paralysis", "burn", "freeze"] as const;
     eSecondaryStatus = { status: statuses[Math.floor(Math.random() * 3)], target: "defender" };
   }
+  // Velo Sagrado del defensor (jugador): bloquea estados y confusión secundarios
+  if (context?.defenderHasSafeguard && eSecondaryStatus?.target === "defender") {
+    eSecondaryStatus = undefined;
+  }
 
   const eConfChance = SECONDARY_CONFUSE_CHANCE[move];
   const eSecondaryConfuse =
-    !eSubActive && eConfChance && Math.random() < eConfChance ? true : false;
+    !eSubActive && !context?.defenderHasSafeguard && eConfChance && Math.random() < eConfChance
+      ? true : false;
 
   const eStatSec = SECONDARY_STAT_CHANCE[move];
   const eSecondaryStat: StatChange | StatChange[] | undefined =
@@ -1098,10 +1336,16 @@ const processMove = (
     ? { move, turns: 2 + Math.floor(Math.random() * 4) }
     : undefined;
 
-  // Cinta Focus del jugador: sobrevive el golpe letal con 1 PS (Gen II)
+  // Aguante del jugador: sobrevive el golpe con 1 PS (determinista)
   let finalUsHp = Math.max(0, us.hp - eDamageToHp);
+  let usEndured = false;
+  if (finalUsHp === 0 && us.hp > 0 && context?.defenderIsEnduring) {
+    finalUsHp = 1;
+    usEndured = true;
+  }
+  // Cinta Focus del jugador: sobrevive el golpe letal con 1 PS (Gen II)
   let usFocusBandSaved = false;
-  if (focusBandSaves(us.hp, finalUsHp)) {
+  if (!usEndured && focusBandSaves(us.hp, finalUsHp)) {
     finalUsHp = 1;
     usFocusBandSaved = true;
   }
@@ -1111,6 +1355,7 @@ const processMove = (
     us: { ...usAfterPP, hp: finalUsHp },
     them: { ...them, hp: newThemHp },
     focusBandSaved: usFocusBandSaved || undefined,
+    enduredHit: usEndured || undefined,
     superEffective,
     notVeryEffective,
     critical: isCrit,
