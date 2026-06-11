@@ -816,9 +816,39 @@ Ejemplos: Diglett/Natu 50px · Pikachu 54px · Charizard 62px · Snorlax 64px ·
 
 **Para re-ejecutar** (nuevos sprites o ajuste de rango): script en commit `67546f5`. Cambiar `MIN_TARGET`/`MAX_TARGET` para ampliar o reducir la diferencia de escala.
 
+### 21. Fuga de PII: `load-game` devolvía el `game_state` íntegro sin autenticación (resuelto)
+**Problema**: `list-players` expone TODOS los `user_id` (necesario para el selector de batalla online) y `load-game` devolvía el `game_state` completo a cualquiera que pasara un `user_id`. Encadenando ambos, cualquier invitado podía volcar el bloque `rsvp` de todos los demás (nombre real, acompañante, alergias, nº de niños, asistencia, autobús).
+**Solución** (`supabase/functions/load-game/index.ts`): se redacta el campo `rsvp` (array `PII_FIELDS`) salvo que el solicitante pruebe posesión presentando el `write_token` correcto por la cabecera `x-write-token`. El dueño recibe el estado íntegro; las batallas online y accesos directos reciben la versión sin PII (solo usan `pokemon` + `name`, que es el nombre de entrenador, público a propósito). Añadida validación de formato UUID.
+**Cliente** (`cloud-save.ts` → `loadFromCloud`): envía `x-write-token` (leído de localStorage) por cabecera, no en la URL, para no filtrarlo en logs. Al cargar la propia partida el token coincide → estado íntegro; al cargar el equipo de un rival no coincide → `rsvp` ajeno redactado.
+**Verificado sin romper nada**: `progressScore` (decide local vs nube en `LoadScreen`) NO mira `rsvp`; `OnlineBattleMenu` solo usa `pokemon`+`name`; `OakIntro` (formulario RSVP) solo corre en partida nueva → la redacción nunca re-pide el RSVP.
+
+### 22. `save-game` conserva el `rsvp` previo (blindaje de la redacción #21)
+**Problema**: un cliente con bundle CACHEADO (service worker antiguo, sin el cambio de `x-write-token`) cargaría un estado con `rsvp` redactado y, al volver a guardar, blanquearía el `rsvp` en `game_state`.
+**Solución** (`supabase/functions/save-game/index.ts`): si llega un `gameState` SIN `rsvp` pero ya había uno guardado, se conserva. El `rsvp` es de solo-escritura en el juego (se fija una vez en OakIntro, nunca se borra), así que preservarlo es siempre correcto. Hace el despliegue inmune al orden Vercel/Supabase y al cacheo. La lectura extra solo ocurre cuando falta el `rsvp` (poco común). El dato canónico vive además en la tabla `rsvp`.
+
+### 23. Apropiación de cuenta vía `webauthn-auth-finish` (endurecido)
+**Problema**: la función no verifica la firma criptográfica (decisión documentada por un bug de `@simplewebauthn/server@10` con Deno), pero además el `clientDataJSON` era OPCIONAL (`if (...clientDataJSON)`) → un atacante podía omitirlo y saltarse TODAS las comprobaciones, y NO se vinculaba el `challenge` firmado con el emitido. Quien conociera un `credential_id` ajeno obtenía su `user_id` + `write_token` (control total).
+**Solución** (`supabase/functions/webauthn-auth-finish/index.ts`):
+- `clientDataJSON` ahora es OBLIGATORIO (+ guarda de entrada para `challengeId`/`credential`).
+- Se verifica que `clientData.challenge` coincide con el `challenge` emitido y guardado en `webauthn_challenges` (uso único), en forma canónica base64url sin padding (tolerante a `+/` vs `-_` y a `=`) para no generar falsos `Challenge mismatch`.
+- Se mantienen las comprobaciones de `type` (`webauthn.get`) y `origin` (`ALLOWED_ORIGINS`).
+**Degradación segura**: si `auth-finish` rechaza, `cloud-save.ts` (`webauthnAuth`) cae a la identidad local de `localStorage` → un usuario en su propio dispositivo nunca queda bloqueado.
+**Pendiente** (ver Ideas futuras): la verificación criptográfica completa de la firma sigue sin implementarse.
+
+### 24. `admin-player`: validación de formato UUID (defensa en profundidad)
+**Solución** (`supabase/functions/admin-player/index.ts`): GET/PUT/DELETE validan que `userId` tiene formato UUID antes de tocar la BD. El admin ya está protegido por `x-admin-key` (`ADMIN_SECRET`); esto solo rechaza IDs malformados que habrían dado error igualmente.
+
+> **Estado de despliegue (revisión de seguridad)**: mergeado a `master` y desplegado. Edge Functions activas en Supabase (`kplfjrjibjptigvfgdvy`): `load-game` v4, `webauthn-auth-finish` v14, `save-game` v8, `admin-player` v2. `verify_jwt` preservado en cada una (`admin-player` = true; resto = false). Bundle del juego: `main.c45b5a0b.js`. La cabecera `x-write-token` está en la allowlist CORS de `_shared/cors.ts`.
+
 ---
 
 ## Ideas futuras (no implementadas)
+
+### Seguridad pendiente (post-boda)
+Mejoras de seguridad identificadas en la revisión que NO se implementaron por riesgo/coste frente al modelo de amenaza real (invitado con DevTools) y al timing del evento:
+- **Verificación criptográfica completa de WebAuthn** (la grande): `webauthn-auth-finish` aún NO comprueba la firma con la clave pública COSE almacenada (`webauthn_credentials.public_key`). Implementarla requiere parseo COSE/CBOR + Web Crypto (`crypto.subtle.verify` sobre `authenticatorData || sha256(clientDataJSON)`) y probarla contra autenticadores reales (Face ID/huella). Hasta entonces, quien conozca un `credential_id` ajeno podría obtener su `user_id`+`write_token`; el `credential_id` no se expone públicamente (solo vive en el localStorage del dueño), y el endurecimiento #23 (challenge vinculado + uso único) eleva mucho la barrera. **Hacerlo con dispositivos de prueba.**
+- **Rate-limiting** en `create-user`, `webauthn-register-start` y `save-rsvp` (auto-crean filas anónimas): sin límite permiten spam/DoS de cuota. Requiere infra de throttling (p.ej. límite por IP en un edge middleware o tabla de contadores).
+- **CORS `*`** en las Edge Functions: necesario hoy para servir el juego con la `apikey` pública; una vez redactada la PII (#21) su impacto es bajo. Revisar si conviene restringir a `ALLOWED_ORIGINS` en las funciones que no sirven al juego.
 
 ### Item Mapa en el juego
 Implementar el objeto "Mapa" (ItemType.Map) usando `kanto_region.png` (237×213px en `game-src/src/assets/map/kanto_region.png`).
