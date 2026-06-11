@@ -61,6 +61,18 @@ export interface PokemonInstance {
    * Espeon/Umbreon, etc.). Indefinido en saves antiguos → se trata como base 70.
    */
   friendship?: number;
+  /**
+   * Género (Gen II): "male" | "female" | null (sin género, p.ej. Magnemite).
+   * Se sortea una vez al crear el Pokémon según el ratio oficial de la especie.
+   * Indefinido en saves antiguos → se asigna al cargar (migración perezosa).
+   */
+  gender?: "male" | "female" | null;
+  /**
+   * Objeto equipado (Gen II). Se da/quita desde la mochila o el menú Pokémon.
+   * Sus efectos (Restos, objetos de tipo ×1.1, bayas autoconsumibles, etc.)
+   * se aplican en combate. null/undefined = sin objeto.
+   */
+  heldItem?: ItemType | null;
 }
 
 export interface PokemonEncounterType {
@@ -68,6 +80,11 @@ export interface PokemonEncounterType {
   level: number;
   hp: number;
   moves: string[];
+  /** Género del Pokémon salvaje/rival (Gen II). Se sortea al crear el
+   *  encuentro y, si se captura, se conserva en el PokemonInstance. */
+  gender?: "male" | "female" | null;
+  /** ¿El encuentro empezó pescando? Lo usa la Cebo Ball (Lure Ball, ×3). */
+  fromFishing?: boolean;
   /** Si el encuentro es un Pokémon estático del mapa, questId a completar al acabar. */
   staticQuestId?: string;
 }
@@ -120,6 +137,10 @@ export interface GameState {
   /** Contador de pasos para la ganancia de amistad al caminar (Gen II). Cada
    *  STEPS_PER_FRIENDSHIP pasos, el equipo gana amistad. Persistido. */
   friendshipStepCounter?: number;
+  /** Árboles de bayas recogidos (Gen II): clave "<mapId>-<x>-<y>" → fecha
+   *  local de la última recogida. El árbol rebrota al cambiar de día
+   *  (medianoche, hora del dispositivo). Persistido en el save. */
+  berryTreesPicked?: Record<string, string>;
 }
 
 export interface RSVPData {

@@ -327,6 +327,19 @@ export interface CuttableTreeType {
 }
 
 /**
+ * Árbol de bayas (Gen II). Bloquea el paso como un muro. Da UNA baya al día:
+ * al pulsar A de frente se recoge `item`; el árbol rebrota a medianoche
+ * (hora local del dispositivo), igual que en Oro/Plata/Cristal.
+ * El estado de recogida persiste en el save (`berryTreesPicked`,
+ * clave `"<mapId>-<x>-<y>"` → fecha local de la última recogida).
+ */
+export interface BerryTreeType {
+  pos: PosType;
+  /** Baya (u objeto) que da el árbol cada día. */
+  item: ItemType;
+}
+
+/**
  * Roca empujable con la MO Fuerza (HM04 / "strength"), estilo Gen I.
  * Bloquea el paso como un muro hasta que el jugador activa FUERZA (pulsando A
  * frente a la roca con un Pokémon del equipo que conozca el movimiento
@@ -429,6 +442,8 @@ export interface MapType {
   staticPokemon?: StaticPokemonType[];
   /** Árboles cortables con la MO Corte. Bloquean el paso hasta ser cortados. */
   cuttableTrees?: CuttableTreeType[];
+  /** Árboles de bayas (Gen II): una baya al día, rebrotan a medianoche. */
+  berryTrees?: BerryTreeType[];
   /** Rocas empujables con la MO Fuerza (strength). Bloquean el paso. */
   boulders?: BoulderType[];
   /** Posición del NPC de batallas online en este mapa (centros Pokémon) */

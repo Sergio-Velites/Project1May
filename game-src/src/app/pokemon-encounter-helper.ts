@@ -1,4 +1,5 @@
 import { PokemonEncounterType } from "../state/state-types";
+import { rollGender } from "./gender-helper";
 import { getPokemonMetadata } from "./use-pokemon-metadata";
 import { getPokemonStats } from "./use-pokemon-stats";
 
@@ -20,6 +21,7 @@ const getPokemonEncounter = (
     level,
     hp: getPokemonStats(id, level).hp,
     moves,
+    gender: rollGender(id),
   };
 };
 

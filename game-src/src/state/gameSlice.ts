@@ -7,8 +7,9 @@ import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
-import { boulderIdAt, canWalk, isCuttableTree, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
+import { boulderIdAt, canWalk, isBerryTree, isCuttableTree, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
 import { BASE_FRIENDSHIP, STEPS_PER_FRIENDSHIP, friendshipOnWalk, getFriendship } from "../app/evolution-helper";
+import { rollGender } from "../app/gender-helper";
 import {
   Direction,
   GameState,
@@ -247,6 +248,7 @@ export const gameSlice = createSlice({
       });
       if (isTrainer(blockingTrainersDown, state.pos.x, state.pos.y + 1)) return;
       if (isCuttableTree(map.cuttableTrees, state.pos.x, state.pos.y + 1, [...state.completedQuests, ...(state.sessionCutTrees ?? [])])) return;
+      if (isBerryTree(map.berryTrees, state.pos.x, state.pos.y + 1)) return;
       if (isStaticPokemon(map.staticPokemon, state.pos.x, state.pos.y + 1, state.completedQuests)) return;
       if (
         isItem(
@@ -466,8 +468,15 @@ export const gameSlice = createSlice({
           ? s.visitedMaps
           : inferVisitedMaps(s);
       state.lastHealLocation = s.lastHealLocation ?? undefined;
+      // Árboles de bayas (Gen II): restaurar fechas de recogida del save.
+      state.berryTreesPicked = s.berryTreesPicked ?? {};
       // Guardar al máximo 6 pokémon en equipo (integridad del save)
       if (state.pokemon.length > 6) state.pokemon = state.pokemon.slice(0, 6);
+      // Migración Gen II: los saves anteriores al sistema de género no traen
+      // el campo → se sortea aquí una vez y queda persistido al guardar.
+      for (const p of [...state.pokemon, ...state.pc]) {
+        if (p.gender === undefined) p.gender = rollGender(p.id);
+      }
       recordVisit(state, s.map);
       if (s.rsvp) state.rsvp = s.rsvp;
     },
@@ -504,6 +513,23 @@ export const gameSlice = createSlice({
       action: PayloadAction<{ index: number; pokemon: PokemonInstance }>
     ) => {
       state.pokemon[action.payload.index] = action.payload.pokemon;
+    },
+    /** Marca un árbol de bayas como recogido hoy (Gen II). */
+    pickBerryTree: (
+      state,
+      action: PayloadAction<{ treeKey: string; date: string }>
+    ) => {
+      if (!state.berryTreesPicked) state.berryTreesPicked = {};
+      state.berryTreesPicked[action.payload.treeKey] = action.payload.date;
+    },
+    /** Equipa o retira (item: null) el objeto de un Pokémon del equipo (Gen II). */
+    setHeldItem: (
+      state,
+      action: PayloadAction<{ index: number; item: ItemType | null }>
+    ) => {
+      const p = state.pokemon[action.payload.index];
+      if (!p) return;
+      p.heldItem = action.payload.item;
     },
     /**
      * Intercambia dos movimientos del pokémon activo (estilo Select de Gen I).
@@ -621,6 +647,10 @@ export const gameSlice = createSlice({
       if (action.payload.friendship === undefined) {
         action.payload.friendship = BASE_FRIENDSHIP;
       }
+      // Género (Gen II): se sortea una única vez al obtener el Pokémon.
+      if (action.payload.gender === undefined) {
+        action.payload.gender = rollGender(id);
+      }
       if (!state.seenPokemon.includes(id)) state.seenPokemon.push(id);
       if (!state.caughtPokemon.includes(id)) state.caughtPokemon.push(id);
       if (state.pokemon.length === 6) {
@@ -735,6 +765,8 @@ export const {
   updatePokemonEncounter,
   updatePokemon,
   updateSpecificPokemon,
+  pickBerryTree,
+  setHeldItem,
   swapMoves,
   setPokemonStatus,
   recoverFromFainting,
@@ -820,6 +852,9 @@ export const selectSessionCutTrees = (state: RootState) =>
 
 export const selectBoulderPositions = (state: RootState) =>
   state.game.boulderPositions ?? {};
+
+export const selectBerryTreesPicked = (state: RootState) =>
+  state.game.berryTreesPicked ?? {};
 
 export const selectStrengthActive = (state: RootState) =>
   state.game.strengthActive ?? false;

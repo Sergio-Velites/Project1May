@@ -7,18 +7,33 @@ import {
   selectConfirmationMenu,
   selectItemsMenu,
   selectLearningMove,
+  showActionOnPokemon,
   showConfirmationMenu,
   showText,
 } from "../state/uiSlice";
 import {
+  addInventory,
   consumeItem,
   selectInventory,
   selectName,
+  selectPokemon,
   selectPokemonEncounter,
+  setHeldItem,
 } from "../state/gameSlice";
 import { useEffect, useRef, useState } from "react";
 import useItemData, { ItemData } from "../app/use-item-data";
 import { InventoryItemType } from "../state/state-types";
+import { getPokemonMetadata } from "../app/use-pokemon-metadata";
+
+// Gen II: casi CUALQUIER objeto puede equiparse (aunque solo los de
+// held-item-helper.ts tienen efecto en combate — el resto simplemente "lo
+// lleva", como en el original). Excluidos: medallas, objetos clave
+// (countable: false — Bici, Mapa, cañas…) y MT/MO.
+const isGivable = (item: ItemData): boolean =>
+  !item.badge &&
+  item.countable &&
+  !item.type.startsWith("tm") &&
+  !item.type.startsWith("hm");
 
 const ItemsMenu = () => {
   const dispatch = useDispatch();
@@ -26,6 +41,7 @@ const ItemsMenu = () => {
   const inventory = useSelector(selectInventory);
   const name = useSelector(selectName);
   const inBattle = !!useSelector(selectPokemonEncounter);
+  const pokemon = useSelector(selectPokemon);
   const itemData = useItemData();
   const usingItem = !!useSelector(selectActionOnPokemon);
   const learningMove = !!useSelector(selectLearningMove);
@@ -108,6 +124,43 @@ const ItemsMenu = () => {
                 }
               },
             },
+            // Dar (Gen II): equipar el objeto a un Pokémon del equipo. Si ya
+            // llevaba otro, vuelve a la mochila (intercambio, como el original).
+            ...(isGivable(selected) && !inBattle
+              ? [
+                  {
+                    label: "Dar",
+                    action: () => {
+                      const itemToGive = selected.type;
+                      const itemName = selected.name;
+                      dispatch(
+                        showActionOnPokemon((index: number) => {
+                          const target = pokemon[index];
+                          if (!target) return;
+                          const prev = target.heldItem ?? null;
+                          dispatch(setHeldItem({ index, item: itemToGive }));
+                          dispatch(consumeItem(itemToGive));
+                          if (prev) {
+                            dispatch(addInventory({ item: prev, amount: 1 }));
+                          }
+                          const pkName = getPokemonMetadata(target.id).name.toUpperCase();
+                          dispatch(
+                            showText(
+                              prev
+                                ? [
+                                    `Le quitaste ${itemData[prev].name} a ${pkName}`,
+                                    `y le diste ${itemName}.`,
+                                  ]
+                                : [`¡${pkName} ahora lleva ${itemName}!`]
+                            )
+                          );
+                        })
+                      );
+                      setSelected(null);
+                    },
+                  },
+                ]
+              : []),
             {
               label: "Tirar",
               action: () => {

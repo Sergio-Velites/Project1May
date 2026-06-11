@@ -11,12 +11,14 @@ import { useCallback, useState } from "react";
 import styled, { css } from "styled-components";
 import { useSelector } from "react-redux";
 import { PokemonInstance } from "../state/state-types";
+import { genderSymbol } from "../app/gender-helper";
 import usePokemonMetadata from "../app/use-pokemon-metadata";
 import usePokemonStats from "../app/use-pokemon-stats";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import PixelImage from "../styles/PixelImage";
 import { getMoveMetadata } from "../app/use-move-metadata";
+import useItemData from "../app/use-item-data";
 import { selectName } from "../state/gameSlice";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -89,6 +91,13 @@ const Txt = styled.span<{ $size?: number; $bold?: boolean }>`
   font-size: ${(p) => (p.$size ? `${p.$size}em` : "1em")};
   font-weight: ${(p) => (p.$bold ? "bold" : "normal")};
   line-height: 1.6;
+`;
+
+// El glifo ♂/♀ viene de la fuente fallback (no existe en la pixel font);
+// line-height: 0 evita que sus métricas inflen la altura de la cabecera.
+const GenderGlyph = styled.span`
+  font-size: 0.9em;
+  line-height: 0;
 `;
 
 // ── Page 1 — ESTADO ───────────────────────────────────────────────────────────
@@ -221,6 +230,10 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
   const meta   = usePokemonMetadata(pokemon.id);
   const stats  = usePokemonStats(pokemon.id, pokemon.level);
   const otName = useSelector(selectName) as string;
+  const itemData = useItemData();
+  const heldItemName = pokemon.heldItem
+    ? itemData[pokemon.heldItem]?.name ?? null
+    : null;
 
   useEvent(Event.Left,  useCallback(() => setPage(0), []));
   useEvent(Event.Right, useCallback(() => setPage(1), []));
@@ -249,7 +262,10 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
         {/* Header */}
         <HeaderBar $align="center" $justify="space-between">
           <Txt $size={0.9}>{noStr}</Txt>
-          <Txt $size={1.05} $bold>{meta.name.toUpperCase()}</Txt>
+          <Txt $size={1.05} $bold>
+            {meta.name.toUpperCase()}
+            <GenderGlyph>{genderSymbol(pokemon.gender)}</GenderGlyph>
+          </Txt>
         </HeaderBar>
 
         {/* Types */}
@@ -277,6 +293,7 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
             <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
               <Txt $size={0.8}>Nv.{pokemon.level}</Txt>
               <Txt $size={0.75}>Alt.{fmtHeight(meta.height)}</Txt>
+              {heldItemName && <Txt $size={0.75}>Obj.{heldItemName}</Txt>}
             </div>
           </InfoBlock>
         </Row>
@@ -320,7 +337,10 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
     <Screen>
       {/* Header */}
       <MovesHeader $align="center" $justify="space-between">
-        <Txt $size={1.0} $bold>{meta.name.toUpperCase()}</Txt>
+        <Txt $size={1.0} $bold>
+          {meta.name.toUpperCase()}
+          <GenderGlyph>{genderSymbol(pokemon.gender)}</GenderGlyph>
+        </Txt>
         <Txt $size={0.85}>Nv.{pokemon.level}</Txt>
       </MovesHeader>
 

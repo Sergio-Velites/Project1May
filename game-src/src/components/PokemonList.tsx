@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import {
+  addInventory,
   markTreeCut,
   moveDown,
   moveLeft,
@@ -16,11 +17,13 @@ import {
   selectVisitedMaps,
   selectStrengthActive,
   selectFlashActive,
+  setHeldItem,
   setOnSurfing,
   setStrengthActive,
   setFlashActive,
   swapPokemonPositions,
 } from "../state/gameSlice";
+import useItemData from "../app/use-item-data";
 import {
   clearActiveCutTree,
   hideStartMenu,
@@ -120,6 +123,7 @@ const PokemonList = ({
   const sessionCutTrees = useSelector(selectSessionCutTrees);
   const strengthActive = useSelector(selectStrengthActive);
   const flashActive = useSelector(selectFlashActive);
+  const itemData = useItemData();
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState(false);
   const [switching, setSwitching] = useState<number | null>(null);
@@ -358,7 +362,26 @@ const PokemonList = ({
           },
         };
 
-        const extras = [cutItem, surfItem, flyItem, strengthItem, flashItem].filter(Boolean) as {
+        // ── Opción QUITAR OBJETO (Gen II, party screen) ──────────────────
+        // Aparece si el pokémon lleva un objeto equipado: lo devuelve a la
+        // mochila. Para DAR un objeto se usa la mochila (Objeto → Dar).
+        const quitarItem = !!target?.heldItem && {
+          label: "Quitar obj.",
+          action: () => {
+            setSelected(false);
+            const held = target!.heldItem!;
+            const targetName = getPokemonMetadata(target!.id).name.toUpperCase();
+            dispatch(setHeldItem({ index: cursorIndex, item: null }));
+            dispatch(addInventory({ item: held, amount: 1 }));
+            close();
+            dispatch(hideStartMenu());
+            dispatch(
+              showText([`Le quitaste ${itemData[held].name} a ${targetName}.`])
+            );
+          },
+        };
+
+        const extras = [cutItem, surfItem, flyItem, strengthItem, flashItem, quitarItem].filter(Boolean) as {
           label: string;
           action: () => void;
         }[];

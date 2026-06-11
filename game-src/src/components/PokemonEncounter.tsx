@@ -21,10 +21,20 @@ import {
   updatePokemon,
   updatePokemonEncounter,
   updateSpecificPokemon,
+  setHeldItem,
   setPokemonStatus,
   seePokemon,
   catchPokemonPokedex,
 } from "../state/gameSlice";
+import { ItemType } from "../app/use-item-data";
+import {
+  HP_BERRIES,
+  HP_BERRY_THRESHOLD,
+  LEFTOVERS_FRACTION,
+  QUICK_CLAW_CHANCE,
+  berryCuresStatus,
+  curesConfusion,
+} from "../app/held-item-helper";
 import usePokemonMetadata, { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import Frame from "./Frame";
 import HealthBar from "./HealthBar";
@@ -77,6 +87,7 @@ import { playCry, isCryActive, waitForCry, cancelCry } from "../app/pokemon-cry"
 import { MoveAnimation } from "./MoveAnimation";
 import { PokemonEncounterType, PokemonInstance } from "../state/state-types";
 import getPokemonEncounter from "../app/pokemon-encounter-helper";
+import { genderSymbol } from "../app/gender-helper";
 import PixelImage from "../styles/PixelImage";
 
 const MOVEMENT_ANIMATION = 1300;
@@ -128,6 +139,15 @@ const Name = styled.div`
   font-size: 3.5cqw;
   font-family: "PokemonGB";
   text-transform: uppercase;
+`;
+
+// El glifo ♂/♀ viene de la fuente fallback (no existe en PokemonGB), cuyas
+// métricas inflarían la altura de línea y desplazarían la barra de PS.
+// line-height: 0 evita que el span contribuya a la caja de línea.
+const GenderGlyph = styled.span`
+  font-family: "PokemonGB", sans-serif;
+  font-size: 3.1cqw;
+  line-height: 0;
 `;
 
 const Level = styled.div`
@@ -750,6 +770,41 @@ const PokemonEncounter = () => {
   const lastEnemyMoveRef = useRef<string | null>(null);
   // Último move usado por el jugador (para Disable del rival)
   const lastPlayerMoveRef = useRef<string | null>(null);
+  // Última Poké Ball lanzada (la Amigo Ball fija amistad 200 al capturar)
+  const lastBallUsedRef = useRef<ItemType | null>(null);
+  // ── Gen II: clima y estados volátiles nuevos ──────────────────────────
+  // Clima activo en el campo: 5 turnos desde Danza Lluvia/Día Soleado/T. Arena
+  const weatherRef = useRef<{ type: "rain" | "sun" | "sandstorm"; turns: number } | null>(null);
+  // Atracción: el combatiente está enamorado (50% de no actuar)
+  const playerAttractedRef = useRef(false);
+  const enemyAttractedRef = useRef(false);
+  // Bis (Encore): obligado a repetir su último movimiento N turnos
+  const playerEncoreRef = useRef<{ move: string; turns: number } | null>(null);
+  const enemyEncoreRef = useRef<{ move: string; turns: number } | null>(null);
+  // Pesadilla: pierde ¼ PS por turno mientras duerma
+  const playerNightmareRef = useRef(false);
+  const enemyNightmareRef = useRef(false);
+  // Canto Mortal: cuenta atrás hasta debilitarse (null = inactivo)
+  const playerPerishRef = useRef<number | null>(null);
+  const enemyPerishRef = useRef<number | null>(null);
+  // Púas en cada lado del campo (dañan al que entra)
+  const playerSpikesRef = useRef(false);
+  const enemySpikesRef = useRef(false);
+  // Fijar Blanco: el siguiente ataque no falla
+  const playerLockOnRef = useRef(false);
+  const enemyLockOnRef = useRef(false);
+  // Premonición pendiente sobre cada bando
+  const playerFutureSightRef = useRef<{ damage: number; turns: number } | null>(null);
+  const enemyFutureSightRef = useRef<{ damage: number; turns: number } | null>(null);
+  // Usos consecutivos de Rodar/Corte Furia (rampa ×2)
+  const playerConsecHitsRef = useRef(0);
+  const enemyConsecHitsRef = useRef(0);
+  // Velo Sagrado: turnos restantes de protección contra estados
+  const playerSafeguardRef = useRef(0);
+  const enemySafeguardRef = useRef(0);
+  // Aguante: sobrevive con 1 PS este turno
+  const playerEnduringRef = useRef(false);
+  const enemyEnduringRef = useRef(false);
 
   // Disable: move inhabilitado del rival + turnos restantes
   const enemyDisabledMoveRef  = useRef<string | null>(null);
@@ -864,9 +919,7 @@ const PokemonEncounter = () => {
               ...pokemon[involvedPokemon[nextIndex]],
               xp:
                 pokemon[involvedPokemon[nextIndex]].xp +
-                Math.round(
-                  getXp(enemy.id, enemy.level, isTrainer) / aliveCount
-                ),
+                earnedXpFor(pokemon[involvedPokemon[nextIndex]], aliveCount),
             },
           })
         );
@@ -896,9 +949,14 @@ const PokemonEncounter = () => {
     if (isTrainer && trainerPokemonIndex < trainer?.pokemon.length - 1) {
       const newIndex = trainerPokemonIndex + 1;
       const newPokemon = trainer?.pokemon[newIndex];
-      dispatch(
-        encounterPokemon(getPokemonEncounter(newPokemon.id, newPokemon.level))
-      );
+      const newEncounter = getPokemonEncounter(newPokemon.id, newPokemon.level);
+      // Gen II — Púas del jugador: dañan al nuevo Pokémon rival al entrar
+      // (⅛ PS máx; clamp a 1 para no soportar un KO en la entrada).
+      if (enemySpikesRef.current) {
+        const spikesDmg = Math.max(1, Math.floor(newEncounter.hp / 8));
+        newEncounter.hp = Math.max(1, newEncounter.hp - spikesDmg);
+      }
+      dispatch(encounterPokemon(newEncounter));
       setTrainerPokemonIndex(newIndex);
 
       // Gen I: todos los efectos volátiles desaparecen cuando un Pokémon
@@ -943,6 +1001,16 @@ const PokemonEncounter = () => {
       enemyConvertedTypesRef.current   = null;
       enemySubHpRef.current            = null;
       setEnemySubVisible(false);
+      // ── Gen II — volátiles nuevos del rival que sale ─────────────────
+      enemyAttractedRef.current = false;
+      playerAttractedRef.current = false; // la atracción se rompe al salir
+      enemyEncoreRef.current = null;
+      enemyNightmareRef.current = false;
+      enemyPerishRef.current = null;
+      enemyLockOnRef.current = false;
+      enemyConsecHitsRef.current = 0;
+      enemyEnduringRef.current = false;
+      enemyFutureSightRef.current = null;
 
       dispatch(seePokemon(newPokemon.id));
       throwPokeballAtEnemy(49, newPokemon.id);
@@ -1105,6 +1173,29 @@ const PokemonEncounter = () => {
       enemySubHpRef.current  = null;
       setPlayerSubVisible(false);
       setEnemySubVisible(false);
+      // ── Reset Gen II al empezar combate ─────────────────────────────
+      weatherRef.current = null;
+      playerAttractedRef.current = false;
+      enemyAttractedRef.current = false;
+      playerEncoreRef.current = null;
+      enemyEncoreRef.current = null;
+      playerNightmareRef.current = false;
+      enemyNightmareRef.current = false;
+      playerPerishRef.current = null;
+      enemyPerishRef.current = null;
+      playerSpikesRef.current = false;
+      enemySpikesRef.current = false;
+      playerLockOnRef.current = false;
+      enemyLockOnRef.current = false;
+      playerFutureSightRef.current = null;
+      enemyFutureSightRef.current = null;
+      playerConsecHitsRef.current = 0;
+      enemyConsecHitsRef.current = 0;
+      playerSafeguardRef.current = 0;
+      enemySafeguardRef.current = 0;
+      playerEnduringRef.current = false;
+      enemyEnduringRef.current = false;
+      lastBallUsedRef.current = null;
       setMoveAnim(null);
       setStage(0);
       // Register enemy as SEEN in Pokédex
@@ -1258,7 +1349,15 @@ const PokemonEncounter = () => {
       };
 
       throwPokeballAtEnemy();
-      const caught = catchesPokemon(enemy, pokeballThrowing, enemyStatusRef.current);
+      // Recordar la ball usada: la Amigo Ball fija amistad 200 tras capturar
+      // (pokeballThrowing ya estará a null cuando lleguemos al stage 45).
+      lastBallUsedRef.current = pokeballThrowing;
+      const caught = catchesPokemon(enemy, pokeballThrowing, enemyStatusRef.current, {
+        playerLevel: active?.level,
+        activeSpeciesId: active?.id,
+        activeGender: active?.gender,
+        fromFishing: enemy.fromFishing,
+      });
       setTimeout(() => {
         if (caught) {
           shakePokeball(3, caught);
@@ -1357,9 +1456,7 @@ const PokemonEncounter = () => {
         }
         if (firstIdx !== 0) setProcessingInvolvedPokemon(firstIdx);
         const targetPokemon = pokemon[involvedPokemon[firstIdx]];
-        const earnedXp = Math.round(
-          getXp(enemy.id, enemy.level, isTrainer) / divisor
-        );
+        const earnedXp = earnedXpFor(targetPokemon, divisor);
         const updatedXp = targetPokemon.xp + earnedXp;
         dispatch(
           updateSpecificPokemon({
@@ -1539,6 +1636,11 @@ const PokemonEncounter = () => {
           }),
           // Keep current HP (Gen I behaviour: caught pokemon retains battle HP)
           hp: Math.max(1, enemy.hp),
+          // Conservar el género visto durante el combate (Gen II).
+          gender: enemy.gender,
+          // Amigo Ball (Gen II): el Pokémon capturado llega con amistad 200.
+          friendship:
+            lastBallUsedRef.current === ItemType.FriendBall ? 200 : undefined,
         })
       );
       // Cambiar stage para evitar re-entrada mientras se muestra el texto
@@ -1582,7 +1684,11 @@ const PokemonEncounter = () => {
 
     if (stage === 52) {
       if (!trainer) throw new Error("No trainer found");
-      dispatch(gainMoney(trainer.money || 0));
+      // Moneda Amuleto (Gen II): ×2 dinero si un participante la llevaba.
+      const hasAmuletCoin = involvedPokemon.some(
+        (i) => pokemon[i]?.heldItem === ItemType.AmuletCoin
+      );
+      dispatch(gainMoney((trainer.money || 0) * (hasAmuletCoin ? 2 : 1)));
       endEncounter_();
     }
   });
@@ -1693,8 +1799,9 @@ const PokemonEncounter = () => {
         1,
         involvedPokemon.filter((i) => pokemon[i].hp > 0).length
       );
-      return `${processingMetadata.name.toUpperCase()} ganó ${Math.round(
-        getXp(enemy.id, enemy.level, isTrainer) / aliveCount
+      return `${processingMetadata.name.toUpperCase()} ganó ${earnedXpFor(
+        processingPokemon,
+        aliveCount
       )} puntos EXP.`;
     }
     if (stage === 22) {
@@ -1763,6 +1870,10 @@ const PokemonEncounter = () => {
     }
     // Si el rival está en Bide, usar bide
     if (enemyBideTurnsRef.current > 0) return "bide";
+    // Bis (Encore): el rival está obligado a repetir su último movimiento
+    if (enemyEncoreRef.current && enemyEncoreRef.current.turns > 0) {
+      return enemyEncoreRef.current.move;
+    }
     // F11 — Rage: rival lockeado en Rage
     if (enemyRageActiveRef.current) return "rage";
     // Si el rival está en Trashing, continuar con ese move
@@ -1822,6 +1933,16 @@ const PokemonEncounter = () => {
     }
     if (!isPlayer && enemyFlinchRef.current) {
       enemyFlinchRef.current = false;
+      return true;
+    }
+
+    // ── Atracción (Gen II): 50% de no poder atacar ────────────────────────
+    const attracted = isPlayer ? playerAttractedRef.current : enemyAttractedRef.current;
+    if (attracted && Math.random() < 0.5) {
+      const nm = isPlayer
+        ? activeMetadata.name.toUpperCase()
+        : enemyMetadata.name.toUpperCase() + " rival";
+      setAlertText(`¡${nm} está enamorado y no puede atacar!`);
       return true;
     }
 
@@ -2036,6 +2157,18 @@ const PokemonEncounter = () => {
     lastSpecialDamageRef.current  = 0;
     playerProtectRef.current = false;
     enemyProtectRef.current  = false;
+    // ── Gen II — volátiles nuevos del Pokémon que sale ───────────────
+    playerAttractedRef.current = false;
+    // La atracción se rompe cuando cualquiera de los dos sale del campo.
+    enemyAttractedRef.current = false;
+    playerEncoreRef.current = null;
+    playerNightmareRef.current = false;
+    // La cuenta de Canto Mortal se cancela al salir del campo.
+    playerPerishRef.current = null;
+    playerLockOnRef.current = false;
+    playerConsecHitsRef.current = 0;
+    playerEnduringRef.current = false;
+    // Velo Sagrado y Púas son condiciones de BANDO: persisten al cambiar.
     enemyLeechSeededRef.current = enemyLeechSeededRef.current; // se mantiene en el rival
     // Gen I: Transform revierte cuando el Pokémon sale del campo.
     // Limpiamos la entrada del Pokémon que sale (activePokemonIndex).
@@ -2048,16 +2181,39 @@ const PokemonEncounter = () => {
 
     // Cargar el estado persistente del Pokémon que entra.
     const incoming = pokemon[index];
+    // Gen II: el envenenamiento grave (Tóxico) pasa a veneno normal cuando
+    // el Pokémon sale del campo. Aplicarlo al que SALE…
+    if (playerStatusRef.current?.type === "badly-poisoned") {
+      dispatch(
+        setPokemonStatus({
+          index: activePokemonIndex,
+          status: { type: "poison", turns: 1 },
+        })
+      );
+    }
+    // …y al que ENTRA si lo arrastraba de antes (saves antiguos).
     const incomingStatus = (incoming?.status ?? null) as typeof playerStatus;
     if (incomingStatus?.type === "badly-poisoned") {
-      // Reiniciar contador (Gen I).
-      const reset = { ...incomingStatus, turns: 1 };
-      setPlayerStatus(reset);
-      playerStatusRef.current = reset;
-      dispatch(setPokemonStatus({ index, status: reset }));
+      const downgraded = { type: "poison" as const, turns: 1 };
+      setPlayerStatus(downgraded as typeof playerStatus);
+      playerStatusRef.current = downgraded as typeof playerStatus;
+      dispatch(setPokemonStatus({ index, status: downgraded }));
     } else {
       setPlayerStatus(incomingStatus);
       playerStatusRef.current = incomingStatus;
+    }
+
+    // ── Gen II — Púas: dañan al Pokémon que entra (⅛ PS máx) ──────────
+    // Clamp a 1 PS: el flujo de cambio no soporta un KO en la entrada.
+    if (playerSpikesRef.current && incoming && incoming.hp > 0) {
+      const incomingMax = getPokemonStats(incoming.id, incoming.level).hp;
+      const spikesDmg = Math.max(1, Math.floor(incomingMax / 8));
+      dispatch(
+        updateSpecificPokemon({
+          index,
+          pokemon: { ...incoming, hp: Math.max(1, incoming.hp - spikesDmg) },
+        })
+      );
     }
 
     dispatch(setActivePokemon(index));
@@ -2087,6 +2243,14 @@ const PokemonEncounter = () => {
     defenderSubHp: playerSubHpRef.current ?? 0,
     defenderIsProtected: playerProtectRef.current,
     attackerHasFocusEnergy: enemyFocusEnergyRef.current,
+    // Los rivales de este juego no llevan objetos; el defensor es el jugador.
+    defenderHeldItem: active?.heldItem ?? null,
+    weather: weatherRef.current?.type ?? null,
+    defenderIsEnduring: playerEnduringRef.current,
+    guaranteedHit: enemyLockOnRef.current,
+    defenderLastMoveId: lastPlayerMoveRef.current,
+    attackerConsecutiveHits: enemyConsecHitsRef.current,
+    defenderHasSafeguard: playerSafeguardRef.current > 0,
   });
   const buildPlayerAttackCtx = (): MoveContext => ({
     lastPhysicalDamageTaken: lastPhysicalDamageRef.current,
@@ -2100,7 +2264,27 @@ const PokemonEncounter = () => {
     defenderSubHp: enemySubHpRef.current ?? 0,
     defenderIsProtected: enemyProtectRef.current,
     attackerHasFocusEnergy: playerFocusEnergyRef.current,
+    attackerHeldItem: active?.heldItem ?? null,
+    weather: weatherRef.current?.type ?? null,
+    defenderIsEnduring: enemyEnduringRef.current,
+    guaranteedHit: playerLockOnRef.current,
+    defenderLastMoveId: lastEnemyMoveRef.current,
+    attackerConsecutiveHits: playerConsecHitsRef.current,
+    defenderHasSafeguard: enemySafeguardRef.current > 0,
   });
+
+  // XP que recibe un participante concreto al repartir: el Huevo Suerte
+  // (Gen II) multiplica ×1.5 la parte de su portador.
+  const earnedXpFor = (
+    recipient: PokemonInstance | undefined,
+    divisor: number
+  ): number => {
+    if (!enemy) return 0;
+    const base = Math.round(getXp(enemy.id, enemy.level, isTrainer) / divisor);
+    return recipient?.heldItem === ItemType.LuckyEgg
+      ? Math.floor(base * 1.5)
+      : base;
+  };
 
   const getActiveMovesFirst = (
     activeMove: MoveMetadata,
@@ -2108,6 +2292,14 @@ const PokemonEncounter = () => {
   ) => {
     if (activeMove.priority > enemyMove.priority) return true;
     if (activeMove.priority < enemyMove.priority) return false;
+    // Garra Rápida (Gen II): 60/256 de actuar primero dentro del mismo
+    // bracket de prioridad, ignorando la velocidad.
+    if (
+      active?.heldItem === ItemType.QuickClaw &&
+      Math.random() < QUICK_CLAW_CHANCE
+    ) {
+      return true;
+    }
     // Apply speed stat stages for priority calculation (Gen I)
     // Paralysis reduces speed by 50% (Gen I mechanic)
     const paralysisMult = (s: typeof playerStatusRef.current) =>
@@ -2118,6 +2310,12 @@ const PokemonEncounter = () => {
     if (playerSpeed < enemySpeed) return false;
     // Speed tie: random (Gen I)
     return Math.random() < 0.5;
+  };
+
+  const WEATHER_START_MSG: Record<"rain" | "sun" | "sandstorm", string> = {
+    rain: "¡Empezó a llover!",
+    sun: "¡El sol calienta con fuerza!",
+    sandstorm: "¡Se desató una tormenta de arena!",
   };
 
   const STAT_NAMES_ES: Record<string, string> = {
@@ -2225,7 +2423,7 @@ const PokemonEncounter = () => {
     const newStatus: BT = {
       type: statusApply.status as BT["type"],
       turns: statusApply.fixedTurns !== undefined  ? statusApply.fixedTurns
-           : statusApply.status === "sleep"          ? 1 + Math.floor(Math.random() * 7)
+           : statusApply.status === "sleep"          ? 1 + Math.floor(Math.random() * 6) // Gen II: 1-6 turnos
            : statusApply.status === "badly-poisoned" ? 1
            : 0,
     };
@@ -2365,6 +2563,44 @@ const PokemonEncounter = () => {
             setEnemySubVisible(false);
           }
         }
+
+        // ── Gen II — nuevos efectos del movimiento del JUGADOR ──────────
+        if (result.startWeather) {
+          weatherRef.current = { type: result.startWeather, turns: 5 };
+        }
+        if (result.isAttract) enemyAttractedRef.current = true;
+        if (result.isEncore && lastEnemyMoveRef.current) {
+          enemyEncoreRef.current = {
+            move: lastEnemyMoveRef.current,
+            turns: 2 + Math.floor(Math.random() * 5), // 2-6 turnos (Gen II)
+          };
+        }
+        if (result.isNightmare) enemyNightmareRef.current = true;
+        if (result.isPerishSong) {
+          if (playerPerishRef.current === null) playerPerishRef.current = 3;
+          if (enemyPerishRef.current === null) enemyPerishRef.current = 3;
+        }
+        if (result.isSpikes) enemySpikesRef.current = true;
+        if (result.isPsychUp) setPlayerStages({ ...enemyStages });
+        if (result.isEndure) playerEnduringRef.current = true;
+        if (result.isSafeguard) playerSafeguardRef.current = 5;
+        if (result.conversion2Type) {
+          playerConvertedTypesRef.current = [result.conversion2Type];
+        }
+        if (result.futureSightDamage) {
+          enemyFutureSightRef.current = { damage: result.futureSightDamage, turns: 2 };
+        }
+        // Fijar Blanco: se activa al usarlo y se consume con el siguiente move
+        if (result.isLockOn) playerLockOnRef.current = true;
+        else if (moveId) playerLockOnRef.current = false;
+        // Rampa de Rodar / Corte Furia: sube con cada acierto consecutivo
+        if (moveId === "rollout" || moveId === "fury-cutter") {
+          playerConsecHitsRef.current = missed ? 0 : playerConsecHitsRef.current + 1;
+        } else {
+          playerConsecHitsRef.current = 0;
+        }
+        // Aguante del rival se consume tras el ataque del jugador
+        enemyEnduringRef.current = false;
 
         // ── F11 — Rage: si el atacante es Rage, lockear al usuario ──────
         if (moveId === "rage") playerRageActiveRef.current = true;
@@ -2511,6 +2747,48 @@ const PokemonEncounter = () => {
             applyStatChange(statChange, isAttacking);
           }
           setStage(17);
+        } else if (result.startWeather) {
+          setAlertText(WEATHER_START_MSG[result.startWeather]);
+          setStage(17);
+        } else if (result.isAttract) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival se enamoró!`);
+          setStage(17);
+        } else if (result.isEncore) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival recibió un BIS!`);
+          setStage(17);
+        } else if (result.isNightmare) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival empezó a tener pesadillas!`);
+          setStage(17);
+        } else if (result.isPerishSong) {
+          setAlertText(`¡Quien oyó el CANTO MORTAL caerá en 3 turnos!`);
+          setStage(17);
+        } else if (result.isSpikes) {
+          setAlertText(`¡El suelo rival se cubrió de PÚAS!`);
+          setStage(17);
+        } else if (result.isNoEscape) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival ya no puede escapar!`);
+          setStage(17);
+        } else if (result.isLockOn) {
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} fijó el blanco!`);
+          setStage(17);
+        } else if (result.isPsychUp) {
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} copió los cambios de stats!`);
+          setStage(17);
+        } else if (result.isEndure) {
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} se prepara para aguantar!`);
+          setStage(17);
+        } else if (result.isSafeguard) {
+          setAlertText(`¡Un velo místico protege a ${activeMetadata.name.toUpperCase()}!`);
+          setStage(17);
+        } else if (result.conversion2Type) {
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} cambió de tipo!`);
+          setStage(17);
+        } else if (result.futureSightDamage) {
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} previó un ataque!`);
+          setStage(17);
+        } else if (result.enduredHit) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival aguantó el golpe!`);
+          setStage(17);
         } else if (critical) {
           setAlertText(`¡Golpe crítico!`);
           setStage(17);
@@ -2613,6 +2891,42 @@ const PokemonEncounter = () => {
         if (playerRageActiveRef.current && us.hp < active.hp && !blockedBySub) {
           setPlayerStages((s) => ({ ...s, attack: Math.min(6, s.attack + 1) }));
         }
+
+        // ── Gen II — nuevos efectos del movimiento del RIVAL ────────────
+        if (result.startWeather) {
+          weatherRef.current = { type: result.startWeather, turns: 5 };
+        }
+        if (result.isAttract) playerAttractedRef.current = true;
+        if (result.isEncore && lastPlayerMoveRef.current) {
+          playerEncoreRef.current = {
+            move: lastPlayerMoveRef.current,
+            turns: 2 + Math.floor(Math.random() * 5),
+          };
+        }
+        if (result.isNightmare) playerNightmareRef.current = true;
+        if (result.isPerishSong) {
+          if (playerPerishRef.current === null) playerPerishRef.current = 3;
+          if (enemyPerishRef.current === null) enemyPerishRef.current = 3;
+        }
+        if (result.isSpikes) playerSpikesRef.current = true;
+        if (result.isPsychUp) setEnemyStages({ ...playerStages });
+        if (result.isEndure) enemyEnduringRef.current = true;
+        if (result.isSafeguard) enemySafeguardRef.current = 5;
+        if (result.conversion2Type) {
+          enemyConvertedTypesRef.current = [result.conversion2Type];
+        }
+        if (result.futureSightDamage) {
+          playerFutureSightRef.current = { damage: result.futureSightDamage, turns: 2 };
+        }
+        if (result.isLockOn) enemyLockOnRef.current = true;
+        else if (moveId) enemyLockOnRef.current = false;
+        if (moveId === "rollout" || moveId === "fury-cutter") {
+          enemyConsecHitsRef.current = missed ? 0 : enemyConsecHitsRef.current + 1;
+        } else {
+          enemyConsecHitsRef.current = 0;
+        }
+        // Aguante del jugador se consume tras el ataque del rival
+        playerEnduringRef.current = false;
 
         // Aplicar condición de estado ANTES de elegir el mensaje
         const statusApplied = statusApply ? applyStatus(statusApply, isAttacking) : false;
@@ -2735,6 +3049,52 @@ const PokemonEncounter = () => {
           } else {
             applyStatChange(statChange, isAttacking);
           }
+          setStage(19);
+        } else if (result.startWeather) {
+          setAlertText(WEATHER_START_MSG[result.startWeather]);
+          setStage(19);
+        } else if (result.isAttract) {
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} se enamoró!`);
+          setStage(19);
+        } else if (result.isEncore) {
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} recibió un BIS!`);
+          setStage(19);
+        } else if (result.isNightmare) {
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} empezó a tener pesadillas!`);
+          setStage(19);
+        } else if (result.isPerishSong) {
+          setAlertText(`¡Quien oyó el CANTO MORTAL caerá en 3 turnos!`);
+          setStage(19);
+        } else if (result.isSpikes) {
+          setAlertText(`¡El suelo de tu equipo se cubrió de PÚAS!`);
+          setStage(19);
+        } else if (result.isNoEscape) {
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} ya no puede escapar!`);
+          setStage(19);
+        } else if (result.isLockOn) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival fijó el blanco!`);
+          setStage(19);
+        } else if (result.isPsychUp) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival copió los cambios de stats!`);
+          setStage(19);
+        } else if (result.isEndure) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival se prepara para aguantar!`);
+          setStage(19);
+        } else if (result.isSafeguard) {
+          setAlertText(`¡Un velo místico protege al rival!`);
+          setStage(19);
+        } else if (result.conversion2Type) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival cambió de tipo!`);
+          setStage(19);
+        } else if (result.futureSightDamage) {
+          setAlertText(`¡${enemyMetadata.name.toUpperCase()} rival previó un ataque!`);
+          setStage(19);
+        } else if (result.enduredHit) {
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} aguantó el golpe!`);
+          setStage(19);
+        } else if (result.focusBandSaved) {
+          // Cinta Focus (Gen II): el jugador aguantó el golpe letal con 1 PS
+          setAlertText(`¡${activeMetadata.name.toUpperCase()} resistió con su CINTA FOCUS!`);
           setStage(19);
         } else if (critical) {
           setAlertText(`¡Golpe crítico!`);
@@ -2916,6 +3276,157 @@ const PokemonEncounter = () => {
       }
     }
 
+    // ── Gen II: objetos equipados del jugador al final del turno ──────────
+    // (los rivales de este juego no llevan objetos)
+    const usMaxHp = getPokemonStats(trueUsId, currentUs.level).hp;
+    const heldItem = active?.heldItem ?? null;
+    if (heldItem && newUsHp > 0) {
+      let berryConsumed = false;
+      // Restos: cura 1/16 del HP máximo cada turno
+      if (heldItem === ItemType.Leftovers && newUsHp < usMaxHp) {
+        newUsHp = Math.min(
+          usMaxHp,
+          newUsHp + Math.max(1, Math.floor(usMaxHp * LEFTOVERS_FRACTION))
+        );
+        dispatchUs(newUsHp);
+        messages.push(`¡${activeMetadata.name.toUpperCase()} recuperó PS con sus RESTOS!`);
+      }
+      // Baya (+10) / Baya Dorada (+30): se consume al caer a mitad de PS
+      const berryHeal = HP_BERRIES[heldItem];
+      if (berryHeal && newUsHp <= usMaxHp * HP_BERRY_THRESHOLD) {
+        newUsHp = Math.min(usMaxHp, newUsHp + berryHeal);
+        dispatchUs(newUsHp);
+        berryConsumed = true;
+        messages.push(`¡${activeMetadata.name.toUpperCase()} se comió su BAYA y recuperó PS!`);
+      }
+      // Bayas curaestados (Antipar, Antitóx, Menta, Hielo, Tostada, Milagro)
+      const curStatus = playerStatusRef.current;
+      if (curStatus && berryCuresStatus(heldItem, curStatus.type)) {
+        setPlayerStatus(null);
+        playerStatusRef.current = null;
+        dispatch(setPokemonStatus({ index: activePokemonIndex, status: null }));
+        berryConsumed = true;
+        messages.push(`¡La BAYA de ${activeMetadata.name.toUpperCase()} curó su estado!`);
+      }
+      // Baya Amarga / Baya Milagro: curan la confusión
+      if (playerConfusionTurnsRef.current > 0 && curesConfusion(heldItem)) {
+        playerConfusionTurnsRef.current = 0;
+        berryConsumed = true;
+        messages.push(`¡La BAYA de ${activeMetadata.name.toUpperCase()} curó su confusión!`);
+      }
+      // IMPORTANTE: consumir la baya DESPUÉS de los dispatchUs de arriba —
+      // dispatchUs reescribe el Pokémon completo (con heldItem stale) y
+      // resucitaría la baya si el orden fuera el inverso.
+      if (berryConsumed) {
+        dispatch(setHeldItem({ index: activePokemonIndex, item: null }));
+      }
+    }
+
+    const themMaxHp = getPokemonStats(currentThem.id, currentThem.level).hp;
+
+    // ── Gen II: Pesadilla — pierde ¼ PS por turno mientras duerma ─────────
+    if (playerNightmareRef.current) {
+      if (playerStatusRef.current?.type === "sleep" && newUsHp > 0) {
+        newUsHp = Math.max(0, newUsHp - Math.max(1, Math.floor(usMaxHp / 4)));
+        dispatchUs(newUsHp);
+        messages.push(`¡${activeMetadata.name.toUpperCase()} sufre pesadillas!`);
+      } else if (playerStatusRef.current?.type !== "sleep") {
+        playerNightmareRef.current = false;
+      }
+    }
+    if (enemyNightmareRef.current) {
+      if (enemyStatusRef.current?.type === "sleep" && newThemHp > 0) {
+        newThemHp = Math.max(0, newThemHp - Math.max(1, Math.floor(themMaxHp / 4)));
+        dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
+        messages.push(`¡${enemyMetadata.name.toUpperCase()} rival sufre pesadillas!`);
+      } else if (enemyStatusRef.current?.type !== "sleep") {
+        enemyNightmareRef.current = false;
+      }
+    }
+
+    // ── Gen II: Premonición — golpea 2 turnos después de anunciarse ───────
+    if (enemyFutureSightRef.current && newThemHp > 0) {
+      enemyFutureSightRef.current.turns -= 1;
+      if (enemyFutureSightRef.current.turns <= 0) {
+        newThemHp = Math.max(0, newThemHp - enemyFutureSightRef.current.damage);
+        dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
+        enemyFutureSightRef.current = null;
+        messages.push(`¡${enemyMetadata.name.toUpperCase()} rival fue alcanzado por PREMONICIÓN!`);
+      }
+    }
+    if (playerFutureSightRef.current && newUsHp > 0) {
+      playerFutureSightRef.current.turns -= 1;
+      if (playerFutureSightRef.current.turns <= 0) {
+        newUsHp = Math.max(0, newUsHp - playerFutureSightRef.current.damage);
+        dispatchUs(newUsHp);
+        playerFutureSightRef.current = null;
+        messages.push(`¡${activeMetadata.name.toUpperCase()} fue alcanzado por PREMONICIÓN!`);
+      }
+    }
+
+    // ── Gen II: Canto Mortal — cuenta atrás de 3 para quien lo oyó ────────
+    // Si ambos llegarían a 0 en el mismo turno, cae primero el rival (el
+    // motor no soporta el KO mutuo simultáneo; así el combate se gana).
+    if (enemyPerishRef.current !== null) {
+      enemyPerishRef.current -= 1;
+      if (enemyPerishRef.current <= 0) {
+        newThemHp = 0;
+        dispatch(updatePokemonEncounter({ ...currentThem, hp: 0 }));
+        enemyPerishRef.current = null;
+        messages.push(`¡La cuenta del rival llegó a 0!`);
+      } else {
+        messages.push(`Cuenta del rival: ${enemyPerishRef.current}.`);
+      }
+    }
+    if (playerPerishRef.current !== null && newThemHp > 0) {
+      playerPerishRef.current -= 1;
+      if (playerPerishRef.current <= 0) {
+        newUsHp = 0;
+        dispatchUs(0);
+        playerPerishRef.current = null;
+        messages.push(`¡La cuenta de ${activeMetadata.name.toUpperCase()} llegó a 0!`);
+      } else {
+        messages.push(`Cuenta de ${activeMetadata.name.toUpperCase()}: ${playerPerishRef.current}.`);
+      }
+    }
+
+    // ── Gen II: clima — daño de tormenta de arena y duración (5 turnos) ───
+    if (weatherRef.current) {
+      const w = weatherRef.current;
+      if (w.type === "sandstorm") {
+        const IMMUNE = ["rock", "ground", "steel"];
+        const playerTypes = playerConvertedTypesRef.current ?? activeMetadata.types;
+        const enemyTypes = enemyConvertedTypesRef.current ?? enemyMetadata.types;
+        if (newUsHp > 0 && !playerTypes.some((t) => IMMUNE.includes(t))) {
+          newUsHp = Math.max(0, newUsHp - Math.max(1, Math.floor(usMaxHp / 8)));
+          dispatchUs(newUsHp);
+          messages.push(`¡La tormenta zarandea a ${activeMetadata.name.toUpperCase()}!`);
+        }
+        if (newThemHp > 0 && !enemyTypes.some((t) => IMMUNE.includes(t))) {
+          newThemHp = Math.max(0, newThemHp - Math.max(1, Math.floor(themMaxHp / 8)));
+          dispatch(updatePokemonEncounter({ ...currentThem, hp: newThemHp }));
+          messages.push(`¡La tormenta zarandea a ${enemyMetadata.name.toUpperCase()} rival!`);
+        }
+      }
+      w.turns -= 1;
+      if (w.turns <= 0) {
+        weatherRef.current = null;
+        messages.push("El tiempo volvió a la normalidad.");
+      }
+    }
+
+    // ── Gen II: contadores de Bis y Velo Sagrado ──────────────────────────
+    if (playerEncoreRef.current) {
+      playerEncoreRef.current.turns -= 1;
+      if (playerEncoreRef.current.turns <= 0) playerEncoreRef.current = null;
+    }
+    if (enemyEncoreRef.current) {
+      enemyEncoreRef.current.turns -= 1;
+      if (enemyEncoreRef.current.turns <= 0) enemyEncoreRef.current = null;
+    }
+    if (playerSafeguardRef.current > 0) playerSafeguardRef.current -= 1;
+    if (enemySafeguardRef.current > 0) enemySafeguardRef.current -= 1;
+
     // Mostrar todos los mensajes en cadena (1s cada uno) y solo entonces
     // pasar al siguiente stage. Si no hay mensajes, transición inmediata.
     const goNext = () => {
@@ -2966,6 +3477,11 @@ const PokemonEncounter = () => {
   };
 
   const processBattle = (attackId: string) => {
+    // Bis (Encore): el jugador está obligado a repetir su último movimiento
+    if (playerEncoreRef.current && playerEncoreRef.current.turns > 0) {
+      attackId = playerEncoreRef.current.move;
+    }
+
     // ── Pre-proceso: movimientos especiales de estado ──────────────────────
 
     // Hyper Beam del jugador: si está recargando, pierde este turno
@@ -3172,7 +3688,10 @@ const PokemonEncounter = () => {
     // en Gen I son también de 2 turnos: T1 = desaparecer, T2 = atacar.
     // IMPORTANTE: comprobar sueño/parálisis/confusión ANTES de iniciar la carga.
     // Si el jugador está dormido en T1, no debe iniciarse la carga en absoluto.
-    if ((CHARGE_MOVES.has(attackId) || INVULNERABLE_MOVES.has(attackId)) && !playerChargingMoveRef.current) {
+    // Gen II: con sol, Rayo Solar dispara sin turno de carga.
+    const skipChargeForSun =
+      attackId === "solar-beam" && weatherRef.current?.type === "sun";
+    if ((CHARGE_MOVES.has(attackId) || INVULNERABLE_MOVES.has(attackId)) && !playerChargingMoveRef.current && !skipChargeForSun) {
       if (checkSkipTurn(true, originalAttackId)) {
         const selfHitMsgC = confusionSelfHitMsgRef.current;
         confusionSelfHitMsgRef.current = null;
@@ -3337,7 +3856,9 @@ const PokemonEncounter = () => {
     // reproduzca el move guardado.
     const enemyChargeJustStarted =
       !enemyWasChargingBefore &&
-      (CHARGE_MOVES.has(enemyMoveId) || INVULNERABLE_MOVES.has(enemyMoveId));
+      (CHARGE_MOVES.has(enemyMoveId) || INVULNERABLE_MOVES.has(enemyMoveId)) &&
+      // Gen II: con sol, Rayo Solar dispara sin turno de carga.
+      !(enemyMoveId === "solar-beam" && weatherRef.current?.type === "sun");
     if (enemyChargeJustStarted) {
       enemyChargingMoveRef.current = enemyMoveId;
       if (INVULNERABLE_MOVES.has(enemyMoveId)) {
@@ -3684,7 +4205,10 @@ const PokemonEncounter = () => {
                       : "0",
                 }}
               >
-                <Name>{enemyMetadata.name}</Name>
+                <Name>
+                  {enemyMetadata.name}
+                  <GenderGlyph>{genderSymbol(enemy.gender)}</GenderGlyph>
+                </Name>
                 <Level>{`:L${enemy.level}`}</Level>
                 <HealthBarContainer>
                   <HealthBar
@@ -3749,7 +4273,10 @@ const PokemonEncounter = () => {
                       : "0",
                 }}
               >
-                <Name>{activeMetadata.name}</Name>
+                <Name>
+                  {activeMetadata.name}
+                  <GenderGlyph>{genderSymbol(active.gender)}</GenderGlyph>
+                </Name>
                 <Level>{`:L${active.level}`}</Level>
                 <HealthBarContainer>
                   <HealthBar

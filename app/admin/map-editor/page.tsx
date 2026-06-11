@@ -57,6 +57,8 @@ interface MapEntry {
   gifts?: { pokemonId: number; level: number; pos: { x: number; y: number }; questId: string }[];
   staticPokemon?: StaticPokemonEntry[];
   boulders?: { pos: { x: number; y: number }; id: string }[];
+  /** Árboles de bayas (Gen II): itemKey = nombre del enum ItemType (ej. "Berry"). */
+  berryTrees?: { pos: { x: number; y: number }; itemKey: string }[];
   pokemonCenter?: { x: number; y: number } | null;
   pc?: { x: number; y: number } | null;
   store?: { x: number; y: number } | null;
@@ -115,7 +117,13 @@ type EncountersOverride = Partial<Record<EncounterTableKey, EncounterTable>>;
 
 const EMPTY_TABLE = (): EncounterTable => ({ rate: 0, pokemon: [] });
 
-type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'boulders' | 'spots' | 'mechanics' | 'portals' | 'map';
+type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'berry-trees' | 'boulders' | 'spots' | 'mechanics' | 'portals' | 'map';
+
+/** Bayas válidas para árboles de bayas (nombres del enum ItemType del juego). */
+const BERRY_ITEM_KEYS = [
+  'Berry', 'GoldBerry', 'PrzCureBerry', 'PsnCureBerry', 'MintBerry',
+  'IceBerry', 'BurntBerry', 'BitterBerry', 'MiracleBerry', 'MysteryBerry',
+] as const;
 
 type SpotKey = 'start' | 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation' | 'onlineBattleNpc';
 
@@ -349,6 +357,17 @@ function exportBouldersTS(boulders: { pos: { x: number; y: number }; id: string 
     `    },`,
   ].join('\n'));
   return `boulders: [\n${lines.join('\n')}\n  ],`;
+}
+
+function exportBerryTreesTS(trees: { pos: { x: number; y: number }; itemKey: string }[]): string {
+  if (trees.length === 0) return 'berryTrees: [],';
+  const lines = trees.map((t) => [
+    `    {`,
+    `      pos: { x: ${t.pos.x}, y: ${t.pos.y} },`,
+    `      item: ItemType.${t.itemKey},`,
+    `    },`,
+  ].join('\n'));
+  return `berryTrees: [\n${lines.join('\n')}\n  ],`;
 }
 
 const STATIC_POKEMON_SPRITES = [
@@ -627,6 +646,7 @@ function exportFullMapTypeTS({
   gifts,
   staticPokemon,
   cuttableTrees,
+  berryTrees,
   boulders,
   pokemonCenter,
   pc,
@@ -659,6 +679,7 @@ function exportFullMapTypeTS({
   gifts: GiftEntry[];
   staticPokemon: StaticPokemonEntry[];
   cuttableTrees: { pos: { x: number; y: number }; questId: string }[];
+  berryTrees: { pos: { x: number; y: number }; itemKey: string }[];
   boulders: { pos: { x: number; y: number }; id: string }[];
   pokemonCenter: { x: number; y: number } | null;
   pc: { x: number; y: number } | null;
@@ -737,6 +758,7 @@ function exportFullMapTypeTS({
   if (gifts.length > 0) lines.push(exportGiftsTS(gifts));
   if (staticPokemon.length > 0) lines.push(exportStaticPokemonTS(staticPokemon));
   if (cuttableTrees.length > 0) lines.push(exportCuttableTreesTS(cuttableTrees));
+  if (berryTrees.length > 0) lines.push(exportBerryTreesTS(berryTrees));
   if (boulders.length > 0) lines.push(exportBouldersTS(boulders));
   if (minimapPos) lines.push(`minimapPos: { x: ${minimapPos.x}, y: ${minimapPos.y} },`);
   lines.push(exportTrainersArrayTS(trainers));
@@ -823,6 +845,8 @@ export default function MapEditor() {
   const [cuttableTrees, setCuttableTrees] = useState<CuttableTreeEntry[]>([]);
   interface BoulderEntry { pos: { x: number; y: number }; id: string; }
   const [boulders, setBoulders] = useState<BoulderEntry[]>([]);
+  interface BerryTreeEntry { pos: { x: number; y: number }; itemKey: string; }
+  const [berryTrees, setBerryTrees] = useState<BerryTreeEntry[]>([]);
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
   const [pokemonCenter, setPokemonCenter] = useState<{ x: number; y: number } | null>(null);
   const [pcPos, setPcPos] = useState<{ x: number; y: number } | null>(null);
@@ -928,6 +952,7 @@ export default function MapEditor() {
     setStaticPokemon((m as MapEntry & { staticPokemon?: StaticPokemonEntry[] }).staticPokemon ?? []);
     setCuttableTrees((m as MapEntry & { cuttableTrees?: { pos: { x: number; y: number }; questId: string }[] }).cuttableTrees ?? []);
     setBoulders((m as MapEntry & { boulders?: { pos: { x: number; y: number }; id: string }[] }).boulders ?? []);
+    setBerryTrees((m as MapEntry & { berryTrees?: { pos: { x: number; y: number }; itemKey: string }[] }).berryTrees ?? []);
     setStartPos(m.start ?? null);
     setPokemonCenter(m.pokemonCenter ?? null);
     setPcPos(m.pc ?? null);
@@ -995,6 +1020,7 @@ export default function MapEditor() {
             gifts,
             staticPokemon,
             cuttableTrees,
+            berryTrees,
             boulders,
             pokemonCenter,
             pc: pcPos,
@@ -1153,6 +1179,11 @@ export default function MapEditor() {
     navigator.clipboard.writeText(ts).then(() => alert('¡Boulders copiados! Pégalo en el .ts del mapa como campo `boulders: [ ... ]`'));
   }
 
+  function doExportBerryTrees() {
+    const ts = exportBerryTreesTS(berryTrees);
+    navigator.clipboard.writeText(ts).then(() => alert('¡Árboles de bayas copiados! Pégalo en el .ts del mapa como campo `berryTrees: [ ... ]`'));
+  }
+
   function doExportSpots() {
     const parts = [
       exportSpotTS('start', startPos),
@@ -1197,6 +1228,7 @@ export default function MapEditor() {
       gifts,
       staticPokemon,
       cuttableTrees,
+      berryTrees,
       boulders,
       pokemonCenter,
       pc: pcPos,
@@ -1846,6 +1878,28 @@ export default function MapEditor() {
       }
       return;
     }
+    if (editMode === 'berry-trees') {
+      const idx = berryTrees.findIndex((t) => t.pos.x === tile.x && t.pos.y === tile.y);
+      if (idx >= 0) {
+        // Clic en árbol existente → eliminar
+        setBerryTrees((p) => p.filter((_, i) => i !== idx));
+        setDirty(true);
+      } else {
+        // Clic en tile vacío → añadir árbol de bayas
+        const raw = window.prompt(
+          `Baya del árbol (${BERRY_ITEM_KEYS.join(', ')}):`,
+          'Berry'
+        );
+        if (raw === null) return;
+        const itemKey = BERRY_ITEM_KEYS.find(
+          (k) => k.toLowerCase() === raw.trim().toLowerCase()
+        );
+        if (!itemKey) { alert(`Baya desconocida: "${raw}"`); return; }
+        setBerryTrees((p) => [...p, { pos: { x: tile.x, y: tile.y }, itemKey }]);
+        setDirty(true);
+      }
+      return;
+    }
     if (editMode === 'boulders') {
       const idx = boulders.findIndex((b) => b.pos.x === tile.x && b.pos.y === tile.y);
       if (idx >= 0) {
@@ -2131,8 +2185,17 @@ export default function MapEditor() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0f0f1a', fontFamily: 'monospace', color: '#e0e0ff', overflow: 'hidden' }}>
 
       {/* ── Toolbar ─────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 84, background: '#13132a', borderBottom: '1px solid #2a2a4a', flexShrink: 0, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 16, fontWeight: 700, color: '#a0a0ff', marginRight: 4 }}>🗺️ Map Editor</span>
+      {/* minHeight (NO height fija): con la altura fija de 84px, en pantallas
+          de portátil el wrap generaba una 3ª línea que quedaba RECORTADA por
+          el overflow:hidden del raíz (los últimos modos eran invisibles).
+          Ahora la barra crece lo que necesite y el lienzo (flex:1) se adapta. */}
+      <div style={{ display: 'flex', alignItems: 'center', columnGap: 12, rowGap: 6, padding: '8px 16px', minHeight: 56, background: '#13132a', borderBottom: '1px solid #2a2a4a', flexShrink: 0, flexWrap: 'wrap' }}>
+        <style>{`
+          /* Elementos prescindibles de la toolbar en pantallas estrechas */
+          @media (max-width: 1600px) { .me-legend { display: none !important; } }
+          @media (max-width: 1280px) { .me-title { display: none !important; } }
+        `}</style>
+        <span className="me-title" style={{ fontSize: 16, fontWeight: 700, color: '#a0a0ff', marginRight: 4 }}>🗺️ Map Editor</span>
 
         <a
           href="/admin/pokedex-editor"
@@ -2154,7 +2217,7 @@ export default function MapEditor() {
         <select
           value={selectedMapId}
           onChange={(e) => selectMap(e.target.value)}
-          style={{ ...inputStyle, width: 220, height: 30 }}
+          style={{ ...inputStyle, width: 'clamp(150px, 14vw, 220px)', height: 30 }}
         >
           {Object.values(mapData).map((m) => (
             <option key={m.id} value={m.id}>{m.name}</option>
@@ -2209,9 +2272,10 @@ export default function MapEditor() {
           Walls
         </label>
 
-        {/* Modo edición */}
-        <div style={{ display: 'flex', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
-          {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'boulders', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
+        {/* Modo edición — flexWrap: el grupo de 16 botones era un bloque
+            indivisible de ~1100px que desbordaba en cualquier portátil. */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
+          {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'berry-trees', 'boulders', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
               npc: '#5050b0',
               walls: '#7a3030',
@@ -2223,6 +2287,7 @@ export default function MapEditor() {
               gifts: '#7a3a5a',
               'static-pokemon': '#3a7a6a',
               'cuttable-trees': '#5a7a3a',
+              'berry-trees': '#a04a5a',
               boulders: '#8a6a3a',
               spots: '#5a7a30',
               mechanics: '#6a4a8a',
@@ -2234,14 +2299,15 @@ export default function MapEditor() {
                 key={m}
                 onClick={() => setEditMode(m)}
                 style={{
-                  padding: '4px 8px',
+                  padding: '3px 7px',
                   background: editMode === m ? colorMap[m] : '#1a1a3a',
                   border: 'none',
                   color: editMode === m ? '#fff' : '#888',
                   cursor: 'pointer',
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: 600,
                   textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {m === 'npc' ? 'NPCs' : m}
@@ -2252,8 +2318,8 @@ export default function MapEditor() {
 
         <div style={{ flex: 1 }} />
 
-        {/* Leyenda */}
-        <div style={{ display: 'flex', gap: 12, fontSize: 11 }}>
+        {/* Leyenda (oculta en pantallas estrechas — ver media query arriba) */}
+        <div className="me-legend" style={{ display: 'flex', gap: 12, fontSize: 11 }}>
           <span><span style={{ color: '#ff5555' }}>●</span> Combat</span>
           <span><span style={{ color: '#5588ff' }}>●</span> Diálogo</span>
           <span><span style={{ color: '#f5c518' }}>●</span> Persistent</span>
@@ -2334,6 +2400,11 @@ export default function MapEditor() {
         {editMode === 'static-pokemon' && (
           <button onClick={doExportStaticPokemon} style={{ padding: '4px 12px', background: '#1a2a2a', border: '1px solid #3a7a6a', borderRadius: 4, color: '#50ddb4', cursor: 'pointer', fontSize: 12 }}>
             🐾 StaticPokémon
+          </button>
+        )}
+        {editMode === 'berry-trees' && (
+          <button onClick={doExportBerryTrees} style={{ padding: '4px 12px', background: '#2a1018', border: '1px solid #a04a5a', borderRadius: 4, color: '#e88aa0', cursor: 'pointer', fontSize: 12 }}>
+            🍒 Árboles de bayas
           </button>
         )}
         {editMode === 'boulders' && (
@@ -2863,6 +2934,35 @@ export default function MapEditor() {
                 </div>
               ))}
 
+              {/* Árboles de bayas overlay (Gen II) */}
+              {berryTrees.map((t, i) => (
+                <div
+                  key={`bt-${i}`}
+                  title={`Árbol de bayas · ${t.itemKey}`}
+                  style={{
+                    position: 'absolute',
+                    left: t.pos.x * zoom,
+                    top: t.pos.y * zoom,
+                    width: zoom,
+                    height: zoom,
+                    background: editMode === 'berry-trees'
+                      ? 'rgba(200, 90, 120, 0.6)'
+                      : 'rgba(200, 90, 120, 0.25)',
+                    border: editMode === 'berry-trees'
+                      ? '1px solid rgba(230, 140, 160, 0.95)'
+                      : '1px dashed rgba(230, 140, 160, 0.5)',
+                    pointerEvents: 'none',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: Math.max(10, zoom * 0.5),
+                  }}
+                >
+                  🍒
+                </div>
+              ))}
+
               {/* Boulders overlay (MO Fuerza) */}
               {boulders.map((b, i) => (
                 <div
@@ -3127,7 +3227,7 @@ export default function MapEditor() {
         </div>
 
         {/* ── Inspector ─────────────────────────────────────────────── */}
-        <div style={{ width: 320, background: '#13132a', borderLeft: '1px solid #2a2a4a', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
+        <div style={{ width: 'clamp(264px, 24vw, 320px)', background: '#13132a', borderLeft: '1px solid #2a2a4a', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
 
           {/* Header inspector */}
           <div style={{ padding: '12px 16px', borderBottom: '1px solid #2a2a4a' }}>
@@ -3313,6 +3413,23 @@ export default function MapEditor() {
                 ]}
                 count={cuttableTrees.length}
                 countLabel="árboles cortables"
+                sourceFile={currentMap?.sourceFile}
+              />
+            ) : editMode === 'berry-trees' ? (
+              <ModeHelpBlock
+                emoji="🍒"
+                title="Árboles de bayas (Gen II)"
+                color="#e88aa0"
+                lines={[
+                  'Click vacío: añadir árbol (elige la baya)',
+                  'Click en árbol existente: eliminar',
+                  `Bayas: ${BERRY_ITEM_KEYS.join(', ')}`,
+                  'Da 1 baya al día (pulsar A de frente)',
+                  'Rebrota a medianoche (hora del dispositivo)',
+                  'Bloquea el paso como un muro',
+                ]}
+                count={berryTrees.length}
+                countLabel="árboles de bayas"
                 sourceFile={currentMap?.sourceFile}
               />
             ) : editMode === 'boulders' ? (
