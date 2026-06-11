@@ -93,6 +93,13 @@ const Txt = styled.span<{ $size?: number; $bold?: boolean }>`
   line-height: 1.6;
 `;
 
+// El glifo ♂/♀ viene de la fuente fallback (no existe en la pixel font);
+// line-height: 0 evita que sus métricas inflen la altura de la cabecera.
+const GenderGlyph = styled.span`
+  font-size: 0.9em;
+  line-height: 0;
+`;
+
 // ── Page 1 — ESTADO ───────────────────────────────────────────────────────────
 
 const HeaderBar = styled(Row)`
@@ -257,7 +264,7 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
           <Txt $size={0.9}>{noStr}</Txt>
           <Txt $size={1.05} $bold>
             {meta.name.toUpperCase()}
-            {genderSymbol(pokemon.gender)}
+            <GenderGlyph>{genderSymbol(pokemon.gender)}</GenderGlyph>
           </Txt>
         </HeaderBar>
 
@@ -332,7 +339,7 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
       <MovesHeader $align="center" $justify="space-between">
         <Txt $size={1.0} $bold>
           {meta.name.toUpperCase()}
-          {genderSymbol(pokemon.gender)}
+          <GenderGlyph>{genderSymbol(pokemon.gender)}</GenderGlyph>
         </Txt>
         <Txt $size={0.85}>Nv.{pokemon.level}</Txt>
       </MovesHeader>

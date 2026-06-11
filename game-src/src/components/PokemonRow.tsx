@@ -121,10 +121,16 @@ const Name = styled.div`
 `;
 
 // El glifo ♂/♀ no existe en la fuente PokemonGB: el fallback per-glyph del
-// navegador lo toma de sans-serif sin afectar al resto del nombre.
+// navegador lo toma de sans-serif. IMPORTANTE: las métricas (ascent/descent)
+// de la fuente fallback son más altas que las de PokemonGB e inflaban la
+// altura de cada fila — con 6 Pokémon, el último se salía de la pantalla.
+// line-height: 0 hace que el span no contribuya a la caja de línea (el
+// glifo se dibuja igual) y la fila conserva su altura original exacta.
 const GenderSymbol = styled.span`
   font-family: "PokemonGB", sans-serif;
   margin-left: 0.5cqw;
+  font-size: 2.1cqw;
+  line-height: 0;
 `;
 
 const HealthBarContainer = styled.div`

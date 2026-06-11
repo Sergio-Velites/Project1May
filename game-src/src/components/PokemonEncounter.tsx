@@ -141,6 +141,15 @@ const Name = styled.div`
   text-transform: uppercase;
 `;
 
+// El glifo ♂/♀ viene de la fuente fallback (no existe en PokemonGB), cuyas
+// métricas inflarían la altura de línea y desplazarían la barra de PS.
+// line-height: 0 evita que el span contribuya a la caja de línea.
+const GenderGlyph = styled.span`
+  font-family: "PokemonGB", sans-serif;
+  font-size: 3.1cqw;
+  line-height: 0;
+`;
+
 const Level = styled.div`
   font-size: 3.2cqw;
   margin: 0 7.5cqw;
@@ -4196,7 +4205,10 @@ const PokemonEncounter = () => {
                       : "0",
                 }}
               >
-                <Name>{`${enemyMetadata.name}${genderSymbol(enemy.gender)}`}</Name>
+                <Name>
+                  {enemyMetadata.name}
+                  <GenderGlyph>{genderSymbol(enemy.gender)}</GenderGlyph>
+                </Name>
                 <Level>{`:L${enemy.level}`}</Level>
                 <HealthBarContainer>
                   <HealthBar
@@ -4261,7 +4273,10 @@ const PokemonEncounter = () => {
                       : "0",
                 }}
               >
-                <Name>{`${activeMetadata.name}${genderSymbol(active.gender)}`}</Name>
+                <Name>
+                  {activeMetadata.name}
+                  <GenderGlyph>{genderSymbol(active.gender)}</GenderGlyph>
+                </Name>
                 <Level>{`:L${active.level}`}</Level>
                 <HealthBarContainer>
                   <HealthBar

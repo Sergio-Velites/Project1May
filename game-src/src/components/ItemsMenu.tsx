@@ -23,8 +23,17 @@ import {
 import { useEffect, useRef, useState } from "react";
 import useItemData, { ItemData } from "../app/use-item-data";
 import { InventoryItemType } from "../state/state-types";
-import { HOLDABLE_ITEMS } from "../app/held-item-helper";
 import { getPokemonMetadata } from "../app/use-pokemon-metadata";
+
+// Gen II: casi CUALQUIER objeto puede equiparse (aunque solo los de
+// held-item-helper.ts tienen efecto en combate — el resto simplemente "lo
+// lleva", como en el original). Excluidos: medallas, objetos clave
+// (countable: false — Bici, Mapa, cañas…) y MT/MO.
+const isGivable = (item: ItemData): boolean =>
+  !item.badge &&
+  item.countable &&
+  !item.type.startsWith("tm") &&
+  !item.type.startsWith("hm");
 
 const ItemsMenu = () => {
   const dispatch = useDispatch();
@@ -117,7 +126,7 @@ const ItemsMenu = () => {
             },
             // Dar (Gen II): equipar el objeto a un Pokémon del equipo. Si ya
             // llevaba otro, vuelve a la mochila (intercambio, como el original).
-            ...(HOLDABLE_ITEMS.has(selected.type) && !inBattle
+            ...(isGivable(selected) && !inBattle
               ? [
                   {
                     label: "Dar",
