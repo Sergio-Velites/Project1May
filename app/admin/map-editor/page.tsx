@@ -2185,8 +2185,17 @@ export default function MapEditor() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0f0f1a', fontFamily: 'monospace', color: '#e0e0ff', overflow: 'hidden' }}>
 
       {/* ── Toolbar ─────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 84, background: '#13132a', borderBottom: '1px solid #2a2a4a', flexShrink: 0, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 16, fontWeight: 700, color: '#a0a0ff', marginRight: 4 }}>🗺️ Map Editor</span>
+      {/* minHeight (NO height fija): con la altura fija de 84px, en pantallas
+          de portátil el wrap generaba una 3ª línea que quedaba RECORTADA por
+          el overflow:hidden del raíz (los últimos modos eran invisibles).
+          Ahora la barra crece lo que necesite y el lienzo (flex:1) se adapta. */}
+      <div style={{ display: 'flex', alignItems: 'center', columnGap: 12, rowGap: 6, padding: '8px 16px', minHeight: 56, background: '#13132a', borderBottom: '1px solid #2a2a4a', flexShrink: 0, flexWrap: 'wrap' }}>
+        <style>{`
+          /* Elementos prescindibles de la toolbar en pantallas estrechas */
+          @media (max-width: 1600px) { .me-legend { display: none !important; } }
+          @media (max-width: 1280px) { .me-title { display: none !important; } }
+        `}</style>
+        <span className="me-title" style={{ fontSize: 16, fontWeight: 700, color: '#a0a0ff', marginRight: 4 }}>🗺️ Map Editor</span>
 
         <a
           href="/admin/pokedex-editor"
@@ -2208,7 +2217,7 @@ export default function MapEditor() {
         <select
           value={selectedMapId}
           onChange={(e) => selectMap(e.target.value)}
-          style={{ ...inputStyle, width: 220, height: 30 }}
+          style={{ ...inputStyle, width: 'clamp(150px, 14vw, 220px)', height: 30 }}
         >
           {Object.values(mapData).map((m) => (
             <option key={m.id} value={m.id}>{m.name}</option>
@@ -2263,8 +2272,9 @@ export default function MapEditor() {
           Walls
         </label>
 
-        {/* Modo edición */}
-        <div style={{ display: 'flex', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
+        {/* Modo edición — flexWrap: el grupo de 16 botones era un bloque
+            indivisible de ~1100px que desbordaba en cualquier portátil. */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
           {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'berry-trees', 'boulders', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
               npc: '#5050b0',
@@ -2289,14 +2299,15 @@ export default function MapEditor() {
                 key={m}
                 onClick={() => setEditMode(m)}
                 style={{
-                  padding: '4px 8px',
+                  padding: '3px 7px',
                   background: editMode === m ? colorMap[m] : '#1a1a3a',
                   border: 'none',
                   color: editMode === m ? '#fff' : '#888',
                   cursor: 'pointer',
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: 600,
                   textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {m === 'npc' ? 'NPCs' : m}
@@ -2307,8 +2318,8 @@ export default function MapEditor() {
 
         <div style={{ flex: 1 }} />
 
-        {/* Leyenda */}
-        <div style={{ display: 'flex', gap: 12, fontSize: 11 }}>
+        {/* Leyenda (oculta en pantallas estrechas — ver media query arriba) */}
+        <div className="me-legend" style={{ display: 'flex', gap: 12, fontSize: 11 }}>
           <span><span style={{ color: '#ff5555' }}>●</span> Combat</span>
           <span><span style={{ color: '#5588ff' }}>●</span> Diálogo</span>
           <span><span style={{ color: '#f5c518' }}>●</span> Persistent</span>
@@ -3216,7 +3227,7 @@ export default function MapEditor() {
         </div>
 
         {/* ── Inspector ─────────────────────────────────────────────── */}
-        <div style={{ width: 320, background: '#13132a', borderLeft: '1px solid #2a2a4a', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
+        <div style={{ width: 'clamp(264px, 24vw, 320px)', background: '#13132a', borderLeft: '1px solid #2a2a4a', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
 
           {/* Header inspector */}
           <div style={{ padding: '12px 16px', borderBottom: '1px solid #2a2a4a' }}>
