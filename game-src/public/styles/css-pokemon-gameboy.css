@@ -154,11 +154,14 @@ ul.buttons li {
   }
 }
 ul.buttons.compact {
-  flex-direction: row;
-  flex-wrap: wrap;
+  /* Cuadrícula 2×2 REAL: con flex-wrap, una etiqueta ancha (p.ej. RENDIRSE)
+     desbordaba el 45% y rompía la matriz — y la navegación del Menu (±2 en
+     vertical) asume siempre dos columnas. */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }
 ul.buttons.compact li {
-  flex-basis: 45%;
+  min-width: 0;
 }
 
 .progress-bar-container {

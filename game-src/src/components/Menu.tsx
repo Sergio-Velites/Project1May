@@ -12,6 +12,7 @@ interface MenuProps {
   $left?: string;
   $compact?: boolean;
   $wide?: boolean;
+  $width?: string;
 }
 
 const StyledMenu = styled.div<MenuProps>`
@@ -27,7 +28,13 @@ const StyledMenu = styled.div<MenuProps>`
   transform: ${(props) =>
     props.$bottom || props.$top ? "none" : "translateY(-50%)"};
   width: ${(props) =>
-    props.$compact ? "35cqw" : props.$wide ? "100%" : "auto"};
+    props.$width
+      ? props.$width
+      : props.$compact
+      ? "35cqw"
+      : props.$wide
+      ? "100%"
+      : "auto"};
 `;
 
 const Button = styled.button`
@@ -78,6 +85,8 @@ interface Props {
   padd?: number;
   tight?: boolean;
   wide?: boolean;
+  /** Ancho fijo del menú (override del de compact/wide). */
+  width?: string;
   setHovered?: (index: number) => void;
 }
 
@@ -98,6 +107,7 @@ const Menu = ({
   padd,
   tight,
   wide,
+  width,
   setHovered,
 }: Props) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -252,6 +262,7 @@ const Menu = ({
       $left={left}
       $compact={compact}
       $wide={wide}
+      $width={width}
     >
       <ul
         className={`framed buttons ${compact ? "compact" : ""}`}

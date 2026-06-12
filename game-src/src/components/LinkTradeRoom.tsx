@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import Frame from "./Frame";
 import Menu from "./Menu";
@@ -27,9 +27,16 @@ import { getCurrentUserId, saveGameVerified } from "../app/cloud-save";
 import { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import { genderSymbol } from "../app/gender-helper";
 import { BASE_FRIENDSHIP } from "../app/evolution-helper";
-import { ItemType } from "../app/use-item-data";
+import useItemData, { ItemType } from "../app/use-item-data";
 import { PokemonInstance } from "../state/state-types";
 import { playCry } from "../app/pokemon-cry";
+import { playGameSfx, GAME_SFX } from "../app/game-sfx";
+import ballIdle from "../assets/battle/ball-idle.png";
+import ballOpen1 from "../assets/battle/ball-open-1.png";
+import ballOpen2 from "../assets/battle/ball-open-2.png";
+import ballOpen3 from "../assets/battle/ball-open-3.png";
+import ballOpen4 from "../assets/battle/ball-open-4.png";
+import ballOpen5 from "../assets/battle/ball-open-5.png";
 
 // ─────────────────────────────────────────────────────────────────────────
 // CENTRO DE INTERCAMBIO del Club Cable (Gen II).
@@ -120,6 +127,143 @@ const MonLabel = styled.div`
   text-align: center;
 `;
 
+// ── Animación de intercambio (fiel a Oro/Plata) ───────────────────────────
+// Secuencia tras el doble SÍ: tu Pokémon se despide → se retira a su Poké
+// Ball → la ball sube por el cable de enlace → transferencia → llega la
+// ball del rival → se abre con sus frames → aparece el Pokémon recibido.
+
+const TradeStage = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+`;
+
+/** Cable de enlace vertical (línea punteada GB) por el que viaja la ball. */
+const Cable = styled.div`
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.2cqw;
+  height: 62%;
+  background: repeating-linear-gradient(
+    to bottom,
+    #181010 0,
+    #181010 1.6cqw,
+    transparent 1.6cqw,
+    transparent 3.2cqw
+  );
+`;
+
+const shrinkIntoBall = keyframes`
+  0% { transform: scale(1); opacity: 1; }
+  80% { transform: scale(0.08); opacity: 1; }
+  100% { transform: scale(0.08); opacity: 0; }
+`;
+
+const growFromBall = keyframes`
+  0% { transform: scale(0.08); opacity: 0; }
+  20% { transform: scale(0.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+`;
+
+const StageSprite = styled.img<{ $shrink?: boolean; $grow?: boolean }>`
+  width: 26cqw;
+  height: 26cqw;
+  image-rendering: pixelated;
+  margin-bottom: 4cqw;
+
+  ${(p) =>
+    p.$shrink &&
+    css`
+      animation: ${shrinkIntoBall} 900ms steps(6) forwards;
+    `};
+  ${(p) =>
+    p.$grow &&
+    css`
+      animation: ${growFromBall} 700ms steps(5) forwards;
+    `};
+`;
+
+const ballAppear = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+const ballRise = keyframes`
+  from { transform: translateY(0); opacity: 1; }
+  95% { opacity: 1; }
+  to { transform: translateY(-62cqw); opacity: 0; }
+`;
+
+const ballFall = keyframes`
+  from { transform: translateY(-62cqw); opacity: 0; }
+  5% { opacity: 1; }
+  to { transform: translateY(0); opacity: 1; }
+`;
+
+const StageBall = styled.img<{ $rise?: boolean; $fall?: boolean; $appear?: boolean }>`
+  position: absolute;
+  bottom: 12cqw;
+  left: 50%;
+  margin-left: -3.5cqw;
+  width: 7cqw;
+  height: 7cqw;
+  image-rendering: pixelated;
+
+  ${(p) =>
+    p.$appear &&
+    css`
+      opacity: 0;
+      animation: ${ballAppear} 200ms 700ms linear forwards;
+    `};
+  ${(p) =>
+    p.$rise &&
+    css`
+      animation: ${ballRise} 1300ms linear forwards;
+    `};
+  ${(p) =>
+    p.$fall &&
+    css`
+      animation: ${ballFall} 1300ms linear forwards;
+    `};
+`;
+
+const blink = keyframes`
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+`;
+
+/** Parpadeo de "datos viajando" por el cable durante la transferencia. */
+const TransferBlip = styled.div<{ $delay: number; $top: string }>`
+  position: absolute;
+  top: ${(p) => p.$top};
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2.4cqw;
+  height: 2.4cqw;
+  background: #181010;
+  animation: ${blink} 600ms ${(p) => p.$delay}ms steps(1) infinite;
+`;
+
+type TradeStep =
+  | "farewell"
+  | "recall"
+  | "send"
+  | "transfer"
+  | "arrive"
+  | "open"
+  | "reveal"
+  | "care";
+
+const BALL_OPEN_FRAMES = [ballOpen1, ballOpen2, ballOpen3, ballOpen4, ballOpen5];
+
 const Countdown = styled.div<{ $urgent?: boolean }>`
   position: absolute;
   top: 1cqw;
@@ -143,11 +287,19 @@ const LinkTradeRoom = () => {
   const room = useSelector(selectLinkRoom);
   const myPokemon = useSelector(selectPokemon);
   const gameState = useSelector(selectGameState);
+  const itemData = useItemData();
 
   const [phase, setPhase] = useState<Phase>("intro");
   const [session, setSession] = useState<LinkSession | null>(null);
   const [text, setText] = useState<string>("");
   const [countdown, setCountdown] = useState<number | null>(null);
+  // Animación GSC del intercambio (fase "completing").
+  const [tradeStep, setTradeStep] = useState<TradeStep | null>(null);
+  const [ballFrame, setBallFrame] = useState(0);
+  const [tradeMons, setTradeMons] = useState<{
+    given: PokemonInstance;
+    received: PokemonInstance;
+  } | null>(null);
 
   const phaseRef = useRef<Phase>("intro");
   phaseRef.current = phase;
@@ -183,6 +335,9 @@ const LinkTradeRoom = () => {
       setSession(null);
       setText("");
       setCountdown(null);
+      setTradeStep(null);
+      setTradeMons(null);
+      setBallFrame(0);
       appliedRef.current = false;
       exitingRef.current = false;
       setTimeout(() => {
@@ -216,54 +371,96 @@ const LinkTradeRoom = () => {
 
       const givenName = getPokemonMetadata(givenMon.id).name.toUpperCase();
       const receivedName = getPokemonMetadata(received.id).name.toUpperCase();
+      setTradeMons({ given: givenMon, received });
 
+      // ── Secuencia GSC: despedida → ball → cable → ball → apertura ────────
+      const t = (ms: number, fn: () => void) => setTimeout(fn, ms);
+
+      // 1. Tu Pokémon se despide (sprite + grito).
+      setTradeStep("farewell");
+      playCry(givenMon.id);
       setText(`¡Adiós, ${givenName}! Buen viaje...`);
-      setTimeout(() => {
+
+      // 2. Se retira a su Poké Ball (encoge + aparece la ball).
+      t(2200, () => setTradeStep("recall"));
+
+      // 3. La ball sube por el cable de enlace.
+      t(3500, () => {
+        setTradeStep("send");
+        setText(`Enviando a ${givenName} a ${opponentName}...`);
+      });
+
+      // 4. Transferencia (datos parpadeando en el cable). El intercambio se
+      //    aplica aquí: a partir de este punto ya es definitivo.
+      t(4900, () => {
+        setTradeStep("transfer");
         dispatch(applyTrade({ giveIndex, received }));
+        const userId = getCurrentUserId();
+        if (userId) {
+          const newPokemon = [...gameState.pokemon];
+          newPokemon[giveIndex] = received;
+          saveGameVerified(userId, { ...gameState, pokemon: newPokemon });
+        }
+      });
+
+      // 5. Llega la ball del rival por el cable.
+      t(6700, () => {
+        setTradeStep("arrive");
+        setText(`¡Ha llegado un POKéMON de ${opponentName}!`);
+      });
+
+      // 6. La ball se abre (frames de apertura, como al capturar).
+      t(8100, () => {
+        setTradeStep("open");
+        setBallFrame(0);
+      });
+      BALL_OPEN_FRAMES.forEach((_, i) => {
+        t(8100 + i * 110, () => setBallFrame(i));
+      });
+
+      // 7. Aparece el Pokémon recibido (crece desde la ball + grito + jingle).
+      t(8700, () => {
+        setTradeStep("reveal");
         playCry(received.id);
+        playGameSfx(GAME_SFX.pokemonObtained, 0.7);
         setText(`¡${opponentName} te ha enviado a ${receivedName}!`);
-        setTimeout(() => {
-          // Persistir cuanto antes: el intercambio ya es definitivo.
-          const userId = getCurrentUserId();
-          if (userId) {
-            const newPokemon = [...gameState.pokemon];
-            newPokemon[giveIndex] = received;
-            saveGameVerified(userId, { ...gameState, pokemon: newPokemon });
-          }
+      });
 
-          // ── Evolución por intercambio (Oro/Plata) ────────────────────────
-          let evolveToId: number | null = null;
-          let consumesItem = false;
-          if (received.heldItem !== ItemType.Everstone) {
-            if (TRADE_EVOS[received.id]) {
-              evolveToId = TRADE_EVOS[received.id];
-            } else {
-              const withItem = TRADE_EVOS_WITH_ITEM[received.id];
-              if (withItem && received.heldItem === withItem.item) {
-                evolveToId = withItem.to;
-                consumesItem = true;
-              }
+      // 8. "¡Cuida mucho a X!" y, si toca, evolución por intercambio.
+      t(11300, () => {
+        setTradeStep("care");
+        setText(`¡Cuida mucho a ${receivedName}!`);
+      });
+
+      t(13500, () => {
+        // ── Evolución por intercambio (Oro/Plata) ────────────────────────
+        let evolveToId: number | null = null;
+        let consumesItem = false;
+        if (received.heldItem !== ItemType.Everstone) {
+          if (TRADE_EVOS[received.id]) {
+            evolveToId = TRADE_EVOS[received.id];
+          } else {
+            const withItem = TRADE_EVOS_WITH_ITEM[received.id];
+            if (withItem && received.heldItem === withItem.item) {
+              evolveToId = withItem.to;
+              consumesItem = true;
             }
           }
-
-          setText(`¡Cuida mucho a ${receivedName}!`);
-          setTimeout(() => {
-            dispatch(closeLinkRoom());
-            if (evolveToId !== null) {
-              if (consumesItem) {
-                // El objeto se consume al disparar la evolución (como en GSC).
-                dispatch(
-                  updateSpecificPokemon({
-                    index: giveIndex,
-                    pokemon: { ...received, heldItem: null },
-                  })
-                );
-              }
-              dispatch(showEvolution({ index: giveIndex, evolveToId }));
-            }
-          }, 2200);
-        }, 2600);
-      }, 2200);
+        }
+        dispatch(closeLinkRoom());
+        if (evolveToId !== null) {
+          if (consumesItem) {
+            // El objeto se consume al disparar la evolución (como en GSC).
+            dispatch(
+              updateSpecificPokemon({
+                index: giveIndex,
+                pokemon: { ...received, heldItem: null },
+              })
+            );
+          }
+          dispatch(showEvolution({ index: giveIndex, evolveToId }));
+        }
+      });
     },
     [dispatch, exit, gameState, myPokemon, myRole, opponentName, theirRole]
   );
@@ -427,6 +624,13 @@ const LinkTradeRoom = () => {
                 {genderSymbol(myOffered.gender)} :L{myOffered.level}
                 <br />
                 (TU EQUIPO)
+                {/* El objeto equipado viaja con el Pokémon (como en GSC) */}
+                {myOffered.heldItem && (
+                  <>
+                    <br />
+                    LLEVA: {itemData[myOffered.heldItem]?.name?.toUpperCase() ?? "OBJETO"}
+                  </>
+                )}
               </MonLabel>
             </MonCard>
             <MonCard>
@@ -439,10 +643,60 @@ const LinkTradeRoom = () => {
                 {genderSymbol(theirOffered.gender)} :L{theirOffered.level}
                 <br />
                 (DE {opponentName.toUpperCase()})
+                {theirOffered.heldItem && (
+                  <>
+                    <br />
+                    LLEVA: {itemData[theirOffered.heldItem]?.name?.toUpperCase() ?? "OBJETO"}
+                  </>
+                )}
               </MonLabel>
             </MonCard>
           </TradePanel>
         )}
+
+      {/* Escena del intercambio (fiel a Oro/Plata): retirada a la ball,
+          viaje por el cable, llegada y apertura */}
+      {phase === "completing" && tradeMons && tradeStep && (
+        <TradeStage>
+          {["send", "transfer", "arrive"].includes(tradeStep) && <Cable />}
+
+          {tradeStep === "farewell" && (
+            <StageSprite
+              src={getPokemonMetadata(tradeMons.given.id).images.front}
+              alt=""
+            />
+          )}
+          {tradeStep === "recall" && (
+            <>
+              <StageSprite
+                $shrink
+                src={getPokemonMetadata(tradeMons.given.id).images.front}
+                alt=""
+              />
+              <StageBall $appear src={ballIdle} alt="" />
+            </>
+          )}
+          {tradeStep === "send" && <StageBall $rise src={ballIdle} alt="" />}
+          {tradeStep === "transfer" && (
+            <>
+              <TransferBlip $top="12%" $delay={0} />
+              <TransferBlip $top="32%" $delay={200} />
+              <TransferBlip $top="52%" $delay={400} />
+            </>
+          )}
+          {tradeStep === "arrive" && <StageBall $fall src={ballIdle} alt="" />}
+          {tradeStep === "open" && (
+            <StageBall src={BALL_OPEN_FRAMES[ballFrame] ?? ballOpen5} alt="" />
+          )}
+          {(tradeStep === "reveal" || tradeStep === "care") && (
+            <StageSprite
+              $grow={tradeStep === "reveal"}
+              src={getPokemonMetadata(tradeMons.received.id).images.front}
+              alt=""
+            />
+          )}
+        </TradeStage>
+      )}
 
       <Menu
         show={phase === "offer"}
