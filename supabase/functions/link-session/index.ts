@@ -7,6 +7,7 @@
 //   create  { kind }                  → crea sala y espera rival
 //   list    { kind }                  → salas en espera (para unirse)
 //   join    { sessionId }             → unirse a una sala (atómico)
+//   mine    {}                        → mi sesión viva (para reanudar tras recarga)
 //   poll    { sessionId }             → estado + heartbeat + adjudicación
 //   act     { sessionId, payload }    → acción del turno (combate/intercambio)
 //   resolve { sessionId, resolution } → solo host: resultado del turno
@@ -168,6 +169,77 @@ const adjudicate = async (s: any): Promise<any> => {
   return data ?? (await fetchSession(s.id));
 };
 
+// ── Intercambio atómico en servidor ────────────────────────────────────────
+// Aplica el swap directamente en saves.game_state de los DOS jugadores.
+// Comprueba la integridad (la especie ofrecida debe seguir en ese hueco del
+// save, que se guardó al entrar al Club Cable) antes de tocar nada.
+// Devuelve el end_reason final: "trade-completed" o "trade-integrity".
+// deno-lint-ignore no-explicit-any
+const applyTradeToSaves = async (s: any): Promise<string> => {
+  try {
+    const hostOffer = s.host_offer as number;
+    const guestOffer = s.guest_offer as number;
+    const { data: rows, error } = await db
+      .from("saves")
+      .select("user_id, game_state")
+      .in("user_id", [s.host_id, s.guest_id]);
+    if (error) throw error;
+    const hostSave = rows?.find((r) => r.user_id === s.host_id);
+    const guestSave = rows?.find((r) => r.user_id === s.guest_id);
+    // deno-lint-ignore no-explicit-any
+    const hostGs = hostSave?.game_state as any;
+    // deno-lint-ignore no-explicit-any
+    const guestGs = guestSave?.game_state as any;
+    const hostMon = hostGs?.pokemon?.[hostOffer];
+    const guestMon = guestGs?.pokemon?.[guestOffer];
+    // Integridad: el hueco ofrecido debe contener la misma especie que se
+    // mostró en la mesa (snapshot de la sesión). Si no, no se toca nada.
+    if (
+      !hostMon || !guestMon ||
+      hostMon.id !== s.host_party?.[hostOffer]?.id ||
+      guestMon.id !== s.guest_party?.[guestOffer]?.id
+    ) {
+      return "trade-integrity";
+    }
+    // GSC: la amistad del Pokémon recibido vuelve a la base (70).
+    const toHost = { ...guestMon, friendship: 70 };
+    const toGuest = { ...hostMon, friendship: 70 };
+    hostGs.pokemon[hostOffer] = toHost;
+    guestGs.pokemon[guestOffer] = toGuest;
+    // Pokédex coherente en la nube: el recibido cuenta como visto+capturado.
+    for (const [gs, mon] of [[hostGs, toHost], [guestGs, toGuest]] as const) {
+      if (Array.isArray(gs.seenPokemon) && !gs.seenPokemon.includes(mon.id)) {
+        gs.seenPokemon.push(mon.id);
+      }
+      if (Array.isArray(gs.caughtPokemon) && !gs.caughtPokemon.includes(mon.id)) {
+        gs.caughtPokemon.push(mon.id);
+      }
+    }
+    const ts = new Date().toISOString();
+    const { error: e1 } = await db
+      .from("saves")
+      .update({ game_state: hostGs, updated_at: ts })
+      .eq("user_id", s.host_id);
+    if (e1) throw e1;
+    const { error: e2 } = await db
+      .from("saves")
+      .update({ game_state: guestGs, updated_at: ts })
+      .eq("user_id", s.guest_id);
+    if (e2) {
+      // Revertir el primer save para no dejar media transacción.
+      hostGs.pokemon[hostOffer] = hostMon;
+      await db
+        .from("saves")
+        .update({ game_state: hostGs, updated_at: ts })
+        .eq("user_id", s.host_id);
+      return "trade-integrity";
+    }
+    return "trade-completed";
+  } catch {
+    return "trade-integrity";
+  }
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -203,6 +275,23 @@ Deno.serve(async (req) => {
       if (kind === "battle" && !myParty.some((p) => p.hp > 0)) {
         return json({ error: "ALL_FAINTED" }, 400, corsHeaders);
       }
+      // Rate limit: máx. una sala nueva cada 5 s por anfitrión.
+      const { data: recent } = await db
+        .from("link_sessions")
+        .select("created_at")
+        .eq("host_id", userId)
+        .gt("created_at", new Date(Date.now() - 5_000).toISOString())
+        .limit(1);
+      if (recent && recent.length > 0) {
+        return json({ error: "RATE_LIMIT" }, 429, corsHeaders);
+      }
+      // Higiene: purgar sesiones terminadas/canceladas de más de un día
+      // (los equipos guardados en la fila dejan de ser necesarios).
+      await db
+        .from("link_sessions")
+        .delete()
+        .in("status", ["finished", "cancelled"])
+        .lt("updated_at", new Date(Date.now() - 86_400_000).toISOString());
       // Una sala en espera por anfitrión: cancelar las anteriores.
       await db
         .from("link_sessions")
@@ -240,6 +329,20 @@ Deno.serve(async (req) => {
         .filter((s) => s.host_id !== userId)
         .map((s) => ({ sessionId: s.id, hostName: s.host_name }));
       return json({ sessions }, 200, corsHeaders);
+    }
+
+    // ── mine: sesión viva del solicitante (reanudar tras recargar la app) ─
+    if (action === "mine") {
+      const { data, error } = await db
+        .from("link_sessions")
+        .select("*")
+        .or(`host_id.eq.${userId},guest_id.eq.${userId}`)
+        .in("status", ["waiting", "active"])
+        .gt("deadline_at", now)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      return json({ session: data?.[0] ?? null }, 200, corsHeaders);
     }
 
     // El resto de acciones operan sobre una sesión concreta.
@@ -419,20 +522,34 @@ Deno.serve(async (req) => {
           .eq("id", sessionId)
           .eq("status", "active")
           .eq("phase", "confirm");
-        // Ambos confirmaron → intercambio cerrado.
-        await db
+        // Ambos confirmaron → cerrar el intercambio. La transición es
+        // exclusiva (el lock de fila de Postgres garantiza que solo UNA de
+        // las dos peticiones concurrentes pasa de active→finishing): esa
+        // petición aplica el swap EN LOS SAVES de los dos jugadores, de
+        // forma que el intercambio queda persistido aunque un cliente se
+        // caiga justo después (sin medias transacciones ni duplicados).
+        const { data: won } = await db
           .from("link_sessions")
           .update({
             status: "finished",
             phase: "done",
-            end_reason: "trade-completed",
+            end_reason: "trade-finishing",
             updated_at: now,
           })
           .eq("id", sessionId)
           .eq("status", "active")
           .eq("phase", "confirm")
           .eq("host_confirm", true)
-          .eq("guest_confirm", true);
+          .eq("guest_confirm", true)
+          .select()
+          .maybeSingle();
+        if (won) {
+          const outcome = await applyTradeToSaves(won);
+          await db
+            .from("link_sessions")
+            .update({ end_reason: outcome, updated_at: new Date().toISOString() })
+            .eq("id", sessionId);
+        }
         session = await fetchSession(sessionId);
         return json({ session }, 200, corsHeaders);
       }
@@ -480,6 +597,20 @@ Deno.serve(async (req) => {
       const finished = !!resolution.winner;
       const newHostParty = sanitizeParty(resolution.hostParty);
       const newGuestParty = sanitizeParty(resolution.guestParty);
+      // Anti-trampa básica: declarar un ganador exige que el equipo perdedor
+      // esté TODO debilitado en el snapshot publicado. No impide a un host
+      // malicioso falsear HPs, pero bloquea el atajo de "declararse ganador".
+      if (finished) {
+        const hostOut = newHostParty.length > 0 && newHostParty.every((p) => p.hp <= 0);
+        const guestOut = newGuestParty.length > 0 && newGuestParty.every((p) => p.hp <= 0);
+        const valid =
+          (resolution.winner === "host" && guestOut) ||
+          (resolution.winner === "guest" && hostOut) ||
+          (resolution.winner === "draw" && hostOut && guestOut);
+        if (!valid) {
+          return json({ error: "Bad resolution" }, 400, corsHeaders);
+        }
+      }
       const { data, error } = await db
         .from("link_sessions")
         .update({

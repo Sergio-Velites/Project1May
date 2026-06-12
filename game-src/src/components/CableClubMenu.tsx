@@ -20,12 +20,14 @@ import {
 } from "../app/cloud-save";
 import {
   LinkKind,
+  LinkSession,
   LinkSessionError,
   WaitingRoom,
   linkCancel,
   linkCreate,
   linkJoin,
   linkList,
+  linkMine,
   linkPoll,
 } from "../app/link-session";
 import Arrow from "./Arrow";
@@ -104,6 +106,7 @@ const ScrollIndicator = styled.div`
 type Stage =
   | "greeting"
   | "menu"
+  | "resume"
   | "saving"
   | "lobby-loading"
   | "lobby"
@@ -123,6 +126,8 @@ const CableClubMenu = () => {
   const pokemon = useSelector(selectPokemon);
 
   const [stage, setStage] = useState<Stage>("greeting");
+  const stageRef = useRef<Stage>("greeting");
+  stageRef.current = stage;
   const [message, setMessage] = useState("");
   const [rooms, setRooms] = useState<WaitingRoom[]>([]);
   const [cursor, setCursor] = useState(0);
@@ -133,6 +138,7 @@ const CableClubMenu = () => {
   const joinIdRef = useRef<string | null>(null);
   const busyRef = useRef(false);
   const selectReadyRef = useRef(false);
+  const resumeSessionRef = useRef<LinkSession | null>(null);
 
   const reset = () => {
     setStage("greeting");
@@ -144,10 +150,33 @@ const CableClubMenu = () => {
     joinIdRef.current = null;
     busyRef.current = false;
     selectReadyRef.current = false;
+    resumeSessionRef.current = null;
   };
 
   useEffect(() => {
     if (show) reset();
+  }, [show]);
+
+  // Al abrir, comprobar en segundo plano si hay una sesión viva (la app se
+  // recargó a mitad de un combate/intercambio) y ofrecer reanudarla — evita
+  // perder por timeout sin querer.
+  useEffect(() => {
+    if (!show) return;
+    if (!getCurrentUserId() || !getWriteToken() || isImpersonating()) return;
+    let cancelled = false;
+    linkMine()
+      .then((session) => {
+        if (cancelled || !session) return;
+        // Solo interrumpir las pantallas iniciales.
+        if (!["greeting", "menu"].includes(stageRef.current)) return;
+        resumeSessionRef.current = session;
+        setStage("resume");
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
 
   const exitWithMessage = (text: string) => {
@@ -158,6 +187,41 @@ const CableClubMenu = () => {
   const close = () => {
     dispatch(hideCableClubMenu());
     reset();
+  };
+
+  // ── Reanudar una sesión viva tras recargar la app ───────────────────────
+  const resumeSession = () => {
+    const s = resumeSessionRef.current;
+    if (!s) {
+      setStage("menu");
+      return;
+    }
+    if (s.status === "waiting") {
+      // Era mi propia sala en espera: volver a esperar en ella.
+      kindRef.current = s.kind;
+      sessionIdRef.current = s.id;
+      setStage("waiting");
+      return;
+    }
+    const role = getCurrentUserId() === s.hostId ? "host" : "guest";
+    dispatch(hideCableClubMenu());
+    dispatch(
+      openLinkRoom({
+        kind: s.kind,
+        sessionId: s.id,
+        role,
+        opponentName:
+          role === "host" ? s.guestName ?? "Invitado" : s.hostName,
+      })
+    );
+  };
+
+  const declineResume = () => {
+    const s = resumeSessionRef.current;
+    // Abandonar explícitamente: en combate activo cuenta como rendición.
+    if (s) linkCancel(s.id);
+    resumeSessionRef.current = null;
+    setStage("menu");
   };
 
   // ── Entrar a un servicio en vivo: validar + guardar partida ─────────────
@@ -235,6 +299,24 @@ const CableClubMenu = () => {
     };
   }, [stage, show]);
 
+  // Refresco automático del lobby: las salas nuevas aparecen solas (y las
+  // ocupadas desaparecen) sin tener que salir y volver a entrar.
+  useEffect(() => {
+    if (stage !== "lobby" || !show) return;
+    const interval = setInterval(() => {
+      linkList(kindRef.current)
+        .then((result) => {
+          if (stageRef.current !== "lobby" || busyRef.current) return;
+          setRooms(result);
+          // El cursor no puede quedar fuera de la lista nueva (+2: crear/salir).
+          setCursor((c) => Math.min(c, result.length + 1));
+          setScrollOffset((s) => Math.min(s, Math.max(0, result.length + 2 - VISIBLE_ROWS)));
+        })
+        .catch(() => {});
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [stage, show]);
+
   // Unirse a una sala existente.
   useEffect(() => {
     if (stage !== "joining" || !show) return;
@@ -306,6 +388,12 @@ const CableClubMenu = () => {
     };
 
     (async () => {
+      // Reanudación: si ya hay una sala propia (recarga de la app), no se
+      // crea otra; se sigue esperando en la existente.
+      if (sessionIdRef.current) {
+        timer = setTimeout(tick, POLL_MS);
+        return;
+      }
       try {
         const session = await linkCreate(kindRef.current);
         if (cancelled) {
@@ -320,6 +408,8 @@ const CableClubMenu = () => {
         exitWithMessage(
           code === "ALL_FAINTED"
             ? "¡Tus POKéMON están debilitados!"
+            : code === "RATE_LIMIT"
+            ? "Espera unos segundos antes de crear otra sala."
             : "No se pudo crear la sala. Inténtalo de nuevo."
         );
       }
@@ -407,9 +497,15 @@ const CableClubMenu = () => {
   if (!show) return null;
 
   const kindLabel = kindRef.current === "battle" ? "COLISEO" : "INTERCAMBIO";
+  const resumeS = resumeSessionRef.current;
+  const resumeLabel = resumeS?.kind === "trade" ? "un INTERCAMBIO" : "un COMBATE";
   const frameText =
     stage === "greeting"
       ? "¡Bienvenido al CLUB CABLE! Aquí puedes combatir o intercambiar POKéMON con otros invitados."
+      : stage === "resume"
+      ? resumeS?.status === "waiting"
+        ? `Tu sala de ${resumeS.kind === "trade" ? "INTERCAMBIO" : "COLISEO"} sigue abierta. ¿Quieres volver a esperar en ella?`
+        : `¡Tienes ${resumeLabel} en curso! Si no vuelves, perderás por tiempo. ¿Continuar?`
       : stage === "menu"
       ? "¿Qué deseas hacer?"
       : stage === "saving"
@@ -432,6 +528,18 @@ const CableClubMenu = () => {
 
   return (
     <Overlay>
+      <Menu
+        show={stage === "resume"}
+        noExitOption
+        close={() => setStage("menu")}
+        menuItems={[
+          { label: "¡VOLVER!", action: resumeSession },
+          { label: "ABANDONAR", action: declineResume },
+        ]}
+        top="0"
+        right="0"
+      />
+
       <Menu
         show={stage === "menu"}
         noExitOption

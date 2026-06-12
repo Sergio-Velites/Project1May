@@ -700,9 +700,26 @@ requiere que el rival esté conectado.
   no puede inyectar un equipo ajeno.
 - Como en GSC, antes de entrar se guarda la partida (`saveGameVerified`);
   sin write_token (nunca guardó en nube) no se puede entrar.
-- Acciones de la Edge Function: `create / list / join / poll / act /
+- Acciones de la Edge Function: `create / list / join / mine / poll / act /
   resolve / cancel`. Transiciones de fase con UPDATEs condicionales
   (atómicas e idempotentes frente a carreras).
+- **Intercambio atómico en servidor**: al confirmar ambos, la transición
+  exclusiva (lock de fila) aplica el swap directamente en
+  `saves.game_state` de los DOS jugadores (`applyTradeToSaves`), con
+  comprobación de integridad (la especie ofrecida debe seguir en su hueco)
+  y revert si el segundo write falla. `end_reason`: `trade-finishing` →
+  `trade-completed` | `trade-integrity`. Un cliente caído ya no puede
+  provocar duplicados ni medias transacciones.
+- **Anti-trampa en `resolve`**: declarar ganador exige que el equipo
+  perdedor esté todo a 0 PS en el snapshot publicado.
+- **Rate limit** (1 sala/5 s por host) y **purga** de sesiones
+  terminadas/canceladas de >1 día (en `create`).
+- **Reanudación**: `mine` devuelve la sesión viva del jugador; al abrir el
+  Club Cable tras recargar la app se ofrece "¡VOLVER!" (en combate, el host
+  reconstruye la simulación desde el snapshot — los volátiles se pierden,
+  degradación documentada). Abandonar explícitamente = rendirse.
+- UX: lobby con auto-refresco (3,5 s), confirmación antes de rendirse,
+  contador en rojo cuando quedan ≤10 s.
 - Cliente: `app/link-session.ts`. Migración: `008_link_sessions.sql`.
 
 **Centros con scientist**: `viridian-city-pokemon-center`, `pewter-city-pokemon-center`, `route-3-pokemon-center`

@@ -120,13 +120,13 @@ const MonLabel = styled.div`
   text-align: center;
 `;
 
-const Countdown = styled.div`
+const Countdown = styled.div<{ $urgent?: boolean }>`
   position: absolute;
   top: 1cqw;
   right: 2cqw;
   font-family: "PokemonGB";
-  font-size: 2.4cqw;
-  color: black;
+  font-size: ${(p) => (p.$urgent ? "3cqw" : "2.4cqw")};
+  color: ${(p) => (p.$urgent ? "#c02020" : "black")};
 `;
 
 type Phase =
@@ -153,6 +153,9 @@ const LinkTradeRoom = () => {
   phaseRef.current = phase;
   const appliedRef = useRef(false);
   const exitingRef = useRef(false);
+  // Polls consecutivos viendo "trade-finishing" (el servidor está aplicando
+  // el swap en los saves): si se eterniza, algo falló de verdad.
+  const finishingPollsRef = useRef(0);
 
   const show = !!room && room.kind === "trade";
   const myRole = room?.role ?? "host";
@@ -279,9 +282,26 @@ const LinkTradeRoom = () => {
         setSession(s);
         setCountdown(s.status === "active" ? Math.min(60, secondsLeft(s)) : null);
 
-        if (s.status === "finished" && s.endReason === "trade-completed") {
-          completeTrade(s);
-          return;
+        if (s.status === "finished") {
+          if (s.endReason === "trade-completed") {
+            completeTrade(s);
+            return;
+          }
+          if (s.endReason === "trade-integrity") {
+            exit(
+              "El intercambio no superó la verificación y se canceló. No se ha cambiado nada."
+            );
+            return;
+          }
+          // "trade-finishing": el servidor está persistiendo el swap en los
+          // dos saves; seguir consultando un poco más antes de rendirse.
+          finishingPollsRef.current += 1;
+          if (finishingPollsRef.current > 8) {
+            exit(
+              "No se pudo confirmar el intercambio. Revisa tu equipo: si falta algo, avisa a los novios."
+            );
+            return;
+          }
         }
         if (s.status === "cancelled") {
           exit(
@@ -390,7 +410,7 @@ const LinkTradeRoom = () => {
     <Overlay>
       {countdown !== null &&
         ["offer", "waiting-offer", "confirm", "waiting-confirm"].includes(phase) && (
-          <Countdown>{countdown}s</Countdown>
+          <Countdown $urgent={countdown <= 10}>{countdown}s</Countdown>
         )}
 
       {(phase === "confirm" || phase === "waiting-confirm") &&

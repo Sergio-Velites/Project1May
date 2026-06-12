@@ -131,6 +131,12 @@ export const linkList = async (kind: LinkKind): Promise<WaitingRoom[]> =>
 export const linkJoin = async (sessionId: string): Promise<LinkSession> =>
   mapSession((await call("join", { sessionId })).session);
 
+/** Mi sesión viva (si la hay) — para reanudar tras recargar la app. */
+export const linkMine = async (): Promise<LinkSession | null> => {
+  const { session } = await call("mine");
+  return session ? mapSession(session) : null;
+};
+
 export const linkPoll = async (sessionId: string): Promise<LinkSession> =>
   mapSession((await call("poll", { sessionId })).session);
 

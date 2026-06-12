@@ -164,13 +164,13 @@ const TextContainer = styled.div`
   z-index: 100;
 `;
 
-const Countdown = styled.div`
+const Countdown = styled.div<{ $urgent?: boolean }>`
   position: absolute;
   top: 1cqw;
   left: 2cqw;
   font-family: "PokemonGB";
-  font-size: 2.4cqw;
-  color: black;
+  font-size: ${(p) => (p.$urgent ? "3cqw" : "2.4cqw")};
+  color: ${(p) => (p.$urgent ? "#c02020" : "black")};
   z-index: 110;
 `;
 
@@ -190,6 +190,7 @@ type Phase =
   | "move-select"
   | "switch-select"
   | "forced-switch"
+  | "confirm-forfeit"
   | "waiting"
   | "animating"
   | "ended";
@@ -262,8 +263,18 @@ const LinkBattleRoom = () => {
         host: s.hostName,
         guest: s.guestName ?? "Invitado",
       };
-      const hostActiveIndex = Math.max(0, hostParty.findIndex((p) => p.hp > 0));
-      const guestActiveIndex = Math.max(0, guestParty.findIndex((p) => p.hp > 0));
+      // Reanudación (la app se recargó a mitad de combate): los índices
+      // activos vienen del último snapshot del host; en un combate recién
+      // empezado no hay resolución y se usa el primer Pokémon vivo.
+      const resumed = s.turn > 1 || !!s.resolution;
+      const hostActiveIndex =
+        s.resolution?.hostActiveIndex ??
+        Math.max(0, hostParty.findIndex((p) => p.hp > 0));
+      const guestActiveIndex =
+        s.resolution?.guestActiveIndex ??
+        Math.max(0, guestParty.findIndex((p) => p.hp > 0));
+      // No re-reproducir la última resolución ya vista antes de la recarga.
+      lastPlayedTurnRef.current = s.resolution?.turn ?? 0;
       setMirror({
         hostParty,
         guestParty,
@@ -275,21 +286,45 @@ const LinkBattleRoom = () => {
         guestHp: guestParty[guestActiveIndex]?.hp ?? 0,
       });
       if (myRole === "host") {
-        simRef.current = createLinkBattleSim(hostParty, guestParty, {
+        // Al reanudar, el host reconstruye la simulación desde el snapshot:
+        // los volátiles (stages, confusión, Protect…) se pierden — degradación
+        // documentada y preferible a perder el combate por timeout.
+        const sim = createLinkBattleSim(hostParty, guestParty, {
           host: s.hostName,
           guest: s.guestName ?? "Invitado",
         });
+        sim.host.activeIndex = hostActiveIndex;
+        sim.guest.activeIndex = guestActiveIndex;
+        simRef.current = sim;
       }
       setPhase("intro");
-      setText(`¡Comienza el combate contra ${s.guestName && myRole === "host" ? s.guestName : s.hostName}!`);
+      setText(
+        resumed
+          ? `¡De vuelta al combate contra ${opponentName}!`
+          : `¡Comienza el combate contra ${s.guestName && myRole === "host" ? s.guestName : s.hostName}!`
+      );
       const enemyParty = myRole === "host" ? guestParty : hostParty;
       const enemyActive = enemyParty[myRole === "host" ? guestActiveIndex : hostActiveIndex];
       if (enemyActive) playCry(enemyActive.id);
+      // Fase inicial tras la intro: si ya había actuado este turno → esperar;
+      // si el último turno me dejó KO pendiente de cambio → cambio forzado.
+      const myAction = myRole === "host" ? s.hostAction : s.guestAction;
+      const needMySwitch = !!s.resolution?.needSwitch?.[myRole] && !myAction;
       setTimeout(() => {
-        if (phaseRef.current === "intro") setPhase("choosing");
+        if (phaseRef.current !== "intro") return;
+        if (s.phase === "resolving" || myAction) {
+          if (myAction) actedTurnRef.current = s.turn;
+          setPhase("waiting");
+          setText(`Esperando a ${opponentName}...`);
+        } else if (needMySwitch) {
+          setPhase("forced-switch");
+          setText("¿A cuál POKéMON mandas?");
+        } else {
+          setPhase("choosing");
+        }
       }, 2000);
     },
-    [myRole]
+    [myRole, opponentName]
   );
 
   // ── Reproducir los eventos de una resolución ─────────────────────────────
@@ -597,13 +632,20 @@ const LinkBattleRoom = () => {
 
   const showCountdown =
     countdown !== null &&
-    ["choosing", "move-select", "switch-select", "forced-switch", "waiting"].includes(
-      phase
-    );
+    [
+      "choosing",
+      "move-select",
+      "switch-select",
+      "forced-switch",
+      "confirm-forfeit",
+      "waiting",
+    ].includes(phase);
 
   return (
     <Overlay>
-      {showCountdown && <Countdown>{countdown}s</Countdown>}
+      {showCountdown && (
+        <Countdown $urgent={countdown <= 10}>{countdown}s</Countdown>
+      )}
 
       <BattleArea>
         <Row>
@@ -666,6 +708,8 @@ const LinkBattleRoom = () => {
             ? endText
             : phase === "choosing"
             ? `¿Qué hará ${myMeta?.name.toUpperCase() ?? "tu POKéMON"}?`
+            : phase === "confirm-forfeit"
+            ? `¿Seguro que quieres rendirte? ${opponentName} ganará el combate.`
             : text}
         </Frame>
       </TextContainer>
@@ -689,13 +733,26 @@ const LinkBattleRoom = () => {
           { pokemon: true, label: "PKMN", action: () => setPhase("switch-select") },
           {
             label: "Rendirse",
-            action: () => submitAction({ type: "forfeit" }),
+            action: () => setPhase("confirm-forfeit"),
           },
           { label: "-", action: () => {} },
         ]}
         noExit
         close={() => {}}
         bottom="0"
+        right="0"
+      />
+
+      {/* Confirmación de rendición: evita perder por un toque accidental */}
+      <Menu
+        noExitOption
+        show={phase === "confirm-forfeit"}
+        menuItems={[
+          { label: "NO, ¡SEGUIR!", action: () => setPhase("choosing") },
+          { label: "SÍ, RENDIRME", action: () => submitAction({ type: "forfeit" }) },
+        ]}
+        close={() => setPhase("choosing")}
+        bottom="30%"
         right="0"
       />
 
