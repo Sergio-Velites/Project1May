@@ -921,6 +921,7 @@ const LinkBattleRoom = () => {
           RENDIRSE en el lugar de HUIR (doble confirmación) */}
       <Menu
         compact
+        width="50cqw"
         show={phase === "choosing" && !notice}
         menuItems={[
           {
