@@ -1,21 +1,31 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import Frame from "./Frame";
 import Menu from "./Menu";
+import MoveSelect from "./MoveSelect";
+import PokemonList from "./PokemonList";
 import HealthBar from "./HealthBar";
 import PixelImage from "../styles/PixelImage";
+import corner from "../assets/ui/corner.png";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import { closeLinkRoom, selectLinkRoom } from "../state/uiSlice";
+import {
+  consumeItem,
+  selectInventory,
+  selectName,
+} from "../state/gameSlice";
+import useItemData, { ItemType } from "../app/use-item-data";
+import { InventoryItemType } from "../state/state-types";
 import {
   LinkBattleAction,
   LinkBattleEvent,
   LinkResolution,
   LinkRole,
   LinkSession,
+  LinkSideHints,
   linkAct,
-  linkCancel,
   linkPoll,
   linkResolve,
   secondsLeft,
@@ -23,12 +33,18 @@ import {
 import {
   LinkBattleSim,
   createLinkBattleSim,
+  formatLinkText,
+  getSideHints,
+  linkItemTargetError,
+  linkItemUsable,
   resolveLinkTurn,
 } from "../app/link-battle-engine";
 import { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import { getPokemonStats } from "../app/use-pokemon-stats";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { getMoveSfxPath } from "../app/move-sfx-map";
+import { isSelfTargetingStatusMove } from "../app/move-helper";
+import { MoveAnimation } from "./MoveAnimation";
 import { genderSymbol } from "../app/gender-helper";
 import { playCry } from "../app/pokemon-cry";
 import { BattleStatus, PokemonInstance } from "../state/state-types";
@@ -41,15 +57,24 @@ import { BattleStatus, PokemonInstance } from "../state/state-types";
 // una lista de eventos; ambos clientes REPRODUCEN exactamente los mismos
 // eventos y adoptan el snapshot del host. El invitado nunca calcula nada.
 //
-// Reglas (fieles a Oro/Plata):
-//   · Sin objetos de la mochila; los equipados sí actúan.
-//   · Huir = rendirse (gana el rival).
-//   · Se combate con COPIAS: tu equipo real queda intacto al salir.
+// La interfaz replica el combate normal contra un NPC: mismo menú
+// (LUCHAR / PKMN / OBJETO) con RENDIRSE en lugar de HUIR (y doble
+// confirmación), las mismas animaciones de movimientos (MoveAnimation +
+// flash + embestida) y los mismos componentes de selección (MoveSelect,
+// PokemonList). Las pokéballs están bloqueadas, como contra un entrenador.
+//
+// Reglas:
+//   · Objetos de mochila permitidos (consumen el turno y se gastan de
+//     verdad); los equipados actúan en ambos bandos.
+//   · Rendirse otorga la victoria al rival.
+//   · Se combate con COPIAS (el equipo real queda intacto, sin XP).
 //   · 1 minuto por decisión: si no respondes, pierdes el combate.
 // ─────────────────────────────────────────────────────────────────────────
 
 const POLL_MS = 2000;
 const MSG_MS = 1400;
+const ANIM_MS = 800;
+const ATTACK_ANIMATION = 600;
 
 const Overlay = styled.div`
   position: absolute;
@@ -102,11 +127,10 @@ const Name = styled.div`
   text-transform: uppercase;
 `;
 
-const OwnerName = styled.div`
-  font-size: 2cqw;
-  font-family: "PokemonGB";
-  text-transform: uppercase;
-  opacity: 0.75;
+const GenderGlyph = styled.span`
+  font-family: "PokemonGB", sans-serif;
+  font-size: 3.1cqw;
+  line-height: 0;
 `;
 
 const Level = styled.div`
@@ -127,16 +151,58 @@ const Health = styled.div`
   margin-top: 0.8cqw;
 `;
 
-const StatusBadge = styled.span<{ $color: string }>`
+const StatusBadge = styled.div<{ $color: string }>`
   font-family: "PokemonGB";
   font-size: 1.7cqw;
   background: ${(p) => p.$color};
   color: #fff;
   padding: 0.15cqw 0.7cqw;
   letter-spacing: 0.05em;
+  position: absolute;
+  bottom: 1.2cqw;
+  left: 0;
+  z-index: 2;
 `;
 
-const ImageContainer = styled.div`
+const StatusBadgeWrap = styled.div`
+  height: 0;
+  overflow: visible;
+  position: relative;
+`;
+
+const Corner = styled(PixelImage)`
+  transform: translateY(-50%);
+  height: 5.1cqw;
+`;
+
+const CornerContainer = styled.div`
+  height: 2.7cqw;
+`;
+
+const CornerRight = styled(PixelImage)`
+  height: 5.1cqw;
+  transform: translateY(-70%) scaleX(-1);
+`;
+
+const flashing = keyframes`
+  0% { opacity: 1; }
+  10% { opacity: 0; }
+  20% { opacity: 1; }
+  30% { opacity: 0; }
+  40% { opacity: 1; }
+  50% { opacity: 0; }
+  60% { opacity: 1; }
+  70% { opacity: 0; }
+  80% { opacity: 1; }
+  90% { opacity: 0; }
+  100% { opacity: 1; }
+`;
+
+interface FlashingProps {
+  $flashing: boolean;
+}
+
+const ImageContainer = styled.div<FlashingProps>`
   height: 100%;
   flex: 1;
   display: flex;
@@ -144,11 +210,53 @@ const ImageContainer = styled.div`
   justify-content: center;
   position: relative;
   overflow: hidden;
+
+  ${(props: FlashingProps) =>
+    props.$flashing &&
+    css`
+      animation: ${flashing} 500ms linear forwards;
+    `};
 `;
 
 const PlayerImageContainer = styled(ImageContainer)`
   align-items: flex-start;
   overflow: visible;
+`;
+
+const attackRight = keyframes`
+  0% { transform: translateX(0%); }
+  50% { transform: translateX(50%); }
+  100% { transform: translateX(0%); }
+`;
+
+const attackLeft = keyframes`
+  0% { transform: translateX(0%); }
+  50% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+`;
+
+interface AttackingProps {
+  $attacking: boolean;
+}
+
+const AttackRight = styled.div<AttackingProps>`
+  height: 100%;
+  transform: translateX(0%);
+  ${(props: AttackingProps) =>
+    props.$attacking &&
+    css`
+      animation: ${attackRight} ${ATTACK_ANIMATION}ms linear forwards;
+    `};
+`;
+
+const AttackLeft = styled.div<AttackingProps>`
+  height: 100%;
+  transform: translateX(0%);
+  ${(props: AttackingProps) =>
+    props.$attacking &&
+    css`
+      animation: ${attackLeft} ${ATTACK_ANIMATION}ms linear forwards;
+    `};
 `;
 
 const SpriteImage = styled(PixelImage)`
@@ -190,6 +298,8 @@ type Phase =
   | "move-select"
   | "switch-select"
   | "forced-switch"
+  | "item-select"
+  | "item-target"
   | "confirm-forfeit"
   | "waiting"
   | "animating"
@@ -207,9 +317,19 @@ interface Mirror {
   guestHp: number;
 }
 
+/** Animación de movimiento en curso (evento `anim` del host). */
+interface AnimState {
+  moveId: string;
+  /** Bando que ATACA (el del evento). */
+  attackerSide: LinkRole;
+}
+
 const LinkBattleRoom = () => {
   const dispatch = useDispatch();
   const room = useSelector(selectLinkRoom);
+  const inventory = useSelector(selectInventory);
+  const playerName = useSelector(selectName);
+  const itemData = useItemData();
 
   const show = !!room && room.kind === "battle";
   const myRole: LinkRole = room?.role ?? "host";
@@ -221,6 +341,11 @@ const LinkBattleRoom = () => {
   const [text, setText] = useState("Conectando con el COLISEO...");
   const [countdown, setCountdown] = useState<number | null>(null);
   const [endText, setEndText] = useState<string | null>(null);
+  const [anim, setAnim] = useState<AnimState | null>(null);
+  /** Aviso transitorio en el frame (pokéball bloqueada, no puede luchar...). */
+  const [notice, setNotice] = useState<string | null>(null);
+  /** Objeto seleccionado en la mochila, pendiente de elegir objetivo. */
+  const [pendingItem, setPendingItem] = useState<string | null>(null);
 
   const phaseRef = useRef<Phase>("loading");
   phaseRef.current = phase;
@@ -232,14 +357,26 @@ const LinkBattleRoom = () => {
   const resolvingRef = useRef(false);
   const pendingResolutionRef = useRef<LinkResolution | null>(null);
   const actedTurnRef = useRef(0);
-  const namesRef = useRef<{ host: string; guest: string }>({
-    host: "Anfitrión",
-    guest: "Invitado",
-  });
+  const noticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const animTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Pistas del último snapshot del host para MI bando (Mal de Ojo, Bis...). */
+  const myHintsRef = useRef<LinkSideHints | null>(null);
 
   const exit = useCallback(() => {
     dispatch(closeLinkRoom());
   }, [dispatch]);
+
+  /** Tokens [[side|NOMBRE]] → "NOMBRE" (míos) / "NOMBRE rival" (suyos). */
+  const fmt = useCallback(
+    (raw: string) => formatLinkText(raw, myRole),
+    [myRole]
+  );
+
+  const showNotice = useCallback((msg: string) => {
+    setNotice(msg);
+    if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
+    noticeTimerRef.current = setTimeout(() => setNotice(null), 1600);
+  }, []);
 
   // ── Inicialización ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -247,22 +384,22 @@ const LinkBattleRoom = () => {
     setPhase("loading");
     setMirror(null);
     setEndText(null);
+    setAnim(null);
+    setNotice(null);
+    setPendingItem(null);
     setText("Conectando con el COLISEO...");
     simRef.current = null;
     sessionRef.current = null;
     lastPlayedTurnRef.current = 0;
     resolvingRef.current = false;
     actedTurnRef.current = 0;
+    myHintsRef.current = null;
   }, [show, room?.sessionId]);
 
   const initFromSession = useCallback(
     (s: LinkSession) => {
       const hostParty = s.hostParty ?? [];
       const guestParty = s.guestParty ?? [];
-      namesRef.current = {
-        host: s.hostName,
-        guest: s.guestName ?? "Invitado",
-      };
       // Reanudación (la app se recargó a mitad de combate): los índices
       // activos vienen del último snapshot del host; en un combate recién
       // empezado no hay resolución y se usa el primer Pokémon vivo.
@@ -275,6 +412,7 @@ const LinkBattleRoom = () => {
         Math.max(0, guestParty.findIndex((p) => p.hp > 0));
       // No re-reproducir la última resolución ya vista antes de la recarga.
       lastPlayedTurnRef.current = s.resolution?.turn ?? 0;
+      myHintsRef.current = s.resolution?.sideHints?.[myRole] ?? null;
       setMirror({
         hostParty,
         guestParty,
@@ -318,7 +456,6 @@ const LinkBattleRoom = () => {
           setText(`Esperando a ${opponentName}...`);
         } else if (needMySwitch) {
           setPhase("forced-switch");
-          setText("¿A cuál POKéMON mandas?");
         } else {
           setPhase("choosing");
         }
@@ -331,6 +468,7 @@ const LinkBattleRoom = () => {
   const playResolution = useCallback(
     (resolution: LinkResolution) => {
       lastPlayedTurnRef.current = resolution.turn;
+      myHintsRef.current = resolution.sideHints?.[myRole] ?? null;
       setPhase("animating");
       const events: LinkBattleEvent[] = resolution.events ?? [];
 
@@ -365,6 +503,10 @@ const LinkBattleRoom = () => {
             guestStatus: e.side === "guest" ? mon?.status ?? null : m.guestStatus,
           });
         } else if (e.t === "anim") {
+          // Animación visual (la misma del combate normal) + SFX del move.
+          setAnim({ moveId: e.moveId, attackerSide: e.side });
+          if (animTimerRef.current) clearTimeout(animTimerRef.current);
+          animTimerRef.current = setTimeout(() => setAnim(null), ANIM_MS);
           const sfxPath = getMoveSfxPath(e.moveId);
           if (sfxPath) {
             const sfx = new Audio(sfxPath);
@@ -386,11 +528,12 @@ const LinkBattleRoom = () => {
         const eventDelay = delay;
         setTimeout(() => applyEvent(e), eventDelay);
         if (e.t === "msg") delay += MSG_MS;
-        else if (e.t === "anim") delay += 500;
+        else if (e.t === "anim") delay += ANIM_MS;
       }
 
       // Al terminar: adoptar el snapshot del host y decidir la siguiente fase.
       setTimeout(() => {
+        setAnim(null);
         setMirror({
           hostParty: resolution.hostParty,
           guestParty: resolution.guestParty,
@@ -409,7 +552,6 @@ const LinkBattleRoom = () => {
         }
         if (resolution.needSwitch[myRole]) {
           setPhase("forced-switch");
-          setText("¿A cuál POKéMON mandas?");
         } else if (resolution.needSwitch[theirRole]) {
           // El rival debe sacar Pokémon; yo "espero" (acción automática).
           setPhase("waiting");
@@ -463,13 +605,21 @@ const LinkBattleRoom = () => {
       actedTurnRef.current = turn;
       if (action.type !== "wait") setPhase("waiting");
       if (action.type !== "wait") setText(`Esperando a ${opponentName}...`);
-      linkAct(room.sessionId, action).catch(() => {
-        // Reintento manual: devolver el control al jugador.
-        actedTurnRef.current = 0;
-        if (phaseRef.current === "waiting") setPhase("choosing");
-      });
+      linkAct(room.sessionId, action)
+        .then(() => {
+          // El objeto se gasta DE VERDAD (a diferencia del equipo, que es
+          // una copia): se consume solo cuando el servidor acepta la acción.
+          if (action.type === "item") {
+            dispatch(consumeItem(action.item as ItemType));
+          }
+        })
+        .catch(() => {
+          // Reintento manual: devolver el control al jugador.
+          actedTurnRef.current = 0;
+          if (phaseRef.current === "waiting") setPhase("choosing");
+        });
     },
-    [opponentName, room]
+    [dispatch, opponentName, room]
   );
 
   // ── Resolver turno (solo host) ───────────────────────────────────────────
@@ -498,6 +648,7 @@ const LinkBattleRoom = () => {
             guestActiveIndex: sim.guest.activeIndex,
             needSwitch: outcome.needSwitch,
             winner: outcome.winner,
+            sideHints: getSideHints(sim),
           };
           pendingResolutionRef.current = resolution;
         }
@@ -624,10 +775,30 @@ const LinkBattleRoom = () => {
     ? getPokemonStats(theirActive.id, theirActive.level)
     : null;
 
+  // ── Animación en curso: bando objetivo, clase de daño ────────────────────
+  const animMeta = anim ? getMoveMetadata(anim.moveId) : null;
+  // Los moves de buff propio (Agilidad, Amnesia...) animan sobre el usuario.
+  const animTargetSide: LinkRole | null = anim
+    ? isSelfTargetingStatusMove(anim.moveId)
+      ? anim.attackerSide
+      : anim.attackerSide === "host"
+      ? "guest"
+      : "host"
+    : null;
+  const animOnMe = animTargetSide === myRole;
+  const animOnThem = animTargetSide === theirRole;
+  const animIsStatus = animMeta?.damageClass === "status";
+  const animIsPhysical = animMeta?.damageClass === "physical";
+  const iAmAttacking = anim?.attackerSide === myRole;
+
   const renderStatus = (status: BattleStatus | null) => {
     if (!status) return null;
     const [label, color] = STATUS_LABEL[status.type] ?? ["???", "#888"];
-    return <StatusBadge $color={color}>{label}</StatusBadge>;
+    return (
+      <StatusBadgeWrap>
+        <StatusBadge $color={color}>{label}</StatusBadge>
+      </StatusBadgeWrap>
+    );
   };
 
   const showCountdown =
@@ -637,9 +808,28 @@ const LinkBattleRoom = () => {
       "move-select",
       "switch-select",
       "forced-switch",
+      "item-select",
+      "item-target",
       "confirm-forfeit",
       "waiting",
     ].includes(phase);
+
+  const frameText = notice
+    ? notice
+    : phase === "ended"
+    ? endText
+    : phase === "choosing"
+    ? `¿Qué hará ${myMeta?.name.toUpperCase() ?? "tu POKéMON"}?`
+    : phase === "confirm-forfeit"
+    ? `¿Seguro que quieres rendirte? ${opponentName} ganará el combate.`
+    : phase === "item-select"
+    ? "¿Qué objeto usar?"
+    : fmt(text);
+
+  // La pantalla PKMN (PokemonList) y la mochila tapan toda la escena, como
+  // en el combate normal.
+  const fullScreenList =
+    phase === "switch-select" || phase === "forced-switch" || phase === "item-target";
 
   return (
     <Overlay>
@@ -654,9 +844,8 @@ const LinkBattleRoom = () => {
               <>
                 <Name>
                   {theirMeta.name}
-                  {genderSymbol(theirActive?.gender)}
+                  <GenderGlyph>{genderSymbol(theirActive?.gender)}</GenderGlyph>
                 </Name>
-                <OwnerName>de {opponentName}</OwnerName>
                 <Level>{`:L${theirActive?.level ?? "?"}`}</Level>
                 <HealthBarContainer>
                   <HealthBar
@@ -666,25 +855,40 @@ const LinkBattleRoom = () => {
                   />
                 </HealthBarContainer>
                 {renderStatus(theirStatus)}
+                <Corner src={corner} />
               </>
             )}
           </LeftInfoSection>
-          <ImageContainer>
-            {theirMeta && theirHp > 0 && (
-              <SpriteImage src={theirMeta.images.front} />
-            )}
+          <ImageContainer $flashing={!!anim && animOnThem && !animIsStatus}>
+            <AttackRight $attacking={!!anim && !iAmAttacking && animIsPhysical}>
+              {theirMeta && theirHp > 0 && (
+                <SpriteImage src={theirMeta.images.front} />
+              )}
+            </AttackRight>
+            <MoveAnimation
+              moveId={anim?.moveId ?? null}
+              active={!!anim && animOnThem}
+              fromDirection="left"
+            />
           </ImageContainer>
         </Row>
         <Row>
-          <PlayerImageContainer>
-            {myMeta && myHp > 0 && <SpriteImage src={myMeta.images.back} />}
+          <PlayerImageContainer $flashing={!!anim && animOnMe && !animIsStatus}>
+            <AttackLeft $attacking={!!anim && iAmAttacking && animIsPhysical}>
+              {myMeta && myHp > 0 && <SpriteImage src={myMeta.images.back} />}
+            </AttackLeft>
+            <MoveAnimation
+              moveId={anim?.moveId ?? null}
+              active={!!anim && animOnMe}
+              fromDirection="right"
+            />
           </PlayerImageContainer>
           <RightInfoSection>
             {myMeta && myStats && (
               <>
                 <Name>
                   {myMeta.name}
-                  {genderSymbol(myActive?.gender)}
+                  <GenderGlyph>{genderSymbol(myActive?.gender)}</GenderGlyph>
                 </Name>
                 <Level>{`:L${myActive?.level ?? "?"}`}</Level>
                 <HealthBarContainer>
@@ -696,33 +900,34 @@ const LinkBattleRoom = () => {
                 </HealthBarContainer>
                 <Health>{`${Math.max(0, myHp)}/${myStats.hp}`}</Health>
                 {renderStatus(myStatus)}
+                <CornerContainer>
+                  <CornerRight src={corner} />
+                </CornerContainer>
               </>
             )}
           </RightInfoSection>
         </Row>
       </BattleArea>
 
-      <TextContainer>
-        <Frame wide tall flashing={phase === "ended"}>
-          {phase === "ended"
-            ? endText
-            : phase === "choosing"
-            ? `¿Qué hará ${myMeta?.name.toUpperCase() ?? "tu POKéMON"}?`
-            : phase === "confirm-forfeit"
-            ? `¿Seguro que quieres rendirte? ${opponentName} ganará el combate.`
-            : text}
-        </Frame>
-      </TextContainer>
+      {!fullScreenList && (
+        <TextContainer>
+          <Frame wide tall flashing={phase === "ended" || !!notice}>
+            {frameText}
+          </Frame>
+        </TextContainer>
+      )}
 
-      {/* Menú principal: LUCHAR / PKMN / RENDIRSE (sin mochila — regla GSC) */}
+      {/* Menú principal — el mismo del combate normal contra un NPC, con
+          RENDIRSE en el lugar de HUIR (doble confirmación) */}
       <Menu
         compact
-        show={phase === "choosing"}
+        show={phase === "choosing" && !notice}
         menuItems={[
           {
             label: "Luchar",
             action: () => {
               if (!myActive) return;
+              // Gen I: si todos los PP son 0, usar Forcejeo automáticamente
               if (myActive.moves.every((mv) => mv.pp <= 0)) {
                 submitAction({ type: "move", moveId: "struggle" });
               } else {
@@ -730,12 +935,25 @@ const LinkBattleRoom = () => {
               }
             },
           },
-          { pokemon: true, label: "PKMN", action: () => setPhase("switch-select") },
+          {
+            pokemon: true,
+            label: "PKMN",
+            action: () => {
+              if (myHintsRef.current?.trapped) {
+                showNotice(`¡${myMeta?.name.toUpperCase() ?? "Tu POKéMON"} no puede escapar!`);
+                return;
+              }
+              setPhase("switch-select");
+            },
+          },
+          {
+            label: "Objeto",
+            action: () => setPhase("item-select"),
+          },
           {
             label: "Rendirse",
             action: () => setPhase("confirm-forfeit"),
           },
-          { label: "-", action: () => {} },
         ]}
         noExit
         close={() => {}}
@@ -756,44 +974,102 @@ const LinkBattleRoom = () => {
         right="0"
       />
 
-      {/* Selección de movimiento */}
-      <Menu
-        tight
-        noExitOption
-        padd={4}
+      {/* Selección de movimiento — el mismo componente del combate normal
+          (caja de tipo/PP incluida) */}
+      <MoveSelect
         show={phase === "move-select"}
-        menuItems={(myActive?.moves ?? []).map((mv) => ({
-          label: `${getMoveMetadata(mv.id)?.name ?? mv.id} ${mv.pp}PP`,
-          action: () => {
-            if (mv.pp <= 0) return;
-            submitAction({ type: "move", moveId: mv.id });
-          },
-        }))}
+        overrideMoves={myActive?.moves ?? []}
+        select={(move: string) => {
+          if (myHintsRef.current?.disabledMove === move) {
+            showNotice("¡Ese movimiento está inhabilitado!");
+            setPhase("choosing");
+            return;
+          }
+          submitAction({ type: "move", moveId: move });
+        }}
         close={() => setPhase("choosing")}
-        bottom="0"
-        right="0"
       />
 
-      {/* Cambio de Pokémon (voluntario o forzado tras KO) */}
-      <Menu
-        noExitOption={phase === "forced-switch"}
-        show={phase === "switch-select" || phase === "forced-switch"}
-        menuItems={myParty.map((p, index) => ({
-          label: `${getPokemonMetadata(p.id).name.toUpperCase()} :L${p.level} ${
-            p.hp <= 0 ? "(KO)" : index === myActiveIdx ? "(EN COMBATE)" : ""
-          }`,
-          action: () => {
-            if (p.hp <= 0) return;
-            if (index === myActiveIdx && phase === "switch-select") return;
+      {/* Pantalla PKMN — la misma lista del combate normal, sobre las COPIAS
+          del Coliseo (cambio voluntario o forzado tras KO) */}
+      {(phase === "switch-select" || phase === "forced-switch") && (
+        <PokemonList
+          mode="battle"
+          customPokemon={myParty}
+          text={phase === "forced-switch" ? "¿A cuál POKéMON mandas?" : undefined}
+          close={() => {
+            if (phase === "switch-select") setPhase("choosing");
+          }}
+          switchAction={(index) => {
+            if (index === myActiveIdx && phase === "switch-select") {
+              showNotice("¡Ya está en combate!");
+              setPhase("choosing");
+              return;
+            }
+            if (!myParty[index] || myParty[index].hp <= 0) {
+              showNotice("¡No puede luchar!");
+              if (phase === "switch-select") setPhase("choosing");
+              return;
+            }
             submitAction({ type: "switch", index });
-          },
-        }))}
-        close={() => {
-          if (phase === "switch-select") setPhase("choosing");
-        }}
-        top="0"
-        right="0"
+          }}
+        />
+      )}
+
+      {/* Mochila — objetos del inventario REAL; las pokéballs están
+          bloqueadas, como contra cualquier entrenador */}
+      <Menu
+        show={phase === "item-select"}
+        menuItems={inventory
+          .filter(
+            (item: InventoryItemType) =>
+              item.amount > 0 && !itemData[item.item]?.badge
+          )
+          .map((item: InventoryItemType) => ({
+            label: itemData[item.item]?.name ?? item.item,
+            value: item.amount,
+            action: () => {
+              const data = itemData[item.item];
+              if (data?.pokeball) {
+                showNotice("¡No puedes capturar el POKéMON de otro entrenador!");
+                return;
+              }
+              if (!data?.usableInBattle || !linkItemUsable(item.item)) {
+                showNotice(`OAK: ¡${playerName}! ¡Éste no es el momento de usarlo!`);
+                return;
+              }
+              setPendingItem(item.item);
+              setPhase("item-target");
+            },
+          }))}
+        close={() => setPhase("choosing")}
       />
+
+      {/* Elegir el Pokémon objetivo del objeto */}
+      {phase === "item-target" && pendingItem && (
+        <PokemonList
+          customPokemon={myParty}
+          text="¿Sobre qué POKéMON?"
+          close={() => {
+            setPendingItem(null);
+            setPhase("item-select");
+          }}
+          clickPokemon={(index) => {
+            const target = myParty[index];
+            if (!target) return;
+            const error = linkItemTargetError(pendingItem, target);
+            if (error) {
+              showNotice(error);
+              setPendingItem(null);
+              setPhase("item-select");
+              return;
+            }
+            const item = pendingItem;
+            setPendingItem(null);
+            submitAction({ type: "item", item, targetIndex: index });
+          }}
+        />
+      )}
     </Overlay>
   );
 };

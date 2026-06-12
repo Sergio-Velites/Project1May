@@ -15,8 +15,20 @@ export type LinkRole = "host" | "guest";
 export type LinkBattleAction =
   | { type: "move"; moveId: string }
   | { type: "switch"; index: number }
+  | { type: "item"; item: string; targetIndex: number }
   | { type: "wait" } // el rival debe sacar un Pokémon tras un KO; yo espero
   | { type: "forfeit" };
+
+/** Pistas que el host publica para que cada cliente bloquee en su UI lo que
+ *  el motor rechazaría (Mal de Ojo, Bis, Inhabilitar). */
+export interface LinkSideHints {
+  /** Mal de Ojo / Red Viva: no se puede cambiar de Pokémon. */
+  trapped: boolean;
+  /** Bis activo: el próximo "Luchar" repite este movimiento. */
+  encoreMove: string | null;
+  /** Movimiento inhabilitado por Disable. */
+  disabledMove: string | null;
+}
 
 /** Eventos que el host emite al resolver un turno; ambos visores los animan. */
 export type LinkBattleEvent =
@@ -37,6 +49,8 @@ export interface LinkResolution {
   /** Quién debe sacar Pokémon en el próximo turno (tras un KO). */
   needSwitch: { host: boolean; guest: boolean };
   winner: LinkRole | "draw" | null;
+  /** Estado de bando para la UI (opcional: resoluciones antiguas no lo traen). */
+  sideHints?: { host: LinkSideHints; guest: LinkSideHints };
 }
 
 export interface LinkSession {

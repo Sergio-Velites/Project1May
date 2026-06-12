@@ -663,13 +663,35 @@ CABLE** (patrón Oro/Plata). `OnlineBattleNpc.tsx` detecta la tecla A →
   `processMove` de move-helper) y publica `resolution.events[]`; los dos
   visores (`LinkBattleRoom.tsx`) reproducen esos eventos y adoptan el
   snapshot. El guest no calcula NADA.
-- **Reglas GSC**: sin objetos de mochila; objetos equipados sí; huir =
-  rendirse; se combate con COPIAS (el equipo real queda intacto, sin XP).
+- **UI idéntica al combate normal contra NPC**: menú LUCHAR / PKMN / OBJETO /
+  RENDIRSE (en vez de HUIR, con doble confirmación), `MoveSelect` y
+  `PokemonList` reales (sobre las copias), animaciones `MoveAnimation` +
+  flash + embestida, esquinas `corner.png`. NO se muestra el nombre del
+  jugador rival bajo su Pokémon.
+- **Mensajes relativos al espectador**: el motor emite tokens
+  `[[side|NOMBRE]]` y cada visor los traduce con `formatLinkText` →
+  "SQUIRTLE" (míos) / "SQUIRTLE rival" (suyos), como en combate normal.
+- **Reglas**: OBJETOS DE MOCHILA PERMITIDOS (consumen el turno y se gastan
+  del inventario real; pokéballs bloqueadas como contra un entrenador —
+  acción `{type:"item", item, targetIndex}`, efectos en
+  `LINK_ITEM_EFFECTS` del motor); objetos equipados activos en AMBOS
+  bandos (Restos, bayas, Garra Rápida en orden de turno, Cinta Focus...);
+  huir = rendirse; se combate con COPIAS (el equipo real queda intacto,
+  sin XP).
+- **Paridad de mecánicas con el combate normal**: Drenadoras, trampas
+  (Wrap/Torbellino 1/16), Tóxico con contador creciente, Púas (al entrar,
+  clamp 1 PS), Bis, Inhabilitar, Pesadilla, Canto Mortal (KO doble =
+  empate), Sustituto, clima completo (5 turnos + chip de arena),
+  Aguante/Protect con racha compartida, Velo Sagrado, Premonición, Fijar
+  Blanco, Mal de Ojo (bloquea cambio; pista `sideHints` en la resolución
+  para que la UI lo pre-bloquee), Psico-cambio, Conversión/Conversión2,
+  Transformación, rampa Rodar/Corte Furia, Patada Salto (1 PS al fallar).
 - **Timeout 1 minuto por decisión** (adjudicado en servidor en cada `poll`):
   quien no responde pierde; si el host no resuelve, gana el guest; si nadie
   responde, se cancela.
-- Limitaciones v1 del motor (degradan limpiamente): sin clima, Bide ni
-  Sustituto; los moves de carga gastan turno de carga.
+- Limitaciones documentadas: sin Bide (cae a "no pasó nada"); Roar/Whirlwind
+  no fuerzan cambio (como en enlaces Gen I); los moves de carga gastan turno
+  de carga (salvo Rayo Solar con sol).
 
 ### INTERCAMBIO — trade en tiempo real (timeout 1 min por fase)
 
