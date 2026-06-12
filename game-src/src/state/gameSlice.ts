@@ -514,6 +514,26 @@ export const gameSlice = createSlice({
     ) => {
       state.pokemon[action.payload.index] = action.payload.pokemon;
     },
+    /**
+     * Intercambio del Club Cable (Gen II): el Pokémon en `giveIndex` se va
+     * con el otro invitado y `received` ocupa su hueco. Es simultáneo, así
+     * que el equipo nunca queda vacío. Marca la Pokédex como visto+capturado
+     * (igual que el original al recibir por cable).
+     */
+    applyTrade: (
+      state,
+      action: PayloadAction<{ giveIndex: number; received: PokemonInstance }>
+    ) => {
+      const { giveIndex, received } = action.payload;
+      if (giveIndex < 0 || giveIndex >= state.pokemon.length) return;
+      state.pokemon[giveIndex] = received;
+      if (!state.seenPokemon.includes(received.id)) {
+        state.seenPokemon.push(received.id);
+      }
+      if (!state.caughtPokemon.includes(received.id)) {
+        state.caughtPokemon.push(received.id);
+      }
+    },
     /** Marca un árbol de bayas como recogido hoy (Gen II). */
     pickBerryTree: (
       state,
@@ -765,6 +785,7 @@ export const {
   updatePokemonEncounter,
   updatePokemon,
   updateSpecificPokemon,
+  applyTrade,
   pickBerryTree,
   setHeldItem,
   swapMoves,

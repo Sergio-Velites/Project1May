@@ -17,7 +17,7 @@ let currentUserId: string | null = localStorage.getItem("wedding_user_id");
 // El servidor lo genera en la primera escritura o lo devuelve al autenticarse.
 const WRITE_TOKEN_KEY = "wedding_write_token";
 
-const getWriteToken = (): string | null => localStorage.getItem(WRITE_TOKEN_KEY);
+export const getWriteToken = (): string | null => localStorage.getItem(WRITE_TOKEN_KEY);
 const setWriteToken = (token: string): void => localStorage.setItem(WRITE_TOKEN_KEY, token);
 
 // Impersonation: cuando se entra al juego con ?play_as=UUID o ?recover=UUID
@@ -61,7 +61,7 @@ const EDGE_TIMEOUT_MS = 8000;
 // AbortError silencioso. Para esa ruta usamos un timeout más generoso.
 const SAVE_GAME_TIMEOUT_MS = 15000;
 
-const callEdge = (
+export const callEdge = (
   endpoint: string,
   body: unknown,
   timeoutMs: number = EDGE_TIMEOUT_MS,

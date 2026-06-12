@@ -73,6 +73,18 @@ export interface FlyAnimationState {
   destination: { map: MapId; pos: PosType };
 }
 
+/**
+ * Sala de enlace activa del Club Cable (combate EN VIVO o intercambio).
+ * La abre CableClubMenu al emparejar dos invitados; LinkBattleRoom /
+ * LinkTradeRoom la consumen y la cierran al terminar.
+ */
+export interface LinkRoomState {
+  kind: "battle" | "trade";
+  sessionId: string;
+  role: "host" | "guest";
+  opponentName: string;
+}
+
 interface UiState {
   text: string[] | null;
   startMenu: boolean;
@@ -97,6 +109,10 @@ interface UiState {
   pokeballCardId: number | null;
   academyPokeballOpen: boolean;
   onlineBattleMenu: boolean;
+  /** Menú del recepcionista del Club Cable (combate en vivo / intercambio / offline). */
+  cableClubMenu: boolean;
+  /** Sala de enlace activa (combate en vivo o intercambio entre invitados). */
+  linkRoom: LinkRoomState | null;
   mapGiftPending: SimpleGiftType | null;
   textRewardPending: TextReward | null;
   /** Sesión de pesca activa (animación + tirada). */
@@ -150,6 +166,8 @@ const initialState: UiState = {
   pokeballCardId: null,
   academyPokeballOpen: false,
   onlineBattleMenu: false,
+  cableClubMenu: false,
+  linkRoom: null,
   mapGiftPending: null,
   textRewardPending: null,
   fishing: null,
@@ -299,6 +317,18 @@ export const uiSlice = createSlice({
     hideOnlineBattleMenu: (state) => {
       state.onlineBattleMenu = false;
     },
+    showCableClubMenu: (state) => {
+      state.cableClubMenu = true;
+    },
+    hideCableClubMenu: (state) => {
+      state.cableClubMenu = false;
+    },
+    openLinkRoom: (state, action: PayloadAction<LinkRoomState>) => {
+      state.linkRoom = action.payload;
+    },
+    closeLinkRoom: (state) => {
+      state.linkRoom = null;
+    },
     openMapGift: (state, action: PayloadAction<SimpleGiftType>) => {
       state.mapGiftPending = action.payload;
     },
@@ -418,6 +448,10 @@ export const {
   closeAcademyPokeball,
   showOnlineBattleMenu,
   hideOnlineBattleMenu,
+  showCableClubMenu,
+  hideCableClubMenu,
+  openLinkRoom,
+  closeLinkRoom,
   openMapGift,
   closeMapGift,
   openTextReward,
@@ -490,6 +524,8 @@ export const selectMenuOpen = (state: RootState) =>
   state.ui.pokeballCardId !== null ||
   state.ui.academyPokeballOpen ||
   state.ui.onlineBattleMenu ||
+  state.ui.cableClubMenu ||
+  state.ui.linkRoom !== null ||
   state.ui.mapGiftPending !== null ||
   state.ui.textRewardPending !== null ||
   state.ui.fishing !== null ||
@@ -528,6 +564,11 @@ export const selectAcademyPokeballOpen = (state: RootState) =>
 
 export const selectOnlineBattleMenu = (state: RootState) =>
   state.ui.onlineBattleMenu;
+
+export const selectCableClubMenu = (state: RootState) =>
+  state.ui.cableClubMenu;
+
+export const selectLinkRoom = (state: RootState) => state.ui.linkRoom;
 
 export const selectMapGiftPending = (state: RootState) =>
   state.ui.mapGiftPending;
