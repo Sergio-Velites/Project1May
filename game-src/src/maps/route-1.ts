@@ -4,6 +4,7 @@ import { beauty, fisher, lass, sailor, youngster } from "../app/npcs";
 import { Direction } from "../state/state-types";
 import music from "../assets/music/maps/route-1.mp3";
 import getEncounterData from "./get-location-data";
+import { ItemType } from "../app/use-item-data";
 
 const route1: MapType = {
   name: "Ruta 1 · Camino al Soto",
@@ -51,6 +52,12 @@ const route1: MapType = {
       34: [9, 12],
       35: [9, 12],
     },
+    berryTrees: [
+    {
+      pos: { x: 6, y: 7 },
+      item: ItemType.Berry,
+    },
+  ],
   fences: {
       5: [4, 5, 6, 7, 8, 10, 11, 12, 13],
       9: [4, 5, 6, 7, 8],
