@@ -313,7 +313,7 @@ const OnlineBattleMenu = () => {
 
   const frameText =
     stage === "greeting"
-      ? "¡Hola! ¿Quieres combatir con el equipo Pokémon de otro invitado?"
+      ? "COMBATE OFFLINE: lucharás contra el equipo guardado de otro invitado, controlado por la máquina. ¿Continuamos?"
       : stage === "loading"
       ? "Buscando invitados..."
       : stage === "empty"

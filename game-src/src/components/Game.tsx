@@ -50,6 +50,9 @@ import DarknessOverlay from "./DarknessOverlay";
 import SurfHandler from "./SurfHandler";
 import OnlineBattleNpc from "./OnlineBattleNpc";
 import OnlineBattleMenu from "./OnlineBattleMenu";
+import CableClubMenu from "./CableClubMenu";
+import LinkBattleRoom from "./LinkBattleRoom";
+import LinkTradeRoom from "./LinkTradeRoom";
 import FishingSession from "./FishingSession";
 import Knockback from "./Knockback";
 import FlyMenu from "./FlyMenu";
@@ -167,6 +170,9 @@ const Game = () => {
       <SurfHandler />
       <OnlineBattleNpc />
       <OnlineBattleMenu />
+      <CableClubMenu />
+      <LinkBattleRoom />
+      <LinkTradeRoom />
       <FishingSession />
       <Knockback />
       <FlyMenu />
