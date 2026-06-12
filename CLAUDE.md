@@ -698,6 +698,15 @@ CABLE** (patrón Oro/Plata). `OnlineBattleNpc.tsx` detecta la tecla A →
 - Fases: `offer` (cada uno elige de su equipo) → `confirm` (¿X por Y? doble
   SÍ) → swap. Rechazar vuelve a la mesa (como GSC). Sin respuesta en 1 min →
   se cancela y nadie pierde nada.
+- **El objeto equipado viaja con el Pokémon** (cliente y servidor
+  intercambian la instancia completa); el panel de confirmación muestra
+  "LLEVA: X" en cada tarjeta.
+- **Animación GSC** tras el doble SÍ (`tradeStep` en LinkTradeRoom):
+  despedida con grito → el Pokémon se retira a su ball (encogido steps) →
+  la ball sube por el cable de enlace → transferencia (blips parpadeando;
+  aquí se aplica `applyTrade` + save) → llega la ball rival → frames de
+  apertura `ball-open-1..5` → el recibido crece desde la ball con grito y
+  jingle `pokemonObtained` → "¡Cuida mucho a X!" → evolución si toca.
 - `LinkTradeRoom.tsx` aplica `applyTrade` (gameSlice): simultáneo (el equipo
   nunca queda vacío), marca Pokédex visto+capturado, amistad reseteada a
   base 70 y guarda en nube inmediatamente.
