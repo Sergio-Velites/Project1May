@@ -644,18 +644,66 @@ Devuelve `SaveVerification`: `{ status: "verified" | "local-only" | "error", rea
 | `get-all-rsvp` | Join de `saves` + `rsvp` para el panel admin |
 | `webauthn-register-start/finish` | Registro de passkey (credential creation) |
 | `webauthn-auth-start/finish` | Autenticación con passkey existente (valida clientDataJSON type + origin) |
+| `link-session` | Club Cable: salas de combate en vivo e intercambio (create/list/join/poll/act/resolve/cancel, timeout 1 min) |
 
 ---
 
-## Batallas online entre invitados
+## Club Cable: combates en vivo, intercambios y combates offline
 
-1. Jugador se acerca al NPC **scientist** en un Centro Pokémon (pos `{x:10,y:2}`)
-2. `OnlineBattleNpc.tsx` detecta la tecla A → `dispatch(showOnlineBattleMenu())`
-3. `OnlineBattleMenu.tsx`: llama `listPlayers()` → muestra lista de invitados
-4. Jugador selecciona un rival → `loadFromCloud(playerId)` carga su `game_state`
-5. Se construye `TrainerType` con los Pokémon del rival (`isOnline: true`)
-6. La batalla transcurre normalmente (local, sin red en tiempo real)
-7. `isOnline: true` → `defeatTrainer` NO añade al `defeatedTrainers` → repetible
+El NPC **scientist** de los centros Pokémon es el recepcionista del **CLUB
+CABLE** (patrón Oro/Plata). `OnlineBattleNpc.tsx` detecta la tecla A →
+`dispatch(showCableClubMenu())` → `CableClubMenu.tsx` ofrece tres servicios:
+
+### ¡COLISEO! — combate EN VIVO (requiere a los dos invitados conectados)
+
+- **Emparejamiento por salas**: crear sala y esperar, o unirse a una abierta
+  (tabla `link_sessions` + Edge Function `link-session`, polling cada 2 s).
+- **Anti-desincronización (host-autoritativo)**: ambos eligen acción; el
+  **anfitrión** resuelve el turno con `app/link-battle-engine.ts` (reutiliza
+  `processMove` de move-helper) y publica `resolution.events[]`; los dos
+  visores (`LinkBattleRoom.tsx`) reproducen esos eventos y adoptan el
+  snapshot. El guest no calcula NADA.
+- **Reglas GSC**: sin objetos de mochila; objetos equipados sí; huir =
+  rendirse; se combate con COPIAS (el equipo real queda intacto, sin XP).
+- **Timeout 1 minuto por decisión** (adjudicado en servidor en cada `poll`):
+  quien no responde pierde; si el host no resuelve, gana el guest; si nadie
+  responde, se cancela.
+- Limitaciones v1 del motor (degradan limpiamente): sin clima, Bide ni
+  Sustituto; los moves de carga gastan turno de carga.
+
+### INTERCAMBIO — trade en tiempo real (timeout 1 min por fase)
+
+- Fases: `offer` (cada uno elige de su equipo) → `confirm` (¿X por Y? doble
+  SÍ) → swap. Rechazar vuelve a la mesa (como GSC). Sin respuesta en 1 min →
+  se cancela y nadie pierde nada.
+- `LinkTradeRoom.tsx` aplica `applyTrade` (gameSlice): simultáneo (el equipo
+  nunca queda vacío), marca Pokédex visto+capturado, amistad reseteada a
+  base 70 y guarda en nube inmediatamente.
+- **Evoluciones por intercambio GSC**: Kadabra/Machoke/Graveler/Haunter
+  siempre; Poliwhirl+RocaRey→Politoed, Slowpoke+RocaRey→Slowking,
+  Onix+RevMetálico→Steelix, Scyther+RevMetálico→Scizor,
+  Seadra+EscamaDragón→Kingdra, Porygon+Mejora→Porygon2 (objeto consumido).
+  Piedra Eterna bloquea. El Cable Unión sigue existiendo como atajo offline.
+
+### C. OFFLINE — el combate clásico contra equipos guardados
+
+Flujo original intacto (`OnlineBattleMenu.tsx`): `listPlayers()` →
+`loadFromCloud(playerId)` → `TrainerType` con `isOnline: true` → batalla
+local contra la IA → repetible (no entra en `defeatedTrainers`). No
+requiere que el rival esté conectado.
+
+### Seguridad y protocolo
+
+- Toda llamada a `link-session` exige `{ userId, writeToken }` validado
+  contra `saves.write_token` (prueba de posesión). Los equipos se leen de
+  `saves.game_state` EN SERVIDOR (whitelist de campos, sin PII) — el cliente
+  no puede inyectar un equipo ajeno.
+- Como en GSC, antes de entrar se guarda la partida (`saveGameVerified`);
+  sin write_token (nunca guardó en nube) no se puede entrar.
+- Acciones de la Edge Function: `create / list / join / poll / act /
+  resolve / cancel`. Transiciones de fase con UPDATEs condicionales
+  (atómicas e idempotentes frente a carreras).
+- Cliente: `app/link-session.ts`. Migración: `008_link_sessions.sql`.
 
 **Centros con scientist**: `viridian-city-pokemon-center`, `pewter-city-pokemon-center`, `route-3-pokemon-center`
 
