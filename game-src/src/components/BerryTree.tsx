@@ -29,6 +29,7 @@ import { xToPx, yToPx } from "../app/position-helper";
 import mapData from "../maps/map-data";
 import { BerryTreeType } from "../maps/map-types";
 import useItemData from "../app/use-item-data";
+import berryTreeImg from "../assets/other/berry_tree.png";
 
 /** Fecha local "YYYY-M-D" — el árbol rebrota cuando cambia el día. */
 const todayKey = (): string => {
@@ -44,37 +45,13 @@ const TreeWrapper = styled.div<{ $x: number; $y: number }>`
   height: ${yToPx(1)};
   z-index: 48;
   pointer-events: none;
-
-  svg {
-    width: 100%;
-    height: 100%;
-    image-rendering: pixelated;
-  }
 `;
 
-/** Sprite SVG inline pixel-art: árbol verde; con baya, puntos rojos visibles. */
-const TreeSprite = ({ hasBerry }: { hasBerry: boolean }) => (
-  <svg viewBox="0 0 16 16" shapeRendering="crispEdges">
-    {/* Copa */}
-    <rect x="3" y="1" width="10" height="3" fill="#2e7d32" />
-    <rect x="2" y="3" width="12" height="6" fill="#388e3c" />
-    <rect x="3" y="9" width="10" height="2" fill="#2e7d32" />
-    {/* Brillos de la copa */}
-    <rect x="4" y="2" width="2" height="1" fill="#66bb6a" />
-    <rect x="9" y="4" width="2" height="1" fill="#66bb6a" />
-    {/* Tronco */}
-    <rect x="6" y="11" width="4" height="4" fill="#6d4c41" />
-    <rect x="7" y="11" width="1" height="4" fill="#8d6e63" />
-    {/* Bayas (solo si quedan) */}
-    {hasBerry && (
-      <>
-        <rect x="4" y="4" width="2" height="2" fill="#e53935" />
-        <rect x="10" y="3" width="2" height="2" fill="#e53935" />
-        <rect x="7" y="6" width="2" height="2" fill="#e53935" />
-      </>
-    )}
-  </svg>
-);
+const TreeImg = styled.img`
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+`;
 
 const BerryTree = () => {
   const dispatch = useDispatch();
@@ -138,7 +115,7 @@ const BerryTree = () => {
           $x={t.pos.x}
           $y={t.pos.y}
         >
-          <TreeSprite hasBerry={hasBerry(t)} />
+          <TreeImg src={berryTreeImg} alt="" />
         </TreeWrapper>
       ))}
     </>
