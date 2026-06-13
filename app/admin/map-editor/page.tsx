@@ -1380,7 +1380,7 @@ function MapTilePickerModal({ state, mapData, onClose }: {
                   }}
                   style={{
                     position: 'relative', width: map.width * previewTile, height: map.height * previewTile,
-                    backgroundImage: `url(/editor/maps/${map.imageFile})`, backgroundSize: '100% 100%',
+                    backgroundImage: `url(/api/admin/map-image/${map.imageFile})`, backgroundSize: '100% 100%',
                     imageRendering: 'pixelated', cursor: state.requirePos ? 'crosshair' : 'default',
                     border: '1px solid #2a2a4a',
                   }}
@@ -1420,6 +1420,214 @@ function PickerHost({ picker, mapData, onClose }: { picker: PickerState; mapData
     case 'text': return <TextEntryModal state={picker} onClose={onClose} />;
     case 'maptile': return <MapTilePickerModal state={picker} mapData={mapData} onClose={onClose} />;
   }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  GRAFO DE CONEXIONES ENTRE MAPAS
+// ════════════════════════════════════════════════════════════════════════════
+
+interface GraphNode { id: string; name: string; x: number; y: number }
+interface GraphEdge { from: string; to: string; kind: 'door' | 'teleport' | 'exit' }
+
+function computeGraph(mapData: MapData): { nodes: GraphNode[]; edges: GraphEdge[] } {
+  const ids = Object.keys(mapData).sort();
+  const idSet = new Set(ids);
+  const edgeKey = new Set<string>();
+  const edges: GraphEdge[] = [];
+  const addEdge = (from: string, to: string, kind: GraphEdge['kind']) => {
+    if (!from || !to || from === to || !idSet.has(to)) return;
+    const k = `${from}|${to}|${kind}`;
+    if (edgeKey.has(k)) return;
+    edgeKey.add(k);
+    edges.push({ from, to, kind });
+  };
+  for (const id of ids) {
+    const e = mapData[id];
+    // Puertas (maps)
+    for (const row of Object.values(e.maps ?? {})) {
+      for (const dest of Object.values(row)) addEdge(id, dest as string, 'door');
+    }
+    // Teleports
+    for (const row of Object.values(e.teleports ?? {})) {
+      for (const t of Object.values(row)) addEdge(id, (t as { map: string }).map, 'teleport');
+    }
+    // Salida (exitReturnMap)
+    if (e.exitReturnMap) addEdge(id, e.exitReturnMap, 'exit');
+  }
+  // Posiciones iniciales deterministas (círculo) por índice.
+  const n = ids.length || 1;
+  const nodes: GraphNode[] = ids.map((id, i) => ({
+    id,
+    name: mapData[id]?.name ?? id,
+    x: Math.cos((2 * Math.PI * i) / n) * 400 + (((i * 97) % 60) - 30),
+    y: Math.sin((2 * Math.PI * i) / n) * 400 + (((i * 53) % 60) - 30),
+  }));
+  return { nodes, edges };
+}
+
+/** Simulación de fuerzas (Fruchterman-Reingold simplificado), determinista. */
+function layoutGraph(nodes: GraphNode[], edges: GraphEdge[], iterations = 250): GraphNode[] {
+  const pos = nodes.map((n) => ({ ...n }));
+  const idx = new Map(pos.map((p, i) => [p.id, i]));
+  const area = 1_200_000;
+  const k = Math.sqrt(area / Math.max(1, pos.length));
+  let temp = 220;
+  const cool = temp / (iterations + 1);
+  for (let it = 0; it < iterations; it++) {
+    const disp = pos.map(() => ({ x: 0, y: 0 }));
+    // Repulsión entre todos los pares.
+    for (let i = 0; i < pos.length; i++) {
+      for (let j = i + 1; j < pos.length; j++) {
+        let dx = pos[i].x - pos[j].x;
+        let dy = pos[i].y - pos[j].y;
+        const dist = Math.hypot(dx, dy) || 0.01;
+        if (dist > 600) continue; // poda lejana
+        const rep = (k * k) / dist;
+        dx /= dist; dy /= dist;
+        disp[i].x += dx * rep; disp[i].y += dy * rep;
+        disp[j].x -= dx * rep; disp[j].y -= dy * rep;
+      }
+    }
+    // Atracción por aristas.
+    for (const e of edges) {
+      const a = idx.get(e.from); const b = idx.get(e.to);
+      if (a === undefined || b === undefined) continue;
+      let dx = pos[a].x - pos[b].x;
+      let dy = pos[a].y - pos[b].y;
+      const dist = Math.hypot(dx, dy) || 0.01;
+      const att = (dist * dist) / k;
+      dx /= dist; dy /= dist;
+      disp[a].x -= dx * att; disp[a].y -= dy * att;
+      disp[b].x += dx * att; disp[b].y += dy * att;
+    }
+    // Aplicar con límite de temperatura + leve gravedad al centro.
+    for (let i = 0; i < pos.length; i++) {
+      const d = Math.hypot(disp[i].x, disp[i].y) || 0.01;
+      pos[i].x += (disp[i].x / d) * Math.min(d, temp) - pos[i].x * 0.012;
+      pos[i].y += (disp[i].y / d) * Math.min(d, temp) - pos[i].y * 0.012;
+    }
+    temp = Math.max(2, temp - cool);
+  }
+  return pos;
+}
+
+function MapGraphOverlay({ mapData, currentMapId, onJump, onClose }: {
+  mapData: MapData;
+  currentMapId: string;
+  onJump: (id: string) => void;
+  onClose: () => void;
+}) {
+  const { nodes, edges } = useMemo(() => {
+    const g = computeGraph(mapData);
+    return { nodes: layoutGraph(g.nodes, g.edges), edges: g.edges };
+  }, [mapData]);
+
+  const posById = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
+  const [hover, setHover] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+
+  // viewBox para pan/zoom
+  const bbox = useMemo(() => {
+    if (nodes.length === 0) return { x: -500, y: -500, w: 1000, h: 1000 };
+    const xs = nodes.map((n) => n.x); const ys = nodes.map((n) => n.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+    const pad = 80;
+    return { x: minX - pad, y: minY - pad, w: (maxX - minX) + pad * 2, h: (maxY - minY) + pad * 2 };
+  }, [nodes]);
+  // Init perezoso: el overlay se monta de nuevo cada vez que se abre, así que
+  // captura el bbox correcto sin necesidad de sincronizar con un efecto.
+  const [view, setView] = useState(() => bbox);
+  const [grabbing, setGrabbing] = useState(false);
+
+  const drag = useRef<{ x: number; y: number } | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  const matches = (id: string) => query.trim() && (id.toLowerCase().includes(query.toLowerCase()) || (mapData[id]?.name ?? '').toLowerCase().includes(query.toLowerCase()));
+
+  function onWheel(e: React.WheelEvent) {
+    const factor = e.deltaY > 0 ? 1.12 : 0.89;
+    setView((v) => {
+      const nw = v.w * factor, nh = v.h * factor;
+      return { x: v.x - (nw - v.w) / 2, y: v.y - (nh - v.h) / 2, w: nw, h: nh };
+    });
+  }
+  function onPointerDown(e: React.PointerEvent) { drag.current = { x: e.clientX, y: e.clientY }; setGrabbing(true); (e.target as Element).setPointerCapture?.(e.pointerId); }
+  function onPointerMove(e: React.PointerEvent) {
+    if (!drag.current || !svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const dx = (e.clientX - drag.current.x) * (view.w / rect.width);
+    const dy = (e.clientY - drag.current.y) * (view.h / rect.height);
+    drag.current = { x: e.clientX, y: e.clientY };
+    setView((v) => ({ ...v, x: v.x - dx, y: v.y - dy }));
+  }
+  function onPointerUp() { drag.current = null; setGrabbing(false); }
+
+  const KIND_COLOR: Record<GraphEdge['kind'], string> = { door: '#5a8aff', teleport: '#cc88ff', exit: '#88ccff' };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(6,6,14,0.92)', display: 'flex', flexDirection: 'column', fontFamily: 'monospace' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid #2a2a4a', flexWrap: 'wrap' }}>
+        <strong style={{ color: '#a0c0ff', fontSize: 15 }}>🕸 Grafo de conexiones</strong>
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="🔍 Resaltar mapa…" style={{ ...searchInputStyle, width: 220, padding: '6px 10px', fontSize: 13 }} />
+        <span style={{ color: '#888', fontSize: 11 }}>{nodes.length} mapas · {edges.length} conexiones · rueda=zoom · arrastra=mover · click=ir</span>
+        <span style={{ display: 'flex', gap: 10, marginLeft: 'auto', fontSize: 11 }}>
+          <span style={{ color: KIND_COLOR.door }}>● puerta</span>
+          <span style={{ color: KIND_COLOR.teleport }}>● teleport</span>
+          <span style={{ color: KIND_COLOR.exit }}>● salida</span>
+        </span>
+        <button onClick={() => setView(bbox)} style={modalBtnStyle}>Centrar</button>
+        <button onClick={onClose} style={{ ...modalBtnStyle, background: '#2a1010', border: '1px solid #5a2a2a', color: '#ff8888' }}>Cerrar ✕</button>
+      </div>
+      <svg
+        ref={svgRef}
+        viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
+        onWheel={onWheel}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        style={{ flex: 1, width: '100%', height: '100%', cursor: grabbing ? 'grabbing' : 'grab', touchAction: 'none' }}
+      >
+        <defs>
+          {(['door', 'teleport', 'exit'] as const).map((kind) => (
+            <marker key={kind} id={`arrow-${kind}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill={KIND_COLOR[kind]} />
+            </marker>
+          ))}
+        </defs>
+        {edges.map((e, i) => {
+          const a = posById.get(e.from); const b = posById.get(e.to);
+          if (!a || !b) return null;
+          const active = hover === e.from || hover === e.to;
+          return (
+            <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+              stroke={KIND_COLOR[e.kind]} strokeWidth={active ? 2.4 : 0.8} strokeOpacity={hover && !active ? 0.08 : active ? 0.95 : 0.32}
+              markerEnd={`url(#arrow-${e.kind})`} />
+          );
+        })}
+        {nodes.map((n) => {
+          const isCurrent = n.id === currentMapId;
+          const isHover = hover === n.id;
+          const isMatch = matches(n.id);
+          const r = isCurrent ? 9 : 6;
+          return (
+            <g key={n.id} transform={`translate(${n.x},${n.y})`} style={{ cursor: 'pointer' }}
+              onMouseEnter={() => setHover(n.id)} onMouseLeave={() => setHover(null)}
+              onClick={() => { onJump(n.id); onClose(); }}>
+              <circle r={r}
+                fill={isCurrent ? '#ffcc44' : isMatch ? '#66ff99' : '#3a6aff'}
+                stroke={isHover ? '#fff' : '#0a0a1a'} strokeWidth={isHover ? 2 : 1}
+                fillOpacity={query && !isMatch && !isCurrent ? 0.25 : 1} />
+              {(isHover || isCurrent || isMatch || view.w < 1600) && (
+                <text x={r + 3} y={3.5} fontSize={view.w < 900 ? 9 : 11} fill={isCurrent ? '#ffd' : '#bcd'} style={{ pointerEvents: 'none', fontFamily: 'monospace' }}>
+                  {n.name}
+                </text>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
 }
 
 // ── Componente principal ───────────────────────────────────────────────────
@@ -1478,6 +1686,9 @@ export default function MapEditor() {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveFlash, setSaveFlash] = useState(false);
+  const [commitMsg, setCommitMsg] = useState<{ text: string; tone: 'ok' | 'warn' | 'err' } | null>(null);
+  const [building, setBuilding] = useState(false);
+  const [showGraph, setShowGraph] = useState(false);
   const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
   const [error, setError] = useState('');
   const [showMinimap, setShowMinimap] = useState(false);
@@ -1585,6 +1796,49 @@ export default function MapEditor() {
     setDirty(false);
   }
 
+  // Estado de escritura para el commit del .ts. Solo campos gestionados.
+  // NO incluye `encounters` (se preserva el getEncounterData del .ts).
+  function buildMapWriteState() {
+    const { maps, teleports, exits } = nestPortals(portals);
+    return {
+      start: startPos,
+      cave, dark, allowBicycle, flyable, flySpot,
+      music: musicField,
+      trainers,
+      walls, fences, grass, water,
+      texts, textRewards,
+      items: items.map((it) => ({ itemKey: it.itemKey, pos: it.pos, ...(it.hidden ? { hidden: true } : {}) })),
+      gifts, staticPokemon, cuttableTrees, berryTrees, boulders,
+      pokemonCenter, pc: pcPos, store: storePos, storeItems,
+      recoverLocation, onlineBattleNpc,
+      spinners, stoppers,
+      maps, teleports, exits, exitReturnMap, exitReturnPos,
+      minimapPos,
+    };
+  }
+
+  // ── Compilar el juego (dispara el GitHub Action) ────────────────────────
+  async function compileGame() {
+    if (dirty && !confirm('Tienes cambios sin guardar. ¿Compilar de todos modos? (se compilará lo ya commiteado)')) return;
+    if (!confirm('Esto reconstruye el bundle del juego desde el código (tarda unos minutos en GitHub Actions). ¿Continuar?')) return;
+    setBuilding(true);
+    try {
+      const res = await fetch('/api/admin/build-game', { method: 'POST' });
+      const json = (await res.json().catch(() => ({}))) as { ok?: boolean; configured?: boolean; branch?: string; error?: string };
+      if (json.ok) {
+        setCommitMsg({ text: `🛠 Compilación lanzada en GitHub Actions (rama ${json.branch}). Tarda unos minutos.`, tone: 'ok' });
+      } else if (json.configured === false) {
+        setCommitMsg({ text: 'Compilar no configurado (falta GH_TOKEN con permiso actions).', tone: 'warn' });
+      } else {
+        setCommitMsg({ text: `No se pudo lanzar la compilación: ${json.error ?? 'error'}`, tone: 'err' });
+      }
+    } catch (e) {
+      setCommitMsg({ text: `Error lanzando compilación: ${String(e)}`, tone: 'err' });
+    } finally {
+      setBuilding(false);
+    }
+  }
+
   // ── Guardar ───────────────────────────────────────────────────────────
   async function save() {
     setSaving(true);
@@ -1664,6 +1918,38 @@ export default function MapEditor() {
       setDirty(false);
       setSaveFlash(true);
       setTimeout(() => setSaveFlash(false), 1500);
+
+      // ── Commit del .ts al repo (fuente única; sin copiar/pegar) ──────────
+      // Aditivo: si falla o no está configurado, el guardado en Supabase ya
+      // quedó hecho (preview intacto). Nunca bloquea ni rompe el editor.
+      if (currentMap?.sourceFile) {
+        try {
+          const cres = await fetch('/api/admin/commit-map', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              mapId: selectedMapId,
+              sourceFile: currentMap.sourceFile,
+              state: buildMapWriteState(),
+            }),
+          });
+          const cjson = (await cres.json().catch(() => ({}))) as {
+            ok?: boolean; configured?: boolean; unchanged?: boolean;
+            error?: string; branch?: string; commitSha?: string;
+          };
+          if (cjson.ok && cjson.unchanged) {
+            setCommitMsg({ text: `✓ Guardado · código sin cambios`, tone: 'ok' });
+          } else if (cjson.ok) {
+            setCommitMsg({ text: `✓ Commit ${(cjson.commitSha ?? '').slice(0, 7)} → ${cjson.branch}`, tone: 'ok' });
+          } else if (cjson.configured === false) {
+            setCommitMsg({ text: 'Guardado en nube. Commit a código no configurado (falta GH_TOKEN).', tone: 'warn' });
+          } else {
+            setCommitMsg({ text: `Guardado en nube. Commit falló: ${cjson.error ?? 'error'}`, tone: 'err' });
+          }
+        } catch (e) {
+          setCommitMsg({ text: `Guardado en nube. Commit no enviado: ${String(e)}`, tone: 'warn' });
+        }
+      }
       // Actualizar cache local
       setMapData((d) => {
         const { maps, teleports, exits } = nestPortals(portals);
@@ -2626,6 +2912,20 @@ export default function MapEditor() {
           /* Elementos prescindibles de la toolbar en pantallas estrechas */
           @media (max-width: 1600px) { .me-legend { display: none !important; } }
           @media (max-width: 1280px) { .me-title { display: none !important; } }
+          /* Responsive: en móvil/tablet, canvas arriba e inspector abajo. */
+          @media (max-width: 820px) {
+            .me-body { flex-direction: column !important; }
+            .me-inspector {
+              width: 100% !important;
+              max-height: 46vh;
+              border-left: none !important;
+              border-top: 1px solid #2a2a4a;
+            }
+          }
+          /* Objetivos de toque cómodos en pantallas táctiles pequeñas. */
+          @media (max-width: 820px) {
+            .me-body button { min-height: 30px; }
+          }
         `}</style>
         <span className="me-title" style={{ fontSize: 16, fontWeight: 700, color: '#a0a0ff', marginRight: 4 }}>🗺️ Map Editor</span>
 
@@ -2765,6 +3065,39 @@ export default function MapEditor() {
         {/* Guardar */}
         <button onClick={save} disabled={!dirty || saving} style={{ padding: '4px 12px', background: saveFlash ? '#2a6a2a' : (dirty ? '#3a3a7a' : '#1a1a3a'), border: `1px solid ${dirty ? '#6060c0' : '#2a2a4a'}`, borderRadius: 4, color: dirty ? '#fff' : '#555', cursor: dirty ? 'pointer' : 'default', fontSize: 13, transition: 'all 0.3s' }}>
           {saveFlash ? '✓ Guardado' : saving ? 'Guardando...' : '💾 Guardar'}
+        </button>
+        {commitMsg && (
+          <span
+            title={commitMsg.text}
+            onClick={() => setCommitMsg(null)}
+            style={{
+              fontSize: 11, maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              cursor: 'pointer', padding: '2px 6px', borderRadius: 4,
+              color: commitMsg.tone === 'ok' ? '#88dd99' : commitMsg.tone === 'warn' ? '#ddcc77' : '#ff8888',
+              background: '#0f0f1a', border: '1px solid #2a2a4a',
+            }}
+          >
+            {commitMsg.text}
+          </span>
+        )}
+
+        {/* Grafo de conexiones */}
+        <button
+          onClick={() => setShowGraph(true)}
+          title="Ver el grafo de conexiones entre mapas (puertas, teleports, salidas)"
+          style={{ padding: '4px 12px', background: '#1a1a2e', border: '1px solid #4a4a7a', borderRadius: 4, color: '#a0c0ff', cursor: 'pointer', fontSize: 12 }}
+        >
+          🕸 Grafo
+        </button>
+
+        {/* Compilar juego (GitHub Action) */}
+        <button
+          onClick={compileGame}
+          disabled={building}
+          title="Reconstruye el bundle del juego desde el código (online, vía GitHub Actions)"
+          style={{ padding: '4px 12px', background: '#1a2a2a', border: '1px solid #3a6a6a', borderRadius: 4, color: building ? '#666' : '#88dddd', cursor: building ? 'default' : 'pointer', fontSize: 12 }}
+        >
+          {building ? 'Lanzando…' : '🛠 Compilar juego'}
         </button>
 
         {/* Importar .ts (sustituye todo el mapa) */}
@@ -2911,7 +3244,7 @@ export default function MapEditor() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/editor/maps/kanto_region.png"
+              src="/api/admin/map-image/kanto_region.png"
               alt="Kanto minimap"
               width={MINIMAP_WIDTH * MINIMAP_DISPLAY_SCALE}
               height={MINIMAP_HEIGHT * MINIMAP_DISPLAY_SCALE}
@@ -3053,7 +3386,7 @@ export default function MapEditor() {
       )}
 
       {/* ── Cuerpo principal ─────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="me-body" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
         {/* ── Canvas ───────────────────────────────────────────────── */}
         <div style={{ flex: 1, overflow: 'auto', position: 'relative', background: '#0a0a18' }}>
@@ -3068,7 +3401,7 @@ export default function MapEditor() {
                 position: 'relative',
                 width: currentMap.width * zoom,
                 height: currentMap.height * zoom,
-                backgroundImage: `url(/editor/maps/${currentMap.imageFile})`,
+                backgroundImage: `url(/api/admin/map-image/${currentMap.imageFile})`,
                 backgroundSize: '100% 100%',
                 backgroundRepeat: 'no-repeat',
                 imageRendering: 'pixelated',
@@ -3659,7 +3992,7 @@ export default function MapEditor() {
         </div>
 
         {/* ── Inspector ─────────────────────────────────────────────── */}
-        <div style={{ width: 'clamp(264px, 24vw, 320px)', background: '#13132a', borderLeft: '1px solid #2a2a4a', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
+        <div className="me-inspector" style={{ width: 'clamp(264px, 24vw, 320px)', background: '#13132a', borderLeft: '1px solid #2a2a4a', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
 
           {/* Header inspector */}
           <div style={{ padding: '12px 16px', borderBottom: '1px solid #2a2a4a' }}>
@@ -3996,6 +4329,16 @@ export default function MapEditor() {
 
       {/* Modales de selección visual */}
       <PickerHost picker={picker} mapData={mapData} onClose={() => setPicker(null)} />
+
+      {/* Grafo de conexiones entre mapas */}
+      {showGraph && (
+        <MapGraphOverlay
+          mapData={mapData}
+          currentMapId={selectedMapId}
+          onJump={(id) => jumpToMap(id)}
+          onClose={() => setShowGraph(false)}
+        />
+      )}
     </div>
   );
 }
