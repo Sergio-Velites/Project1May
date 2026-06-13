@@ -17,12 +17,14 @@ const GAME_SRC = path.join(ROOT, "game-src/src");
 const PUBLIC_EDITOR = path.join(ROOT, "public/editor");
 
 // ── Directorios de destino ────────────────────────────────────────────────
-const DEST_MAPS = path.join(PUBLIC_EDITOR, "maps");
+// NOTA: las imágenes de MAPA ya NO se copian. El editor las sirve desde la
+// única fuente del proyecto (game-src/src/assets/map) vía /api/admin/map-image.
+// Sprites/retratos/pokémon sí se copian (son assets pequeños usados como <img>).
 const DEST_SPRITES = path.join(PUBLIC_EDITOR, "sprites");
 const DEST_PORTRAITS = path.join(PUBLIC_EDITOR, "portraits");
 const DEST_POKEMON = path.join(PUBLIC_EDITOR, "pokemon");
 
-for (const dir of [PUBLIC_EDITOR, DEST_MAPS, DEST_SPRITES, DEST_PORTRAITS, DEST_POKEMON]) {
+for (const dir of [PUBLIC_EDITOR, DEST_SPRITES, DEST_PORTRAITS, DEST_POKEMON]) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
@@ -37,7 +39,6 @@ function copyDir(srcDir, destDir, ext = ".png") {
 }
 
 console.log("📂 Copiando assets...");
-copyDir(path.join(GAME_SRC, "assets/map"), DEST_MAPS);
 copyDir(path.join(GAME_SRC, "assets/walk-sprites"), DEST_SPRITES);
 copyDir(path.join(GAME_SRC, "assets/portraits"), DEST_PORTRAITS);
 copyDir(path.join(GAME_SRC, "assets/pokemon/front"), DEST_POKEMON);
@@ -525,6 +526,65 @@ function parseStaticPokemonField(tsText) {
   return result;
 }
 
+// ── Parsers de objetos por-posición con clave string/itemtype ─────────────
+// (boulders, berryTrees, cuttableTrees). CRÍTICO para que el editor cargue
+// estos campos: si no los lee, al guardar enviaría arrays vacíos y los
+// borraría del .ts (pérdida de datos).
+function parsePosArrayField(tsText, field, extract) {
+  const m = tsText.match(new RegExp(`(?<![\\w])${field}\\s*:\\s*\\[`));
+  if (!m) return [];
+  const arrStart = tsText.indexOf("[", m.index + m[0].length - 1);
+  const arrBlk = findBalancedBlock(tsText, arrStart, "[", "]");
+  if (!arrBlk) return [];
+  const inner = arrBlk.text.slice(1, -1);
+  const result = [];
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    if (inner[i] !== "{") { i++; continue; }
+    const objBlk = findBalancedBlock(inner, i);
+    if (!objBlk) break;
+    const t = objBlk.text;
+    let pos = null;
+    const posStartM = t.match(/pos\s*:\s*\{/);
+    if (posStartM) {
+      const posOpenIdx = t.indexOf("{", posStartM.index + posStartM[0].length - 1);
+      const posBlk = findBalancedBlock(t, posOpenIdx);
+      if (posBlk) {
+        const xm = posBlk.text.match(/x\s*:\s*(\d+)/);
+        const ym = posBlk.text.match(/y\s*:\s*(\d+)/);
+        if (xm && ym) pos = { x: parseInt(xm[1], 10), y: parseInt(ym[1], 10) };
+      }
+    }
+    const extra = extract(t);
+    if (pos && extra) result.push({ pos, ...extra });
+    i = objBlk.end + 1;
+  }
+  return result;
+}
+
+function parseBouldersField(tsText) {
+  return parsePosArrayField(tsText, "boulders", (t) => {
+    const id = t.match(/id\s*:\s*"([^"]+)"/);
+    return id ? { id: id[1] } : null;
+  });
+}
+
+function parseBerryTreesField(tsText) {
+  return parsePosArrayField(tsText, "berryTrees", (t) => {
+    const item = t.match(/item\s*:\s*ItemType\.(\w+)/);
+    return item ? { itemKey: item[1] } : null;
+  });
+}
+
+function parseCuttableTreesField(tsText) {
+  return parsePosArrayField(tsText, "cuttableTrees", (t) => {
+    const qid = t.match(/questId\s*:\s*"([^"]+)"/);
+    return qid ? { questId: qid[1] } : null;
+  });
+}
+
 // ── Parsear los trainers del archivo .ts con regex ────────────────────────
 // Extrae el bloque trainers: [...] como texto y lo convierte en objetos planos.
 function parseTrainers(tsText) {
@@ -808,6 +868,9 @@ for (const file of MAP_FILES) {
   const items = parseItemsField(tsText);
   const gifts = parseGiftsField(tsText);
   const staticPokemon = parseStaticPokemonField(tsText);
+  const boulders = parseBouldersField(tsText);
+  const berryTrees = parseBerryTreesField(tsText);
+  const cuttableTrees = parseCuttableTreesField(tsText);
   const pokemonCenter = parsePos(tsText, "pokemonCenter");
   const pc = parsePos(tsText, "pc");
   const store = parsePos(tsText, "store");
@@ -890,6 +953,9 @@ for (const file of MAP_FILES) {
     items,
     gifts,
     staticPokemon,
+    boulders,
+    berryTrees,
+    cuttableTrees,
     pokemonCenter,
     pc,
     store,
@@ -922,6 +988,6 @@ fs.writeFileSync(
 );
 console.log(`\n✅ Listo — ${processed} mapas procesados`);
 console.log(`   JSON: ${path.relative(ROOT, outputPath)}`);
-console.log(`   Maps: public/editor/maps/`);
+console.log(`   Maps: servidos desde game-src/src/assets/map vía /api/admin/map-image (fuente única)`);
 console.log(`   Sprites: public/editor/sprites/`);
 console.log(`   Portraits: public/editor/portraits/`);

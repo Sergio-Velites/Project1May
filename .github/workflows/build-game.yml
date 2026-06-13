@@ -1,0 +1,74 @@
+name: Build game bundle
+
+# Reconstruye el bundle del juego (CRA) desde game-src y commitea el resultado
+# en public/game/ de la rama indicada. Se dispara desde el Map Editor (botón
+# "Compilar juego") vía workflow_dispatch, o manualmente desde la pestaña
+# Actions de GitHub. El juego solo refleja los cambios de mapas tras correr esto.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Rama a compilar y donde commitear el bundle"
+        required: false
+        default: "map-editor"
+
+permissions:
+  contents: write
+
+concurrency:
+  # Evita builds solapadas sobre la misma rama (carreras de commit).
+  group: build-game-${{ github.event.inputs.ref || 'map-editor' }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || 'map-editor' }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: game-src/package-lock.json
+
+      - name: Install game deps
+        working-directory: game-src
+        run: npm ci
+
+      - name: Build game (CRA)
+        working-directory: game-src
+        env:
+          PUBLIC_URL: /game
+          DISABLE_ESLINT_PLUGIN: "true"
+          GENERATE_SOURCEMAP: "false"
+          CI: "false" # no tratar warnings como errores
+          REACT_APP_SUPABASE_URL: ${{ secrets.REACT_APP_SUPABASE_URL }}
+          REACT_APP_SUPABASE_ANON_KEY: ${{ secrets.REACT_APP_SUPABASE_ANON_KEY }}
+        run: node_modules/.bin/react-scripts build
+
+      - name: Sync build → public/game
+        run: |
+          set -e
+          # Reemplaza los assets compilados (hashes nuevos) y refresca el resto.
+          rm -rf public/game/static
+          cp -r game-src/build/. public/game/
+
+      - name: Commit bundle if changed
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/game
+          if git diff --cached --quiet; then
+            echo "Sin cambios en el bundle del juego."
+          else
+            git commit -m "build: recompilar juego desde el Map Editor"
+            git push origin "HEAD:${{ github.event.inputs.ref || 'map-editor' }}"
+          fi
