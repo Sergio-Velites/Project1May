@@ -835,7 +835,7 @@ Las imágenes de mapa **ya NO se copian** a `public/editor/maps/`. El editor las
      (`encounters` vía `getEncounterData`, comentarios, imagen, código custom).
    - **Reconcilia imports** según el uso real del texto final (npcs, `Direction`, `ItemType`,
      `MapId`) → resuelve el clásico "faltan librerías al pegar".
-   - Commitea a la rama `MAP_EDIT_BRANCH` (def. `map-editor`) vía la GitHub API.
+   - Commitea a la rama `MAP_EDIT_BRANCH` (def. `master` → llega a producción) vía la GitHub API.
 
 > ⚠️ **No perder datos**: `setup-editor.mjs` DEBE parsear todo campo editable
 > (incluidos `boulders`/`berryTrees`/`cuttableTrees`). Si el editor no carga un campo,
@@ -870,7 +870,7 @@ bajo el canvas (clases `.me-body`/`.me-inspector` + media queries en el `<style>
 # Vercel (para que guardar commitee y el botón de compilar funcionen)
 GH_TOKEN=<PAT fine-grained con contents:write + actions:write sobre el repo>
 GH_REPO=Sergio-Velites/Project1May   # opcional (default)
-MAP_EDIT_BRANCH=map-editor           # opcional: rama donde commitea el editor
+MAP_EDIT_BRANCH=master               # opcional: rama donde commitea/compila el editor (def. master)
 GH_WORKFLOW_REF=master               # opcional: rama donde vive build-game.yml
 
 # GitHub → Settings → Secrets → Actions (para el workflow build-game.yml)
@@ -880,11 +880,17 @@ REACT_APP_SUPABASE_ANON_KEY=<...>
 
 Sin `GH_TOKEN` el editor sigue funcionando (guardado en Supabase) y avisa "commit no configurado".
 
-### Flujo de ramas recomendado
+### Flujo (commit directo a master → producción)
 
-El editor commitea a `map-editor` (sale de `master`). Revisas/mergeas a `master` por PR; "Compilar
-juego" reconstruye el bundle en esa rama. Tu rama de features se rebasa sobre `master` para traerse los
-mapas. Mapas y código viven en sitios distintos del archivo → conflictos mínimos.
+Por defecto el editor commitea los `.ts` directamente a `master` y "Compilar juego" reconstruye el
+bundle también en `master`, de modo que los cambios **llegan a producción (Vercel) sin pasos manuales**:
+1. Editas y pulsas **💾 Guardar** → commit del `.ts` a `master` (Vercel redespliega el shell Next).
+2. Cuando quieras verlo en el juego jugable, pulsas **🛠 Compilar juego** → recompila el bundle CRA y lo
+   commitea a `master` → Vercel despliega el juego actualizado (tarda unos minutos).
+
+`writeMapTs` lee siempre el `.ts` actual de `master` antes de reescribir, así que no pisa cambios de
+código hechos en otras ramas (esas ramas se rebasan sobre `master` para traerse los mapas). Si prefieres
+una rama de staging con revisión por PR, basta con poner `MAP_EDIT_BRANCH=<rama>` en Vercel.
 
 ---
 

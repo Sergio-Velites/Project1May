@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, configured: false, error: 'GH_TOKEN no configurado en el entorno.' });
     }
     const repo = process.env.GH_REPO || 'Sergio-Velites/Project1May';
-    const branch = process.env.MAP_EDIT_BRANCH || 'map-editor';
+    const branch = process.env.MAP_EDIT_BRANCH || 'master';
     const baseBranch = process.env.MAP_EDIT_BASE || 'master';
 
     const body = await request.json();

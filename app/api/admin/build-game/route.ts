@@ -21,7 +21,7 @@ export async function POST() {
     }
     const repo = process.env.GH_REPO || 'Sergio-Velites/Project1May';
     const workflowRef = process.env.GH_WORKFLOW_REF || 'master';
-    const buildBranch = process.env.MAP_EDIT_BRANCH || 'map-editor';
+    const buildBranch = process.env.MAP_EDIT_BRANCH || 'master';
 
     const res = await fetch(`${GH_API}/repos/${repo}/actions/workflows/build-game.yml/dispatches`, {
       method: 'POST',
