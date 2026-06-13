@@ -423,6 +423,17 @@ export interface MapType {
   recoverLocation?: PosType;
   fences?: Record<number, number[]>;
   /**
+   * Dirección de salto de cada saliente (ledge). Mismo formato
+   * `{ fila: { col: Direction } }` que `spinners`. La dirección indica hacia
+   * dónde se PUEDE saltar el saliente (y, por tanto, desde qué lado es un muro).
+   *
+   * Compatibilidad: si un tile presente en `fences` NO aparece aquí, su
+   * dirección por defecto es `Direction.Down` (todos los salientes anteriores
+   * a este sistema saltan hacia abajo, como en Pokémon Rojo/Azul). Por eso no
+   * es necesario migrar ningún mapa existente.
+   */
+  fenceDirections?: Record<number, Record<number, Direction>>;
+  /**
    * Tiles de agua. Mismo formato Record<row, col[]> que walls/grass.
    * Bloquean el paso (como muros) pero permiten pescar desde tile adyacente
    * con cualquiera de las 3 cañas (`OldRod`, `GoodRod`, `SuperRod`).

@@ -853,6 +853,7 @@ for (const file of MAP_FILES) {
 
   // Campos extra (todos opcionales en MapType)
   const fences = parseRowColMap(tsText, "fences");
+  const fenceDirections = parseDirectionRowColMap(tsText, "fenceDirections");
   const grass = parseRowColMap(tsText, "grass");
   const water = parseRowColMap(tsText, "water");
 
@@ -945,6 +946,7 @@ for (const file of MAP_FILES) {
     trainers,
     walls,
     fences,
+    fenceDirections,
     grass,
     water,
     encounters,

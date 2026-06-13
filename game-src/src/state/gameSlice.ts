@@ -7,7 +7,7 @@ import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
-import { boulderIdAt, canWalk, isBerryTree, isCuttableTree, isFence, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
+import { boulderIdAt, canWalk, getFenceDirection, isBerryTree, isCuttableTree, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
 import { BASE_FRIENDSHIP, STEPS_PER_FRIENDSHIP, friendshipOnWalk, getFriendship } from "../app/evolution-helper";
 import { rollGender } from "../app/gender-helper";
 import {
@@ -184,6 +184,14 @@ export const gameSlice = createSlice({
         state.pos.x -= 1;
         return;
       }
+      // Saliente (ledge) orientado a la izquierda: se cruza de un salto. Los
+      // salientes con otra orientación bloquean (canWalk los trata como muro).
+      if (getFenceDirection(mapData[state.map], state.pos.x - 1, state.pos.y) === Direction.Left) {
+        state.jumping = true;
+        state.pos.x -= 1;
+        accrueWalkFriendship(state);
+        return;
+      }
       if (
         !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {})
       )
@@ -201,6 +209,13 @@ export const gameSlice = createSlice({
         state.pos.x += 1;
         return;
       }
+      // Saliente (ledge) orientado a la derecha: se cruza de un salto.
+      if (getFenceDirection(map, state.pos.x + 1, state.pos.y) === Direction.Right) {
+        state.jumping = true;
+        state.pos.x += 1;
+        accrueWalkFriendship(state);
+        return;
+      }
       if (
         !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {})
       )
@@ -215,6 +230,13 @@ export const gameSlice = createSlice({
       if (boulder === "blocked") return;
       if (boulder === "pushed") {
         state.pos.y -= 1;
+        return;
+      }
+      // Saliente (ledge) orientado hacia arriba: se cruza de un salto.
+      if (getFenceDirection(mapData[state.map], state.pos.x, state.pos.y - 1) === Direction.Up) {
+        state.jumping = true;
+        state.pos.y -= 1;
+        accrueWalkFriendship(state);
         return;
       }
       if (
@@ -234,8 +256,14 @@ export const gameSlice = createSlice({
         state.pos.y += 1;
         return;
       }
-      if (isFence(map.fences, state.pos.x, state.pos.y + 1)) {
+      const fenceDirDown = getFenceDirection(map, state.pos.x, state.pos.y + 1);
+      if (fenceDirDown === Direction.Down) {
+        // Saliente orientado hacia abajo: se cruza de un salto (comportamiento
+        // clásico). Se mantienen las comprobaciones de muro/agua de más abajo.
         state.jumping = true;
+      } else if (fenceDirDown !== null) {
+        // Saliente orientado a otro lado: por este flanco se comporta como muro.
+        return;
       }
       if (isWall(map.walls, state.pos.x, state.pos.y + 1)) return;
       // Surf: el agua es transitable; la tierra también (al pisarla se

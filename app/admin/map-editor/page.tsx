@@ -10,6 +10,14 @@ interface Pokemon { id: number; level: number; }
 
 type DirectionName = 'down' | 'up' | 'left' | 'right';
 
+/** Glifo de flecha por dirección (para overlays y selectores de dirección). */
+const DIRECTION_ARROW: Record<DirectionName, string> = {
+  down: '▼',
+  up: '▲',
+  left: '◀',
+  right: '▶',
+};
+
 interface Trainer {
   npcKey: string;
   pos: { x: number; y: number };
@@ -49,6 +57,8 @@ interface MapEntry {
   trainers: Trainer[];
   walls: Record<string, number[]>;
   fences?: Record<string, number[]>;
+  /** Dirección de salto por tile de saliente. Default Down si falta el tile. */
+  fenceDirections?: Record<string, Record<string, DirectionName>>;
   grass?: Record<string, number[]>;
   water?: Record<string, number[]>;
   encounters?: EncountersOverride | null;
@@ -717,6 +727,7 @@ function exportFullMapTypeTS({
   trainers,
   walls,
   fences,
+  fenceDirections,
   grass,
   water,
   encounters,
@@ -750,6 +761,7 @@ function exportFullMapTypeTS({
   trainers: Trainer[];
   walls: Record<string, number[]>;
   fences: Record<string, number[]>;
+  fenceDirections: Record<string, Record<string, DirectionName>>;
   grass: Record<string, number[]>;
   water: Record<string, number[]>;
   encounters: EncountersOverride;
@@ -789,6 +801,9 @@ function exportFullMapTypeTS({
   lines.push(`start: { x: ${safeStart.x}, y: ${safeStart.y} },`);
   lines.push(exportWallsTS(walls));
   lines.push(exportRowColMapTS(fences, 'fences'));
+  if (!isNestedMapEmpty(fenceDirections as unknown as Record<string, Record<string, unknown>>)) {
+    lines.push(exportSpinnersTS(fenceDirections).replace(/^spinners:/, 'fenceDirections:'));
+  }
   lines.push(exportRowColMapTS(grass, 'grass'));
   if (!isRowColMapEmpty(water)) lines.push(exportRowColMapTS(water, 'water'));
   lines.push(exportTextsTS(texts));
@@ -1638,6 +1653,10 @@ export default function MapEditor() {
   const [trainers, setTrainers] = useState<Trainer[]>([]);
   const [walls, setWalls] = useState<Record<string, number[]>>({});
   const [fences, setFences] = useState<Record<string, number[]>>({});
+  // Dirección de salto por tile de saliente ({fila:{col:dir}}). Default Down.
+  const [fenceDirections, setFenceDirections] = useState<Record<string, Record<string, DirectionName>>>({});
+  // Dirección activa al pintar salientes en el modo "fences".
+  const [activeFenceDir, setActiveFenceDir] = useState<DirectionName>('down');
   const [grass, setGrass] = useState<Record<string, number[]>>({});
   const [water, setWater] = useState<Record<string, number[]>>({});
   const [encounters, setEncounters] = useState<EncountersOverride>({});
@@ -1708,6 +1727,34 @@ export default function MapEditor() {
   const wallPaint = useRef<{ active: boolean; mode: 'add' | 'remove'; visited: Set<string> } | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  // ── Pan del canvas (arrastrar para desplazar; imprescindible en móvil) ──────
+  // En modo Mover, arrastrar sobre el lienzo desplaza el scroll en vez de editar.
+  const [panMode, setPanMode] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const panState = useRef<{ startX: number; startY: number; scrollLeft: number; scrollTop: number } | null>(null);
+
+  const onPanPointerDown = useCallback((e: React.PointerEvent) => {
+    if (!panMode || !scrollRef.current) return;
+    panState.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      scrollLeft: scrollRef.current.scrollLeft,
+      scrollTop: scrollRef.current.scrollTop,
+    };
+    scrollRef.current.setPointerCapture?.(e.pointerId);
+  }, [panMode]);
+
+  const onPanPointerMove = useCallback((e: React.PointerEvent) => {
+    const p = panState.current;
+    if (!p || !scrollRef.current) return;
+    scrollRef.current.scrollLeft = p.scrollLeft - (e.clientX - p.startX);
+    scrollRef.current.scrollTop = p.scrollTop - (e.clientY - p.startY);
+  }, []);
+
+  const onPanPointerUp = useCallback(() => {
+    panState.current = null;
+  }, []);
+
   const currentMap = mapData[selectedMapId];
 
   // ── Cargar datos ──────────────────────────────────────────────────────
@@ -1737,6 +1784,7 @@ export default function MapEditor() {
     setTrainers(m.trainers ?? []);
     setWalls(m.walls ?? {});
     setFences(m.fences ?? {});
+    setFenceDirections(m.fenceDirections ?? {});
     setGrass(m.grass ?? {});
     setWater((m as MapEntry & { water?: Record<string, number[]> }).water ?? {});
     // Encounters: copiar SOLO las 4 tablas que nos interesan (walk + 3 cañas)
@@ -1806,7 +1854,7 @@ export default function MapEditor() {
       // flyable/flySpot son solo del editor; no se escriben al .ts (no existen en MapType).
       music: musicField,
       trainers,
-      walls, fences, grass, water,
+      walls, fences, fenceDirections, grass, water,
       texts, textRewards,
       items: items.map((it) => ({ itemKey: it.itemKey, pos: it.pos, ...(it.hidden ? { hidden: true } : {}) })),
       gifts, staticPokemon, cuttableTrees, berryTrees, boulders,
@@ -1860,6 +1908,7 @@ export default function MapEditor() {
             flySpot,
             music: musicField,
             fences,
+            fenceDirections,
             grass,
             water,
             encounters,
@@ -1961,6 +2010,7 @@ export default function MapEditor() {
             trainers,
             walls,
             fences,
+            fenceDirections,
             grass,
             water,
             encounters,
@@ -2014,8 +2064,12 @@ export default function MapEditor() {
   }
 
   function doExportFences() {
-    const ts = exportRowColMapTS(fences, 'fences');
-    navigator.clipboard.writeText(ts).then(() => alert('¡Fences copiadas!'));
+    const parts = [exportRowColMapTS(fences, 'fences')];
+    // Solo exportar fenceDirections si hay alguna dirección no-Down definida.
+    if (Object.keys(fenceDirections).length > 0) {
+      parts.push(exportSpinnersTS(fenceDirections).replace(/^spinners:/, 'fenceDirections:'));
+    }
+    navigator.clipboard.writeText(parts.join('\n')).then(() => alert('¡Fences copiadas!'));
   }
 
   function doExportGrass() {
@@ -2104,6 +2158,7 @@ export default function MapEditor() {
       trainers,
       walls,
       fences,
+      fenceDirections,
       grass,
       water,
       encounters,
@@ -2168,6 +2223,7 @@ export default function MapEditor() {
       setTrainers(parsed.trainers);
       setWalls(parsed.walls);
       setFences(parsed.fences);
+      setFenceDirections((parsed as typeof parsed & { fenceDirections?: Record<string, Record<string, DirectionName>> }).fenceDirections ?? {});
       setGrass(parsed.grass);
       setWater(parsed.water);
       setTexts(parsed.texts);
@@ -2328,6 +2384,7 @@ export default function MapEditor() {
   // ── Drag & drop NPC ────────────────────────────────────────────────────────
   const onPointerDown = useCallback(
     (e: React.PointerEvent, idx: number) => {
+      if (panMode) return; // En modo Mover, dejar que el lienzo haga pan.
       if (editMode !== 'npc') return;
       e.preventDefault();
       e.stopPropagation();
@@ -2335,11 +2392,12 @@ export default function MapEditor() {
       dragging.current = { idx, startX: e.clientX, startY: e.clientY };
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
     },
-    [editMode]
+    [editMode, panMode]
   );
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
+      if (panMode) return; // En modo Mover no se edita por arrastre.
       const tile = tileFromClientPoint(e.clientX, e.clientY, true);
       if (!tile) return;
       const tileX = tile.x;
@@ -2366,6 +2424,10 @@ export default function MapEditor() {
             : editMode === 'grass' ? setGrass
             : setWater;
           setter((prev) => setMaskAt(prev, tileX, tileY, paint.mode === 'add'));
+          // Salientes: etiquetar el tile con la dirección activa (o quitarla).
+          if (editMode === 'fences') {
+            setFenceDirections((prev) => setSpinnerAt(prev, tileX, tileY, paint.mode === 'add' ? activeFenceDir : null));
+          }
           setDirty(true);
         }
         return;
@@ -2378,7 +2440,7 @@ export default function MapEditor() {
       );
       setDirty(true);
     },
-    [tileFromClientPoint, editMode]
+    [tileFromClientPoint, editMode, activeFenceDir, panMode]
   );
 
   const onPointerUp = useCallback(() => {
@@ -2396,6 +2458,7 @@ export default function MapEditor() {
         | { kind: 'text'; row: number; col: number }
         | { kind: 'item' | 'gift' | 'portal'; idx: number },
     ) => {
+      if (panMode) return; // En modo Mover, dejar que el lienzo haga pan.
       e.preventDefault();
       e.stopPropagation();
       entityDrag.current = { ...target, moved: false } as typeof entityDrag.current;
@@ -2403,7 +2466,7 @@ export default function MapEditor() {
       // Selección inmediata para portales
       if (target.kind === 'portal') setSelectedPortalIdx(target.idx);
     },
-    []
+    [panMode]
   );
 
   // Movimiento de entidades durante drag (se ejecuta dentro del onPointerMove del canvas)
@@ -2466,6 +2529,7 @@ export default function MapEditor() {
 
   // En modo walls/fences/grass/water: pointerdown en canvas inicia pintura.
   function onCanvasPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    if (panMode) return; // En modo Mover no se pinta; el lienzo hace pan.
     if (editMode !== 'walls' && editMode !== 'fences' && editMode !== 'grass' && editMode !== 'water') return;
     const tile = tileFromEvent(e);
     if (!tile) return;
@@ -2488,11 +2552,16 @@ export default function MapEditor() {
     const mode: 'add' | 'remove' = currentlyOn ? 'remove' : 'add';
     wallPaint.current = { active: true, mode, visited: new Set([`${tile.x},${tile.y}`]) };
     setter((prev) => setMaskAt(prev, tile.x, tile.y, mode === 'add'));
+    // Salientes: etiquetar el tile con la dirección activa (o quitarla al borrar).
+    if (editMode === 'fences') {
+      setFenceDirections((prev) => setSpinnerAt(prev, tile.x, tile.y, mode === 'add' ? activeFenceDir : null));
+    }
     setDirty(true);
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   }
 
   function onCanvasClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (panMode) return; // En modo Mover no se colocan entidades.
     if (suppressNextClick.current) {
       suppressNextClick.current = false;
       return;
@@ -2976,6 +3045,24 @@ export default function MapEditor() {
           ))}
         </div>
 
+        {/* Pan / Mover (imprescindible en móvil para desplazar el mapa) */}
+        <button
+          onClick={() => setPanMode((v) => !v)}
+          title={panMode ? 'Modo Mover activo: arrastra para desplazar el mapa' : 'Activar modo Mover (arrastrar para desplazar)'}
+          style={{
+            padding: '2px 8px',
+            fontSize: 12,
+            background: panMode ? '#2a3a5a' : '#1a1a3a',
+            border: `1px solid ${panMode ? '#5a8aff' : '#3a3a5a'}`,
+            borderRadius: 4,
+            color: panMode ? '#aaccff' : '#e0e0ff',
+            cursor: 'pointer',
+            fontWeight: panMode ? 700 : 400,
+          }}
+        >
+          ✋ Mover
+        </button>
+
         {/* Minimap toggle */}
         <button
           onClick={() => setShowMinimap((v) => !v)}
@@ -3390,7 +3477,23 @@ export default function MapEditor() {
       <div className="me-body" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
         {/* ── Canvas ───────────────────────────────────────────────── */}
-        <div style={{ flex: 1, overflow: 'auto', position: 'relative', background: '#0a0a18' }}>
+        <div
+          ref={scrollRef}
+          onPointerDown={onPanPointerDown}
+          onPointerMove={onPanPointerMove}
+          onPointerUp={onPanPointerUp}
+          onPointerCancel={onPanPointerUp}
+          style={{
+            flex: 1,
+            overflow: 'auto',
+            position: 'relative',
+            background: '#0a0a18',
+            // En modo Mover capturamos el gesto para desplazar (desactiva el
+            // scroll/zoom nativo del navegador para que el arrastre haga pan).
+            touchAction: panMode ? 'none' : 'auto',
+            cursor: panMode ? 'grab' : 'default',
+          }}
+        >
           {currentMap && (
             <div
               ref={canvasRef}
@@ -3452,30 +3555,43 @@ export default function MapEditor() {
                 ));
               })}
 
-              {/* Fences overlay */}
+              {/* Fences overlay (con flecha de dirección de salto) */}
               {Object.entries(fences).flatMap(([rowKey, cols]) => {
                 const y = parseInt(rowKey, 10);
                 if (Number.isNaN(y)) return [];
-                return cols.map((x) => (
-                  <div
-                    key={`f-${y}-${x}`}
-                    style={{
-                      position: 'absolute',
-                      left: x * zoom,
-                      top: y * zoom,
-                      width: zoom,
-                      height: zoom,
-                      background: editMode === 'fences'
-                        ? 'rgba(255, 200, 80, 0.55)'
-                        : 'rgba(255, 200, 80, 0.18)',
-                      border: editMode === 'fences'
-                        ? '1px solid rgba(255, 200, 80, 0.9)'
-                        : '1px dashed rgba(255, 200, 80, 0.4)',
-                      pointerEvents: 'none',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                ));
+                return cols.map((x) => {
+                  const dir = (fenceDirections[String(y)]?.[String(x)] ?? 'down') as DirectionName;
+                  return (
+                    <div
+                      key={`f-${y}-${x}`}
+                      style={{
+                        position: 'absolute',
+                        left: x * zoom,
+                        top: y * zoom,
+                        width: zoom,
+                        height: zoom,
+                        background: editMode === 'fences'
+                          ? 'rgba(255, 200, 80, 0.55)'
+                          : 'rgba(255, 200, 80, 0.18)',
+                        border: editMode === 'fences'
+                          ? '1px solid rgba(255, 200, 80, 0.9)'
+                          : '1px dashed rgba(255, 200, 80, 0.4)',
+                        pointerEvents: 'none',
+                        boxSizing: 'border-box',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#1a1200',
+                        fontSize: Math.max(9, zoom * 0.55),
+                        fontWeight: 700,
+                        lineHeight: 1,
+                        textShadow: '0 0 2px rgba(255,230,150,0.9)',
+                      }}
+                    >
+                      {DIRECTION_ARROW[dir]}
+                    </div>
+                  );
+                });
               })}
 
               {/* Grass overlay */}
@@ -4021,18 +4137,54 @@ export default function MapEditor() {
                 sourceFile={currentMap?.sourceFile}
               />
             ) : editMode === 'fences' ? (
-              <ModeHelpBlock
-                emoji="🚧"
-                title="Modo Fences"
-                color="#ffcc88"
-                lines={[
-                  'Click + arrastre: pintar/borrar fences',
-                  'Bloquean el paso pero permiten saltar',
-                ]}
-                count={Object.values(fences).reduce((a, b) => a + b.length, 0)}
-                countLabel="fences"
-                sourceFile={currentMap?.sourceFile}
-              />
+              <>
+                {/* Selector de dirección de salto del saliente */}
+                <div style={{ padding: '10px 12px', background: '#1a1408', border: '1px solid #7a5a30', borderRadius: 6, marginBottom: 10 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#ffcc88', marginBottom: 6 }}>
+                    Dirección del salto
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
+                    {(['up', 'down', 'left', 'right'] as DirectionName[]).map((d) => {
+                      const active = activeFenceDir === d;
+                      const label = { up: 'Arriba', down: 'Abajo', left: 'Izquierda', right: 'Derecha' }[d];
+                      return (
+                        <button
+                          key={d}
+                          onClick={() => setActiveFenceDir(d)}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            padding: '8px 6px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                            background: active ? '#7a5a30' : '#2a2010',
+                            border: active ? '1px solid #ffcc88' : '1px solid #4a3a20',
+                            borderRadius: 4, color: active ? '#fff4e0' : '#bba',
+                          }}
+                        >
+                          <span style={{ fontSize: 15 }}>{DIRECTION_ARROW[d]}</span> {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#a89878', marginTop: 8, lineHeight: 1.4 }}>
+                    La flecha marca hacia dónde se SALTA el saliente. Por el lado
+                    contrario actúa como muro. Pinta los tiles con la dirección
+                    elegida; cámbiala para colocar salientes en otro sentido.
+                    Borrar un tile (volver a pintarlo) también quita su dirección.
+                  </div>
+                </div>
+                <ModeHelpBlock
+                  emoji="🚧"
+                  title="Modo Fences"
+                  color="#ffcc88"
+                  lines={[
+                    'Click + arrastre: pintar/borrar fences',
+                    'Cada tile guarda su dirección de salto',
+                    'Lo ya existente salta hacia abajo (▼)',
+                  ]}
+                  count={Object.values(fences).reduce((a, b) => a + b.length, 0)}
+                  countLabel="fences"
+                  sourceFile={currentMap?.sourceFile}
+                />
+              </>
             ) : editMode === 'grass' ? (
               <>
                 <ModeHelpBlock

@@ -332,6 +332,31 @@ ss-anne-1f · ss-anne-2f · ss-anne-3f · ss-anne-bf1
   Hielo + Baya Menta) · Fuchsia Baya Tostada. Colocarlos visualmente con el
   editor (las posiciones no están hardcodeadas).
 
+### Salientes (ledges) direccionales
+
+- **Colisión**: `MapType.fences?: Record<number, number[]>` (`{fila:[cols]}`) sigue
+  siendo la fuente única de colisión — un saliente bloquea el paso como un muro
+  desde todos los flancos salvo el de salto. `isFence` (en `map-helper.ts`) no
+  cambia y lo usan colisión, visión de entrenadores, Knockback y MO Corte/etc.
+- **Dirección de salto**: `MapType.fenceDirections?: Record<number, Record<number, Direction>>`
+  (mismo formato `{fila:{col:Direction}}` que `spinners`). Indica hacia dónde se
+  PUEDE saltar el saliente. **Compatibilidad total**: si un tile de `fences` no
+  aparece en `fenceDirections`, su dirección por defecto es `Direction.Down` →
+  todos los salientes anteriores a este sistema saltan hacia abajo (como antes,
+  sin migrar ningún mapa).
+- **Helper**: `getFenceDirection(map, x, y)` devuelve la `Direction` del saliente
+  (default `Down`) o `null` si ahí no hay saliente.
+- **Movimiento (`gameSlice.ts`)**: cada reducer `moveUp/Down/Left/Right` salta el
+  saliente (un brinco de 1 tile, `state.jumping = true`) SOLO si la dirección del
+  saliente coincide con la del movimiento; desde cualquier otro flanco actúa como
+  muro (`canWalk`/`isFence`).
+- **Editor**: en el modo `fences` (botón 🚧) hay un selector de dirección
+  (▲▼◀▶). Pintar/arrastrar coloca los tiles con la dirección activa; el overlay
+  dibuja la flecha de cada tile. Borrar un tile (repintarlo) también quita su
+  dirección. Serialización `fenceDirections` en `ts-codegen.ts` (reusa el patrón
+  de `spinners`), parser en `parse-ts.ts` + `setup-editor.mjs`, override key en
+  `app/api/admin/map-data/route.ts`.
+
 ### Cómo añadir un mapa nuevo
 
 1. Añadir valor al enum `MapId` en `maps/map-types.ts`
@@ -857,6 +882,17 @@ como aristas dirigidas. Simulación de fuerzas, pan/zoom (rueda + arrastre), bú
 
 El editor es usable en móvil/tablet: en pantallas ≤820px el inspector pasa a ocupar el ancho completo
 bajo el canvas (clases `.me-body`/`.me-inspector` + media queries en el `<style>` de la toolbar).
+
+### Modo Mover (pan del canvas, imprescindible en móvil)
+
+Botón `✋ Mover` (junto a Zoom). Al activarlo, arrastrar sobre el lienzo lo
+DESPLAZA (scroll) en vez de editar/pintar — la única forma usable de recorrer
+mapas grandes en táctil (el lienzo tiene `touch-action: none` para pintar, lo
+que bloquea el scroll nativo). Implementación: drag-to-scroll manual sobre el
+contenedor `overflow:auto` (`scrollRef` + `panState`); mientras `panMode` está
+activo, todos los manejadores de edición (`onCanvasPointerDown`, `onCanvasClick`,
+drag de NPC/entidades, pintura) hacen early-return. En escritorio el scroll por
+barra/trackpad sigue funcionando con el modo desactivado.
 
 ### Selector de música
 

@@ -19,6 +19,28 @@ export const isFence = (
   return !!fences && fences[y] && fences[y].includes(x);
 };
 
+/**
+ * Dirección de salto del saliente (ledge) que ocupa el tile (x,y), o `null` si
+ * ahí no hay saliente. Si el tile existe en `fences` pero no tiene una entrada
+ * explícita en `fenceDirections`, su dirección por defecto es `Direction.Down`
+ * (compatibilidad con todos los salientes anteriores a este sistema).
+ *
+ * La colisión sigue gestionándose con `isFence` (un saliente bloquea igual sea
+ * cual sea su orientación); esta función solo aporta la orientación necesaria
+ * para decidir hacia qué lado se puede SALTAR.
+ */
+export const getFenceDirection = (
+  map: {
+    fences?: Record<number, number[]>;
+    fenceDirections?: Record<number, Record<number, Direction>>;
+  },
+  x: number,
+  y: number
+): Direction | null => {
+  if (!isFence(map.fences, x, y)) return null;
+  return map.fenceDirections?.[y]?.[x] ?? Direction.Down;
+};
+
 export const isGrass = (
   grass: Record<number, number[]> | undefined,
   x: number,
