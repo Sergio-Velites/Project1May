@@ -13,10 +13,7 @@ const mtMoon3f: MapType = {
   music,
   height: 28,
   width: 28,
-  start: {
-    x: 0,
-    y: 0,
-  },
+  start: { x: 0, y: 0 },
   walls: {
     0: [],
     1: [20, 21, 22, 23, 24, 25, 26, 27],
@@ -74,7 +71,7 @@ const mtMoon3f: MapType = {
   exits: {
     3: [27],
   },
-  exitReturnPos: { x: 7, y: 2 },
+  exitReturnPos: { x: 3, y: 6 },
   fences: {},
   grass: {},
   text: {},
@@ -90,13 +87,12 @@ const mtMoon3f: MapType = {
       pos: { x: 27, y: 3 },
       questId: "mt-moon-3f-static-27-3",
       intro: [
-        "Si has llegado hasta aqúi eres un auténtico friki.",
+        "Si has llegado hasta aquí eres un auténtico friki.",
         "Muy bien. Suerte en la vida.",
         "Pero ponte a hacer algo con ella.",
-        "Nos vemos a la vuelta de japón.",
-        "Besos. Marta & Sergio...",
-        "Bueno venga...",
-        "La última y acasa!",
+        "Sergio y Marta te ven a la vuelta de Japón.",
+        "Besos de sus partes!",
+        "Ahora pelea contra mí capullo!",
       ],
     },
     {
@@ -105,7 +101,10 @@ const mtMoon3f: MapType = {
       sprite: "bird-a",
       pos: { x: 26, y: 27 },
       questId: "mt-moon-3f-static-26-27",
-      intro: ["Sientes frio...", "será por los hielos de los cubatas?"],
+      intro: [
+        "Sientes frio...",
+        "será por los hielos de los cubatas?",
+      ],
     },
     {
       pokemonId: 145,
@@ -131,7 +130,8 @@ const mtMoon3f: MapType = {
     },
   ],
 
-  exitReturnMap: MapId.PalletTownHouseA2F,
+  exitReturnMap: MapId.Route4,
+  music: music,
 };
 
 export default mtMoon3f;
