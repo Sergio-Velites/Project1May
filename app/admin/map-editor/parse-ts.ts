@@ -58,6 +58,7 @@ export interface ParsedMap {
   music: string | null;
   walls: Record<string, number[]>;
   fences: Record<string, number[]>;
+  fenceDirections: Record<string, Record<string, 'down' | 'up' | 'left' | 'right'>>;
   grass: Record<string, number[]>;
   water: Record<string, number[]>;
   texts: Record<string, Record<string, string[]>>;
@@ -591,6 +592,7 @@ export function parseMapTS(tsText: string): ParsedMap {
     music: parseMusicField(tsText),
     walls: parseRowColMap(tsText, 'walls'),
     fences: parseRowColMap(tsText, 'fences'),
+    fenceDirections: parseDirectionRowColMap(tsText, 'fenceDirections'),
     grass: parseRowColMap(tsText, 'grass'),
     water: parseRowColMap(tsText, 'water'),
     texts: parseTextField(tsText),

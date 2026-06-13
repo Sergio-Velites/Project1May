@@ -67,6 +67,7 @@ export interface MapWriteState {
   trainers?: TrainerState[];
   walls?: Record<string, number[]>;
   fences?: Record<string, number[]>;
+  fenceDirections?: Record<string, Record<string, DirectionName>>;
   grass?: Record<string, number[]>;
   water?: Record<string, number[]>;
   texts?: Record<string, Record<string, string[]>>;
@@ -249,15 +250,19 @@ function serStoreItems(items: string[]): string {
   return `storeItems: [\n${items.map((i) => `    ItemType.${i},`).join('\n')}\n  ]`;
 }
 
-function serSpinners(spinners: Record<string, Record<string, DirectionName>>): string {
-  const rows = sortedNumKeys(spinners);
-  if (rows.length === 0) return 'spinners: {}';
+function serDirectionRowColMap(data: Record<string, Record<string, DirectionName>>, field: string): string {
+  const rows = sortedNumKeys(data);
+  if (rows.length === 0) return `${field}: {}`;
   const rowLines = rows.map((r) => {
-    const cols = sortedNumKeys(spinners[String(r)] ?? {});
-    const colLines = cols.map((c) => `      ${c}: ${directionToEnum(spinners[String(r)][String(c)])},`);
+    const cols = sortedNumKeys(data[String(r)] ?? {});
+    const colLines = cols.map((c) => `      ${c}: ${directionToEnum(data[String(r)][String(c)])},`);
     return `    ${r}: {\n${colLines.join('\n')}\n    },`;
   });
-  return `spinners: {\n${rowLines.join('\n')}\n  }`;
+  return `${field}: {\n${rowLines.join('\n')}\n  }`;
+}
+
+function serSpinners(spinners: Record<string, Record<string, DirectionName>>): string {
+  return serDirectionRowColMap(spinners, 'spinners');
 }
 
 function serMaps(maps: Record<string, Record<string, string>>): string {
@@ -338,6 +343,7 @@ function buildFieldOps(state: MapWriteState): FieldOp[] {
   if (state.start !== undefined && state.start) push('start', serPos('start', state.start));
   if (state.walls !== undefined) push('walls', serRowColMap(state.walls, 'walls'));
   if (state.fences !== undefined) push('fences', serRowColMap(state.fences, 'fences'));
+  if (state.fenceDirections !== undefined) push('fenceDirections', Object.keys(state.fenceDirections).length ? serDirectionRowColMap(state.fenceDirections, 'fenceDirections') : null);
   if (state.grass !== undefined) push('grass', serRowColMap(state.grass, 'grass'));
   if (state.water !== undefined) push('water', Object.keys(state.water).length ? serRowColMap(state.water, 'water') : null);
   if (state.texts !== undefined) push('text', serTexts(state.texts));
