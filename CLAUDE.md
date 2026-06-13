@@ -883,16 +883,33 @@ como aristas dirigidas. Simulación de fuerzas, pan/zoom (rueda + arrastre), bú
 El editor es usable en móvil/tablet: en pantallas ≤820px el inspector pasa a ocupar el ancho completo
 bajo el canvas (clases `.me-body`/`.me-inspector` + media queries en el `<style>` de la toolbar).
 
-### Modo Mover (pan del canvas, imprescindible en móvil)
+### Desplazar y hacer zoom del canvas (multitáctil, imprescindible en móvil)
 
-Botón `✋ Mover` (junto a Zoom). Al activarlo, arrastrar sobre el lienzo lo
-DESPLAZA (scroll) en vez de editar/pintar — la única forma usable de recorrer
-mapas grandes en táctil (el lienzo tiene `touch-action: none` para pintar, lo
-que bloquea el scroll nativo). Implementación: drag-to-scroll manual sobre el
-contenedor `overflow:auto` (`scrollRef` + `panState`); mientras `panMode` está
-activo, todos los manejadores de edición (`onCanvasPointerDown`, `onCanvasClick`,
-drag de NPC/entidades, pintura) hacen early-return. En escritorio el scroll por
-barra/trackpad sigue funcionando con el modo desactivado.
+Dos modelos que conviven sin estorbarse (`scrollRef` = contenedor `overflow:auto`):
+
+- **Táctil — gesto de DOS dedos (sin cambiar de modo, a cualquier escala)**: UN
+  dedo edita/pinta como siempre; DOS dedos DESPLAZAN el mapa y hacen
+  **pinch-zoom**. Es el patrón estándar de editores táctiles (Figma, mapas) y
+  funciona en cualquier dispositivo sin tocar ningún botón. Implementación en
+  los manejadores del contenedor (`onCanvasScrollPointerDown/Move/Up`): se
+  rastrean los punteros táctiles en `gesture.current.pointers`; al entrar el
+  segundo dedo se activa el gesto (`gesture.active`), se cancela cualquier
+  edición en curso (`wallPaint`/`dragging`/`entityDrag`) y se capturan ambos
+  punteros. En `move` se desplaza el scroll según el centro de los dedos y, si
+  el ratio de distancia cruza a otro `ZOOM_LEVELS`, se hace `setZoom` con
+  preservación del **punto focal** (el tile bajo los dedos sigue bajo los dedos)
+  vía `pinchFocus` + un `useLayoutEffect` keyed en `zoom`.
+- **Escritorio / explícito — botón `✋ Mover`** (junto a Zoom): activa el
+  arrastre con ratón (drag-to-scroll, `panState`). Sigue disponible como antes.
+
+Para que los gestos no disparen edición, los manejadores de edición
+(`onCanvasPointerDown`, `onCanvasClick`, drag de NPC/entidades, pintura) hacen
+early-return cuando `panMode`, cuando `gesture.active`, o cuando
+`isSecondaryTouch(e)` (toque secundario: ya hay otro dedo apoyado → es el inicio
+de un gesto de dos dedos, no se pinta ni se coloca). El lienzo mantiene
+`touch-action: none` para que los gestos de uno y dos dedos lleguen como
+pointer events limpios. En escritorio el scroll por barra/trackpad sigue
+funcionando con el modo desactivado.
 
 ### Selector de música
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { parseMapTS } from './parse-ts';
 import { ITEM_NAMES } from '../item-names';
 
@@ -873,6 +873,15 @@ function pascalCaseFromMapId(id: string): string {
 // ── Constantes UI ─────────────────────────────────────────────────────────
 
 const ZOOM_LEVELS = [16, 24, 32, 48];
+
+// Devuelve el nivel de zoom de ZOOM_LEVELS más cercano a `z` (para pinch-zoom).
+function nearestZoomLevel(z: number): number {
+  let best = ZOOM_LEVELS[0];
+  for (const lv of ZOOM_LEVELS) {
+    if (Math.abs(lv - z) < Math.abs(best - z)) best = lv;
+  }
+  return best;
+}
 const MINIMAP_WIDTH = 237;
 const MINIMAP_HEIGHT = 213;
 const MINIMAP_DISPLAY_SCALE = 2;
@@ -1727,31 +1736,157 @@ export default function MapEditor() {
   const wallPaint = useRef<{ active: boolean; mode: 'add' | 'remove'; visited: Set<string> } | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  // ── Pan del canvas (arrastrar para desplazar; imprescindible en móvil) ──────
-  // En modo Mover, arrastrar sobre el lienzo desplaza el scroll en vez de editar.
+  // ── Pan / zoom del canvas (desplazar y escalar; imprescindible en móvil) ────
+  // Dos modelos que conviven sin estorbarse:
+  //  • Táctil (cualquier dispositivo, SIN cambiar de modo): UN dedo edita/pinta;
+  //    DOS dedos desplazan el mapa y hacen pinch-zoom. Es el patrón estándar de
+  //    editores táctiles (Figma, mapas) y funciona sea cual sea la escala.
+  //  • Escritorio / explícito: el botón ✋ Mover activa el arrastre con ratón.
   const [panMode, setPanMode] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const panState = useRef<{ startX: number; startY: number; scrollLeft: number; scrollTop: number } | null>(null);
 
-  const onPanPointerDown = useCallback((e: React.PointerEvent) => {
-    if (!panMode || !scrollRef.current) return;
-    panState.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      scrollLeft: scrollRef.current.scrollLeft,
-      scrollTop: scrollRef.current.scrollTop,
-    };
-    scrollRef.current.setPointerCapture?.(e.pointerId);
-  }, [panMode]);
+  // Gesto multitáctil de 2 dedos (pan + pinch-zoom). `active` se consulta en los
+  // manejadores de edición para que el dibujo de un dedo se cancele en cuanto
+  // entra el segundo dedo.
+  const gesture = useRef<{
+    pointers: Map<number, { x: number; y: number }>;
+    active: boolean;
+    startCenterX: number;
+    startCenterY: number;
+    startDist: number;
+    startScrollLeft: number;
+    startScrollTop: number;
+    startZoom: number;
+  }>({
+    pointers: new Map(),
+    active: false,
+    startCenterX: 0,
+    startCenterY: 0,
+    startDist: 0,
+    startScrollLeft: 0,
+    startScrollTop: 0,
+    startZoom: 32,
+  });
+  // Punto focal del pinch a preservar tras el cambio (discreto) de zoom: el tile
+  // bajo los dedos debe seguir bajo los dedos cuando el lienzo se redimensiona.
+  const pinchFocus = useRef<{ tileX: number; tileY: number; offsetX: number; offsetY: number } | null>(null);
 
-  const onPanPointerMove = useCallback((e: React.PointerEvent) => {
-    const p = panState.current;
-    if (!p || !scrollRef.current) return;
-    scrollRef.current.scrollLeft = p.scrollLeft - (e.clientX - p.startX);
-    scrollRef.current.scrollTop = p.scrollTop - (e.clientY - p.startY);
+  // ¿Es un toque secundario (segundo dedo) mientras ya hay otro apoyado? Si lo
+  // es, los manejadores de edición lo ignoran para no pintar/colocar al iniciar
+  // un gesto de dos dedos.
+  const isSecondaryTouch = useCallback((e: React.PointerEvent) => {
+    return e.pointerType === 'touch' && gesture.current.pointers.size >= 1;
   }, []);
 
-  const onPanPointerUp = useCallback(() => {
+  // Tras un paso de pinch-zoom, reposiciona el scroll para mantener el punto
+  // focal estable y re-basa el gesto en curso para que el pan siga fluido.
+  useLayoutEffect(() => {
+    const pf = pinchFocus.current;
+    const el = scrollRef.current;
+    if (!pf || !el) return;
+    el.scrollLeft = pf.tileX * zoom - pf.offsetX;
+    el.scrollTop = pf.tileY * zoom - pf.offsetY;
+    pinchFocus.current = null;
+    if (gesture.current.active) {
+      gesture.current.startScrollLeft = el.scrollLeft;
+      gesture.current.startScrollTop = el.scrollTop;
+    }
+  }, [zoom]);
+
+  const onCanvasScrollPointerDown = useCallback((e: React.PointerEvent) => {
+    const el = scrollRef.current;
+    // Gesto táctil de 2 dedos: registrar el dedo y, al llegar el segundo,
+    // arrancar pan+pinch cancelando cualquier edición en curso.
+    if (e.pointerType === 'touch') {
+      const g = gesture.current;
+      g.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (g.pointers.size === 2 && el) {
+        wallPaint.current = null;
+        dragging.current = null;
+        entityDrag.current = null;
+        suppressNextClick.current = true;
+        const [a, b] = [...g.pointers.values()];
+        g.active = true;
+        g.startCenterX = (a.x + b.x) / 2;
+        g.startCenterY = (a.y + b.y) / 2;
+        g.startDist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+        g.startScrollLeft = el.scrollLeft;
+        g.startScrollTop = el.scrollTop;
+        g.startZoom = zoom;
+        for (const id of g.pointers.keys()) el.setPointerCapture?.(id);
+      }
+    }
+    // Arrastre con ratón en modo Mover (escritorio / explícito).
+    if (panMode && el) {
+      panState.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        scrollLeft: el.scrollLeft,
+        scrollTop: el.scrollTop,
+      };
+      el.setPointerCapture?.(e.pointerId);
+    }
+  }, [panMode, zoom]);
+
+  const onCanvasScrollPointerMove = useCallback((e: React.PointerEvent) => {
+    const g = gesture.current;
+    if (g.pointers.has(e.pointerId)) {
+      g.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    }
+    const el = scrollRef.current;
+    if (g.active && g.pointers.size >= 2 && el) {
+      e.preventDefault();
+      const [a, b] = [...g.pointers.values()];
+      const cx = (a.x + b.x) / 2;
+      const cy = (a.y + b.y) / 2;
+      const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      // Pinch-zoom: saltar al nivel de ZOOM_LEVELS más cercano al ratio actual.
+      const target = nearestZoomLevel(g.startZoom * (dist / g.startDist));
+      if (target !== zoom) {
+        const rect = el.getBoundingClientRect();
+        const offsetX = cx - rect.left;
+        const offsetY = cy - rect.top;
+        pinchFocus.current = {
+          tileX: (el.scrollLeft + offsetX) / zoom,
+          tileY: (el.scrollTop + offsetY) / zoom,
+          offsetX,
+          offsetY,
+        };
+        // Re-basar el gesto alrededor del centro/distancia actuales para que el
+        // pan posterior sea coherente tras el redimensionado del lienzo.
+        g.startDist = dist;
+        g.startZoom = target;
+        g.startCenterX = cx;
+        g.startCenterY = cy;
+        setZoom(target);
+        return;
+      }
+      // Pan: desplazar el scroll en sentido opuesto al centro de los dedos.
+      el.scrollLeft = g.startScrollLeft - (cx - g.startCenterX);
+      el.scrollTop = g.startScrollTop - (cy - g.startCenterY);
+      return;
+    }
+    // Arrastre con ratón en modo Mover.
+    const p = panState.current;
+    if (!p || !el) return;
+    el.scrollLeft = p.scrollLeft - (e.clientX - p.startX);
+    el.scrollTop = p.scrollTop - (e.clientY - p.startY);
+  }, [zoom]);
+
+  const onCanvasScrollPointerUp = useCallback((e: React.PointerEvent) => {
+    const g = gesture.current;
+    if (g.pointers.has(e.pointerId)) {
+      g.pointers.delete(e.pointerId);
+      scrollRef.current?.releasePointerCapture?.(e.pointerId);
+    }
+    if (g.pointers.size < 2) {
+      if (g.active) {
+        g.active = false;
+        suppressNextClick.current = true; // tragar el click posterior al gesto
+      }
+      g.startDist = 0;
+    }
     panState.current = null;
   }, []);
 
@@ -2384,7 +2519,7 @@ export default function MapEditor() {
   // ── Drag & drop NPC ────────────────────────────────────────────────────────
   const onPointerDown = useCallback(
     (e: React.PointerEvent, idx: number) => {
-      if (panMode) return; // En modo Mover, dejar que el lienzo haga pan.
+      if (panMode || isSecondaryTouch(e)) return; // dejar que el lienzo haga pan/gesto.
       if (editMode !== 'npc') return;
       e.preventDefault();
       e.stopPropagation();
@@ -2392,12 +2527,12 @@ export default function MapEditor() {
       dragging.current = { idx, startX: e.clientX, startY: e.clientY };
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
     },
-    [editMode, panMode]
+    [editMode, panMode, isSecondaryTouch]
   );
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
-      if (panMode) return; // En modo Mover no se edita por arrastre.
+      if (panMode || gesture.current.active) return; // gesto/Mover: no editar por arrastre.
       const tile = tileFromClientPoint(e.clientX, e.clientY, true);
       if (!tile) return;
       const tileX = tile.x;
@@ -2458,7 +2593,7 @@ export default function MapEditor() {
         | { kind: 'text'; row: number; col: number }
         | { kind: 'item' | 'gift' | 'portal'; idx: number },
     ) => {
-      if (panMode) return; // En modo Mover, dejar que el lienzo haga pan.
+      if (panMode || isSecondaryTouch(e)) return; // dejar que el lienzo haga pan/gesto.
       e.preventDefault();
       e.stopPropagation();
       entityDrag.current = { ...target, moved: false } as typeof entityDrag.current;
@@ -2466,7 +2601,7 @@ export default function MapEditor() {
       // Selección inmediata para portales
       if (target.kind === 'portal') setSelectedPortalIdx(target.idx);
     },
-    [panMode]
+    [panMode, isSecondaryTouch]
   );
 
   // Movimiento de entidades durante drag (se ejecuta dentro del onPointerMove del canvas)
@@ -2529,7 +2664,7 @@ export default function MapEditor() {
 
   // En modo walls/fences/grass/water: pointerdown en canvas inicia pintura.
   function onCanvasPointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    if (panMode) return; // En modo Mover no se pinta; el lienzo hace pan.
+    if (panMode || isSecondaryTouch(e)) return; // gesto/Mover: el lienzo hace pan, no se pinta.
     if (editMode !== 'walls' && editMode !== 'fences' && editMode !== 'grass' && editMode !== 'water') return;
     const tile = tileFromEvent(e);
     if (!tile) return;
@@ -3048,7 +3183,9 @@ export default function MapEditor() {
         {/* Pan / Mover (imprescindible en móvil para desplazar el mapa) */}
         <button
           onClick={() => setPanMode((v) => !v)}
-          title={panMode ? 'Modo Mover activo: arrastra para desplazar el mapa' : 'Activar modo Mover (arrastrar para desplazar)'}
+          title={panMode
+            ? 'Modo Mover activo: arrastra con el ratón para desplazar el mapa'
+            : 'Móvil: arrastra con DOS dedos para desplazar y pellizca para zoom (sin activar nada). Ratón: activa este modo para arrastrar.'}
           style={{
             padding: '2px 8px',
             fontSize: 12,
@@ -3479,10 +3616,10 @@ export default function MapEditor() {
         {/* ── Canvas ───────────────────────────────────────────────── */}
         <div
           ref={scrollRef}
-          onPointerDown={onPanPointerDown}
-          onPointerMove={onPanPointerMove}
-          onPointerUp={onPanPointerUp}
-          onPointerCancel={onPanPointerUp}
+          onPointerDown={onCanvasScrollPointerDown}
+          onPointerMove={onCanvasScrollPointerMove}
+          onPointerUp={onCanvasScrollPointerUp}
+          onPointerCancel={onCanvasScrollPointerUp}
           style={{
             flex: 1,
             overflow: 'auto',
