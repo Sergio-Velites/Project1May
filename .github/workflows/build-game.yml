@@ -49,8 +49,8 @@ jobs:
           DISABLE_ESLINT_PLUGIN: "true"
           GENERATE_SOURCEMAP: "false"
           CI: "false" # no tratar warnings como errores
-          REACT_APP_SUPABASE_URL: ${{ secrets.REACT_APP_SUPABASE_URL }}
-          REACT_APP_SUPABASE_ANON_KEY: ${{ secrets.REACT_APP_SUPABASE_ANON_KEY }}
+          # La config de Supabase (pública) la aporta game-src/.env.production,
+          # así el build es autosuficiente y no depende de secrets del repo.
         run: node_modules/.bin/react-scripts build
 
       - name: Sync build → public/game

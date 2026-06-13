@@ -872,11 +872,11 @@ GH_TOKEN=<PAT fine-grained con contents:write + actions:write sobre el repo>
 GH_REPO=Sergio-Velites/Project1May   # opcional (default)
 MAP_EDIT_BRANCH=master               # opcional: rama donde commitea/compila el editor (def. master)
 GH_WORKFLOW_REF=master               # opcional: rama donde vive build-game.yml
-
-# GitHub → Settings → Secrets → Actions (para el workflow build-game.yml)
-REACT_APP_SUPABASE_URL=<...>
-REACT_APP_SUPABASE_ANON_KEY=<...>
 ```
+
+La config de Supabase para el build del juego vive en `game-src/.env.production` (valores
+públicos: el anon key ya viaja en el bundle). Así el workflow `build-game.yml` NO necesita
+secrets. Único requisito en producción: `GH_TOKEN` en Vercel.
 
 Sin `GH_TOKEN` el editor sigue funcionando (guardado en Supabase) y avisa "commit no configurado".
 
