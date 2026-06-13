@@ -332,8 +332,8 @@ function buildFieldOps(state: MapWriteState): FieldOp[] {
   if (state.allowBicycle !== undefined) push('allowBicycle', state.allowBicycle ? 'allowBicycle: true' : null);
   if (state.cave !== undefined) push('cave', state.cave ? 'cave: true' : null);
   if (state.dark !== undefined) push('dark', state.dark ? 'dark: true' : null);
-  if (state.flyable !== undefined) push('flyable', state.flyable ? 'flyable: true' : null);
-  if (state.flySpot !== undefined) push('flySpot', state.flySpot ? serPos('flySpot', state.flySpot) : null);
+  // NOTA: `flyable`/`flySpot` son SOLO del editor (no existen en MapType del
+  // juego). NO se escriben al .ts o el juego no compilaría.
   if (state.music !== undefined) push('music', state.music && state.music.trim() ? `music: ${state.music.trim()}` : null);
   if (state.start !== undefined && state.start) push('start', serPos('start', state.start));
   if (state.walls !== undefined) push('walls', serRowColMap(state.walls, 'walls'));
@@ -419,13 +419,24 @@ function locateTopLevelFields(body: string): Map<string, { start: number; end: n
     if (c === '{' || c === '[' || c === '(') { depth++; i++; continue; }
     if (c === '}' || c === ']' || c === ')') { depth--; i++; continue; }
     if (depth === 0) {
-      // Posible inicio de campo: identificador seguido de ':'
+      // Posible inicio de campo: identificador seguido de ':' (normal) o de
+      // ',' / '}' (propiedad SHORTHAND, p.ej. `music,`). Reconocer el shorthand
+      // es CRÍTICO: si no, se insertaría un campo duplicado al guardar.
       const slice = body.slice(i);
-      const fm = slice.match(/^([A-Za-z_$][\w$]*)\s*:/);
+      const fm = slice.match(/^([A-Za-z_$][\w$]*)\s*([:,}])/);
       if (fm) {
         const name = fm[1];
+        const sep = fm[2];
         const fieldStart = i;
-        // Avanzar hasta la coma de nivel 0 que cierra el valor (o fin del cuerpo).
+        if (sep !== ':') {
+          // Shorthand: el span va del identificador hasta su coma (si la hay).
+          const sepAbs = i + fm[0].length - 1;
+          const end = sep === ',' ? sepAbs : sepAbs - 1; // si es '}', no incluirla
+          result.set(name, { start: fieldStart, end });
+          i = end + 1;
+          continue;
+        }
+        // Campo normal: avanzar hasta la coma de nivel 0 que cierra el valor.
         let j = i + fm[0].length;
         let d = 0;
         let s: string | null = null;

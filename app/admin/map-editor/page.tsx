@@ -1802,7 +1802,8 @@ export default function MapEditor() {
     const { maps, teleports, exits } = nestPortals(portals);
     return {
       start: startPos,
-      cave, dark, allowBicycle, flyable, flySpot,
+      cave, dark, allowBicycle,
+      // flyable/flySpot son solo del editor; no se escriben al .ts (no existen en MapType).
       music: musicField,
       trainers,
       walls, fences, grass, water,

@@ -43,7 +43,6 @@ const ceruleanCity: MapType = {
   music: "/game/music/maps-original/cerulean-city.mp3",
   grass: {},
   allowBicycle: true,
-  flySpot: { x: 20, y: 34 },
   fences: {},
   cuttableTrees: [
     {

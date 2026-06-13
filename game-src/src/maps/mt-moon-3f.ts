@@ -131,7 +131,6 @@ const mtMoon3f: MapType = {
   ],
 
   exitReturnMap: MapId.Route4,
-  music: music,
 };
 
 export default mtMoon3f;
