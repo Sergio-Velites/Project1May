@@ -791,28 +791,100 @@ type SortDir = "asc" | "desc";
 
 ## Map Editor
 
-Ruta: `/admin/map-editor` · Herramienta visual para editar mapas sin tocar el código.
+Ruta: `/admin/map-editor` · Herramienta visual para construir mapas **sin tocar código a mano ni copiar/pegar**.
 
 ### Arquitectura
 
 ```
-app/admin/map-editor/page.tsx  → Editor principal (Client Component)
+app/admin/map-editor/page.tsx     → Editor principal (Client Component)
+app/admin/map-editor/ts-codegen.ts → Escritor QUIRÚRGICO de los .ts (puro, sin React)
 app/api/admin/
-  ├── map-data/route.ts        → GET/POST: lee y guarda maps/*.ts via AST
-  ├── music-tracks/route.ts    → GET: lista .mp3 de /game/music/maps-original/
-  └── item-types/route.ts      → GET: lista ItemType disponibles
+  ├── map-data/route.ts           → GET (map-data.json + overrides Supabase) / POST (Supabase, preview)
+  ├── commit-map/route.ts         → POST: reescribe game-src/src/maps/<map>.ts y lo COMMITEA a GitHub
+  ├── build-game/route.ts         → POST: dispara el workflow build-game.yml (compilar el juego online)
+  ├── map-image/[file]/route.ts   → GET: sirve los PNG desde game-src/src/assets/map (fuente única)
+  └── music-tracks/route.ts       → GET: lista .mp3 de /game/music/maps-original/
 public/editor/
-  ├── pokemon/                 → Sprites front de los 251 Pokémon
-  └── original-map-music.json → Metadatos de música original Gen I (referencia)
+  ├── pokemon/ sprites/ portraits/ → Sprites (copiados por setup-editor)
+  ├── map-data.json                → Datos de todos los mapas (generado desde los .ts en cada build)
+  └── item-types.json              → Claves del enum ItemType
+.github/workflows/build-game.yml   → Recompila el bundle CRA y lo commitea (workflow_dispatch)
 ```
+
+### Selección visual (sin window.prompt)
+
+Toda la edición pasa por modales con búsqueda y preview clicable:
+- **Portales**: selector de mapa con filtro + preview del mapa destino con casillas clicables.
+- **Objetos / Pokémon / bayas / recompensas de texto / equipo de entrenador**: listas con búsqueda y sprites.
+- **Hide condition `trainer-defeated`**: se elige el entrenador haciendo click sobre el mapa (resaltado).
+
+El sistema de pickers vive en `page.tsx` (estado `picker: PickerState` + `PickerHost`).
+
+### Fuente única de imágenes
+
+Las imágenes de mapa **ya NO se copian** a `public/editor/maps/`. El editor las sirve desde
+`game-src/src/assets/map/` vía `/api/admin/map-image/<file>` (misma fuente que compila el juego).
+`next.config.ts` incluye `game-src/src/assets/map/**` en el trace de ese lambda.
+
+### Guardar → commit del `.ts` (escritura quirúrgica + auto-imports)
+
+`💾 Guardar` hace DOS cosas (aditivo, nunca rompe):
+1. **POST `/api/admin/map-data`** → Supabase (preview instantáneo, como siempre).
+2. **POST `/api/admin/commit-map`** → reescribe `game-src/src/maps/<sourceFile>` con `ts-codegen.writeMapTs()`:
+   - **Quirúrgico**: solo toca los campos que el editor gestiona; conserva el resto
+     (`encounters` vía `getEncounterData`, comentarios, imagen, código custom).
+   - **Reconcilia imports** según el uso real del texto final (npcs, `Direction`, `ItemType`,
+     `MapId`) → resuelve el clásico "faltan librerías al pegar".
+   - Commitea a la rama `MAP_EDIT_BRANCH` (def. `map-editor`) vía la GitHub API.
+
+> ⚠️ **No perder datos**: `setup-editor.mjs` DEBE parsear todo campo editable
+> (incluidos `boulders`/`berryTrees`/`cuttableTrees`). Si el editor no carga un campo,
+> al guardar enviaría un array vacío y `writeMapTs` lo borraría del `.ts`. Si añades un
+> campo nuevo al editor, añade su parser en `setup-editor.mjs` Y su serializador en `ts-codegen.ts`.
+
+### Compilar el juego online
+
+Botón `🛠 Compilar juego` → `/api/admin/build-game` dispara `build-game.yml` (workflow_dispatch):
+recompila el bundle CRA desde `game-src` y commitea `public/game/` en la rama. Permite publicar
+cambios sin entrar al entorno de desarrollo. El juego solo refleja los mapas tras esta compilación.
+
+### Grafo de conexiones
+
+Botón `🕸 Grafo` → overlay con todos los mapas como nodos y las conexiones (puertas/teleports/salidas)
+como aristas dirigidas. Simulación de fuerzas, pan/zoom (rueda + arrastre), búsqueda y click-para-ir.
+
+### Responsive
+
+El editor es usable en móvil/tablet: en pantallas ≤820px el inspector pasa a ocupar el ancho completo
+bajo el canvas (clases `.me-body`/`.me-inspector` + media queries en el `<style>` de la toolbar).
 
 ### Selector de música
 
-El inspector de mapa (`MapMetaInspector`) ofrece:
-1. **Desplegable**: lista de tracks disponibles en `/game/music/maps-original/` (consume `/api/admin/music-tracks`)
-2. **Input manual**: para expresiones personalizadas (ej. `music` para un import existente, o `"/game/music/maps-original/route-1.mp3"` para ruta pública)
+`MapMetaInspector`: desplegable de tracks (`/api/admin/music-tracks`) + input manual para expresiones
+(`music` para un import, o `"/game/music/maps-original/route-1.mp3"` para ruta pública). El campo
+`expression` es la cadena que se almacena en `MapType.music`.
 
-El campo `expression` del track es la cadena que se almacena en `MapType.music`.
+### Variables de entorno requeridas (commit / compilar)
+
+```bash
+# Vercel (para que guardar commitee y el botón de compilar funcionen)
+GH_TOKEN=<PAT fine-grained con contents:write + actions:write sobre el repo>
+GH_REPO=Sergio-Velites/Project1May   # opcional (default)
+MAP_EDIT_BRANCH=map-editor           # opcional: rama donde commitea el editor
+GH_WORKFLOW_REF=master               # opcional: rama donde vive build-game.yml
+
+# GitHub → Settings → Secrets → Actions (para el workflow build-game.yml)
+REACT_APP_SUPABASE_URL=<...>
+REACT_APP_SUPABASE_ANON_KEY=<...>
+```
+
+Sin `GH_TOKEN` el editor sigue funcionando (guardado en Supabase) y avisa "commit no configurado".
+
+### Flujo de ramas recomendado
+
+El editor commitea a `map-editor` (sale de `master`). Revisas/mergeas a `master` por PR; "Compilar
+juego" reconstruye el bundle en esa rama. Tu rama de features se rebasa sobre `master` para traerse los
+mapas. Mapas y código viven en sitios distintos del archivo → conflictos mínimos.
 
 ---
 
