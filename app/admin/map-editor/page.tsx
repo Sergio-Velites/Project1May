@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { parseMapTS } from './parse-ts';
+import { ITEM_NAMES } from '../item-names';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────
 
@@ -150,6 +151,85 @@ interface TextRewardEntry {
   amount?: number;
   questId: string;
 }
+
+// ── Sistema de pickers visuales ─────────────────────────────────────────────
+// Toda la edición que antes usaba window.prompt() ahora pasa por un overlay
+// modal con búsqueda y selección por click. El estado `picker` del editor
+// describe qué se está eligiendo y los callbacks que aplican el cambio.
+
+type PickerState =
+  | null
+  | {
+      kind: 'item';
+      title: string;
+      subtitle?: string;
+      options: string[];
+      current?: string;
+      hidden?: boolean;
+      labelFor?: (key: string) => string;
+      onPick: (itemKey: string) => void;
+      onToggleHidden?: () => void;
+      onDelete?: () => void;
+    }
+  | {
+      kind: 'pokemon';
+      title: string;
+      subtitle?: string;
+      current?: number;
+      onPick: (id: number) => void;
+    }
+  | {
+      kind: 'gift';
+      title: string;
+      initial: { pokemonId: number; level: number; questId: string };
+      onSave: (v: { pokemonId: number; level: number; questId: string }) => void;
+      onDelete?: () => void;
+    }
+  | {
+      kind: 'static';
+      title: string;
+      initial: { pokemonId: number; level: number; sprite: string; questId: string; intro: string };
+      onSave: (v: { pokemonId: number; level: number; sprite: string; questId: string; intro?: string[] }) => void;
+      onDelete?: () => void;
+    }
+  | {
+      kind: 'text';
+      title: string;
+      initial: { text: string; reward: TextRewardEntry | null };
+      defaultQuestId: string;
+      itemOptions: string[];
+      onSave: (v: { text: string; reward: TextRewardEntry | null }) => void;
+    }
+  | {
+      kind: 'maptile';
+      title: string;
+      subtitle?: string;
+      requirePos: boolean;
+      highlightTrainers?: boolean;
+      current?: { mapId: string; pos?: { x: number; y: number } };
+      onPick: (v: { mapId: string; pos: { x: number; y: number } | null }) => void;
+    };
+
+/** PascalCase del enum ItemType → slug kebab-case usado en ITEM_NAMES. */
+function itemKeyToSlug(key: string): string {
+  return key
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase();
+}
+
+/** Nombre legible (ES) de un ItemType; cae al PascalCase espaciado. */
+function itemLabel(key: string): string {
+  const slug = itemKeyToSlug(key);
+  return ITEM_NAMES[slug] ?? key.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+}
+
+const BERRY_LABELS: Record<string, string> = {
+  Berry: 'Baya', GoldBerry: 'Baya Dorada', PrzCureBerry: 'Baya Antipar',
+  PsnCureBerry: 'Baya Antitóx', MintBerry: 'Baya Menta', IceBerry: 'Baya Hielo',
+  BurntBerry: 'Baya Tostada', BitterBerry: 'Baya Amarga', MiracleBerry: 'Baya Milagro',
+  MysteryBerry: 'Baya Misterio',
+};
 
 // ── NPC Registry ──────────────────────────────────────────────────────────
 
@@ -825,6 +905,523 @@ const sectionStyle: React.CSSProperties = {
   marginTop: 12,
 };
 
+// ════════════════════════════════════════════════════════════════════════════
+//  MODALES DE SELECCIÓN VISUAL (pickers)
+// ════════════════════════════════════════════════════════════════════════════
+
+const searchInputStyle: React.CSSProperties = {
+  width: '100%',
+  boxSizing: 'border-box',
+  background: '#0a0a1e',
+  border: '1px solid #3a3a5a',
+  color: '#e0e0ff',
+  borderRadius: 6,
+  padding: '8px 12px',
+  fontSize: 14,
+  fontFamily: 'monospace',
+  outline: 'none',
+};
+
+const modalBtnStyle: React.CSSProperties = {
+  padding: '8px 16px',
+  background: '#1a1a3a',
+  border: '1px solid #3a3a5a',
+  borderRadius: 6,
+  color: '#ccd',
+  cursor: 'pointer',
+  fontSize: 13,
+  fontFamily: 'monospace',
+};
+
+const modalPrimaryBtnStyle: React.CSSProperties = {
+  ...modalBtnStyle,
+  background: '#2a4a2a',
+  border: '1px solid #4a7a4a',
+  color: '#aaffaa',
+  fontWeight: 700,
+};
+
+/** Shell común de todos los modales: backdrop, panel centrado, título y ESC. */
+function PickerOverlay({
+  title, subtitle, onClose, width = 560, children,
+}: {
+  title: string;
+  subtitle?: string;
+  onClose: () => void;
+  width?: number;
+  children: React.ReactNode;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { e.stopPropagation(); onClose(); }
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [onClose]);
+
+  return (
+    <div
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 10000,
+        background: 'rgba(4,4,12,0.78)', backdropFilter: 'blur(2px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: 'monospace',
+      }}
+    >
+      <div
+        style={{
+          width, maxWidth: '92vw', maxHeight: '88vh', display: 'flex', flexDirection: 'column',
+          background: '#12122a', border: '1px solid #3a3a5a', borderRadius: 12,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.6)', overflow: 'hidden',
+        }}
+      >
+        <div style={{ padding: '14px 18px', borderBottom: '1px solid #2a2a4a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#e0e0ff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
+            {subtitle && <div style={{ fontSize: 11, color: '#8888aa', marginTop: 2 }}>{subtitle}</div>}
+          </div>
+          <button onClick={onClose} title="Cerrar (Esc)" style={{ flexShrink: 0, width: 28, height: 28, padding: 0, background: '#1a1a2e', border: '1px solid #3a3a5a', borderRadius: 6, color: '#aaa', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** Autofocus en montaje para escribir la búsqueda al instante. */
+function useAutofocus<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  useEffect(() => { ref.current?.focus(); }, []);
+  return ref;
+}
+
+// ── Grid de Pokémon con búsqueda (sprite + nombre + nº) ─────────────────────
+function PokemonSearchGrid({ value, onPick, autofocus = true }: {
+  value?: number;
+  onPick: (id: number) => void;
+  autofocus?: boolean;
+}) {
+  const [q, setQ] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (autofocus) inputRef.current?.focus(); }, [autofocus]);
+  const results = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    const ids: number[] = [];
+    for (let id = 1; id <= MAX_POKEMON_ID; id++) {
+      const name = POKEMON_NAMES_EDITOR[id] ?? '';
+      if (!needle || name.toLowerCase().includes(needle) || String(id) === needle || String(id).padStart(3, '0').includes(needle)) {
+        ids.push(id);
+      }
+    }
+    return ids;
+  }, [q]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
+      <div style={{ padding: '10px 14px 8px' }}>
+        <input ref={inputRef} value={q} onChange={(e) => setQ(e.target.value)} placeholder="🔍 Buscar Pokémon por nombre o nº…" style={searchInputStyle} />
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '4px 12px 12px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(74px, 1fr))', gap: 6, alignContent: 'start' }}>
+        {results.length === 0 && <div style={{ gridColumn: '1/-1', color: '#666', textAlign: 'center', padding: 20, fontSize: 12 }}>Sin resultados</div>}
+        {results.map((id) => {
+          const active = value === id;
+          return (
+            <button
+              key={id}
+              onClick={() => onPick(id)}
+              title={`#${id} ${POKEMON_NAMES_EDITOR[id]}`}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+                padding: '6px 2px 4px', cursor: 'pointer',
+                background: active ? '#2a3a5a' : '#0d0d22',
+                border: `1px solid ${active ? '#6a8aff' : '#222240'}`,
+                borderRadius: 6,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`/editor/pokemon/${id}.png`} alt="" style={{ width: 40, height: 40, imageRendering: 'pixelated', objectFit: 'contain' }} onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.15'; }} />
+              <span style={{ fontSize: 9, color: '#7777aa' }}>#{id}</span>
+              <span style={{ fontSize: 10, color: active ? '#cfe' : '#bbc', textAlign: 'center', lineHeight: 1.1, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{POKEMON_NAMES_EDITOR[id]}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Lista de objetos con búsqueda ───────────────────────────────────────────
+function ItemSearchList({ options, value, onPick, labelFor = itemLabel }: {
+  options: string[];
+  value?: string;
+  onPick: (key: string) => void;
+  labelFor?: (key: string) => string;
+}) {
+  const [q, setQ] = useState('');
+  const inputRef = useAutofocus<HTMLInputElement>();
+  const results = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return options;
+    return options.filter((k) => k.toLowerCase().includes(needle) || labelFor(k).toLowerCase().includes(needle));
+  }, [q, options, labelFor]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
+      <div style={{ padding: '10px 14px 8px' }}>
+        <input ref={inputRef} value={q} onChange={(e) => setQ(e.target.value)} placeholder="🔍 Buscar objeto…" style={searchInputStyle} />
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '4px 12px 12px', display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {results.length === 0 && <div style={{ color: '#666', textAlign: 'center', padding: 20, fontSize: 12 }}>Sin resultados</div>}
+        {results.map((key) => {
+          const active = value === key;
+          const label = labelFor(key);
+          return (
+            <button
+              key={key}
+              onClick={() => onPick(key)}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+                padding: '8px 12px', cursor: 'pointer', textAlign: 'left',
+                background: active ? '#2a3a5a' : '#0d0d22',
+                border: `1px solid ${active ? '#6a8aff' : '#222240'}`,
+                borderRadius: 6,
+              }}
+            >
+              <span style={{ fontSize: 13, color: active ? '#cfe' : '#dde' }}>{label}</span>
+              <code style={{ fontSize: 10, color: '#7777aa', flexShrink: 0 }}>{key}</code>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Modal: elegir objeto (con toggle oculto + eliminar si edita) ────────────
+function ItemPickerModal({ state, onClose }: { state: Extract<NonNullable<PickerState>, { kind: 'item' }>; onClose: () => void }) {
+  return (
+    <PickerOverlay title={state.title} subtitle={state.subtitle} onClose={onClose} width={480}>
+      <ItemSearchList options={state.options} value={state.current} labelFor={state.labelFor} onPick={(k) => { state.onPick(k); onClose(); }} />
+      {(state.onToggleHidden || state.onDelete) && (
+        <div style={{ display: 'flex', gap: 8, padding: '10px 14px', borderTop: '1px solid #2a2a4a' }}>
+          {state.onToggleHidden && (
+            <button onClick={() => { state.onToggleHidden!(); onClose(); }} style={modalBtnStyle}>
+              {state.hidden ? '👁 Hacer visible' : '🙈 Hacer oculto'}
+            </button>
+          )}
+          {state.onDelete && (
+            <button onClick={() => { state.onDelete!(); onClose(); }} style={{ ...modalBtnStyle, marginLeft: 'auto', background: '#2a1010', border: '1px solid #5a2a2a', color: '#ff8888' }}>🗑 Eliminar</button>
+          )}
+        </div>
+      )}
+    </PickerOverlay>
+  );
+}
+
+// ── Modal: elegir Pokémon (solo id) ─────────────────────────────────────────
+function PokemonPickerModal({ state, onClose }: { state: Extract<NonNullable<PickerState>, { kind: 'pokemon' }>; onClose: () => void }) {
+  return (
+    <PickerOverlay title={state.title} subtitle={state.subtitle} onClose={onClose} width={560}>
+      <div style={{ height: '60vh', display: 'flex' }}>
+        <PokemonSearchGrid value={state.current} onPick={(id) => { state.onPick(id); onClose(); }} />
+      </div>
+    </PickerOverlay>
+  );
+}
+
+// ── Modal: regalo (Pokémon + nivel + questId) ───────────────────────────────
+function GiftFormModal({ state, onClose }: { state: Extract<NonNullable<PickerState>, { kind: 'gift' }>; onClose: () => void }) {
+  const [pokemonId, setPokemonId] = useState(state.initial.pokemonId);
+  const [level, setLevel] = useState(state.initial.level);
+  const [questId, setQuestId] = useState(state.initial.questId);
+  const valid = pokemonId >= 1 && pokemonId <= MAX_POKEMON_ID && level >= 1 && level <= 100 && questId.trim().length > 0;
+  return (
+    <PickerOverlay title={state.title} subtitle="Pokémon que se obtiene al recoger la pokéball" onClose={onClose} width={560}>
+      <div style={{ height: '46vh', display: 'flex' }}>
+        <PokemonSearchGrid value={pokemonId} onPick={setPokemonId} />
+      </div>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', padding: '12px 16px', borderTop: '1px solid #2a2a4a', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`/editor/pokemon/${pokemonId}.png`} alt="" style={{ width: 36, height: 36, imageRendering: 'pixelated' }} onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.15'; }} />
+          <div style={{ fontSize: 13, color: '#cfe' }}>#{pokemonId} {POKEMON_NAMES_EDITOR[pokemonId] ?? ''}</div>
+        </div>
+        <div>
+          <label style={labelStyle}>Nivel</label>
+          <input type="number" min={1} max={100} value={level} onChange={(e) => setLevel(parseInt(e.target.value, 10) || 1)} style={{ ...inputStyle, width: 70 }} />
+        </div>
+        <div style={{ flex: 1, minWidth: 160 }}>
+          <label style={labelStyle}>questId (único)</label>
+          <input value={questId} onChange={(e) => setQuestId(e.target.value)} style={inputStyle} />
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {state.onDelete && <button onClick={() => { state.onDelete!(); onClose(); }} style={{ ...modalBtnStyle, background: '#2a1010', border: '1px solid #5a2a2a', color: '#ff8888' }}>🗑</button>}
+          <button onClick={onClose} style={modalBtnStyle}>Cancelar</button>
+          <button disabled={!valid} onClick={() => { state.onSave({ pokemonId, level, questId: questId.trim() }); onClose(); }} style={{ ...modalPrimaryBtnStyle, opacity: valid ? 1 : 0.4, cursor: valid ? 'pointer' : 'not-allowed' }}>Guardar</button>
+        </div>
+      </div>
+    </PickerOverlay>
+  );
+}
+
+// ── Modal: Pokémon estático (Pokémon + nivel + sprite + questId + intro) ────
+function StaticPokemonFormModal({ state, onClose }: { state: Extract<NonNullable<PickerState>, { kind: 'static' }>; onClose: () => void }) {
+  const [pokemonId, setPokemonId] = useState(state.initial.pokemonId);
+  const [level, setLevel] = useState(state.initial.level);
+  const [sprite, setSprite] = useState(state.initial.sprite);
+  const [questId, setQuestId] = useState(state.initial.questId);
+  const [intro, setIntro] = useState(state.initial.intro);
+  const valid = pokemonId >= 1 && pokemonId <= MAX_POKEMON_ID && level >= 1 && level <= 100 && questId.trim().length > 0 && STATIC_POKEMON_SPRITES.includes(sprite);
+  return (
+    <PickerOverlay title={state.title} subtitle="Pokémon estático tipo Articuno (combate único)" onClose={onClose} width={580}>
+      <div style={{ height: '40vh', display: 'flex' }}>
+        <PokemonSearchGrid value={pokemonId} onPick={setPokemonId} />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, padding: '12px 16px', borderTop: '1px solid #2a2a4a' }}>
+        <div>
+          <label style={labelStyle}>Nivel</label>
+          <input type="number" min={1} max={100} value={level} onChange={(e) => setLevel(parseInt(e.target.value, 10) || 1)} style={inputStyle} />
+        </div>
+        <div>
+          <label style={labelStyle}>Sprite overworld</label>
+          <select value={sprite} onChange={(e) => setSprite(e.target.value)} style={{ ...inputStyle, height: 32 }}>
+            {STATIC_POKEMON_SPRITES.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+        <div style={{ gridColumn: '1/-1' }}>
+          <label style={labelStyle}>questId (único)</label>
+          <input value={questId} onChange={(e) => setQuestId(e.target.value)} style={inputStyle} />
+        </div>
+        <div style={{ gridColumn: '1/-1' }}>
+          <label style={labelStyle}>Intro (una línea por diálogo, vacío = sin intro)</label>
+          <textarea value={intro} onChange={(e) => setIntro(e.target.value)} rows={2} style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', padding: '0 16px 14px' }}>
+        {state.onDelete && <button onClick={() => { state.onDelete!(); onClose(); }} style={{ ...modalBtnStyle, marginRight: 'auto', background: '#2a1010', border: '1px solid #5a2a2a', color: '#ff8888' }}>🗑 Eliminar</button>}
+        <button onClick={onClose} style={modalBtnStyle}>Cancelar</button>
+        <button disabled={!valid} onClick={() => {
+          const lines = intro.trim() ? intro.split('\n').map((s) => s.trim()).filter(Boolean) : undefined;
+          state.onSave({ pokemonId, level, sprite, questId: questId.trim(), intro: lines });
+          onClose();
+        }} style={{ ...modalPrimaryBtnStyle, opacity: valid ? 1 : 0.4, cursor: valid ? 'pointer' : 'not-allowed' }}>Guardar</button>
+      </div>
+    </PickerOverlay>
+  );
+}
+
+// ── Modal: texto de casilla + recompensa opcional ───────────────────────────
+function TextEntryModal({ state, onClose }: { state: Extract<NonNullable<PickerState>, { kind: 'text' }>; onClose: () => void }) {
+  const [text, setText] = useState(state.initial.text);
+  const r = state.initial.reward;
+  const [rewardType, setRewardType] = useState<'none' | 'item' | 'pokemon'>(r ? r.type : 'none');
+  const [itemKey, setItemKey] = useState(r?.itemKey ?? 'Potion');
+  const [amount, setAmount] = useState(r?.amount ?? 1);
+  const [pokemonId, setPokemonId] = useState(r?.pokemonId ?? 1);
+  const [level, setLevel] = useState(r?.level ?? 5);
+  const [questId, setQuestId] = useState(r?.questId ?? state.defaultQuestId);
+  const [subPicker, setSubPicker] = useState<'item' | 'pokemon' | null>(null);
+
+  const save = () => {
+    const cleanText = text;
+    let reward: TextRewardEntry | null = null;
+    if (cleanText.trim() !== '') {
+      if (rewardType === 'item') reward = { type: 'item', itemKey, amount: amount || 1, questId: questId.trim() || state.defaultQuestId };
+      else if (rewardType === 'pokemon') reward = { type: 'pokemon', pokemonId, level: level || 5, questId: questId.trim() || state.defaultQuestId };
+    }
+    state.onSave({ text: cleanText, reward });
+    onClose();
+  };
+
+  return (
+    <PickerOverlay title={state.title} subtitle="Texto al pulsar A. Vacío = borrar la casilla." onClose={onClose} width={520}>
+      <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto' }}>
+        <div>
+          <label style={labelStyle}>Texto (una línea por caja de diálogo)</label>
+          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} autoFocus style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }} />
+        </div>
+        <div>
+          <label style={labelStyle}>Recompensa al leer</label>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {(['none', 'item', 'pokemon'] as const).map((t) => (
+              <button key={t} onClick={() => setRewardType(t)} style={{
+                flex: 1, padding: '7px 0', borderRadius: 6, cursor: 'pointer', fontSize: 12,
+                background: rewardType === t ? '#2a4a2a' : '#0d0d22',
+                border: `1px solid ${rewardType === t ? '#4a7a4a' : '#222240'}`,
+                color: rewardType === t ? '#aaffaa' : '#99a',
+              }}>{t === 'none' ? '— Ninguna' : t === 'item' ? '📦 Objeto' : '⭐ Pokémon'}</button>
+            ))}
+          </div>
+        </div>
+        {rewardType === 'item' && (
+          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Objeto</label>
+              <button onClick={() => setSubPicker('item')} style={{ ...inputStyle, textAlign: 'left', cursor: 'pointer' }}>{itemLabel(itemKey)} <span style={{ color: '#778' }}>· cambiar</span></button>
+            </div>
+            <div>
+              <label style={labelStyle}>Cantidad</label>
+              <input type="number" min={1} value={amount} onChange={(e) => setAmount(parseInt(e.target.value, 10) || 1)} style={{ ...inputStyle, width: 70 }} />
+            </div>
+          </div>
+        )}
+        {rewardType === 'pokemon' && (
+          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+            <button onClick={() => setSubPicker('pokemon')} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#0d0d22', border: '1px solid #222240', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`/editor/pokemon/${pokemonId}.png`} alt="" style={{ width: 32, height: 32, imageRendering: 'pixelated' }} onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.15'; }} />
+              <span style={{ fontSize: 12, color: '#cfe' }}>#{pokemonId} {POKEMON_NAMES_EDITOR[pokemonId] ?? ''} · cambiar</span>
+            </button>
+            <div>
+              <label style={labelStyle}>Nivel</label>
+              <input type="number" min={1} max={100} value={level} onChange={(e) => setLevel(parseInt(e.target.value, 10) || 1)} style={{ ...inputStyle, width: 70 }} />
+            </div>
+          </div>
+        )}
+        {rewardType !== 'none' && (
+          <div>
+            <label style={labelStyle}>questId (único)</label>
+            <input value={questId} onChange={(e) => setQuestId(e.target.value)} style={inputStyle} />
+          </div>
+        )}
+      </div>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', padding: '12px 16px', borderTop: '1px solid #2a2a4a' }}>
+        <button onClick={onClose} style={modalBtnStyle}>Cancelar</button>
+        <button onClick={save} style={modalPrimaryBtnStyle}>Guardar</button>
+      </div>
+
+      {subPicker === 'item' && (
+        <ItemPickerModal
+          state={{ kind: 'item', title: 'Objeto de recompensa', options: state.itemOptions, current: itemKey, onPick: setItemKey }}
+          onClose={() => setSubPicker(null)}
+        />
+      )}
+      {subPicker === 'pokemon' && (
+        <PokemonPickerModal
+          state={{ kind: 'pokemon', title: 'Pokémon de recompensa', current: pokemonId, onPick: setPokemonId }}
+          onClose={() => setSubPicker(null)}
+        />
+      )}
+    </PickerOverlay>
+  );
+}
+
+// ── Modal: elegir mapa destino + (opcional) casilla por click sobre preview ─
+function MapTilePickerModal({ state, mapData, onClose }: {
+  state: Extract<NonNullable<PickerState>, { kind: 'maptile' }>;
+  mapData: MapData;
+  onClose: () => void;
+}) {
+  const [q, setQ] = useState('');
+  const [mapId, setMapId] = useState(state.current?.mapId ?? '');
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(state.current?.pos ?? null);
+  const searchRef = useAutofocus<HTMLInputElement>();
+
+  const mapIds = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return Object.keys(mapData).sort().filter((id) => {
+      if (!needle) return true;
+      return id.toLowerCase().includes(needle) || (mapData[id]?.name ?? '').toLowerCase().includes(needle);
+    });
+  }, [q, mapData]);
+
+  const map = mapId ? mapData[mapId] : null;
+  // Tamaño del tile del preview para encajar en ~520×420.
+  const previewTile = map ? Math.max(6, Math.min(28, Math.floor(Math.min(520 / map.width, 420 / map.height)))) : 16;
+  const canConfirm = !!mapId && (!state.requirePos || !!pos);
+
+  return (
+    <PickerOverlay title={state.title} subtitle={state.subtitle} onClose={onClose} width={900}>
+      <div style={{ display: 'flex', minHeight: 0, height: '64vh' }}>
+        {/* Lista de mapas */}
+        <div style={{ width: 260, borderRight: '1px solid #2a2a4a', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <div style={{ padding: '10px 12px 8px' }}>
+            <input ref={searchRef} value={q} onChange={(e) => setQ(e.target.value)} placeholder="🔍 Buscar mapa…" style={searchInputStyle} />
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 10px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {mapIds.map((id) => {
+              const active = mapId === id;
+              return (
+                <button key={id} onClick={() => { setMapId(id); setPos(null); }} style={{
+                  textAlign: 'left', padding: '6px 10px', borderRadius: 5, cursor: 'pointer',
+                  background: active ? '#2a3a5a' : 'transparent',
+                  border: `1px solid ${active ? '#6a8aff' : 'transparent'}`,
+                  color: active ? '#cfe' : '#bbc', fontSize: 12,
+                }}>
+                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{mapData[id]?.name ?? id}</div>
+                  <code style={{ fontSize: 9, color: '#778' }}>{id}</code>
+                </button>
+              );
+            })}
+            {mapIds.length === 0 && <div style={{ color: '#666', textAlign: 'center', padding: 16, fontSize: 12 }}>Sin resultados</div>}
+          </div>
+        </div>
+
+        {/* Preview del mapa destino */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <div style={{ flex: 1, overflow: 'auto', padding: 16, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+            {!map ? (
+              <div style={{ color: '#666', fontSize: 13, margin: 'auto', textAlign: 'center' }}>← Elige un mapa destino</div>
+            ) : (
+              <div>
+                {state.requirePos && (
+                  <div style={{ fontSize: 11, color: pos ? '#aaffaa' : '#ffcc88', marginBottom: 8 }}>
+                    {pos ? `Casilla destino: (${pos.x}, ${pos.y})` : '👆 Click en una casilla del mapa para fijar la posición de llegada'}
+                  </div>
+                )}
+                <div
+                  onClick={(e) => {
+                    if (!state.requirePos) return;
+                    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                    const x = Math.floor((e.clientX - rect.left) / previewTile);
+                    const y = Math.floor((e.clientY - rect.top) / previewTile);
+                    if (x >= 0 && y >= 0 && x < map.width && y < map.height) setPos({ x, y });
+                  }}
+                  style={{
+                    position: 'relative', width: map.width * previewTile, height: map.height * previewTile,
+                    backgroundImage: `url(/editor/maps/${map.imageFile})`, backgroundSize: '100% 100%',
+                    imageRendering: 'pixelated', cursor: state.requirePos ? 'crosshair' : 'default',
+                    border: '1px solid #2a2a4a',
+                  }}
+                >
+                  <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', backgroundImage: `linear-gradient(to right, rgba(120,120,200,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(120,120,200,0.18) 1px, transparent 1px)`, backgroundSize: `${previewTile}px ${previewTile}px` }} />
+                  {/* Entrenadores (para hide-condition) */}
+                  {state.highlightTrainers && map.trainers?.map((t, i) => (
+                    <div key={i} title={`${t.npcKey} (${t.pos.x},${t.pos.y})`} style={{ position: 'absolute', left: t.pos.x * previewTile, top: t.pos.y * previewTile, width: previewTile, height: previewTile, background: 'rgba(255,80,80,0.45)', border: '1px solid #ff6666', boxSizing: 'border-box' }} />
+                  ))}
+                  {pos && (
+                    <div style={{ position: 'absolute', left: pos.x * previewTile, top: pos.y * previewTile, width: previewTile, height: previewTile, background: 'rgba(80,255,120,0.5)', border: '2px solid #6effa0', boxSizing: 'border-box' }} />
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', padding: '10px 16px', borderTop: '1px solid #2a2a4a' }}>
+            <button onClick={onClose} style={modalBtnStyle}>Cancelar</button>
+            <button disabled={!canConfirm} onClick={() => { state.onPick({ mapId, pos }); onClose(); }} style={{ ...modalPrimaryBtnStyle, opacity: canConfirm ? 1 : 0.4, cursor: canConfirm ? 'pointer' : 'not-allowed' }}>
+              {state.requirePos ? 'Fijar destino' : 'Elegir mapa'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </PickerOverlay>
+  );
+}
+
+/** Despacha el modal correcto según el estado del picker. */
+function PickerHost({ picker, mapData, onClose }: { picker: PickerState; mapData: MapData; onClose: () => void }) {
+  if (!picker) return null;
+  switch (picker.kind) {
+    case 'item': return <ItemPickerModal state={picker} onClose={onClose} />;
+    case 'pokemon': return <PokemonPickerModal state={picker} onClose={onClose} />;
+    case 'gift': return <GiftFormModal state={picker} onClose={onClose} />;
+    case 'static': return <StaticPokemonFormModal state={picker} onClose={onClose} />;
+    case 'text': return <TextEntryModal state={picker} onClose={onClose} />;
+    case 'maptile': return <MapTilePickerModal state={picker} mapData={mapData} onClose={onClose} />;
+  }
+}
+
 // ── Componente principal ───────────────────────────────────────────────────
 
 export default function MapEditor() {
@@ -874,6 +1471,7 @@ export default function MapEditor() {
   const [musicTracks, setMusicTracks] = useState<MusicTrack[]>([]);
   const [editMode, setEditMode] = useState<EditMode>('npc');
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [picker, setPicker] = useState<PickerState>(null);
   const [zoom, setZoom] = useState(32);
   const [showGrid, setShowGrid] = useState(true);
   const [showWalls, setShowWalls] = useState(true);
@@ -1623,179 +2221,81 @@ export default function MapEditor() {
       const rowKey = String(tile.y);
       const colKey = String(tile.x);
       const existing = texts[rowKey]?.[colKey] ?? [];
-      const initial = existing.join('\n');
-      const input = window.prompt(
-        `Texto en (${tile.x}, ${tile.y}) — una línea por fila. Vacío = borrar.`,
-        initial,
-      );
-      if (input === null) return;
-      // ── Actualizar texto ──
-      setTexts((prev) => {
-        const nextRow = { ...(prev[rowKey] ?? {}) };
-        if (input.trim() === '') {
-          delete nextRow[colKey];
-          // Si se borra el texto, borrar también la recompensa asociada
+      const existingReward = textRewards[rowKey]?.[colKey] ?? null;
+      setPicker({
+        kind: 'text',
+        title: `Casilla (${tile.x}, ${tile.y})`,
+        initial: { text: existing.join('\n'), reward: existingReward },
+        defaultQuestId: `text-reward-${selectedMapId}-${tile.x}-${tile.y}`,
+        itemOptions: itemTypeKeys,
+        onSave: ({ text, reward }) => {
+          // Texto
+          setTexts((prev) => {
+            const nextRow = { ...(prev[rowKey] ?? {}) };
+            if (text.trim() === '') delete nextRow[colKey];
+            else nextRow[colKey] = text.split('\n').map((s) => s.trim()).filter((s) => s.length > 0);
+            const next = { ...prev };
+            if (Object.keys(nextRow).length === 0) delete next[rowKey];
+            else next[rowKey] = nextRow;
+            return next;
+          });
+          // Recompensa (siempre se sincroniza: null borra)
           setTextRewards((pr) => {
             const nr = { ...(pr[rowKey] ?? {}) };
-            delete nr[colKey];
+            if (reward && text.trim() !== '') nr[colKey] = reward;
+            else delete nr[colKey];
             const n = { ...pr };
             if (Object.keys(nr).length === 0) delete n[rowKey];
             else n[rowKey] = nr;
             return n;
           });
-        } else {
-          nextRow[colKey] = input.split('\n').map((s) => s.trim()).filter((s) => s.length > 0);
-        }
-        const next = { ...prev };
-        if (Object.keys(nextRow).length === 0) delete next[rowKey];
-        else next[rowKey] = nextRow;
-        return next;
+          setDirty(true);
+        },
       });
-      setDirty(true);
-      // ── Configurar recompensa (solo si hay texto) ──
-      if (input.trim() !== '') {
-        const existingReward = textRewards[rowKey]?.[colKey];
-        const rewardChoice = window.prompt(
-          `Recompensa en (${tile.x}, ${tile.y}):\n` +
-          `  "pokemon" → dar un Pokémon\n` +
-          `  "item"    → dar un objeto\n` +
-          `  "-"       → quitar recompensa\n` +
-          `  [Cancelar]→ dejar como está\n` +
-          `\nActual: ${existingReward ? `${existingReward.type} (${existingReward.questId})` : 'ninguna'}`,
-          existingReward ? existingReward.type : '-',
-        );
-        if (rewardChoice === null) return; // cancelar → no tocar recompensa
-        if (rewardChoice.trim() === '-' || rewardChoice.trim() === '') {
-          // Quitar recompensa
-          setTextRewards((pr) => {
-            const nr = { ...(pr[rowKey] ?? {}) };
-            delete nr[colKey];
-            const n = { ...pr };
-            if (Object.keys(nr).length === 0) delete n[rowKey];
-            else n[rowKey] = nr;
-            return n;
-          });
-          setDirty(true);
-        } else if (rewardChoice.trim() === 'item') {
-          const itemKey = window.prompt('ItemType del objeto (ej. Potion, PokeBall, Tm12):', existingReward?.itemKey ?? 'Potion');
-          if (!itemKey) return;
-          if (!itemTypeKeys.includes(itemKey.trim())) {
-            alert(`ItemType inválido: ${itemKey}. Disponibles: ${itemTypeKeys.slice(0, 12).join(', ')}…`);
-            return;
-          }
-          const amountStr = window.prompt('Cantidad (por defecto 1):', String(existingReward?.amount ?? 1));
-          const amount = parseInt(amountStr ?? '1', 10) || 1;
-          const defaultQuestId = `text-reward-${selectedMapId}-${tile.x}-${tile.y}`;
-          const questId = window.prompt('questId único (dejar para usar automático):', existingReward?.questId ?? defaultQuestId);
-          if (!questId) return;
-          const newReward: TextRewardEntry = { type: 'item', itemKey: itemKey.trim(), amount, questId: questId.trim() };
-          setTextRewards((pr) => {
-            const nr = { ...(pr[rowKey] ?? {}), [colKey]: newReward };
-            return { ...pr, [rowKey]: nr };
-          });
-          setDirty(true);
-        } else if (rewardChoice.trim() === 'pokemon') {
-          const pidStr = window.prompt('ID del Pokémon (1-251):', String(existingReward?.pokemonId ?? 1));
-          const pokemonId = parseInt(pidStr ?? '1', 10);
-          if (!pokemonId || pokemonId < 1 || pokemonId > 251) {
-            alert('ID de Pokémon inválido (1-251).');
-            return;
-          }
-          const lvlStr = window.prompt('Nivel:', String(existingReward?.level ?? 5));
-          const level = parseInt(lvlStr ?? '5', 10) || 5;
-          const defaultQuestId = `text-reward-${selectedMapId}-${tile.x}-${tile.y}`;
-          const questId = window.prompt('questId único:', existingReward?.questId ?? defaultQuestId);
-          if (!questId) return;
-          const newReward: TextRewardEntry = { type: 'pokemon', pokemonId, level, questId: questId.trim() };
-          setTextRewards((pr) => {
-            const nr = { ...(pr[rowKey] ?? {}), [colKey]: newReward };
-            return { ...pr, [rowKey]: nr };
-          });
-          setDirty(true);
-        }
-      }
       return;
     }
     if (editMode === 'items') {
       const idx = items.findIndex((it) => it.pos.x === tile.x && it.pos.y === tile.y);
       if (idx >= 0) {
-        // Toggle hidden / delete
-        const action = window.prompt(
-          `Item ${items[idx].itemKey} (${items[idx].hidden ? 'oculto' : 'visible'}). Escribe:\n  toggle  → cambiar visible/oculto\n  delete  → eliminar\n  o un nuevo ItemType`,
-          '',
-        );
-        if (action === null) return;
-        if (action.trim() === 'delete') {
-          setItems((p) => p.filter((_, i) => i !== idx));
-        } else if (action.trim() === 'toggle') {
-          setItems((p) => p.map((it, i) => i === idx ? { ...it, hidden: !it.hidden } : it));
-        } else {
-          const key = action.trim();
-          if (!itemTypeKeys.includes(key)) {
-            alert(`ItemType inválido. Usa uno de: ${itemTypeKeys.slice(0, 8).join(', ')}…`);
-            return;
-          }
-          setItems((p) => p.map((it, i) => i === idx ? { ...it, itemKey: key } : it));
-        }
-        setDirty(true);
+        setPicker({
+          kind: 'item',
+          title: `Objeto en (${tile.x}, ${tile.y})`,
+          subtitle: 'Elige otro objeto, cambia su visibilidad o elimínalo',
+          options: itemTypeKeys,
+          current: items[idx].itemKey,
+          hidden: items[idx].hidden,
+          onPick: (key) => { setItems((p) => p.map((it, i) => i === idx ? { ...it, itemKey: key } : it)); setDirty(true); },
+          onToggleHidden: () => { setItems((p) => p.map((it, i) => i === idx ? { ...it, hidden: !it.hidden } : it)); setDirty(true); },
+          onDelete: () => { setItems((p) => p.filter((_, i) => i !== idx)); setDirty(true); },
+        });
       } else {
-        const key = window.prompt(
-          `Nuevo item en (${tile.x}, ${tile.y}). Escribe ItemType (ej. PokeBall, Potion, Tm12).`,
-          'PokeBall',
-        );
-        if (!key) return;
-        if (!itemTypeKeys.includes(key.trim())) {
-          alert(`ItemType inválido. Disponibles: ${itemTypeKeys.slice(0, 12).join(', ')}…`);
-          return;
-        }
-        setItems((p) => [...p, { itemKey: key.trim(), pos: { x: tile.x, y: tile.y } }]);
-        setDirty(true);
+        setPicker({
+          kind: 'item',
+          title: `Nuevo objeto en (${tile.x}, ${tile.y})`,
+          options: itemTypeKeys,
+          onPick: (key) => { setItems((p) => [...p, { itemKey: key, pos: { x: tile.x, y: tile.y } }]); setDirty(true); },
+        });
       }
       return;
     }
     if (editMode === 'gifts') {
       const idx = gifts.findIndex((g) => g.pos.x === tile.x && g.pos.y === tile.y);
       if (idx >= 0) {
-        const action = window.prompt(
-          `Regalo: pokemonId=${gifts[idx].pokemonId} level=${gifts[idx].level} questId=${gifts[idx].questId}\n\n  delete\n  edit  → editar valores`,
-          'edit',
-        );
-        if (action === null) return;
-        if (action.trim() === 'delete') {
-          setGifts((p) => p.filter((_, i) => i !== idx));
-          setDirty(true);
-          return;
-        }
-        if (action.trim() === 'edit') {
-          const pidStr = window.prompt('pokemonId (1-251):', String(gifts[idx].pokemonId));
-          if (pidStr === null) return;
-          const lvlStr = window.prompt('level (1-100):', String(gifts[idx].level));
-          if (lvlStr === null) return;
-          const qid = window.prompt('questId (único):', gifts[idx].questId);
-          if (qid === null) return;
-          const pid = parseInt(pidStr, 10);
-          const lvl = parseInt(lvlStr, 10);
-          if (Number.isNaN(pid) || pid < 1 || pid > 251) { alert('pokemonId inválido'); return; }
-          if (Number.isNaN(lvl) || lvl < 1 || lvl > 100) { alert('level inválido'); return; }
-          if (!qid.trim()) { alert('questId vacío'); return; }
-          setGifts((p) => p.map((g, i) => i === idx ? { ...g, pokemonId: pid, level: lvl, questId: qid.trim() } : g));
-          setDirty(true);
-        }
+        const g = gifts[idx];
+        setPicker({
+          kind: 'gift',
+          title: `Regalo en (${tile.x}, ${tile.y})`,
+          initial: { pokemonId: g.pokemonId, level: g.level, questId: g.questId },
+          onSave: (v) => { setGifts((p) => p.map((it, i) => i === idx ? { ...it, ...v } : it)); setDirty(true); },
+          onDelete: () => { setGifts((p) => p.filter((_, i) => i !== idx)); setDirty(true); },
+        });
       } else {
-        const pidStr = window.prompt(`Nuevo regalo en (${tile.x}, ${tile.y}). pokemonId (1-251):`, '1');
-        if (pidStr === null) return;
-        const lvlStr = window.prompt('level (1-100):', '5');
-        if (lvlStr === null) return;
-        const defaultQid = `${selectedMapId}-gift-${tile.x}-${tile.y}`;
-        const qid = window.prompt('questId (único, persiste el regalo recogido):', defaultQid);
-        if (qid === null) return;
-        const pid = parseInt(pidStr, 10);
-        const lvl = parseInt(lvlStr, 10);
-        if (Number.isNaN(pid) || pid < 1 || pid > 251) { alert('pokemonId inválido'); return; }
-        if (Number.isNaN(lvl) || lvl < 1 || lvl > 100) { alert('level inválido'); return; }
-        if (!qid.trim()) { alert('questId vacío'); return; }
-        setGifts((p) => [...p, { pokemonId: pid, level: lvl, pos: { x: tile.x, y: tile.y }, questId: qid.trim() }]);
-        setDirty(true);
+        setPicker({
+          kind: 'gift',
+          title: `Nuevo regalo en (${tile.x}, ${tile.y})`,
+          initial: { pokemonId: 1, level: 5, questId: `${selectedMapId}-gift-${tile.x}-${tile.y}` },
+          onSave: (v) => { setGifts((p) => [...p, { ...v, pos: { x: tile.x, y: tile.y } }]); setDirty(true); },
+        });
       }
       return;
     }
@@ -1803,61 +2303,20 @@ export default function MapEditor() {
       const idx = staticPokemon.findIndex((sp) => sp.pos.x === tile.x && sp.pos.y === tile.y);
       if (idx >= 0) {
         const sp = staticPokemon[idx];
-        const action = window.prompt(
-          `Pokémon estático: #${sp.pokemonId} lv${sp.level} sprite=${sp.sprite}\n  delete\n  edit`,
-          'edit',
-        );
-        if (action === null) return;
-        if (action.trim() === 'delete') {
-          setStaticPokemon((p) => p.filter((_, i) => i !== idx));
-          setDirty(true);
-          return;
-        }
-        if (action.trim() === 'edit') {
-          const pidStr = window.prompt('pokemonId (1-251):', String(sp.pokemonId));
-          if (pidStr === null) return;
-          const lvlStr = window.prompt('level (1-100):', String(sp.level));
-          if (lvlStr === null) return;
-          const spriteStr = window.prompt(`sprite:\n${STATIC_POKEMON_SPRITES.join(', ')}`, sp.sprite);
-          if (spriteStr === null) return;
-          const qid = window.prompt('questId:', sp.questId);
-          if (qid === null) return;
-          const introRaw = window.prompt(
-            'Intro (líneas separadas por "|", vacío = sin intro):',
-            sp.intro && sp.intro.length > 0 ? sp.intro.join(' | ') : '',
-          );
-          if (introRaw === null) return;
-          const pid = parseInt(pidStr, 10);
-          const lvl = parseInt(lvlStr, 10);
-          if (Number.isNaN(pid) || pid < 1 || pid > 251) { alert('pokemonId inválido'); return; }
-          if (Number.isNaN(lvl) || lvl < 1 || lvl > 100) { alert('level inválido'); return; }
-          if (!STATIC_POKEMON_SPRITES.includes(spriteStr.trim())) { alert('sprite inválido'); return; }
-          if (!qid.trim()) { alert('questId vacío'); return; }
-          const intro = introRaw.trim() ? introRaw.split('|').map(s => s.trim()).filter(Boolean) : undefined;
-          setStaticPokemon((p) => p.map((s, i) => i === idx ? { ...s, pokemonId: pid, level: lvl, sprite: spriteStr.trim(), questId: qid.trim(), intro } : s));
-          setDirty(true);
-        }
+        setPicker({
+          kind: 'static',
+          title: `Pokémon estático en (${tile.x}, ${tile.y})`,
+          initial: { pokemonId: sp.pokemonId, level: sp.level, sprite: sp.sprite, questId: sp.questId, intro: (sp.intro ?? []).join('\n') },
+          onSave: (v) => { setStaticPokemon((p) => p.map((s, i) => i === idx ? { ...s, ...v } : s)); setDirty(true); },
+          onDelete: () => { setStaticPokemon((p) => p.filter((_, i) => i !== idx)); setDirty(true); },
+        });
       } else {
-        const pidStr = window.prompt(`Pokémon estático en (${tile.x}, ${tile.y}). pokemonId (1-251):`, '144');
-        if (pidStr === null) return;
-        const lvlStr = window.prompt('level (1-100):', '50');
-        if (lvlStr === null) return;
-        const spriteStr = window.prompt(`sprite:\n${STATIC_POKEMON_SPRITES.join(', ')}`, 'bird-a');
-        if (spriteStr === null) return;
-        const defaultQid = `${selectedMapId}-static-${tile.x}-${tile.y}`;
-        const qid = window.prompt('questId (único):', defaultQid);
-        if (qid === null) return;
-        const introRaw = window.prompt('Intro (líneas separadas por "|", vacío = sin intro):', '');
-        if (introRaw === null) return;
-        const pid = parseInt(pidStr, 10);
-        const lvl = parseInt(lvlStr, 10);
-        if (Number.isNaN(pid) || pid < 1 || pid > 251) { alert('pokemonId inválido'); return; }
-        if (Number.isNaN(lvl) || lvl < 1 || lvl > 100) { alert('level inválido'); return; }
-        if (!STATIC_POKEMON_SPRITES.includes(spriteStr.trim())) { alert('sprite inválido'); return; }
-        if (!qid.trim()) { alert('questId vacío'); return; }
-        const intro = introRaw.trim() ? introRaw.split('|').map(s => s.trim()).filter(Boolean) : undefined;
-        setStaticPokemon((p) => [...p, { pokemonId: pid, level: lvl, sprite: spriteStr.trim(), pos: { x: tile.x, y: tile.y }, questId: qid.trim(), intro }]);
-        setDirty(true);
+        setPicker({
+          kind: 'static',
+          title: `Nuevo Pokémon estático en (${tile.x}, ${tile.y})`,
+          initial: { pokemonId: 144, level: 50, sprite: 'bird-a', questId: `${selectedMapId}-static-${tile.x}-${tile.y}`, intro: '' },
+          onSave: (v) => { setStaticPokemon((p) => [...p, { ...v, pos: { x: tile.x, y: tile.y } }]); setDirty(true); },
+        });
       }
       return;
     }
@@ -1866,16 +2325,11 @@ export default function MapEditor() {
       if (idx >= 0) {
         // Clic en árbol existente → eliminar
         setCuttableTrees((p) => p.filter((_, i) => i !== idx));
-        setDirty(true);
       } else {
-        // Clic en tile vacío → añadir árbol
-        const defaultQid = `cut-tree-${selectedMapId}-${tile.x}-${tile.y}`;
-        const qid = window.prompt('questId (único):', defaultQid);
-        if (qid === null) return;
-        if (!qid.trim()) { alert('questId vacío'); return; }
-        setCuttableTrees((p) => [...p, { pos: { x: tile.x, y: tile.y }, questId: qid.trim() }]);
-        setDirty(true);
+        // Clic en tile vacío → añadir árbol (questId automático único)
+        setCuttableTrees((p) => [...p, { pos: { x: tile.x, y: tile.y }, questId: `cut-tree-${selectedMapId}-${tile.x}-${tile.y}` }]);
       }
+      setDirty(true);
       return;
     }
     if (editMode === 'berry-trees') {
@@ -1885,18 +2339,15 @@ export default function MapEditor() {
         setBerryTrees((p) => p.filter((_, i) => i !== idx));
         setDirty(true);
       } else {
-        // Clic en tile vacío → añadir árbol de bayas
-        const raw = window.prompt(
-          `Baya del árbol (${BERRY_ITEM_KEYS.join(', ')}):`,
-          'Berry'
-        );
-        if (raw === null) return;
-        const itemKey = BERRY_ITEM_KEYS.find(
-          (k) => k.toLowerCase() === raw.trim().toLowerCase()
-        );
-        if (!itemKey) { alert(`Baya desconocida: "${raw}"`); return; }
-        setBerryTrees((p) => [...p, { pos: { x: tile.x, y: tile.y }, itemKey }]);
-        setDirty(true);
+        // Clic en tile vacío → elegir baya con el picker
+        setPicker({
+          kind: 'item',
+          title: `Árbol de bayas en (${tile.x}, ${tile.y})`,
+          subtitle: 'Elige la baya que dará el árbol (1 al día)',
+          options: [...BERRY_ITEM_KEYS],
+          labelFor: (k) => BERRY_LABELS[k] ?? k,
+          onPick: (itemKey) => { setBerryTrees((p) => [...p, { pos: { x: tile.x, y: tile.y }, itemKey }]); setDirty(true); },
+        });
       }
       return;
     }
@@ -1907,12 +2358,8 @@ export default function MapEditor() {
         setBoulders((p) => p.filter((_, i) => i !== idx));
         setDirty(true);
       } else {
-        // Clic en tile vacío → añadir roca (MO Fuerza)
-        const defaultId = `boulder-${selectedMapId}-${tile.x}-${tile.y}`;
-        const id = window.prompt('id único de la roca:', defaultId);
-        if (id === null) return;
-        if (!id.trim()) { alert('id vacío'); return; }
-        setBoulders((p) => [...p, { pos: { x: tile.x, y: tile.y }, id: id.trim() }]);
+        // Clic en tile vacío → añadir roca (MO Fuerza), id automático único
+        setBoulders((p) => [...p, { pos: { x: tile.x, y: tile.y }, id: `boulder-${selectedMapId}-${tile.x}-${tile.y}` }]);
         setDirty(true);
       }
       return;
@@ -1967,37 +2414,22 @@ export default function MapEditor() {
         return;
       }
       // Crear nuevo portal del tipo activo
-      const mapIds = Object.keys(mapData).sort();
       if (activePortalKind === 'door') {
-        const dest = window.prompt(
-          `Crear PUERTA en (${tile.x}, ${tile.y}).\n\nMapId destino:\n\n${mapIds.join('\n')}`,
-          mapIds[0] ?? '',
-        );
-        if (!dest || !mapData[dest]) {
-          if (dest) alert(`MapId desconocido: ${dest}`);
-          return;
-        }
-        setPortals((p) => [...p, { kind: 'door', pos: { x: tile.x, y: tile.y }, destMap: dest }]);
-        setDirty(true);
+        setPicker({
+          kind: 'maptile',
+          title: `🚪 Puerta en (${tile.x}, ${tile.y})`,
+          subtitle: 'Elige el mapa destino al que lleva esta puerta',
+          requirePos: false,
+          onPick: ({ mapId }) => { setPortals((p) => [...p, { kind: 'door', pos: { x: tile.x, y: tile.y }, destMap: mapId }]); setDirty(true); },
+        });
       } else if (activePortalKind === 'teleport') {
-        const dest = window.prompt(`Crear TELEPORT en (${tile.x}, ${tile.y}).\n\nMapId destino:`, mapIds[0] ?? '');
-        if (!dest || !mapData[dest]) {
-          if (dest) alert(`MapId desconocido: ${dest}`);
-          return;
-        }
-        const xs = window.prompt('Posición destino X:', '0');
-        const ys = window.prompt('Posición destino Y:', '0');
-        if (xs === null || ys === null) return;
-        const dx = parseInt(xs, 10);
-        const dy = parseInt(ys, 10);
-        if (Number.isNaN(dx) || Number.isNaN(dy)) { alert('Posición destino inválida'); return; }
-        setPortals((p) => [...p, {
-          kind: 'teleport',
-          pos: { x: tile.x, y: tile.y },
-          destMap: dest,
-          destPos: { x: dx, y: dy },
-        }]);
-        setDirty(true);
+        setPicker({
+          kind: 'maptile',
+          title: `🌀 Teleport en (${tile.x}, ${tile.y})`,
+          subtitle: 'Elige el mapa y haz click en la casilla de llegada',
+          requirePos: true,
+          onPick: ({ mapId, pos }) => { setPortals((p) => [...p, { kind: 'teleport', pos: { x: tile.x, y: tile.y }, destMap: mapId, destPos: pos ?? { x: 0, y: 0 } }]); setDirty(true); },
+        });
       } else {
         // exit
         setPortals((p) => [...p, { kind: 'exit', pos: { x: tile.x, y: tile.y } }]);
@@ -2150,7 +2582,7 @@ export default function MapEditor() {
       return tag === 'input' || tag === 'textarea' || tag === 'select' || target.isContentEditable;
     };
     const onKeyDown = (e: KeyboardEvent) => {
-      if (isTextInput(e.target) || dragging.current || entityDrag.current || wallPaint.current?.active) return;
+      if (isTextInput(e.target) || dragging.current || entityDrag.current || wallPaint.current?.active || picker) return;
       if (e.key === 'ArrowUp') {
         e.preventDefault();
         jumpToMap(mapNavTargets.up);
@@ -2167,7 +2599,7 @@ export default function MapEditor() {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [mapNavTargets.up, mapNavTargets.down, mapNavTargets.left, mapNavTargets.right, dirty, selectedMapId]);
+  }, [mapNavTargets.up, mapNavTargets.down, mapNavTargets.left, mapNavTargets.right, dirty, selectedMapId, picker]);
 
   // ── Render ────────────────────────────────────────────────────────────
   if (error) {
@@ -3284,6 +3716,7 @@ export default function MapEditor() {
                 <EncountersTableEditor
                   title="🌿 Pokémon en hierba"
                   tableKey="walk"
+                  openPicker={setPicker}
                   table={encounters.walk ?? EMPTY_TABLE()}
                   onChange={(t) => {
                     setEncounters((e) => ({ ...e, walk: t }));
@@ -3309,6 +3742,7 @@ export default function MapEditor() {
                 <EncountersTableEditor
                   title="🎣 Caña Vieja"
                   tableKey="oldRod"
+                  openPicker={setPicker}
                   table={encounters.oldRod ?? EMPTY_TABLE()}
                   onChange={(t) => {
                     setEncounters((e) => ({ ...e, oldRod: t }));
@@ -3318,6 +3752,7 @@ export default function MapEditor() {
                 <EncountersTableEditor
                   title="🎣 Caña Buena"
                   tableKey="goodRod"
+                  openPicker={setPicker}
                   table={encounters.goodRod ?? EMPTY_TABLE()}
                   onChange={(t) => {
                     setEncounters((e) => ({ ...e, goodRod: t }));
@@ -3327,6 +3762,7 @@ export default function MapEditor() {
                 <EncountersTableEditor
                   title="🎣 Súper Caña"
                   tableKey="superRod"
+                  openPicker={setPicker}
                   table={encounters.superRod ?? EMPTY_TABLE()}
                   onChange={(t) => {
                     setEncounters((e) => ({ ...e, superRod: t }));
@@ -3336,6 +3772,7 @@ export default function MapEditor() {
                 <EncountersTableEditor
                   title="🏄 Surfeando"
                   tableKey="surfSpots"
+                  openPicker={setPicker}
                   table={encounters.surfSpots ?? EMPTY_TABLE()}
                   onChange={(t) => {
                     setEncounters((e) => ({ ...e, surfSpots: t }));
@@ -3349,8 +3786,8 @@ export default function MapEditor() {
                 title="Modo Texts"
                 color="#88ccff"
                 lines={[
-                  'Click en una casilla → texto + recompensa',
-                  'Recompensa: pokemon ⭐ o item 📦 (se bloquea al tomar)',
+                  'Click en una casilla → escribe el texto en el modal',
+                  'Recompensa: elige Pokémon ⭐ o objeto 📦 (se bloquea al tomar)',
                   'Sin recompensa → texto siempre visible 💬',
                 ]}
                 count={Object.values(texts).reduce((a, m) => a + Object.keys(m).length, 0)}
@@ -3363,9 +3800,9 @@ export default function MapEditor() {
                 title="Modo Items"
                 color="#cc88ff"
                 lines={[
-                  'Click vacío: nuevo item (escribe ItemType)',
-                  'Click en item: toggle visible/oculto, delete o cambiar tipo',
-                  `${itemTypeKeys.length} ItemTypes válidos`,
+                  'Click vacío: elige el objeto en la lista (con búsqueda)',
+                  'Click en item: cambiar tipo, visible/oculto o eliminar',
+                  `${itemTypeKeys.length} objetos disponibles`,
                 ]}
                 count={items.length}
                 countLabel="items"
@@ -3377,9 +3814,9 @@ export default function MapEditor() {
                 title="Modo Gifts"
                 color="#ff88cc"
                 lines={[
-                  'Click vacío: nueva pokéball-regalo',
+                  'Click vacío: elige el Pokémon regalo (con búsqueda)',
                   'Click en regalo: editar o eliminar',
-                  'Pokémon (1-251) + nivel + questId único',
+                  'questId automático único (editable)',
                 ]}
                 count={gifts.length}
                 countLabel="regalos"
@@ -3391,10 +3828,9 @@ export default function MapEditor() {
                 title="Pokémon Estático"
                 color="#50ddb4"
                 lines={[
-                  'Click vacío: añadir Pokémon estático (Articuno-style)',
+                  'Click vacío: elige el Pokémon (con búsqueda) + sprite',
                   'Click en tile: editar o eliminar',
                   'Una vez combatido (captura/derrota) desaparece',
-                  `Sprites: ${STATIC_POKEMON_SPRITES.join(', ')}`,
                 ]}
                 count={staticPokemon.length}
                 countLabel="pokémon estáticos"
@@ -3409,7 +3845,7 @@ export default function MapEditor() {
                   'Click vacío: añadir árbol cortable (bush.png)',
                   'Click en árbol existente: eliminar',
                   'Bloquea el paso hasta usar la MO Corte',
-                  'Se persiste via questId en completedQuests',
+                  'questId automático único · persiste en completedQuests',
                 ]}
                 count={cuttableTrees.length}
                 countLabel="árboles cortables"
@@ -3421,9 +3857,8 @@ export default function MapEditor() {
                 title="Árboles de bayas (Gen II)"
                 color="#e88aa0"
                 lines={[
-                  'Click vacío: añadir árbol (elige la baya)',
+                  'Click vacío: elige la baya en la lista (con búsqueda)',
                   'Click en árbol existente: eliminar',
-                  `Bayas: ${BERRY_ITEM_KEYS.join(', ')}`,
                   'Da 1 baya al día (pulsar A de frente)',
                   'Rebrota a medianoche (hora del dispositivo)',
                   'Bloquea el paso como un muro',
@@ -3473,6 +3908,7 @@ export default function MapEditor() {
                   setStoreItems(next);
                   setDirty(true);
                 }}
+                openPicker={setPicker}
                 sourceFile={currentMap?.sourceFile}
               />
             ) : editMode === 'mechanics' ? (
@@ -3516,7 +3952,8 @@ export default function MapEditor() {
                 setExitReturnMap={(v) => { setExitReturnMap(v); setDirty(true); }}
                 exitReturnPos={exitReturnPos}
                 setExitReturnPos={(v) => { setExitReturnPos(v); setDirty(true); }}
-                mapIds={Object.keys(mapData).sort()}
+                mapData={mapData}
+                openPicker={setPicker}
                 onUpdate={(idx, patch) => {
                   setPortals((ps) => ps.map((p, i) => i === idx ? { ...p, ...patch } : p));
                   setDirty(true);
@@ -3542,6 +3979,8 @@ export default function MapEditor() {
                 idx={selectedIdx!}
                 onChange={updateSelected}
                 onDelete={() => deleteNpc(selectedIdx!)}
+                openPicker={setPicker}
+                currentMapId={selectedMapId}
               />
             )}
           </div>
@@ -3554,17 +3993,22 @@ export default function MapEditor() {
           {tooltip.text}
         </div>
       )}
+
+      {/* Modales de selección visual */}
+      <PickerHost picker={picker} mapData={mapData} onClose={() => setPicker(null)} />
     </div>
   );
 }
 
 // ── Inspector Panel ────────────────────────────────────────────────────────
 
-function InspectorPanel({ trainer, idx, onChange, onDelete }: {
+function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, currentMapId }: {
   trainer: Trainer;
   idx: number;
   onChange: (patch: Partial<Trainer>) => void;
   onDelete: () => void;
+  openPicker: (s: PickerState) => void;
+  currentMapId: string;
 }) {
   const reg = NPC_REGISTRY[trainer.npcKey];
   const sprite = spriteUrl(trainer.npcKey, trainer.facing);
@@ -3628,24 +4072,26 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
 
       {/* Pokémon */}
       <div style={sectionStyle}>
-        <label style={labelStyle}>Pokémon</label>
+        <label style={labelStyle}>Pokémon (click en el sprite para elegir)</label>
         {trainer.pokemon.map((p, i) => (
           <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6, alignItems: 'center' }}>
-            {/* Sprite del pokémon */}
-            {p.id > 0 && p.id <= MAX_POKEMON_ID && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={`/editor/pokemon/${p.id}.png`}
-                alt={POKEMON_NAMES_EDITOR[p.id] ?? `#${p.id}`}
-                title={`#${p.id} ${POKEMON_NAMES_EDITOR[p.id] ?? ''}`}
-                style={{ width: 24, height: 24, imageRendering: 'pixelated', flexShrink: 0, background: '#0a0a18', borderRadius: 2 }}
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-              />
-            )}
-            <input type="number" value={p.id} placeholder="#ID" onChange={(e) => {
-              const next = trainer.pokemon.map((pk, j) => j === i ? { ...pk, id: parseInt(e.target.value) || 0 } : pk);
-              onChange({ pokemon: next });
-            }} style={{ ...inputStyle, width: 60 }} />
+            {/* Sprite del pokémon → abre el picker visual */}
+            <button
+              onClick={() => openPicker({
+                kind: 'pokemon',
+                title: `Pokémon #${i + 1} del entrenador`,
+                current: p.id,
+                onPick: (id) => onChange({ pokemon: trainer.pokemon.map((pk, j) => j === i ? { ...pk, id } : pk) }),
+              })}
+              title={`#${p.id} ${POKEMON_NAMES_EDITOR[p.id] ?? ''} · cambiar`}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0, padding: '3px 6px', background: '#0d0d22', border: '1px solid #2a2a4a', borderRadius: 4, cursor: 'pointer' }}
+            >
+              {p.id > 0 && p.id <= MAX_POKEMON_ID && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={`/editor/pokemon/${p.id}.png`} alt="" style={{ width: 26, height: 26, imageRendering: 'pixelated', flexShrink: 0 }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              )}
+              <span style={{ fontSize: 11, color: '#cdf', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{POKEMON_NAMES_EDITOR[p.id] ?? `#${p.id}`}</span>
+            </button>
             <span style={{ color: '#666', fontSize: 12 }}>Lv</span>
             <input type="number" value={p.level} onChange={(e) => {
               const next = trainer.pokemon.map((pk, j) => j === i ? { ...pk, level: parseInt(e.target.value) || 1 } : pk);
@@ -3654,7 +4100,11 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
             <button onClick={() => onChange({ pokemon: trainer.pokemon.filter((_, j) => j !== i) })} style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: 16, padding: 0, lineHeight: 1 }}>×</button>
           </div>
         ))}
-        <button onClick={() => onChange({ pokemon: [...trainer.pokemon, { id: 19, level: 2 }] })} style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', padding: '3px 10px' }}>
+        <button onClick={() => openPicker({
+          kind: 'pokemon',
+          title: 'Añadir Pokémon al entrenador',
+          onPick: (id) => onChange({ pokemon: [...trainer.pokemon, { id, level: 5 }] }),
+        })} style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', padding: '3px 10px' }}>
           + Pokémon
         </button>
       </div>
@@ -3746,12 +4196,25 @@ function InspectorPanel({ trainer, idx, onChange, onDelete }: {
               <option value="trainer-defeated">trainer-defeated: …</option>
             </select>
             {hideType === 'trainer-defeated' && (
-              <input
-                value={defeatedId}
-                placeholder="mapId-x-y  (ej: pewter-city-gym-4-1)"
-                onChange={(e) => onChange({ hideCondition: `trainer-defeated:${e.target.value}` })}
-                style={{ ...inputStyle, marginTop: 4 }}
-              />
+              <div style={{ marginTop: 4 }}>
+                <button
+                  onClick={() => openPicker({
+                    kind: 'maptile',
+                    title: 'Entrenador del que depende',
+                    subtitle: 'Elige el mapa y haz click en el entrenador (resaltado en rojo)',
+                    requirePos: true,
+                    highlightTrainers: true,
+                    current: defeatedId ? (() => {
+                      const m = defeatedId.match(/^(.*)-(\d+)-(\d+)$/);
+                      return m ? { mapId: m[1], pos: { x: parseInt(m[2], 10), y: parseInt(m[3], 10) } } : undefined;
+                    })() : { mapId: currentMapId },
+                    onPick: ({ mapId, pos }) => { if (pos) onChange({ hideCondition: `trainer-defeated:${mapId}-${pos.x}-${pos.y}` }); },
+                  })}
+                  style={{ ...inputStyle, textAlign: 'left', cursor: 'pointer', width: '100%' }}
+                >
+                  {defeatedId ? defeatedId : '👆 Elegir entrenador…'}
+                </button>
+              </div>
             )}
           </div>
         );
@@ -3858,7 +4321,7 @@ const GEN1_NAMES = POKEMON_NAMES_EDITOR;
  * - `chance`: peso relativo. Probabilidad real = chance / sum(chances).
  */
 function EncountersTableEditor({
-  title, tableKey, table, onChange,
+  title, tableKey, table, onChange, openPicker,
 }: {
   title: string;
   tableKey: 'walk' | 'oldRod' | 'goodRod' | 'superRod' | 'surfSpots';
@@ -3866,6 +4329,7 @@ function EncountersTableEditor({
   onChange: (
     next: { rate: number; pokemon: { id: number; chance: number; minLevel: number; maxLevel: number; conditionValues: { name: string; url: string }[]; timesOfDay?: ('morning' | 'day' | 'night')[] }[] }
   ) => void;
+  openPicker: (s: PickerState) => void;
 }) {
   const totalChance = table.pokemon.reduce((a, b) => a + (b.chance || 0), 0) || 1;
 
@@ -3970,9 +4434,14 @@ function EncountersTableEditor({
                 padding: '8px',
               }}
             >
-              {/* Sprite */}
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: 52, height: 52, background: '#111130', borderRadius: 5, flexShrink: 0, border: '1px solid #2a2a4a' }}>
+              {/* Sprite → abre el picker visual */}
+              <button
+                onClick={() => openPicker({ kind: 'pokemon', title: 'Elegir Pokémon del encuentro', current: p.id, onPick: (id) => update(i, { id }) })}
+                title="Cambiar Pokémon"
+                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: 52, height: 52, background: '#111130', borderRadius: 5, flexShrink: 0, border: '1px solid #2a2a4a', cursor: 'pointer', padding: 0 }}
+              >
                 {spriteOk ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={`/editor/pokemon/${p.id}.png`}
                     alt={name}
@@ -3981,7 +4450,7 @@ function EncountersTableEditor({
                 ) : (
                   <span style={{ fontSize: 20, color: '#444' }}>?</span>
                 )}
-              </div>
+              </button>
 
               {/* Datos */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: 0 }}>
@@ -4138,7 +4607,7 @@ function ModeHelpBlock({
 function SpotsInspector({
   activeSpot, setActiveSpot,
   startPos, pokemonCenter, pcPos, storePos, storeItems, itemTypeKeys, recoverLocation, onlineBattleNpc,
-  onClear, onStoreItemsChange, sourceFile,
+  onClear, onStoreItemsChange, openPicker, sourceFile,
 }: {
   activeSpot: SpotKey;
   setActiveSpot: (k: SpotKey) => void;
@@ -4152,6 +4621,7 @@ function SpotsInspector({
   onlineBattleNpc: { x: number; y: number } | null;
   onClear: (k: SpotKey) => void;
   onStoreItemsChange: (next: string[]) => void;
+  openPicker: (s: PickerState) => void;
   sourceFile?: string;
 }) {
   const spots: { key: SpotKey; label: string; emoji: string; color: string; pos: { x: number; y: number } | null; required?: boolean }[] = [
@@ -4210,13 +4680,18 @@ function SpotsInspector({
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {storeItems.map((item, idx) => (
               <div key={`${item}-${idx}`} style={{ display: 'flex', gap: 6 }}>
-                <select
-                  value={item}
-                  onChange={(e) => onStoreItemsChange(storeItems.map((it, i) => i === idx ? e.target.value : it))}
-                  style={{ ...inputStyle, height: 28 }}
+                <button
+                  onClick={() => openPicker({
+                    kind: 'item',
+                    title: 'Objeto de la tienda',
+                    options: itemTypeKeys,
+                    current: item,
+                    onPick: (key) => onStoreItemsChange(storeItems.map((it, i) => i === idx ? key : it)),
+                  })}
+                  style={{ ...inputStyle, height: 28, flex: 1, textAlign: 'left', cursor: 'pointer' }}
                 >
-                  {itemTypeKeys.map((key) => <option key={key} value={key}>{key}</option>)}
-                </select>
+                  {itemLabel(item)}
+                </button>
                 <button
                   onClick={() => onStoreItemsChange(storeItems.filter((_, i) => i !== idx))}
                   style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 14 }}
@@ -4229,7 +4704,12 @@ function SpotsInspector({
               <div style={{ color: '#555', fontSize: 11, textAlign: 'center', padding: 6 }}>Sin storeItems</div>
             )}
             <button
-              onClick={() => onStoreItemsChange([...storeItems, itemTypeKeys[0] ?? 'PokeBall'])}
+              onClick={() => openPicker({
+                kind: 'item',
+                title: 'Añadir objeto a la tienda',
+                options: itemTypeKeys,
+                onPick: (key) => onStoreItemsChange([...storeItems, key]),
+              })}
               style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', padding: '3px 10px' }}
             >
               + Item
@@ -4473,7 +4953,7 @@ function PortalsInspector({
   activePortalKind, setActivePortalKind,
   exitReturnMap, setExitReturnMap,
   exitReturnPos, setExitReturnPos,
-  mapIds, onUpdate, onDelete, sourceFile,
+  mapData, openPicker, onUpdate, onDelete, sourceFile,
 }: {
   portals: PortalEntry[];
   selectedIdx: number | null;
@@ -4484,7 +4964,8 @@ function PortalsInspector({
   setExitReturnMap: (v: string | null) => void;
   exitReturnPos: { x: number; y: number } | null;
   setExitReturnPos: (v: { x: number; y: number } | null) => void;
-  mapIds: string[];
+  mapData: MapData;
+  openPicker: (s: PickerState) => void;
   onUpdate: (idx: number, patch: Partial<PortalEntry>) => void;
   onDelete: (idx: number) => void;
   sourceFile?: string;
@@ -4547,36 +5028,21 @@ function PortalsInspector({
           </div>
           {(sel.kind === 'door' || sel.kind === 'teleport') && (
             <div style={{ marginBottom: 8 }}>
-              <label style={{ fontSize: 11, color: '#888' }}>MapId destino:</label>
-              <select
-                value={sel.destMap ?? ''}
-                onChange={(e) => onUpdate(selectedIdx!, { destMap: e.target.value })}
-                style={{ ...inputStyle, width: '100%', marginTop: 4 }}
+              <label style={{ fontSize: 11, color: '#888' }}>Mapa destino:</label>
+              <button
+                onClick={() => openPicker({
+                  kind: 'maptile',
+                  title: sel.kind === 'teleport' ? '🌀 Destino del teleport' : '🚪 Mapa destino de la puerta',
+                  subtitle: sel.kind === 'teleport' ? 'Elige mapa y casilla de llegada' : 'Elige el mapa destino',
+                  requirePos: sel.kind === 'teleport',
+                  current: sel.destMap ? { mapId: sel.destMap, pos: sel.destPos } : undefined,
+                  onPick: ({ mapId, pos }) => onUpdate(selectedIdx!, sel.kind === 'teleport' ? { destMap: mapId, destPos: pos ?? { x: 0, y: 0 } } : { destMap: mapId }),
+                })}
+                style={{ ...inputStyle, width: '100%', marginTop: 4, textAlign: 'left', cursor: 'pointer' }}
               >
-                {mapIds.map((m) => <option key={m} value={m}>{m}</option>)}
-              </select>
-            </div>
-          )}
-          {sel.kind === 'teleport' && (
-            <div style={{ display: 'flex', gap: 8 }}>
-              <div style={{ flex: 1 }}>
-                <label style={{ fontSize: 11, color: '#888' }}>Dest X:</label>
-                <input
-                  type="number"
-                  value={sel.destPos?.x ?? 0}
-                  onChange={(e) => onUpdate(selectedIdx!, { destPos: { x: parseInt(e.target.value, 10) || 0, y: sel.destPos?.y ?? 0 } })}
-                  style={{ ...inputStyle, width: '100%', marginTop: 4 }}
-                />
-              </div>
-              <div style={{ flex: 1 }}>
-                <label style={{ fontSize: 11, color: '#888' }}>Dest Y:</label>
-                <input
-                  type="number"
-                  value={sel.destPos?.y ?? 0}
-                  onChange={(e) => onUpdate(selectedIdx!, { destPos: { x: sel.destPos?.x ?? 0, y: parseInt(e.target.value, 10) || 0 } })}
-                  style={{ ...inputStyle, width: '100%', marginTop: 4 }}
-                />
-              </div>
+                {sel.destMap ? (mapData[sel.destMap]?.name ?? sel.destMap) : '👆 Elegir mapa…'}
+                {sel.kind === 'teleport' && sel.destPos && <span style={{ color: '#88aaff' }}> → ({sel.destPos.x},{sel.destPos.y})</span>}
+              </button>
             </div>
           )}
         </div>
@@ -4620,44 +5086,29 @@ function PortalsInspector({
         <div style={{ fontSize: 11, color: '#88ccff', fontWeight: 700, marginBottom: 6 }}>
           ↪️ Destino de los <code>exits</code>
         </div>
-        <label style={{ fontSize: 11, color: '#888' }}>exitReturnMap:</label>
-        <select
-          value={exitReturnMap ?? ''}
-          onChange={(e) => setExitReturnMap(e.target.value || null)}
-          style={{ ...inputStyle, width: '100%', marginTop: 4, marginBottom: 8 }}
+        <label style={{ fontSize: 11, color: '#888' }}>Mapa + casilla de regreso:</label>
+        <button
+          onClick={() => openPicker({
+            kind: 'maptile',
+            title: '↪️ Regreso de las salidas (exits)',
+            subtitle: 'Elige el mapa y la casilla a la que vuelve el jugador',
+            requirePos: true,
+            current: exitReturnMap ? { mapId: exitReturnMap, pos: exitReturnPos ?? undefined } : undefined,
+            onPick: ({ mapId, pos }) => { setExitReturnMap(mapId); setExitReturnPos(pos); },
+          })}
+          style={{ ...inputStyle, width: '100%', marginTop: 4, textAlign: 'left', cursor: 'pointer' }}
         >
-          <option value="">— ninguno —</option>
-          {mapIds.map((m) => <option key={m} value={m}>{m}</option>)}
-        </select>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 11, color: '#888' }}>X:</label>
-            <input
-              type="number"
-              value={exitReturnPos?.x ?? 0}
-              onChange={(e) => setExitReturnPos({ x: parseInt(e.target.value, 10) || 0, y: exitReturnPos?.y ?? 0 })}
-              style={{ ...inputStyle, width: '100%', marginTop: 4 }}
-            />
-          </div>
-          <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 11, color: '#888' }}>Y:</label>
-            <input
-              type="number"
-              value={exitReturnPos?.y ?? 0}
-              onChange={(e) => setExitReturnPos({ x: exitReturnPos?.x ?? 0, y: parseInt(e.target.value, 10) || 0 })}
-              style={{ ...inputStyle, width: '100%', marginTop: 4 }}
-            />
-          </div>
-          {exitReturnPos && (
-            <button
-              onClick={() => setExitReturnPos(null)}
-              style={{ alignSelf: 'flex-end', background: 'transparent', border: '1px solid #5a5a7a', color: '#888', borderRadius: 4, padding: '2px 6px', cursor: 'pointer', fontSize: 10 }}
-              title="Limpiar"
-            >
-              ×
-            </button>
-          )}
-        </div>
+          {exitReturnMap ? (mapData[exitReturnMap]?.name ?? exitReturnMap) : '👆 Elegir mapa…'}
+          {exitReturnPos && <span style={{ color: '#88aaff' }}> → ({exitReturnPos.x},{exitReturnPos.y})</span>}
+        </button>
+        {(exitReturnMap || exitReturnPos) && (
+          <button
+            onClick={() => { setExitReturnMap(null); setExitReturnPos(null); }}
+            style={{ marginTop: 6, background: 'transparent', border: '1px solid #5a5a7a', color: '#888', borderRadius: 4, padding: '3px 10px', cursor: 'pointer', fontSize: 10 }}
+          >
+            × Limpiar destino
+          </button>
+        )}
       </div>
 
       <div style={{ padding: 10, background: '#1a1530', border: '1px solid #5a3a3a', borderRadius: 4, fontSize: 11, color: '#ff9999' }}>
