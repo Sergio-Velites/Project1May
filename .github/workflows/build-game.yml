@@ -11,14 +11,14 @@ on:
       ref:
         description: "Rama a compilar y donde commitear el bundle"
         required: false
-        default: "map-editor"
+        default: "master"
 
 permissions:
   contents: write
 
 concurrency:
   # Evita builds solapadas sobre la misma rama (carreras de commit).
-  group: build-game-${{ github.event.inputs.ref || 'map-editor' }}
+  group: build-game-${{ github.event.inputs.ref || 'master' }}
   cancel-in-progress: false
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || 'map-editor' }}
+          ref: ${{ github.event.inputs.ref || 'master' }}
           fetch-depth: 0
 
       - name: Setup Node
@@ -70,5 +70,5 @@ jobs:
             echo "Sin cambios en el bundle del juego."
           else
             git commit -m "build: recompilar juego desde el Map Editor"
-            git push origin "HEAD:${{ github.event.inputs.ref || 'map-editor' }}"
+            git push origin "HEAD:${{ github.event.inputs.ref || 'master' }}"
           fi
