@@ -89,6 +89,8 @@ interface MapEntry {
   exitReturnMap?: string | null;
   exitReturnPos?: { x: number; y: number } | null;
   minimapPos?: { x: number; y: number } | null;
+  /** Agrupación en el minimapa: undefined/null = auto por nombre; "" = suelto; "<id>" = forzado. */
+  minimapParent?: string | null;
   sourceFile: string;
 }
 
@@ -755,6 +757,7 @@ function exportFullMapTypeTS({
   spinners,
   stoppers,
   minimapPos,
+  minimapParent,
 }: {
   currentMap: MapEntry;
   start: { x: number; y: number } | null;
@@ -789,6 +792,7 @@ function exportFullMapTypeTS({
   spinners: Record<string, Record<string, DirectionName>>;
   stoppers: Record<string, number[]>;
   minimapPos: { x: number; y: number } | null;
+  minimapParent: string | null;
 }): string {
   const { maps, teleports, exits } = nestPortals(portals);
   const lines: string[] = [
@@ -860,6 +864,7 @@ function exportFullMapTypeTS({
   if (berryTrees.length > 0) lines.push(exportBerryTreesTS(berryTrees));
   if (boulders.length > 0) lines.push(exportBouldersTS(boulders));
   if (minimapPos) lines.push(`minimapPos: { x: ${minimapPos.x}, y: ${minimapPos.y} },`);
+  if (minimapParent !== null) lines.push(`minimapParent: ${JSON.stringify(minimapParent)},`);
   lines.push(exportTrainersArrayTS(trainers));
 
   return `{\n${lines.map((line) => indentTS(line)).join('\n')}\n}`;
@@ -906,7 +911,13 @@ const MINIMAP_FLOOR_GROUPS = [
   'safari-zone', 'underground-path', 'elite-four',
 ];
 
-function minimapDirectParent(mapId: string, allIds: readonly string[]): string {
+// `parentOf` = override manual por mapa: "" = suelto (su propio grupo);
+// "<id>" = forzado a ese grupo; ausente/undefined = automático por nombre.
+type MinimapParentOf = Record<string, string | undefined>;
+
+function minimapDirectParent(mapId: string, allIds: readonly string[], parentOf?: MinimapParentOf): string {
+  const ov = parentOf?.[mapId];
+  if (ov !== undefined) return ov === '' ? mapId : ov;
   let best = '';
   for (const cand of allIds) {
     if (cand !== mapId && mapId.startsWith(cand + '-') && cand.length > best.length) {
@@ -920,10 +931,10 @@ function minimapDirectParent(mapId: string, allIds: readonly string[]): string {
   return mapId;
 }
 
-function minimapGroupKey(mapId: string, allIds: readonly string[]): string {
+function minimapGroupKey(mapId: string, allIds: readonly string[], parentOf?: MinimapParentOf): string {
   let cur = mapId;
   for (let i = 0; i < 8; i++) {
-    const parent = minimapDirectParent(cur, allIds);
+    const parent = minimapDirectParent(cur, allIds, parentOf);
     if (parent === cur) break;
     cur = parent;
   }
@@ -1786,6 +1797,8 @@ export default function MapEditor() {
   const [showMinimap, setShowMinimap] = useState(false);
   const [minimapMode, setMinimapMode] = useState<'edit' | 'navigate'>('navigate');
   const [minimapPos, setMinimapPos] = useState<{ x: number; y: number } | null>(null);
+  // Agrupación del mapa en el minimapa: null = auto por nombre; "" = suelto; "<id>" = forzado a ese grupo.
+  const [minimapParent, setMinimapParent] = useState<string | null>(null);
   // Vista del minimapa de Kanto (pan + pinch-zoom). Las coordenadas de los
   // puntos se siguen expresando en % sobre la imagen, así que el transform
   // del contenedor desplaza/escala imagen y puntos a la vez: nunca se
@@ -2096,6 +2109,7 @@ export default function MapEditor() {
     setExitReturnMap(m.exitReturnMap ?? null);
     setExitReturnPos(m.exitReturnPos ?? null);
     setMinimapPos(m.minimapPos ?? null);
+    setMinimapParent(m.minimapParent ?? null);
     setSelectedPortalIdx(null);
   }
 
@@ -2130,7 +2144,7 @@ export default function MapEditor() {
       recoverLocation, onlineBattleNpc,
       spinners, stoppers,
       maps, teleports, exits, exitReturnMap, exitReturnPos,
-      minimapPos,
+      minimapPos, minimapParent,
     };
   }
 
@@ -2212,6 +2226,7 @@ export default function MapEditor() {
               };
             })(),
             minimapPos,
+            minimapParent,
           },
         }),
       });
@@ -2308,6 +2323,7 @@ export default function MapEditor() {
             exitReturnMap,
             exitReturnPos,
             minimapPos,
+            minimapParent,
           },
         };
       });
@@ -2450,6 +2466,7 @@ export default function MapEditor() {
       spinners,
       stoppers,
       minimapPos,
+      minimapParent,
     });
     navigator.clipboard.writeText(ts).then(() => alert('¡Objeto MapType completo copiado!'));
   }
@@ -2523,6 +2540,7 @@ export default function MapEditor() {
       setExitReturnMap(parsed.exitReturnMap);
       setExitReturnPos(parsed.exitReturnPos);
       setMinimapPos(parsed.minimapPos);
+      setMinimapParent(parsed.minimapParent);
       setSelectedPortalIdx(null);
       setSelectedIdx(null);
       setDirty(true);
@@ -3228,10 +3246,20 @@ export default function MapEditor() {
   // del mapa padre o, si el padre no tiene (mazmorras), la del primer miembro
   // que sí la tenga.
   const allMapIds = Object.keys(mapData);
+  // Override manual de agrupación (campo minimapParent). Para el mapa
+  // seleccionado se usa el estado LOCAL (refleja la edición en curso); para el
+  // resto, lo guardado en mapData.
+  const minimapParentOf: MinimapParentOf = {};
+  for (const id of allMapIds) {
+    const v = mapData[id]?.minimapParent;
+    if (v !== undefined && v !== null) minimapParentOf[id] = v;
+  }
+  if (minimapParent !== null) minimapParentOf[selectedMapId] = minimapParent;
+  else delete minimapParentOf[selectedMapId];
   const minimapGroups = (() => {
     const byKey = new Map<string, string[]>();
     for (const id of allMapIds) {
-      const k = minimapGroupKey(id, allMapIds);
+      const k = minimapGroupKey(id, allMapIds, minimapParentOf);
       const arr = byKey.get(k);
       if (arr) arr.push(id); else byKey.set(k, [id]);
     }
@@ -3252,7 +3280,7 @@ export default function MapEditor() {
     }
     return list;
   })();
-  const currentGroupKey = minimapGroupKey(selectedMapId, allMapIds);
+  const currentGroupKey = minimapGroupKey(selectedMapId, allMapIds, minimapParentOf);
   const openGroupData = openGroup ? minimapGroups.find((g) => g.key === openGroup) ?? null : null;
 
   // ── Gesto del minimapa: pan + pinch-zoom (no desajusta los puntos) ──────
@@ -4099,6 +4127,34 @@ export default function MapEditor() {
                     🗑 Borrar posición
                   </button>
                 )}
+
+                {/* Agrupación: incluir/excluir este mapa de un grupo */}
+                <div style={{ marginTop: 14, borderTop: '1px solid #2a2a44', paddingTop: 10 }}>
+                  <div style={{ color: '#9090c0', fontSize: 11, fontWeight: 700, marginBottom: 4 }}>Grupo en el minimapa</div>
+                  <div style={{ color: '#778', fontSize: 10, marginBottom: 6 }}>
+                    Ahora pertenece a <b style={{ color: '#cfe' }}>{minimapGroups.find((g) => g.key === currentGroupKey)?.name ?? prettyMapName(currentGroupKey)}</b>.
+                  </div>
+                  <select
+                    value={minimapParent === null ? '__auto__' : (minimapParent === '' ? '__none__' : minimapParent)}
+                    onChange={(e) => { const v = e.target.value; setMinimapParent(v === '__auto__' ? null : v === '__none__' ? '' : v); setDirty(true); }}
+                    style={{ ...inputStyle, fontSize: 12, height: 28 }}
+                  >
+                    <option value="__auto__">Automático (por nombre)</option>
+                    <option value="__none__">Suelto (excluir de todo grupo)</option>
+                    <optgroup label="Incluir en…">
+                      {minimapGroups
+                        .filter((g) => g.key !== selectedMapId)
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((g) => (
+                          <option key={g.key} value={g.key}>{g.name}</option>
+                        ))}
+                    </optgroup>
+                  </select>
+                  <div style={{ color: '#667', fontSize: 10, marginTop: 4, lineHeight: 1.5 }}>
+                    <b>Automático</b>: agrupa por el nombre. <b>Suelto</b>: punto independiente.
+                    <b> Incluir en…</b>: lo mete bajo esa ciudad/zona aunque el nombre no coincida.
+                  </div>
+                </div>
               </div>
             ) : openGroupData && openGroupData.members.length > 1 ? (
               /* Grupo desplegado: lista de sus sub-mapas (casas, plantas, gimnasio…) */

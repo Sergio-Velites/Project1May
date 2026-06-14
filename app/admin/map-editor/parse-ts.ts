@@ -81,9 +81,17 @@ export interface ParsedMap {
   exitReturnPos: { x: number; y: number } | null;
   staticPokemon: ParsedStaticPokemon[];
   minimapPos: { x: number; y: number } | null;
+  minimapParent: string | null;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────
+
+/** Lee un campo string entre comillas: `key: "valor"`. `""` se conserva (no es
+ *  lo mismo que ausente). Devuelve null si el campo no aparece. */
+function parseQuotedStringField(tsText: string, key: string): string | null {
+  const m = tsText.match(new RegExp(`(?<![\\w])${key}\\s*:\\s*"([^"]*)"`));
+  return m ? m[1] : null;
+}
 
 function findBalancedBlock(
   text: string,
@@ -615,6 +623,7 @@ export function parseMapTS(tsText: string): ParsedMap {
     exitReturnMap: parseEnumValue(tsText, 'exitReturnMap'),
     exitReturnPos: parsePos(tsText, 'exitReturnPos'),
     minimapPos: parsePos(tsText, 'minimapPos'),
+    minimapParent: parseQuotedStringField(tsText, 'minimapParent'),
   };
 }
 

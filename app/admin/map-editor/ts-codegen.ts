@@ -92,6 +92,7 @@ export interface MapWriteState {
   exitReturnMap?: string | null;
   exitReturnPos?: Pos | null;
   minimapPos?: Pos | null;
+  minimapParent?: string | null;
 }
 
 // ── Helpers de formato (idénticos al editor para conservar el estilo) ───────
@@ -415,6 +416,8 @@ function buildFieldOps(state: MapWriteState, resolve: (t: string) => string): Fi
   if (state.berryTrees !== undefined) push('berryTrees', state.berryTrees.length ? serBerryTrees(state.berryTrees) : null);
   if (state.boulders !== undefined) push('boulders', state.boulders.length ? serBoulders(state.boulders) : null);
   if (state.minimapPos !== undefined) push('minimapPos', state.minimapPos ? serPos('minimapPos', state.minimapPos) : null);
+  // minimapParent: null = automático (se omite); "" = suelto; "<id>" = forzado.
+  if (state.minimapParent !== undefined) push('minimapParent', state.minimapParent !== null ? `minimapParent: ${JSON.stringify(state.minimapParent)}` : null);
   if (state.trainers !== undefined) push('trainers', serTrainers(state.trainers));
 
   return ops;

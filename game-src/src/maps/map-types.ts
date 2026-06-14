@@ -467,6 +467,12 @@ export interface MapType {
   /** Posición de este mapa en el minimapa de Kanto (píxeles sobre kanto_region.png 237×213). */
   minimapPos?: PosType;
   /**
+   * Agrupación en el minimapa del Map Editor (metadato editor-only; el juego no
+   * lo consume). `undefined` = agrupar automáticamente por nombre; `""` = mapa
+   * suelto (excluido de cualquier grupo); `"<mapId>"` = forzar a ese grupo.
+   */
+  minimapParent?: string;
+  /**
    * Destino válido para la MO Vuelo (Gen I). Para que el jugador pueda volar
    * aquí deben cumplirse TRES condiciones: `flyable === true`, tener `minimapPos`
    * (punto en el mapa de Kanto) y `flySpot` (casilla de aterrizaje), y que el
