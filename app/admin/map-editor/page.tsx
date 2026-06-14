@@ -1743,6 +1743,25 @@ export default function MapEditor() {
   //    editores táctiles (Figma, mapas) y funciona sea cual sea la escala.
   //  • Escritorio / explícito: el botón ✋ Mover activa el arrastre con ratón.
   const [panMode, setPanMode] = useState(false);
+
+  // ── Maximizar el lienzo (más espacio para pintar agua/paredes, etc.) ──────
+  // Dos ejes independientes + un atajo que los combina:
+  //  • inspectorOpen → eje HORIZONTAL: colapsar el panel derecho ⇒ el lienzo
+  //    ocupa todo el ancho. Una pestaña fina permite reabrirlo sin perder nada.
+  //  • toolbarCompact → eje VERTICAL: ocultar los controles secundarios de la
+  //    barra (export, grafo, compilar…) para que no haga wrap en varias filas,
+  //    ganando alto para el lienzo. Lo esencial (mapa, modos, zoom, guardar)
+  //    sigue siempre visible y se puede seguir editando con normalidad.
+  const [inspectorOpen, setInspectorOpen] = useState(true);
+  const [toolbarCompact, setToolbarCompact] = useState(false);
+  const maximized = !inspectorOpen && toolbarCompact;
+  const toggleMaximize = useCallback(() => {
+    // Maximizado ⇒ restaura ambos ejes; si no, maximiza ambos a la vez.
+    const isMax = !inspectorOpen && toolbarCompact;
+    setInspectorOpen(isMax);
+    setToolbarCompact(!isMax);
+  }, [inspectorOpen, toolbarCompact]);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const panState = useRef<{ startX: number; startY: number; scrollLeft: number; scrollTop: number } | null>(null);
 
@@ -3112,7 +3131,7 @@ export default function MapEditor() {
           de portátil el wrap generaba una 3ª línea que quedaba RECORTADA por
           el overflow:hidden del raíz (los últimos modos eran invisibles).
           Ahora la barra crece lo que necesite y el lienzo (flex:1) se adapta. */}
-      <div style={{ display: 'flex', alignItems: 'center', columnGap: 12, rowGap: 6, padding: '8px 16px', minHeight: 56, background: '#13132a', borderBottom: '1px solid #2a2a4a', flexShrink: 0, flexWrap: 'wrap' }}>
+      <div className={`me-toolbar${toolbarCompact ? ' me-compact' : ''}`} style={{ display: 'flex', alignItems: 'center', columnGap: 12, rowGap: 6, padding: '8px 16px', minHeight: 56, background: '#13132a', borderBottom: '1px solid #2a2a4a', flexShrink: 0, flexWrap: 'wrap' }}>
         <style>{`
           /* Elementos prescindibles de la toolbar en pantallas estrechas */
           @media (max-width: 1600px) { .me-legend { display: none !important; } }
@@ -3131,10 +3150,45 @@ export default function MapEditor() {
           @media (max-width: 820px) {
             .me-body button { min-height: 30px; }
           }
+          /* Barra compacta: oculta los controles secundarios para ganar alto
+             de lienzo (el flujo de edición —mapa, modos, zoom, guardar— sigue). */
+          .me-toolbar.me-compact .me-tb-secondary { display: none !important; }
+          /* Pestaña para reabrir el inspector colapsado (eje horizontal). */
+          .me-inspector-reopen {
+            flex-shrink: 0;
+            width: 26px;
+            background: #13132a;
+            border: none;
+            border-left: 1px solid #2a2a4a;
+            color: #8a8aff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            letter-spacing: 2px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: background 0.15s, color 0.15s;
+          }
+          .me-inspector-reopen:hover { background: #1c1c3a; color: #aaccff; }
+          @media (max-width: 820px) {
+            .me-inspector-reopen {
+              width: 100% !important;
+              writing-mode: horizontal-tb !important;
+              border-left: none !important;
+              border-top: 1px solid #2a2a4a;
+              padding: 6px 0;
+              gap: 8px;
+            }
+          }
         `}</style>
         <span className="me-title" style={{ fontSize: 16, fontWeight: 700, color: '#a0a0ff', marginRight: 4 }}>🗺️ Map Editor</span>
 
         <a
+          className="me-tb-secondary"
           href="/admin/pokedex-editor"
           style={{
             fontSize: 12,
@@ -3200,8 +3254,48 @@ export default function MapEditor() {
           ✋ Mover
         </button>
 
+        {/* Maximizar lienzo (colapsa inspector + compacta barra a la vez) */}
+        <button
+          onClick={toggleMaximize}
+          title={maximized
+            ? 'Restaurar la vista normal (mostrar inspector y barra completa)'
+            : 'Maximizar el lienzo: oculta el inspector y compacta la barra para ganar espacio (puedes seguir editando)'}
+          style={{
+            padding: '2px 8px',
+            fontSize: 12,
+            background: maximized ? '#2a3a5a' : '#1a1a3a',
+            border: `1px solid ${maximized ? '#5a8aff' : '#3a3a5a'}`,
+            borderRadius: 4,
+            color: maximized ? '#aaccff' : '#e0e0ff',
+            cursor: 'pointer',
+            fontWeight: maximized ? 700 : 400,
+          }}
+        >
+          {maximized ? '🗗 Restaurar' : '⛶ Maximizar'}
+        </button>
+
+        {/* Compactar barra (eje vertical, independiente) */}
+        <button
+          onClick={() => setToolbarCompact((v) => !v)}
+          title={toolbarCompact
+            ? 'Mostrar todos los controles de la barra'
+            : 'Compactar la barra: oculta controles secundarios y gana alto de lienzo'}
+          style={{
+            padding: '2px 8px',
+            fontSize: 12,
+            background: toolbarCompact ? '#2a3a5a' : '#1a1a3a',
+            border: `1px solid ${toolbarCompact ? '#5a8aff' : '#3a3a5a'}`,
+            borderRadius: 4,
+            color: toolbarCompact ? '#aaccff' : '#e0e0ff',
+            cursor: 'pointer',
+          }}
+        >
+          {toolbarCompact ? '▾ Barra' : '▴ Barra'}
+        </button>
+
         {/* Minimap toggle */}
         <button
+          className="me-tb-secondary"
           onClick={() => setShowMinimap((v) => !v)}
           title="Ver minimap de Kanto"
           style={{
@@ -3308,6 +3402,7 @@ export default function MapEditor() {
 
         {/* Grafo de conexiones */}
         <button
+          className="me-tb-secondary"
           onClick={() => setShowGraph(true)}
           title="Ver el grafo de conexiones entre mapas (puertas, teleports, salidas)"
           style={{ padding: '4px 12px', background: '#1a1a2e', border: '1px solid #4a4a7a', borderRadius: 4, color: '#a0c0ff', cursor: 'pointer', fontSize: 12 }}
@@ -3317,6 +3412,7 @@ export default function MapEditor() {
 
         {/* Compilar juego (GitHub Action) */}
         <button
+          className="me-tb-secondary"
           onClick={compileGame}
           disabled={building}
           title="Reconstruye el bundle del juego desde el código (online, vía GitHub Actions)"
@@ -3327,6 +3423,7 @@ export default function MapEditor() {
 
         {/* Importar .ts (sustituye todo el mapa) */}
         <button
+          className="me-tb-secondary"
           onClick={doImportTs}
           title="Cargar un .ts de game-src/src/maps y sustituir el contenido del mapa actual"
           style={{ padding: '4px 12px', background: '#2a2a1a', border: '1px solid #7a7a3a', borderRadius: 4, color: '#ffff88', cursor: 'pointer', fontSize: 12 }}
@@ -3341,7 +3438,9 @@ export default function MapEditor() {
           style={{ display: 'none' }}
         />
 
-        {/* Exportar TS según modo */}
+        {/* Exportar TS según modo — cluster secundario (oculto en barra compacta;
+            el guardado commitea igualmente, así que exportar es opcional). */}
+        <div className="me-tb-secondary" style={{ display: 'contents' }}>
         {editMode === 'npc' && (
           <button onClick={doExport} style={{ padding: '4px 12px', background: '#1a2a3a', border: '1px solid #3a5a7a', borderRadius: 4, color: '#88ccff', cursor: 'pointer', fontSize: 12 }}>
             📋 Trainers
@@ -3420,6 +3519,7 @@ export default function MapEditor() {
         <button onClick={doExportMapType} style={{ padding: '4px 12px', background: '#1a2a3a', border: '1px solid #4a6a8a', borderRadius: 4, color: '#aaddff', cursor: 'pointer', fontSize: 12 }}>
           📋 MapType
         </button>
+        </div>
 
         {/* Logout */}
         <button onClick={() => { document.cookie = 'admin_token=; Max-Age=0; path=/'; window.location.href = '/admin/login'; }} style={{ padding: '4px 8px', background: 'none', border: '1px solid #3a3a5a', borderRadius: 4, color: '#666', cursor: 'pointer', fontSize: 12 }}>
@@ -4245,16 +4345,34 @@ export default function MapEditor() {
           )}
         </div>
 
+        {/* ── Pestaña para reabrir el inspector colapsado (eje horizontal) ── */}
+        {!inspectorOpen && (
+          <button
+            className="me-inspector-reopen"
+            onClick={() => setInspectorOpen(true)}
+            title="Mostrar el inspector"
+          >
+            ‹ Inspector
+          </button>
+        )}
+
         {/* ── Inspector ─────────────────────────────────────────────── */}
-        <div className="me-inspector" style={{ width: 'clamp(264px, 24vw, 320px)', background: '#13132a', borderLeft: '1px solid #2a2a4a', display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
+        <div className="me-inspector" style={{ width: 'clamp(264px, 24vw, 320px)', background: '#13132a', borderLeft: '1px solid #2a2a4a', display: inspectorOpen ? 'flex' : 'none', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
 
           {/* Header inspector */}
-          <div style={{ padding: '12px 16px', borderBottom: '1px solid #2a2a4a' }}>
-            <div style={{ fontSize: 11, color: '#666', textTransform: 'uppercase', letterSpacing: 1 }}>
+          <div style={{ padding: '12px 16px', borderBottom: '1px solid #2a2a4a', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ flex: 1, minWidth: 0, fontSize: 11, color: '#666', textTransform: 'uppercase', letterSpacing: 1 }}>
               Inspector — {currentMap
                 ? `${currentMap.name} · ${trainers.length} NPCs · ${Object.values(walls).reduce((a, b) => a + b.length, 0)} walls`
                 : 'sin mapa'}
             </div>
+            <button
+              onClick={() => setInspectorOpen(false)}
+              title="Ocultar el inspector y ampliar el lienzo"
+              style={{ flexShrink: 0, padding: '2px 8px', fontSize: 13, lineHeight: 1, background: '#1a1a3a', border: '1px solid #3a3a5a', borderRadius: 4, color: '#8a8aff', cursor: 'pointer' }}
+            >
+              ⟩
+            </button>
           </div>
 
           {/* Contenido inspector */}
