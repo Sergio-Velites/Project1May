@@ -169,6 +169,10 @@ function parseDirectionRowColMap(tsText, key) {
 
 // ── Parsers de portales ────────────────────────────────────────────────
 function mapIdEnumToKebab(name) {
+  // Fuente de verdad: el valor real del enum. Solo si el nombre no existe en el
+  // enum (mapa nuevo aún sin entrada) recurrimos a la heurística.
+  const real = MAP_ID_NAME_TO_VALUE.get(name);
+  if (real) return real;
   return name
     .replace(/([a-z])([A-Z0-9])/g, "$1-$2")
     .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
@@ -753,6 +757,19 @@ const MAP_DIR = path.join(GAME_SRC, "maps");
 const MAP_FILES = fs.readdirSync(MAP_DIR).filter(
   (f) => f.endsWith(".ts") && !f.startsWith("map-") && f !== "template.ts" && f !== "get-location-data.ts"
 );
+
+// Índice del enum MapId real (nombre del miembro → valor/slug). Es la fuente de
+// verdad para convertir `MapId.<Nombre>` al slug canónico al parsear los mapas,
+// evitando heurísticas lossy (p.ej. PalletTownHouseA1F → "pallet-town-house-a-1f"
+// exacto, no "pallet-town-house-a1f"). `mapIdEnumToKebab` lo consulta primero.
+const MAP_ID_NAME_TO_VALUE = (() => {
+  const text = fs.readFileSync(path.join(MAP_DIR, "map-types.ts"), "utf-8");
+  const block = text.match(/enum\s+MapId\s*\{([\s\S]*?)\n\}/);
+  const body = block ? block[1] : "";
+  const m = new Map();
+  for (const e of body.matchAll(/([A-Za-z0-9_]+)\s*=\s*"([^"]+)"/g)) m.set(e[1], e[2]);
+  return m;
+})();
 
 // Mapeo de nombres de función/variable NPC → claves del NPC_REGISTRY del editor
 // (algunos mapas importan npcs con alias)

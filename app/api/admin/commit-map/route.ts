@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { writeMapTs, type MapWriteState } from '../../../admin/map-editor/ts-codegen';
+import { writeMapTs, type MapWriteState, type MapIdEntry } from '../../../admin/map-editor/ts-codegen';
 
 /**
  * Guardado REAL al código fuente: reescribe game-src/src/maps/<sourceFile> con
@@ -33,6 +33,37 @@ function b64encode(s: string): string {
 }
 function b64decode(s: string): string {
   return Buffer.from(s, 'base64').toString('utf-8');
+}
+
+/**
+ * Parsea el bloque `enum MapId { ... }` de map-types.ts a [{ name, value }].
+ * Es la ÚNICA fuente de verdad para resolver nombres de miembros del enum, de
+ * modo que las referencias a mapas en el .ts generado siempre compilen.
+ */
+function parseMapIdEnum(mapTypesText: string): MapIdEntry[] {
+  const block = mapTypesText.match(/enum\s+MapId\s*\{([\s\S]*?)\n\}/);
+  const body = block ? block[1] : '';
+  const entries: MapIdEntry[] = [];
+  for (const m of body.matchAll(/([A-Za-z0-9_]+)\s*=\s*"([^"]+)"/g)) {
+    entries.push({ name: m[1], value: m[2] });
+  }
+  return entries;
+}
+
+/** Lee map-types.ts de la rama y devuelve el índice del enum (o [] si falla). */
+async function fetchMapIdIndex(repo: string, token: string, branch: string): Promise<MapIdEntry[]> {
+  try {
+    const path = 'game-src/src/maps/map-types.ts';
+    const res = await fetch(
+      `${GH_API}/repos/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`,
+      { headers: ghHeaders(token) },
+    );
+    if (!res.ok) return [];
+    const json = await res.json();
+    return parseMapIdEnum(b64decode(json.content ?? ''));
+  } catch {
+    return [];
+  }
 }
 
 async function ensureBranch(repo: string, token: string, branch: string, base: string): Promise<void> {
@@ -101,8 +132,17 @@ export async function POST(request: Request) {
     const currentSha: string = getJson.sha;
     const currentText = b64decode(getJson.content ?? '');
 
+    // Índice del enum MapId real (para resolver referencias de portales al
+    // nombre EXACTO del miembro → el .ts generado siempre compila).
+    const mapIdIndex = await fetchMapIdIndex(repo, token, branch);
+
     // Reescritura quirúrgica + imports.
-    const result = writeMapTs(currentText, state);
+    const result = writeMapTs(currentText, state, { mapIdIndex });
+    if (mapIdIndex.length === 0) {
+      result.warnings.push(
+        'No se pudo leer el enum MapId (map-types.ts); referencias de mapas resueltas por heurística.',
+      );
+    }
     if (!result.ok || !result.text) {
       return NextResponse.json(
         { ok: false, error: `Generación abortada (sin tocar el archivo): ${result.error}` },

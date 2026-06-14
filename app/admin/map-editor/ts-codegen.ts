@@ -112,6 +112,51 @@ export function pascalCaseFromMapId(id: string): string {
     .join('');
 }
 
+/** Una entrada del enum MapId real: nombre del miembro ↔ su valor (slug). */
+export interface MapIdEntry { name: string; value: string }
+
+/** Normaliza un identificador para comparar tolerando guiones/casing. */
+function normalizeId(s: string): string {
+  return s.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+}
+
+/**
+ * Crea un resolutor token → NOMBRE EXACTO del miembro del enum MapId.
+ *
+ * El editor almacena los destinos de portales como slugs (valores del enum),
+ * pero por heurísticas previas algunos pueden estar "sucios" (p.ej.
+ * `pallet-town-house-a1f` en vez de `pallet-town-house-a-1f`). En vez de
+ * reconstruir el nombre con `pascalCaseFromMapId` (que no conoce las
+ * irregularidades de casing del enum, como `A1F` vs `Museum1f`), resolvemos
+ * SIEMPRE contra el enum real:
+ *   1. coincidencia exacta por nombre del miembro
+ *   2. coincidencia exacta por valor (slug)
+ *   3. coincidencia normalizada (sin guiones, en minúsculas) → tolera slugs sucios
+ *   4. último recurso: pascalCaseFromMapId (mapas nuevos aún sin entrada en el enum)
+ *
+ * Garantiza que el `.ts` generado SIEMPRE compile (referencias válidas al enum).
+ */
+export function makeMapIdResolver(index?: MapIdEntry[]): (token: string) => string {
+  if (!index || index.length === 0) return pascalCaseFromMapId;
+  const byName = new Set<string>();
+  const byValue = new Map<string, string>();
+  const byNorm = new Map<string, string>();
+  for (const { name, value } of index) {
+    byName.add(name);
+    byValue.set(value, name);
+    byNorm.set(normalizeId(value), name);
+    byNorm.set(normalizeId(name), name);
+  }
+  return (token: string): string => {
+    if (byName.has(token)) return token;
+    const v = byValue.get(token);
+    if (v) return v;
+    const n = byNorm.get(normalizeId(token));
+    if (n) return n;
+    return pascalCaseFromMapId(token);
+  };
+}
+
 function sortedNumKeys(obj: Record<string, unknown>): number[] {
   return Object.keys(obj)
     .map((k) => parseInt(k, 10))
@@ -265,25 +310,25 @@ function serSpinners(spinners: Record<string, Record<string, DirectionName>>): s
   return serDirectionRowColMap(spinners, 'spinners');
 }
 
-function serMaps(maps: Record<string, Record<string, string>>): string {
+function serMaps(maps: Record<string, Record<string, string>>, resolve: (t: string) => string): string {
   const rows = sortedNumKeys(maps);
   if (rows.length === 0) return 'maps: {}';
   const rowLines = rows.map((r) => {
     const cols = sortedNumKeys(maps[String(r)] ?? {});
-    const colLines = cols.map((c) => `      ${c}: MapId.${pascalCaseFromMapId(maps[String(r)][String(c)])},`);
+    const colLines = cols.map((c) => `      ${c}: MapId.${resolve(maps[String(r)][String(c)])},`);
     return `    ${r}: {\n${colLines.join('\n')}\n    },`;
   });
   return `maps: {\n${rowLines.join('\n')}\n  }`;
 }
 
-function serTeleports(teleports: Record<string, Record<string, { map: string; pos: Pos }>>): string {
+function serTeleports(teleports: Record<string, Record<string, { map: string; pos: Pos }>>, resolve: (t: string) => string): string {
   const rows = sortedNumKeys(teleports);
   if (rows.length === 0) return 'teleports: {}';
   const rowLines = rows.map((r) => {
     const cols = sortedNumKeys(teleports[String(r)] ?? {});
     const colLines = cols.map((c) => {
       const t = teleports[String(r)][String(c)];
-      return `      ${c}: { map: MapId.${pascalCaseFromMapId(t.map)}, pos: { x: ${t.pos.x}, y: ${t.pos.y} } },`;
+      return `      ${c}: { map: MapId.${resolve(t.map)}, pos: { x: ${t.pos.x}, y: ${t.pos.y} } },`;
     });
     return `    ${r}: {\n${colLines.join('\n')}\n    },`;
   });
@@ -329,7 +374,7 @@ function serPos(field: string, pos: Pos): string {
 
 interface FieldOp { field: string; text: string | null }
 
-function buildFieldOps(state: MapWriteState): FieldOp[] {
+function buildFieldOps(state: MapWriteState, resolve: (t: string) => string): FieldOp[] {
   const ops: FieldOp[] = [];
   const push = (field: string, text: string | null) => ops.push({ field, text });
 
@@ -351,9 +396,9 @@ function buildFieldOps(state: MapWriteState): FieldOp[] {
   if (state.texts !== undefined) push('text', serTexts(state.texts));
   if (state.textRewards !== undefined) push('textRewards', Object.keys(state.textRewards).length ? serTextRewards(state.textRewards) : null);
   if (state.exits !== undefined) push('exits', serRowColMap(state.exits, 'exits'));
-  if (state.maps !== undefined) push('maps', serMaps(state.maps));
-  if (state.teleports !== undefined) push('teleports', Object.keys(state.teleports).length ? serTeleports(state.teleports) : null);
-  if (state.exitReturnMap !== undefined) push('exitReturnMap', state.exitReturnMap ? `exitReturnMap: MapId.${pascalCaseFromMapId(state.exitReturnMap)}` : null);
+  if (state.maps !== undefined) push('maps', serMaps(state.maps, resolve));
+  if (state.teleports !== undefined) push('teleports', Object.keys(state.teleports).length ? serTeleports(state.teleports, resolve) : null);
+  if (state.exitReturnMap !== undefined) push('exitReturnMap', state.exitReturnMap ? `exitReturnMap: MapId.${resolve(state.exitReturnMap)}` : null);
   if (state.exitReturnPos !== undefined) push('exitReturnPos', state.exitReturnPos ? serPos('exitReturnPos', state.exitReturnPos) : null);
   if (state.pokemonCenter !== undefined) push('pokemonCenter', state.pokemonCenter ? serPos('pokemonCenter', state.pokemonCenter) : null);
   if (state.pc !== undefined) push('pc', state.pc ? serPos('pc', state.pc) : null);
@@ -568,8 +613,19 @@ export interface WriteResult {
  * Reescribe `fileText` aplicando `state`. Quirúrgico: solo toca los campos
  * presentes en `state`; conserva el resto del archivo. Reconcilia imports.
  */
-export function writeMapTs(fileText: string, state: MapWriteState): WriteResult {
+export interface WriteOptions {
+  /**
+   * Índice del enum MapId real (nombre ↔ valor). Si se pasa, las referencias a
+   * mapas (portales `maps`/`teleports`, `exitReturnMap`) se resuelven al NOMBRE
+   * EXACTO del miembro del enum, evitando errores de casing que romperían la
+   * compilación. Si se omite, se cae a `pascalCaseFromMapId` (compatibilidad).
+   */
+  mapIdIndex?: MapIdEntry[];
+}
+
+export function writeMapTs(fileText: string, state: MapWriteState, options?: WriteOptions): WriteResult {
   const warnings: string[] = [];
+  const resolve = makeMapIdResolver(options?.mapIdIndex);
   const obj = findMapObject(fileText);
   if (!obj) {
     return { ok: false, error: 'No se encontró el literal `: MapType = { ... }` en el archivo.', warnings };
@@ -580,7 +636,7 @@ export function writeMapTs(fileText: string, state: MapWriteState): WriteResult 
   const body = fileText.slice(bodyStart, bodyEnd);
 
   const fields = locateTopLevelFields(body);
-  const ops = buildFieldOps(state);
+  const ops = buildFieldOps(state, resolve);
 
   // Construimos el nuevo cuerpo aplicando reemplazos de mayor a menor índice.
   type Edit = { start: number; end: number; replacement: string };
