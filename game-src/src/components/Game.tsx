@@ -10,7 +10,7 @@ import KeyboardHandler from "./KeyboardHandler";
 import MovementHandler from "./MovementHandler";
 import ItemsMenu from "./ItemsMenu";
 import PlayerMenu from "./PlayerMenu";
-import PixelImage from "../styles/PixelImage";
+import MapBackground from "./MapBackground";
 import TitleScreen from "./TitleScreen";
 import LoadScreen from "./LoadScreen";
 import SoundHandler from "./SoundHandler";
@@ -85,19 +85,6 @@ const BackgroundContainer = styled.div`
   transition: transform 0.2s steps(5, end);
 `;
 
-interface BackgroundProps {
-  width: number;
-  height: number;
-}
-
-const Background = styled(PixelImage)<BackgroundProps>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: ${(props) => xToPx(props.width)};
-  height: ${(props) => yToPx(props.height)};
-`;
-
 const ColorOverlay = styled.div`
   position: absolute;
   top: 0;
@@ -126,7 +113,7 @@ const Game = () => {
             transform: `translate(${xToPx(-pos.x)}, ${yToPx(-pos.y)})`,
           }}
         >
-          <Background src={map.image} width={map.width} height={map.height} />
+          <MapBackground image={map.image} width={map.width} height={map.height} />
           {map.trainers &&
             map.trainers
               .filter((trainer: TrainerType) => {
