@@ -60,7 +60,8 @@ type OverrideKey =
   | 'cuttableTrees'
   | 'berryTrees'
   | 'boulders'
-  | 'minimapPos';
+  | 'minimapPos'
+  | 'minimapParent';
 
 const OVERRIDE_KEYS: OverrideKey[] = [
   'start',
@@ -97,6 +98,7 @@ const OVERRIDE_KEYS: OverrideKey[] = [
   'berryTrees',
   'boulders',
   'minimapPos',
+  'minimapParent',
 ];
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {

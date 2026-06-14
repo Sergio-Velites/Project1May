@@ -110,6 +110,11 @@ function parsePos(tsText, key) {
   return { x: parseInt(m[1], 10), y: parseInt(m[2], 10) };
 }
 
+function parseQuotedStringField(tsText, key) {
+  const m = tsText.match(new RegExp(`(?<![\\w])${key}\\s*:\\s*"([^"]*)"`));
+  return m ? m[1] : null;
+}
+
 function parseBooleanField(tsText, key) {
   const re = new RegExp(`(?<![\\w])${key}\\s*:\\s*true`);
   return re.test(tsText);
@@ -863,6 +868,7 @@ for (const file of MAP_FILES) {
   const flyable = parseBooleanField(tsText, "flyable");
   const flySpot = parsePos(tsText, "flySpot");
   const minimapPos = parsePos(tsText, "minimapPos");
+  const minimapParent = parseQuotedStringField(tsText, "minimapParent");
   const music = parseMusicField(tsText);
 
   // Extraer imagen
@@ -968,6 +974,7 @@ for (const file of MAP_FILES) {
     flyable,
     flySpot,
     minimapPos,
+    minimapParent,
     music,
     trainers,
     walls,
