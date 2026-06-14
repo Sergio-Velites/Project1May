@@ -21,8 +21,9 @@ import {
 import kantoMap from "../assets/map/kanto_region.png";
 import birdDown from "../assets/walk-sprites/bird-down.png";
 
-// Layout en COLUMNA: cabecera (nombre) · mapa entero · pie (controles). El mapa
-// nunca queda tapado por la UI — la UI vive fuera de él (filas separadas).
+// Layout en COLUMNA: mapa entero (lo más grande posible) · un ÚNICO pie con el
+// nombre de la ciudad + controles. El mapa nunca queda tapado por la UI — la UI
+// vive fuera de él, en una sola fila inferior.
 const Container = styled.div`
   position: absolute;
   top: 0;
@@ -35,7 +36,8 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-// Fila central: ocupa el espacio restante y centra el mapa contenido al 100%.
+// Fila central: ocupa todo el espacio restante y centra el mapa al 100%. Sin
+// cabecera arriba y con padding mínimo, el mapa gana el máximo de superficie.
 // min-height: 0 es imprescindible en flex-column para que la imagen respete
 // max-height y el mapa SIEMPRE se vea entero.
 const MapRow = styled.div`
@@ -44,7 +46,7 @@ const MapRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5cqw;
+  padding: 0.8cqw;
 `;
 
 // Caja con la relación de aspecto EXACTA del mapa (237×213). En la pantalla GB
@@ -65,6 +67,32 @@ const MapImg = styled.img`
   height: 100%;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
+`;
+
+// Pie ÚNICO: nombre de la ciudad (izquierda) + controles (derecha) en una sola
+// caja. Texto en cuerpo pequeño (más pequeño que el h1 del Frame), priorizando
+// que el mapa respire.
+const BottomBar = styled.div`
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1cqw;
+  font-family: "PokemonGB";
+  color: black;
+`;
+
+const CityName = styled.span`
+  font-size: 1.7cqw;
+  letter-spacing: 0.1cqw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const Controls = styled.span`
+  font-size: 1.25cqw;
+  white-space: nowrap;
+  flex-shrink: 0;
 `;
 
 const blink = keyframes`
@@ -178,7 +206,6 @@ const FlyMenu = () => {
 
   return (
     <Container>
-      <Frame wide>{selected ? selected.name : ""}</Frame>
       <MapRow>
         <MapBox>
           <MapImg src={kantoMap} alt="Mapa de Kanto" />
@@ -192,7 +219,12 @@ const FlyMenu = () => {
           )}
         </MapBox>
       </MapRow>
-      <Frame wide>A: VOLAR &nbsp; B: SALIR</Frame>
+      <Frame wide>
+        <BottomBar>
+          <CityName>{selected ? selected.name : ""}</CityName>
+          <Controls>A:VOLAR&nbsp;&nbsp;B:SALIR</Controls>
+        </BottomBar>
+      </Frame>
     </Container>
   );
 };
