@@ -1,4 +1,4 @@
-import { birdKeeper, bugCatcher, burglar, lass, oak, sergioNpc, youngster } from "../app/npcs";
+import { birdKeeper, bugCatcher, burglar, lass, oak, youngster } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
 import image from "../assets/map/route-3.png";
 import music from "../assets/music/maps/route-3.mp3";
@@ -15,84 +15,84 @@ const route3: MapType = {
   width: 73,
   start: { x: 1, y: 27 },
   walls: {
-      3: [53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66],
-      4: [53, 60, 61, 63, 66, 68],
-      5: [53, 60, 62, 63, 66, 67, 69, 70],
-      6: [53, 70],
-      7: [53, 67, 70],
-      8: [53, 70],
-      9: [53, 70],
-      10: [53, 70],
-      11: [53, 70],
-      12: [53, 70],
-      13: [53, 70],
-      14: [53, 54, 55, 70],
-      15: [55, 70],
-      16: [55, 64, 65, 66, 67, 68, 69, 70],
-      17: [55, 64],
-      18: [55, 56, 64],
-      19: [55, 56, 64],
-      20: [55, 64],
-      21: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 55, 64],
-      22: [9, 28, 33, 50, 55, 60, 61, 62, 63, 64],
-      23: [9, 28, 33, 50, 55, 60],
-      24: [9, 17, 23, 28, 33, 38, 39, 40, 41, 42, 43, 50, 55, 60],
-      25: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 23, 28, 29, 30, 31, 32, 33, 38, 43, 50, 55, 60, 61, 62, 63, 64, 65, 66],
-      26: [4, 17, 23, 38, 43, 50, 55, 66],
-      27: [17, 23, 38, 43, 50, 51, 52, 53, 54, 55, 58, 59, 66],
-      28: [9, 17, 23, 38, 43, 66],
-      29: [4, 9, 23, 38, 43, 66],
-      30: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 23, 38, 43, 66],
-      31: [9, 23, 38, 43, 66],
-      32: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66],
-    },
+    3: [53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66],
+    4: [53, 60, 61, 63, 66, 68],
+    5: [53, 60, 62, 63, 66, 67, 69, 70],
+    6: [53, 70],
+    7: [53, 67, 70],
+    8: [53, 70],
+    9: [53, 70],
+    10: [53, 70],
+    11: [53, 70],
+    12: [53, 70],
+    13: [53, 70],
+    14: [53, 54, 55, 70],
+    15: [55, 70],
+    16: [55, 64, 65, 66, 67, 68, 69, 70],
+    17: [55, 64],
+    18: [55, 56, 64],
+    19: [55, 56, 64],
+    20: [55, 64],
+    21: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 55, 64],
+    22: [9, 28, 33, 50, 55, 60, 61, 62, 63, 64],
+    23: [9, 28, 33, 50, 55, 60],
+    24: [9, 17, 23, 28, 33, 38, 39, 40, 41, 42, 43, 50, 55, 60],
+    25: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 23, 28, 29, 30, 31, 32, 33, 38, 43, 50, 55, 60, 61, 62, 63, 64, 65, 66],
+    26: [4, 17, 23, 38, 43, 50, 55, 66],
+    27: [17, 23, 38, 43, 50, 51, 52, 53, 54, 55, 58, 59, 66],
+    28: [9, 17, 23, 38, 43, 66],
+    29: [4, 9, 23, 38, 43, 66],
+    30: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 23, 38, 43, 66],
+    31: [9, 23, 38, 43, 66],
+    32: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66],
+  },
   fences: {
-      7: [54, 55, 56, 57],
-      9: [64, 65, 66, 67, 68, 69],
-      11: [54, 55, 56, 57, 58, 59, 60, 61],
-      13: [64, 65, 66, 67, 68, 69],
-      15: [56, 57, 58, 59],
-      17: [62, 63],
-      25: [10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 34, 35, 36, 44, 45, 46, 47, 48, 56, 57, 58],
-      29: [10, 11, 12, 13, 14, 16, 18, 19, 20, 21, 22],
-    },
+    7: [54, 55, 56, 57],
+    9: [64, 65, 66, 67, 68, 69],
+    11: [54, 55, 56, 57, 58, 59, 60, 61],
+    13: [64, 65, 66, 67, 68, 69],
+    15: [56, 57, 58, 59],
+    17: [62, 63],
+    25: [10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 34, 35, 36, 44, 45, 46, 47, 48, 56, 57, 58],
+    29: [10, 11, 12, 13, 14, 16, 18, 19, 20, 21, 22],
+  },
   grass: {
-      26: [60, 61, 62, 63, 64, 65],
-      27: [60, 61, 62, 63, 64, 65],
-      28: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 58, 59, 60, 61, 62, 63, 64, 65],
-      29: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 58, 59, 60, 61, 62, 63, 64, 65],
-      30: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 58, 59, 60, 61, 62, 63, 64, 65],
-      31: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 58, 59, 60, 61, 62, 63, 64, 65],
-    },
+    26: [60, 61, 62, 63, 64, 65],
+    27: [60, 61, 62, 63, 64, 65],
+    28: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 58, 59, 60, 61, 62, 63, 64, 65],
+    29: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 58, 59, 60, 61, 62, 63, 64, 65],
+    30: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 58, 59, 60, 61, 62, 63, 64, 65],
+    31: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 58, 59, 60, 61, 62, 63, 64, 65],
+  },
   text: {
-      7: {
-        67: [
-          "MONTE LUNA DE MIEL",
-          "¿Quién vuelve a casa así?"
-        ],
-      },
-      27: {
-        59: [
-          "RUTA 3 · CAMINO DE LA RESACA",
-          "Hacia el MONTE LUNA DE MIEL.",
-          "Cuidado con los chupasangres,",
-          "que ayer ya nos chuparon",
-          "hasta la última copa."
-        ],
-      },
+    7: {
+      67: [
+        "MONTE LUNA DE MIEL",
+        "¿Quién vuelve a casa así?"
+      ],
     },
+    27: {
+      59: [
+        "RUTA 3 · CAMINO DE LA RESACA",
+        "Hacia el MONTE LUNA DE MIEL.",
+        "Cuidado con los chupasangres,",
+        "que ayer ya nos chuparon",
+        "hasta la última copa."
+      ],
+    },
+  },
   maps: {
-      5: {
-        61: MapId.Route3PokemonCenter,
-        68: MapId.MtMoon1f,
-      },
+    5: {
+      61: MapId.Route3pokemonCenter,
+      68: MapId.MtMoon1f,
     },
+  },
   exits: {
-      26: [0],
-      27: [0],
-      28: [0],
-      29: [0],
-    },
+    26: [0],
+    27: [0],
+    28: [0],
+    29: [0],
+  },
   exitReturnMap: MapId.PewterCity,
   exitReturnPos: { x: 38, y: 17 },
   encounters: {
@@ -143,13 +143,13 @@ const route3: MapType = {
     roughTerrain: { rate: 0, pokemon: [] }, gift: { rate: 0, pokemon: [] }, giftEgg: { rate: 0, pokemon: [] }, onlyOne: { rate: 0, pokemon: [] },
   },
   items: [
-      {
-        item: ItemType.MasterBall,
-        pos: { x: 63, y: 18 },
-      },
-    ],
-  trainers: [
     {
+      item: ItemType.MasterBall,
+      pos: { x: 63, y: 18 },
+    },
+  ],
+  trainers: [
+  {
     npc: oak,
     pokemon: [{ id: 122, level: 35 }, { id: 125, level: 37 }, { id: 124, level: 37 }, { id: 154, level: 39 }, { id: 157, level: 39 }, { id: 160, level: 40 }],
     facing: Direction.Right,
@@ -170,21 +170,16 @@ const route3: MapType = {
     isGymLeader: true,
     sightRange: 0,
     postGame: {
-            message: [
-              "¡Toma, para que sigas con tus andanzas!",
-              "Otra jodida masterball, y esta MO",
-              "CORTE! Te permitirá cortar los viñedos de monjardin",
-              "y de otros obstáculos de tu vida.",
-              "Gracias por contribuir al juego.",
-              "Y por supuesto, a la boda!",
-              "¡Bebe más anís!",
-              "Que te veo seco",
-              "Más anís, siempre más anís!",
-            ],
-            items: [ItemType.MasterBall, ItemType.Hm01],
-          },
+          message: [
+            "¡Toma, para que sigas con tus andanzas!",
+            "Gracias por contribuir al juego.",
+            "Y por supuesto, a la boda!",
+            "¡Bebe más anís!",
+          ],
+          items: [ItemType.MasterBall, ItemType.Hm01],
+        },
   },
-    {
+  {
     npc: lass,
     pokemon: [{ id: 17, level: 26 }, { id: 20, level: 29 }],
     facing: Direction.Left,
@@ -198,9 +193,8 @@ const route3: MapType = {
       "haciendo las MALETAS para JAPÓN!"
     ],
     money: 135,
-
   },
-    {
+  {
     npc: bugCatcher,
     pokemon: [{ id: 12, level: 19 }, { id: 15, level: 26 }],
     facing: Direction.Right,
@@ -214,9 +208,8 @@ const route3: MapType = {
       "en sitios donde no debería haber confeti."
     ],
     money: 100,
-
   },
-    {
+  {
     npc: youngster,
     pokemon: [{ id: 19, level: 17 }, { id: 19, level: 21 }, { id: 20, level: 25 }],
     facing: Direction.Down,
@@ -230,9 +223,8 @@ const route3: MapType = {
       "todo lo que vomité ayer… metafóricamente."
     ],
     money: 165,
-
   },
-    {
+  {
     npc: bugCatcher,
     pokemon: [{ id: 10, level: 14 }, { id: 12, level: 19 }],
     facing: Direction.Down,
@@ -246,9 +238,8 @@ const route3: MapType = {
       "que un MEWTWO a nivel 70."
     ],
     money: 90,
-
   },
-    {
+  {
     npc: youngster,
     pokemon: [{ id: 21, level: 20 }, { id: 19, level: 27 }],
     facing: Direction.Left,
@@ -262,9 +253,8 @@ const route3: MapType = {
       "¡Hasta debajo del esmoquin!"
     ],
     money: 210,
-
   },
-    {
+  {
     npc: lass,
     pokemon: [{ id: 39, level: 14 }, { id: 17, level: 21 }],
     facing: Direction.Left,
@@ -279,9 +269,8 @@ const route3: MapType = {
       "¡Qué envidia me dan!"
     ],
     money: 150,
-
   },
-    {
+  {
     npc: bugCatcher,
     pokemon: [{ id: 13, level: 14 }, { id: 15, level: 20 }],
     facing: Direction.Right,
@@ -295,9 +284,8 @@ const route3: MapType = {
       "¡A todos nos sentó fatal el brindis!"
     ],
     money: 110,
-
   },
-    {
+  {
     npc: lass,
     pokemon: [{ id: 19, level: 14 }, { id: 30, level: 25 }],
     facing: Direction.Up,
@@ -312,9 +300,8 @@ const route3: MapType = {
       "¡Igual que la suite de los novios!"
     ],
     money: 210,
-
   },
-    {
+  {
     npc: burglar,
     pokemon: [{ id: 24, level: 30 }],
     facing: Direction.Left,
@@ -329,7 +316,7 @@ const route3: MapType = {
     money: 0,
     persistent: true,
   },
-    {
+  {
     npc: birdKeeper,
     pokemon: [{ id: 22, level: 20 }, { id: 17, level: 25 }, { id: 83, level: 30 }],
     facing: Direction.Down,
@@ -344,7 +331,7 @@ const route3: MapType = {
     money: 0,
     persistent: true,
   },
-    {
+  {
     npc: lass,
     pokemon: [{ id: 36, level: 28 }, { id: 108, level: 30 }],
     facing: Direction.Left,
@@ -361,6 +348,7 @@ const route3: MapType = {
     persistent: true,
   }
   ],
+  minimapPos: { x: 65, y: 52 },
 }
 
 export default route3;
