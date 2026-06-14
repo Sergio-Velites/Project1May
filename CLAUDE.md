@@ -878,6 +878,52 @@ cambios sin entrar al entorno de desarrollo. El juego solo refleja los mapas tra
 Botón `🕸 Grafo` → overlay con todos los mapas como nodos y las conexiones (puertas/teleports/salidas)
 como aristas dirigidas. Simulación de fuerzas, pan/zoom (rueda + arrastre), búsqueda y click-para-ir.
 
+### Minimapa de Kanto (`🗺️ Kanto`) — pan/pinch-zoom + agrupación de puntos
+
+- **Pan + pinch-zoom** (móvil y escritorio) en modos **Navegar** y **Editar**, sin
+  desajustar los puntos. La imagen y los puntos viven dentro de un contenedor con
+  `transform: translate+scale` (los puntos se posicionan en % → se mueven/escalan
+  con la imagen). El mapeo tap→píxel usa el `getBoundingClientRect` REAL de la
+  `<img>` (ya refleja el transform), así que es independiente del zoom/desplazamiento.
+  Los puntos llevan `scale(1/mmView.scale)` para mantener tamaño constante en pantalla.
+- **Gestos**: 1 dedo = tocar (fijar posición en Editar / elegir grupo en Navegar);
+  2 dedos = desplazar + escalar (anclado a los dedos). Ratón: arrastrar = pan,
+  rueda = zoom focal (listener nativo no-pasivo), botones `− / + / ⤢ Ajustar`.
+  Estado en `mmView {scale,tx,ty}` + ref `mmGesture`; `clampMmView` impide sacar
+  la imagen de la vista. El panel hace `flex-wrap` → en móvil el inspector baja
+  bajo el mapa.
+- **Agrupación automática por nombre** (`minimapGroupKey`): los interiores se
+  nombran `<padre>-<sufijo>` (gimnasio, centro, casas, plantas…) y las mazmorras
+  con plantas caen en `MINIMAP_FLOOR_GROUPS`. La resolución es transitiva → todo
+  cuelga de su ciudad/mazmorra en un único nivel. En Navegar se muestra UN punto
+  por grupo (🟡 grupo con interiores · 🔵 mapa suelto · 🔴 actual); al tocarlo se
+  listan sus sub-mapas en el panel para ir a cualquiera. Sin cambios de datos ni
+  migración. Editar sigue fijando el `minimapPos` del mapa seleccionado.
+
+### Auto-relleno de contenido (Pokémon salvajes y equipos) — `pokemon-pool.ts`
+
+Herramientas para poblar contenido rápido sin elegir Pokémon uno a uno. Datos en
+`app/admin/map-editor/pokemon-pool.ts` (`POKEMON_POOL`: id→`{types, bst}` de los
+251, autogenerado desde `pokemon-metadata.ts`; `LEGENDARY_IDS`, `genOf`).
+
+- **Pokémon salvajes** (botón `✨ Auto-rellenar` en modos Hierba y Agua):
+  `buildEncounterTable` elige especies por **terreno** (hierba / cueva según el
+  flag del mapa / agua), **generación** (I, II o ambas), **rango de niveles**,
+  nº de especies, **franjas horarias** y sesgo automático día/noche
+  (fantasmas/siniestros de noche). La distribución de rarezas suma 100
+  (`decreasingChances`). La **pesca** rellena las 3 cañas diferenciadas del surf:
+  Caña Vieja = debiluchos (BST + nivel bajos), Buena = media, Súper/Surf = fuertes
+  (`TERRAIN_BST_CEIL` + ventanas de nivel por tabla en `applyEncounterAutofill`).
+- **Equipos de entrenador** (`✨ Auto-equipo` en el inspector · `✨ Auto-equipos`
+  para todo el mapa): `buildTrainerTeam` filtra por **tipo/tipos** y generación,
+  y la **dificultad 1-10** escala el BST objetivo, los niveles y (a 9-10) habilita
+  legendarios; tamaño de equipo configurable o "conservar el actual" de cada NPC.
+
+> Como el resto del editor, el auto-relleno escribe en el mismo estado
+> (`encounters` / `trainers`) que la edición manual: persiste a Supabase
+> (preview) y, los entrenadores, al `.ts` en el commit. Siempre es ajustable a
+> mano después (reemplaza la tabla/equipo actual).
+
 ### Responsive
 
 El editor es usable en móvil/tablet: en pantallas ≤820px el inspector pasa a ocupar el ancho completo

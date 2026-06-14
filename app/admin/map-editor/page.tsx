@@ -3,6 +3,10 @@
 import { useEffect, useLayoutEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { parseMapTS } from './parse-ts';
 import { ITEM_NAMES } from '../item-names';
+import {
+  ALL_TYPES, buildEncounterTable, buildTrainerTeam,
+  type GenChoice, type TimeSegment, type TerrainKind,
+} from './pokemon-pool';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────
 
@@ -885,6 +889,50 @@ function nearestZoomLevel(z: number): number {
 const MINIMAP_WIDTH = 237;
 const MINIMAP_HEIGHT = 201;
 const MINIMAP_DISPLAY_SCALE = 2;
+// Límites del pinch-zoom del minimapa (1 = imagen ajustada al ancho del panel).
+const MM_MIN_SCALE = 1;
+const MM_MAX_SCALE = 6;
+
+// ── Agrupación automática de puntos del minimapa ──────────────────────────
+// Los interiores se nombran siempre `<padre>-<sufijo>` (p.ej. `pewter-city-gym`,
+// `pallet-town-house-a-1f`), así que el padre se deduce como el mapa-prefijo
+// más largo que EXISTA de verdad. Las mazmorras con plantas no tienen un mapa
+// raíz sin sufijo (`mt-moon-1f/2f/3f`), por lo que se agrupan bajo una clave
+// sintética de esta lista. La resolución es transitiva → todo cae bajo su
+// ciudad/mazmorra principal en un único nivel.
+const MINIMAP_FLOOR_GROUPS = [
+  'mt-moon', 'rock-tunnel', 'pokemon-tower', 'silph-co', 'pokemon-mansion',
+  'cerulean-cave', 'seafoam-islands', 'victory-road', 'ss-anne',
+  'safari-zone', 'underground-path', 'elite-four',
+];
+
+function minimapDirectParent(mapId: string, allIds: readonly string[]): string {
+  let best = '';
+  for (const cand of allIds) {
+    if (cand !== mapId && mapId.startsWith(cand + '-') && cand.length > best.length) {
+      best = cand;
+    }
+  }
+  if (best) return best;
+  for (const g of MINIMAP_FLOOR_GROUPS) {
+    if (mapId === g || mapId.startsWith(g + '-')) return g;
+  }
+  return mapId;
+}
+
+function minimapGroupKey(mapId: string, allIds: readonly string[]): string {
+  let cur = mapId;
+  for (let i = 0; i < 8; i++) {
+    const parent = minimapDirectParent(cur, allIds);
+    if (parent === cur) break;
+    cur = parent;
+  }
+  return cur;
+}
+
+function prettyMapName(id: string): string {
+  return id.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
 
 // ── Estilos compartidos ───────────────────────────────────────────────────
 
@@ -899,6 +947,19 @@ const inputStyle: React.CSSProperties = {
   outline: 'none',
   width: '100%',
   boxSizing: 'border-box',
+};
+
+const zoomBtnStyle: React.CSSProperties = {
+  width: 26,
+  height: 24,
+  padding: 0,
+  fontSize: 13,
+  lineHeight: 1,
+  cursor: 'pointer',
+  borderRadius: 4,
+  background: '#1a1a2a',
+  border: '1px solid #3a3a5a',
+  color: '#bcbce0',
 };
 
 const navBtnStyle: React.CSSProperties = {
@@ -1708,6 +1769,9 @@ export default function MapEditor() {
   const [editMode, setEditMode] = useState<EditMode>('npc');
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [picker, setPicker] = useState<PickerState>(null);
+  // Auto-relleno de contenido (Pokémon salvajes / equipos de entrenador).
+  const [autofillEnc, setAutofillEnc] = useState<{ tables: EncounterTableKey[]; isCave: boolean } | null>(null);
+  const [autofillTr, setAutofillTr] = useState<{ scope: 'one' | 'all'; index: number | null } | null>(null);
   const [zoom, setZoom] = useState(32);
   const [showGrid, setShowGrid] = useState(true);
   const [showWalls, setShowWalls] = useState(true);
@@ -1722,6 +1786,30 @@ export default function MapEditor() {
   const [showMinimap, setShowMinimap] = useState(false);
   const [minimapMode, setMinimapMode] = useState<'edit' | 'navigate'>('navigate');
   const [minimapPos, setMinimapPos] = useState<{ x: number; y: number } | null>(null);
+  // Vista del minimapa de Kanto (pan + pinch-zoom). Las coordenadas de los
+  // puntos se siguen expresando en % sobre la imagen, así que el transform
+  // del contenedor desplaza/escala imagen y puntos a la vez: nunca se
+  // desajustan. El mapeo tap→píxel usa el rect REAL de la imagen (que ya
+  // refleja el transform), por lo que también es independiente del zoom.
+  const [mmView, setMmView] = useState<{ scale: number; tx: number; ty: number }>({ scale: 1, tx: 0, ty: 0 });
+  // Grupo desplegado en modo Navegar (ciudad/mazmorra cuyos sub-mapas se listan).
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const mmViewportRef = useRef<HTMLDivElement>(null);
+  const mmImgRef = useRef<HTMLImageElement>(null);
+  // Gesto del minimapa: 1 dedo = tocar (editar/navegar), 2 dedos = pan+pinch,
+  // ratón = arrastrar para desplazar / clic para tocar, rueda = zoom focal.
+  const mmGesture = useRef<{
+    pointers: Map<number, { x: number; y: number }>;
+    mode: 'none' | 'pinch' | 'mouse-pan';
+    startScale: number; startTx: number; startTy: number;
+    startDist: number; startCx: number; startCy: number;
+    downX: number; downY: number; moved: boolean; downType: string;
+  }>({
+    pointers: new Map(), mode: 'none',
+    startScale: 1, startTx: 0, startTy: 0,
+    startDist: 0, startCx: 0, startCy: 0,
+    downX: 0, downY: 0, moved: false, downType: '',
+  });
 
   const dragging = useRef<{ idx: number; startX: number; startY: number } | null>(null);
   // Drag genérico para texts/items/gifts/portals
@@ -1812,6 +1900,31 @@ export default function MapEditor() {
       gesture.current.startScrollTop = el.scrollTop;
     }
   }, [zoom]);
+
+  // Rueda del ratón sobre el minimapa = zoom focal (listener nativo no pasivo
+  // para poder preventDefault y que no haga scroll de la página).
+  useEffect(() => {
+    const vp = mmViewportRef.current;
+    if (!vp || !showMinimap) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = vp.getBoundingClientRect();
+      const fx = e.clientX - rect.left;
+      const fy = e.clientY - rect.top;
+      setMmView((prev) => {
+        const factor = e.deltaY < 0 ? 1.2 : 1 / 1.2;
+        const scale = Math.max(MM_MIN_SCALE, Math.min(MM_MAX_SCALE, prev.scale * factor));
+        const cx = (fx - prev.tx) / prev.scale;
+        const cy = (fy - prev.ty) / prev.scale;
+        const w = vp.clientWidth, h = vp.clientHeight;
+        const tx = Math.min(0, Math.max(w - w * scale, fx - cx * scale));
+        const ty = Math.min(0, Math.max(h - h * scale, fy - cy * scale));
+        return { scale, tx, ty };
+      });
+    };
+    vp.addEventListener('wheel', onWheel, { passive: false });
+    return () => vp.removeEventListener('wheel', onWheel);
+  }, [showMinimap]);
 
   const onCanvasScrollPointerDown = useCallback((e: React.PointerEvent) => {
     const el = scrollRef.current;
@@ -2447,6 +2560,73 @@ export default function MapEditor() {
     setDirty(true);
   }
 
+  // ── Auto-relleno de Pokémon salvajes ──────────────────────────────────
+  // Mapea cada tabla a su terreno (la tabla `walk` cambia de pool según el
+  // mapa sea cueva o no) y a una ventana de niveles dentro del rango global,
+  // para que la Caña Vieja saque debiluchos y la Súper Caña ejemplares fuertes.
+  function applyEncounterAutofill(cfg: EncounterAutofillConfig) {
+    if (!autofillEnc) return;
+    const lo = Math.min(cfg.minLevel, cfg.maxLevel);
+    const hi = Math.max(cfg.minLevel, cfg.maxLevel);
+    const span = hi - lo;
+    const slice = (a: number, b: number): [number, number] => [
+      Math.round(lo + span * a),
+      Math.round(lo + span * b),
+    ];
+    const TABLE_TERRAIN: Record<EncounterTableKey, TerrainKind> = {
+      walk: autofillEnc.isCave ? 'cave' : 'grass',
+      oldRod: 'oldRod', goodRod: 'goodRod', superRod: 'superRod', surfSpots: 'surf',
+    };
+    const TABLE_LEVELS: Record<EncounterTableKey, [number, number]> = {
+      walk: [lo, hi],
+      oldRod: slice(0, 0.35),
+      goodRod: slice(0.25, 0.7),
+      superRod: slice(0.5, 1),
+      surfSpots: slice(0.3, 1),
+    };
+    const TABLE_COUNT: Record<EncounterTableKey, number> = {
+      walk: cfg.count, oldRod: 2, goodRod: 3, superRod: 3, surfSpots: 3,
+    };
+    const patch: EncountersOverride = {};
+    for (const key of autofillEnc.tables) {
+      const [tlo, thi] = TABLE_LEVELS[key];
+      patch[key] = buildEncounterTable({
+        gen: cfg.gen,
+        terrain: TABLE_TERRAIN[key],
+        minLevel: tlo,
+        maxLevel: thi,
+        count: TABLE_COUNT[key],
+        allowedTimes: cfg.allowedTimes,
+        autoTimeBias: cfg.autoTimeBias,
+        includeLegendary: cfg.includeLegendary,
+      });
+    }
+    setEncounters((e) => ({ ...e, ...patch }));
+    setDirty(true);
+    setAutofillEnc(null);
+  }
+
+  // ── Auto-relleno de equipos de entrenador ─────────────────────────────
+  function applyTrainerAutofill(cfg: TrainerAutofillConfig) {
+    if (!autofillTr) return;
+    const makeTeam = (currentSize: number) => buildTrainerTeam({
+      gen: cfg.gen,
+      types: cfg.types,
+      difficulty: cfg.difficulty,
+      minLevel: cfg.minLevel,
+      maxLevel: cfg.maxLevel,
+      size: cfg.keepSize && currentSize > 0 ? currentSize : cfg.size,
+    });
+    if (autofillTr.scope === 'one' && autofillTr.index !== null) {
+      const idx = autofillTr.index;
+      setTrainers((prev) => prev.map((t, i) => i === idx ? { ...t, pokemon: makeTeam(t.pokemon.length) } : t));
+    } else if (autofillTr.scope === 'all') {
+      setTrainers((prev) => prev.map((t) => ({ ...t, pokemon: makeTeam(t.pokemon.length) })));
+    }
+    setDirty(true);
+    setAutofillTr(null);
+  }
+
   // ── Walls / Fences / Grass (mismo formato Record<row, col[]>) ──────────
   function setMaskAt(
     src: Record<string, number[]>,
@@ -3042,6 +3222,172 @@ export default function MapEditor() {
     .map((id) => ({ id, coord: mapData[id]?.minimapPos ?? BASE_MINIMAP_COORDS[id], name: mapData[id]?.name ?? id }))
     .filter((entry): entry is { id: string; coord: { x: number; y: number }; name: string } => !!entry.coord);
 
+  // ── Grupos del minimapa (automáticos por nombre) ───────────────────────
+  // Un punto por ciudad/mazmorra; los interiores (gimnasio, centro, casas,
+  // plantas…) se listan al desplegar su grupo. La coordenada del grupo es la
+  // del mapa padre o, si el padre no tiene (mazmorras), la del primer miembro
+  // que sí la tenga.
+  const allMapIds = Object.keys(mapData);
+  const minimapGroups = (() => {
+    const byKey = new Map<string, string[]>();
+    for (const id of allMapIds) {
+      const k = minimapGroupKey(id, allMapIds);
+      const arr = byKey.get(k);
+      if (arr) arr.push(id); else byKey.set(k, [id]);
+    }
+    const list: { key: string; name: string; coord: { x: number; y: number }; members: string[] }[] = [];
+    for (const [key, members] of byKey.entries()) {
+      let coord = getMinimapCoords(key);
+      if (!coord) {
+        for (const m of members) { const c = getMinimapCoords(m); if (c) { coord = c; break; } }
+      }
+      if (!coord) continue;
+      const name = mapData[key]?.name ?? prettyMapName(key);
+      const sorted = [...members].sort((a, b) => {
+        if (a === key) return -1;
+        if (b === key) return 1;
+        return (mapData[a]?.name ?? a).localeCompare(mapData[b]?.name ?? b);
+      });
+      list.push({ key, name, coord, members: sorted });
+    }
+    return list;
+  })();
+  const currentGroupKey = minimapGroupKey(selectedMapId, allMapIds);
+  const openGroupData = openGroup ? minimapGroups.find((g) => g.key === openGroup) ?? null : null;
+
+  // ── Gesto del minimapa: pan + pinch-zoom (no desajusta los puntos) ──────
+  const clampMmView = (v: { scale: number; tx: number; ty: number }) => {
+    const vp = mmViewportRef.current;
+    const scale = Math.max(MM_MIN_SCALE, Math.min(MM_MAX_SCALE, v.scale));
+    if (!vp) return { scale, tx: 0, ty: 0 };
+    const w = vp.clientWidth, h = vp.clientHeight;
+    return {
+      scale,
+      tx: Math.min(0, Math.max(w - w * scale, v.tx)),
+      ty: Math.min(0, Math.max(h - h * scale, v.ty)),
+    };
+  };
+  const zoomMmAroundCenter = (factor: number) => {
+    const vp = mmViewportRef.current;
+    setMmView((prev) => {
+      const scale = Math.max(MM_MIN_SCALE, Math.min(MM_MAX_SCALE, prev.scale * factor));
+      const w = vp?.clientWidth ?? 0, h = vp?.clientHeight ?? 0;
+      const fx = w / 2, fy = h / 2;
+      const cx = (fx - prev.tx) / prev.scale;
+      const cy = (fy - prev.ty) / prev.scale;
+      return clampMmView({ scale, tx: fx - cx * scale, ty: fy - cy * scale });
+    });
+  };
+  const MM_TAP_THRESH = 6;
+  const performMinimapTap = (clientX: number, clientY: number) => {
+    const img = mmImgRef.current;
+    if (!img) return;
+    const rect = img.getBoundingClientRect();
+    const px = Math.max(0, Math.min(MINIMAP_WIDTH, Math.round(((clientX - rect.left) / rect.width) * MINIMAP_WIDTH)));
+    const py = Math.max(0, Math.min(MINIMAP_HEIGHT, Math.round(((clientY - rect.top) / rect.height) * MINIMAP_HEIGHT)));
+    if (minimapMode === 'edit') {
+      setMinimapPos({ x: px, y: py });
+      setDirty(true);
+      return;
+    }
+    // Navegar: grupo más cercano. Singleton → ir directo; grupo → desplegar.
+    let best: typeof minimapGroups[number] | null = null;
+    let bestDist = Infinity;
+    for (const grp of minimapGroups) {
+      const d = Math.hypot(grp.coord.x - px, grp.coord.y - py);
+      if (d < bestDist) { bestDist = d; best = grp; }
+    }
+    if (best && bestDist < 16) {
+      setOpenGroup(best.key);
+      if (best.members.length === 1) selectMap(best.members[0]);
+    }
+  };
+  const onMmPointerDown = (e: React.PointerEvent) => {
+    const vp = mmViewportRef.current;
+    if (!vp) return;
+    const g = mmGesture.current;
+    if (e.pointerType === 'touch') {
+      g.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (g.pointers.size === 2) {
+        const [a, b] = [...g.pointers.values()];
+        const rect = vp.getBoundingClientRect();
+        g.mode = 'pinch';
+        g.startScale = mmView.scale; g.startTx = mmView.tx; g.startTy = mmView.ty;
+        g.startDist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+        g.startCx = (a.x + b.x) / 2 - rect.left;
+        g.startCy = (a.y + b.y) / 2 - rect.top;
+        for (const id of g.pointers.keys()) vp.setPointerCapture?.(id);
+        e.preventDefault();
+      } else if (g.pointers.size === 1) {
+        g.mode = 'none';
+        g.downX = e.clientX; g.downY = e.clientY; g.moved = false; g.downType = 'touch';
+      }
+    } else {
+      g.mode = 'none';
+      g.downX = e.clientX; g.downY = e.clientY; g.moved = false; g.downType = e.pointerType;
+      g.startTx = mmView.tx; g.startTy = mmView.ty;
+      vp.setPointerCapture?.(e.pointerId);
+    }
+  };
+  const onMmPointerMove = (e: React.PointerEvent) => {
+    const vp = mmViewportRef.current;
+    if (!vp) return;
+    const g = mmGesture.current;
+    if (g.pointers.has(e.pointerId)) g.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (g.mode === 'pinch' && g.pointers.size >= 2) {
+      e.preventDefault();
+      const [a, b] = [...g.pointers.values()];
+      const rect = vp.getBoundingClientRect();
+      const cx = (a.x + b.x) / 2 - rect.left;
+      const cy = (a.y + b.y) / 2 - rect.top;
+      const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      const scale = Math.max(MM_MIN_SCALE, Math.min(MM_MAX_SCALE, g.startScale * (dist / g.startDist)));
+      // Punto focal (contenido) bajo el centro inicial → se mantiene bajo el
+      // centro actual: zoom anclado a los dedos + pan siguiendo su movimiento.
+      const focalX = (g.startCx - g.startTx) / g.startScale;
+      const focalY = (g.startCy - g.startTy) / g.startScale;
+      setMmView(clampMmView({ scale, tx: cx - focalX * scale, ty: cy - focalY * scale }));
+      return;
+    }
+    if (g.downType && g.downType !== 'touch') {
+      const dx = e.clientX - g.downX, dy = e.clientY - g.downY;
+      if (!g.moved && Math.hypot(dx, dy) > MM_TAP_THRESH) g.moved = true;
+      if (g.moved) {
+        g.mode = 'mouse-pan';
+        setMmView(clampMmView({ scale: mmView.scale, tx: g.startTx + dx, ty: g.startTy + dy }));
+      }
+      return;
+    }
+    if (g.downType === 'touch' && g.pointers.size === 1) {
+      if (Math.hypot(e.clientX - g.downX, e.clientY - g.downY) > MM_TAP_THRESH) g.moved = true;
+    }
+  };
+  const onMmPointerUp = (e: React.PointerEvent) => {
+    const vp = mmViewportRef.current;
+    const g = mmGesture.current;
+    const wasTouch = e.pointerType === 'touch';
+    if (g.pointers.has(e.pointerId)) g.pointers.delete(e.pointerId);
+    vp?.releasePointerCapture?.(e.pointerId);
+    if (g.mode === 'pinch') {
+      if (g.pointers.size < 2) {
+        g.mode = 'none';
+        // Si queda un dedo apoyado, márcalo como "movido" para que al soltarlo
+        // no se interprete como un tap accidental.
+        if (g.pointers.size === 1) {
+          const [p] = [...g.pointers.values()];
+          g.downX = p.x; g.downY = p.y; g.moved = true; g.downType = 'touch';
+        }
+      }
+      return;
+    }
+    if (g.mode === 'mouse-pan') { g.mode = 'none'; return; }
+    const moved = g.moved;
+    g.mode = 'none';
+    if (wasTouch && g.pointers.size > 0) return; // aún hay dedos: no es un tap
+    if (moved) return;
+    performMinimapTap(e.clientX, e.clientY);
+  };
+
   const sortedMapIds = Object.keys(mapData).sort((a, b) =>
     (mapData[a]?.name ?? a).localeCompare(mapData[b]?.name ?? b),
   );
@@ -3381,6 +3727,15 @@ export default function MapEditor() {
         <button onClick={addNpc} disabled={editMode !== 'npc'} style={{ padding: '4px 12px', background: editMode === 'npc' ? '#2a4a2a' : '#1a1a2a', border: '1px solid #4a8a4a', borderRadius: 4, color: editMode === 'npc' ? '#88ff88' : '#444', cursor: editMode === 'npc' ? 'pointer' : 'not-allowed', fontSize: 13 }}>
           + NPC
         </button>
+        <button
+          className="me-tb-secondary"
+          onClick={() => setAutofillTr({ scope: 'all', index: null })}
+          disabled={editMode !== 'npc' || trainers.length === 0}
+          title="Auto-generar el equipo de TODOS los entrenadores del mapa"
+          style={{ padding: '4px 12px', background: editMode === 'npc' && trainers.length ? '#2a2a4a' : '#1a1a2a', border: '1px solid #6a5a9a', borderRadius: 4, color: editMode === 'npc' && trainers.length ? '#c8b0ff' : '#444', cursor: editMode === 'npc' && trainers.length ? 'pointer' : 'not-allowed', fontSize: 12 }}
+        >
+          ✨ Auto-equipos
+        </button>
 
         {/* Guardar */}
         <button onClick={save} disabled={!dirty || saving} style={{ padding: '4px 12px', background: saveFlash ? '#2a6a2a' : (dirty ? '#3a3a7a' : '#1a1a3a'), border: `1px solid ${dirty ? '#6060c0' : '#2a2a4a'}`, borderRadius: 4, color: dirty ? '#fff' : '#555', cursor: dirty ? 'pointer' : 'default', fontSize: 13, transition: 'all 0.3s' }}>
@@ -3535,100 +3890,113 @@ export default function MapEditor() {
           background: '#0d0d20',
           borderBottom: '1px solid #2a2a4a',
           display: 'flex',
+          flexWrap: 'wrap',
           alignItems: 'flex-start',
           gap: 16,
           padding: '12px 20px',
         }}>
-          {/* Imagen interactiva */}
+          {/* Imagen interactiva — viewport con pan + pinch-zoom */}
           <div
+            ref={mmViewportRef}
+            onPointerDown={onMmPointerDown}
+            onPointerMove={onMmPointerMove}
+            onPointerUp={onMmPointerUp}
+            onPointerCancel={onMmPointerUp}
             style={{
               position: 'relative',
-              display: 'inline-block',
               flexShrink: 0,
-              cursor: minimapMode === 'edit' ? 'crosshair' : 'pointer',
+              overflow: 'hidden',
+              width: MINIMAP_WIDTH * MINIMAP_DISPLAY_SCALE,
+              maxWidth: '100%',
+              aspectRatio: `${MINIMAP_WIDTH} / ${MINIMAP_HEIGHT}`,
+              background: '#000',
+              touchAction: 'none',
+              cursor: minimapMode === 'edit' ? 'crosshair' : 'grab',
               outline: minimapMode === 'edit' ? '2px solid #ffaa44' : '2px solid #2a2a4a',
               borderRadius: 2,
             }}
-            onClick={(e) => {
-              const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-              const px = Math.max(0, Math.min(MINIMAP_WIDTH, Math.round(((e.clientX - rect.left) / rect.width) * MINIMAP_WIDTH)));
-              const py = Math.max(0, Math.min(MINIMAP_HEIGHT, Math.round(((e.clientY - rect.top) / rect.height) * MINIMAP_HEIGHT)));
-              if (minimapMode === 'edit') {
-                setMinimapPos({ x: px, y: py });
-                setDirty(true);
-              } else {
-                // Navegar: buscar el mapa más cercano
-                let bestId = '';
-                let bestDist = Infinity;
-                for (const { id, coord } of minimapEntries) {
-                  const d = Math.hypot(coord.x - px, coord.y - py);
-                  if (d < bestDist) { bestDist = d; bestId = id; }
-                }
-                if (bestId && bestDist < 20) selectMap(bestId);
-              }
-            }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/api/admin/map-image/kanto_region.png"
-              alt="Kanto minimap"
-              width={MINIMAP_WIDTH * MINIMAP_DISPLAY_SCALE}
-              height={MINIMAP_HEIGHT * MINIMAP_DISPLAY_SCALE}
-              style={{ imageRendering: 'pixelated', display: 'block' }}
-              draggable={false}
-            />
-            {/* Todos los puntos conocidos (modo navegar) */}
-            {minimapMode === 'navigate' && minimapEntries.map(({ id, coord, name }) => {
-              const isCurrent = id === selectedMapId;
-              return (
-                <div key={id} title={`${name} · ${id} (${coord.x}, ${coord.y})`} style={{
+            {/* Contenido transformado: imagen + puntos se desplazan/escalan
+                juntos, así que los puntos nunca se desajustan. */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              transformOrigin: '0 0',
+              transform: `translate(${mmView.tx}px, ${mmView.ty}px) scale(${mmView.scale})`,
+            }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                ref={mmImgRef}
+                src="/api/admin/map-image/kanto_region.png"
+                alt="Kanto minimap"
+                style={{ width: '100%', height: '100%', display: 'block', imageRendering: 'pixelated' }}
+                draggable={false}
+              />
+              {/* Puntos de grupo (modo navegar) — contra-escalados para que
+                  mantengan tamaño constante en pantalla a cualquier zoom. */}
+              {minimapMode === 'navigate' && minimapGroups.map((grp) => {
+                const isCurrent = grp.key === currentGroupKey;
+                const isOpen = grp.key === openGroup;
+                const multi = grp.members.length > 1;
+                return (
+                  <div key={grp.key} title={`${grp.name}${multi ? ` · ${grp.members.length} mapas` : ''} (${grp.coord.x}, ${grp.coord.y})`} style={{
+                    position: 'absolute',
+                    left: `${(grp.coord.x / MINIMAP_WIDTH) * 100}%`,
+                    top: `${(grp.coord.y / MINIMAP_HEIGHT) * 100}%`,
+                    transform: `translate(-50%, -50%) scale(${1 / mmView.scale})`,
+                    width: isCurrent ? 12 : 9,
+                    height: isCurrent ? 12 : 9,
+                    borderRadius: '50%',
+                    background: isCurrent ? '#ff2222' : (multi ? '#ffcc44' : '#4488ff'),
+                    border: isOpen ? '2px solid #fff' : (multi ? '1.5px solid rgba(255,255,255,0.85)' : '1px solid rgba(255,255,255,0.5)'),
+                    boxShadow: isCurrent ? '0 0 4px 2px rgba(255,60,60,0.7)' : '0 0 3px rgba(0,0,0,0.85)',
+                    pointerEvents: 'none',
+                  }} />
+                );
+              })}
+              {/* Modo editar: puntos de referencia (tenues) + punto editable */}
+              {minimapMode === 'edit' && minimapGroups.map((grp) => (
+                <div key={grp.key} style={{
                   position: 'absolute',
-                  left: `${(coord.x / MINIMAP_WIDTH) * 100}%`,
-                  top: `${(coord.y / MINIMAP_HEIGHT) * 100}%`,
-                  transform: 'translate(-50%, -50%)',
-                  width: isCurrent ? 10 : 6,
-                  height: isCurrent ? 10 : 6,
-                  borderRadius: '50%',
-                  background: isCurrent ? '#ff2222' : (mapData[id]?.minimapPos ? '#4488ff' : '#7788aa'),
-                  boxShadow: isCurrent ? '0 0 4px 2px rgba(255,60,60,0.7)' : '0 0 2px rgba(80,140,255,0.6)',
-                  pointerEvents: 'none',
-                  opacity: isCurrent ? 1 : (mapData[id]?.minimapPos ? 0.78 : 0.48),
+                  left: `${(grp.coord.x / MINIMAP_WIDTH) * 100}%`,
+                  top: `${(grp.coord.y / MINIMAP_HEIGHT) * 100}%`,
+                  transform: `translate(-50%, -50%) scale(${1 / mmView.scale})`,
+                  width: 7, height: 7, borderRadius: '50%',
+                  background: grp.key === currentGroupKey ? '#88aaff' : '#445',
+                  opacity: 0.5, pointerEvents: 'none',
                 }} />
-              );
-            })}
-            {/* Punto editable del mapa actual (modo editar) */}
-            {minimapMode === 'edit' && (() => {
-              const dot = minimapPos ?? minimapCoords;
-              if (!dot) return null;
-              const saved = !!minimapPos;
-              return (
-                <div style={{
-                  position: 'absolute',
-                  left: `${(dot.x / MINIMAP_WIDTH) * 100}%`,
-                  top: `${(dot.y / MINIMAP_HEIGHT) * 100}%`,
-                  transform: 'translate(-50%, -50%)',
-                  width: 10,
-                  height: 10,
-                  borderRadius: '50%',
-                  background: saved ? '#ff2222' : '#ff8800',
-                  boxShadow: `0 0 4px 2px ${saved ? 'rgba(255,60,60,0.7)' : 'rgba(255,140,0,0.6)'}`,
-                  pointerEvents: 'none',
-                  border: saved ? 'none' : '1px dashed #fff',
-                }} />
-              );
-            })()}
+              ))}
+              {minimapMode === 'edit' && (() => {
+                const dot = minimapPos ?? minimapCoords;
+                if (!dot) return null;
+                const saved = !!minimapPos;
+                return (
+                  <div style={{
+                    position: 'absolute',
+                    left: `${(dot.x / MINIMAP_WIDTH) * 100}%`,
+                    top: `${(dot.y / MINIMAP_HEIGHT) * 100}%`,
+                    transform: `translate(-50%, -50%) scale(${1 / mmView.scale})`,
+                    width: 11, height: 11, borderRadius: '50%',
+                    background: saved ? '#ff2222' : '#ff8800',
+                    boxShadow: `0 0 4px 2px ${saved ? 'rgba(255,60,60,0.7)' : 'rgba(255,140,0,0.6)'}`,
+                    pointerEvents: 'none',
+                    border: saved ? 'none' : '1px dashed #fff',
+                  }} />
+                );
+              })()}
+            </div>
           </div>
 
           {/* Panel lateral */}
-          <div style={{ fontSize: 12, color: '#888', paddingTop: 4, minWidth: 180 }}>
+          <div style={{ fontSize: 12, color: '#888', paddingTop: 4, minWidth: 180, flex: 1 }}>
             <div style={{ color: '#a0a0ff', fontWeight: 700, marginBottom: 8 }}>
               {mapData[selectedMapId]?.name ?? selectedMapId}
             </div>
 
             {/* Botones de modo */}
-            <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
               {(['navigate', 'edit'] as const).map((mode) => (
-                <button key={mode} onClick={() => setMinimapMode(mode)} style={{
+                <button key={mode} onClick={() => { setMinimapMode(mode); setOpenGroup(null); }} style={{
                   padding: '3px 10px', fontSize: 11, cursor: 'pointer', borderRadius: 4,
                   background: minimapMode === mode ? (mode === 'edit' ? '#3a2a0a' : '#0a1a3a') : '#1a1a2a',
                   border: `1px solid ${minimapMode === mode ? (mode === 'edit' ? '#ffaa44' : '#4488ff') : '#3a3a5a'}`,
@@ -3637,6 +4005,17 @@ export default function MapEditor() {
                   {mode === 'navigate' ? '🗺️ Navegar' : '📍 Editar pos'}
                 </button>
               ))}
+            </div>
+
+            {/* Controles de zoom (pan + pinch con dos dedos en móvil) */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+              <button onClick={() => zoomMmAroundCenter(1 / 1.4)} title="Alejar" style={zoomBtnStyle}>−</button>
+              <span style={{ color: '#9090b0', fontSize: 11, minWidth: 34, textAlign: 'center' }}>{mmView.scale.toFixed(1)}×</span>
+              <button onClick={() => zoomMmAroundCenter(1.4)} title="Acercar" style={zoomBtnStyle}>＋</button>
+              <button onClick={() => setMmView({ scale: 1, tx: 0, ty: 0 })} title="Ajustar a la vista" style={{ ...zoomBtnStyle, width: 'auto', padding: '2px 8px' }}>⤢ Ajustar</button>
+            </div>
+            <div style={{ color: '#556', fontSize: 10, marginBottom: 8 }}>
+              📱 Dos dedos para mover y escalar · un dedo para {minimapMode === 'edit' ? 'fijar la posición' : 'elegir grupo'}.
             </div>
 
             {minimapMode === 'edit' ? (
@@ -3701,10 +4080,44 @@ export default function MapEditor() {
                   </button>
                 )}
               </div>
+            ) : openGroupData && openGroupData.members.length > 1 ? (
+              /* Grupo desplegado: lista de sus sub-mapas (casas, plantas, gimnasio…) */
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ color: '#ffd166', fontWeight: 700 }}>{openGroupData.name} · {openGroupData.members.length}</span>
+                  <button onClick={() => setOpenGroup(null)} style={{
+                    padding: '1px 7px', fontSize: 11, cursor: 'pointer', borderRadius: 4,
+                    background: '#1a1a2a', border: '1px solid #3a3a5a', color: '#aaa',
+                  }}>✕</button>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 3, maxHeight: 200, overflowY: 'auto' }}>
+                  {openGroupData.members.map((m) => {
+                    const isSel = m === selectedMapId;
+                    const hasPos = !!mapData[m]?.minimapPos;
+                    return (
+                      <button key={m} onClick={() => selectMap(m)} title={m} style={{
+                        textAlign: 'left', padding: '3px 8px', fontSize: 11, borderRadius: 4, cursor: 'pointer',
+                        background: isSel ? '#0a2a4a' : '#141428',
+                        border: `1px solid ${isSel ? '#4488ff' : '#2a2a44'}`,
+                        color: isSel ? '#bcd8ff' : '#cfcfe8',
+                        display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center',
+                      }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {m === openGroupData.key ? '★ ' : ''}{mapData[m]?.name ?? m}
+                        </span>
+                        <span title={hasPos ? 'Con posición propia' : 'Sin posición propia (hereda)'} style={{ color: hasPos ? '#5ad17a' : '#5a5a6a', fontSize: 10 }}>
+                          {hasPos ? '●' : '○'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             ) : (
               <div style={{ color: '#555', fontSize: 11, lineHeight: 1.7 }}>
-                Click cerca de un punto para ir a ese mapa. También puedes usar las flechas del teclado.
-                <br />Azul = posición guardada · Gris = fallback · Rojo = mapa actual.
+                Toca un punto para ir a ese mapa o desplegar su grupo.
+                <br />🟡 Grupo (ciudad/mazmorra con interiores) · 🔵 Mapa suelto · 🔴 Mapa actual.
+                <br />También puedes usar las flechas del teclado.
               </div>
             )}
           </div>
@@ -4455,6 +4868,12 @@ export default function MapEditor() {
                   countLabel="grass"
                   sourceFile={currentMap?.sourceFile}
                 />
+                <button
+                  onClick={() => setAutofillEnc({ tables: ['walk'], isCave: !!cave })}
+                  style={{ width: '100%', padding: '6px 0', fontSize: 12, cursor: 'pointer', borderRadius: 6, background: '#1a2e3a', border: '1px solid #4a7a8a', color: '#a0e0ff', marginBottom: 8 }}
+                >
+                  ✨ Auto-rellenar {cave ? 'cueva' : 'hierba'} (rango, gen, horario…)
+                </button>
                 <EncountersTableEditor
                   title="🌿 Pokémon en hierba"
                   tableKey="walk"
@@ -4481,6 +4900,12 @@ export default function MapEditor() {
                   countLabel="water"
                   sourceFile={currentMap?.sourceFile}
                 />
+                <button
+                  onClick={() => setAutofillEnc({ tables: ['oldRod', 'goodRod', 'superRod', 'surfSpots'], isCave: false })}
+                  style={{ width: '100%', padding: '6px 0', fontSize: 12, cursor: 'pointer', borderRadius: 6, background: '#1a2e3a', border: '1px solid #4a7a8a', color: '#a0e0ff', marginBottom: 8 }}
+                >
+                  ✨ Auto-rellenar pesca + surf (3 cañas diferenciadas)
+                </button>
                 <EncountersTableEditor
                   title="🎣 Caña Vieja"
                   tableKey="oldRod"
@@ -4722,6 +5147,7 @@ export default function MapEditor() {
                 onChange={updateSelected}
                 onDelete={() => deleteNpc(selectedIdx!)}
                 openPicker={setPicker}
+                onAutofill={() => setAutofillTr({ scope: 'one', index: selectedIdx! })}
                 currentMapId={selectedMapId}
               />
             )}
@@ -4748,18 +5174,269 @@ export default function MapEditor() {
           onClose={() => setShowGraph(false)}
         />
       )}
+
+      {/* Auto-relleno de Pokémon salvajes */}
+      {autofillEnc && (
+        <AutofillEncountersModal
+          tables={autofillEnc.tables}
+          isCave={autofillEnc.isCave}
+          onApply={applyEncounterAutofill}
+          onClose={() => setAutofillEnc(null)}
+        />
+      )}
+
+      {/* Auto-relleno de equipos de entrenador */}
+      {autofillTr && (
+        <AutofillTrainersModal
+          scope={autofillTr.scope}
+          count={autofillTr.scope === 'all' ? trainers.length : 1}
+          onApply={applyTrainerAutofill}
+          onClose={() => setAutofillTr(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Auto-relleno de contenido (Pokémon salvajes / equipos) ─────────────────
+
+export interface EncounterAutofillConfig {
+  gen: GenChoice;
+  minLevel: number;
+  maxLevel: number;
+  count: number;
+  allowedTimes: TimeSegment[] | null;
+  autoTimeBias: boolean;
+  includeLegendary: boolean;
+}
+
+export interface TrainerAutofillConfig {
+  gen: GenChoice;
+  types: string[];
+  difficulty: number;
+  minLevel: number;
+  maxLevel: number;
+  size: number;       // tamaño objetivo del equipo
+  keepSize: boolean;  // (scope all) conservar el tamaño actual de cada equipo
+}
+
+const afOverlayStyle: React.CSSProperties = {
+  position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.62)', zIndex: 120,
+  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+};
+const afCardStyle: React.CSSProperties = {
+  background: '#12122a', border: '1px solid #3a3a5a', borderRadius: 8,
+  padding: '18px 20px', width: 380, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto',
+  color: '#cfcfe8', fontSize: 13, boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
+};
+const afLabel: React.CSSProperties = { display: 'block', color: '#9090c0', fontSize: 11, marginBottom: 4, marginTop: 14 };
+const afApplyBtn: React.CSSProperties = {
+  marginTop: 18, width: '100%', padding: '8px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+  borderRadius: 6, background: '#2a5a2a', border: '1px solid #4a8a4a', color: '#bfffbf',
+};
+
+function GenPicker({ value, onChange }: { value: GenChoice; onChange: (g: GenChoice) => void }) {
+  const opts: { v: GenChoice; l: string }[] = [{ v: 1, l: 'Gen I' }, { v: 2, l: 'Gen II' }, { v: 'both', l: 'Ambas' }];
+  return (
+    <div style={{ display: 'flex', gap: 6 }}>
+      {opts.map((o) => (
+        <button key={String(o.v)} onClick={() => onChange(o.v)} style={{
+          flex: 1, padding: '5px 0', fontSize: 12, cursor: 'pointer', borderRadius: 4,
+          background: value === o.v ? '#2a3a6a' : '#1a1a2a',
+          border: `1px solid ${value === o.v ? '#5a7aff' : '#3a3a5a'}`,
+          color: value === o.v ? '#bcd0ff' : '#888',
+        }}>{o.l}</button>
+      ))}
+    </div>
+  );
+}
+
+function AfLevelRange({ min, max, setMin, setMax }: { min: number; max: number; setMin: (n: number) => void; setMax: (n: number) => void }) {
+  const clamp = (n: number) => Math.max(2, Math.min(100, n || 2));
+  return (
+    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+      <div style={{ flex: 1 }}>
+        <span style={{ color: '#888', fontSize: 10 }}>Nivel mín.</span>
+        <input type="number" min={2} max={100} value={min} onChange={(e) => setMin(clamp(parseInt(e.target.value, 10)))} style={{ ...inputStyle, fontSize: 12, padding: '3px 6px' }} />
+      </div>
+      <div style={{ flex: 1 }}>
+        <span style={{ color: '#888', fontSize: 10 }}>Nivel máx.</span>
+        <input type="number" min={2} max={100} value={max} onChange={(e) => setMax(clamp(parseInt(e.target.value, 10)))} style={{ ...inputStyle, fontSize: 12, padding: '3px 6px' }} />
+      </div>
+    </div>
+  );
+}
+
+function AutofillEncountersModal({ tables, isCave, onApply, onClose }: {
+  tables: EncounterTableKey[];
+  isCave: boolean;
+  onApply: (cfg: EncounterAutofillConfig) => void;
+  onClose: () => void;
+}) {
+  const isWater = tables.some((t) => t !== 'walk');
+  const [gen, setGen] = useState<GenChoice>('both');
+  const [minLevel, setMinLevel] = useState(isWater ? 5 : 3);
+  const [maxLevel, setMaxLevel] = useState(isWater ? 35 : 7);
+  const [count, setCount] = useState(7);
+  const segs: TimeSegment[] = ['morning', 'day', 'night'];
+  const [times, setTimes] = useState<Record<TimeSegment, boolean>>({ morning: true, day: true, night: true });
+  const [autoTimeBias, setAutoTimeBias] = useState(true);
+  const [includeLegendary, setIncludeLegendary] = useState(false);
+  const segLabel: Record<TimeSegment, string> = { morning: '🌅 Mañana', day: '☀️ Día', night: '🌙 Noche' };
+
+  const apply = () => {
+    const selected = segs.filter((s) => times[s]);
+    const allowedTimes = selected.length === 0 || selected.length === 3 ? null : selected;
+    onApply({ gen, minLevel, maxLevel, count, allowedTimes, autoTimeBias, includeLegendary });
+  };
+
+  return (
+    <div style={afOverlayStyle} onClick={onClose}>
+      <div style={afCardStyle} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontWeight: 700, color: '#a0d0ff', fontSize: 15 }}>
+            ✨ Auto-rellenar {isWater ? 'pesca y surf' : isCave ? 'cueva' : 'hierba'}
+          </span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#888', fontSize: 18, cursor: 'pointer' }}>×</button>
+        </div>
+        <div style={{ color: '#778', fontSize: 11, marginTop: 4 }}>
+          {isWater
+            ? 'Rellena Caña Vieja, Buena, Súper y Surf con especies de agua adecuadas a cada nivel.'
+            : isCave
+              ? 'Especies típicas de cueva (roca, tierra, veneno, murciélagos…).'
+              : 'Especies comunes de ruta. Las raras salen a nivel algo más alto.'}
+        </div>
+
+        <label style={afLabel}>Generación</label>
+        <GenPicker value={gen} onChange={setGen} />
+
+        <label style={afLabel}>Rango de niveles</label>
+        <AfLevelRange min={minLevel} max={maxLevel} setMin={setMinLevel} setMax={setMaxLevel} />
+
+        {!isWater && (
+          <>
+            <label style={afLabel}>Nº de especies: {count}</label>
+            <input type="range" min={2} max={10} value={count} onChange={(e) => setCount(parseInt(e.target.value, 10))} style={{ width: '100%' }} />
+          </>
+        )}
+
+        <label style={afLabel}>Franjas horarias</label>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {segs.map((s) => (
+            <button key={s} onClick={() => setTimes((t) => ({ ...t, [s]: !t[s] }))} style={{
+              flex: 1, padding: '5px 0', fontSize: 11, cursor: 'pointer', borderRadius: 4,
+              background: times[s] ? '#2a3a5a' : '#1a1a2a',
+              border: `1px solid ${times[s] ? '#5a7aaa' : '#3a3a5a'}`,
+              color: times[s] ? '#bcd' : '#666',
+            }}>{segLabel[s]}</button>
+          ))}
+        </div>
+        <div style={{ color: '#667', fontSize: 10, marginTop: 4 }}>Las tres (o ninguna) = 24 h.</div>
+
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, cursor: 'pointer', color: '#bcd' }}>
+          <input type="checkbox" checked={autoTimeBias} onChange={(e) => setAutoTimeBias(e.target.checked)} />
+          Asignar día/noche según la especie (fantasmas/siniestros de noche…)
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, cursor: 'pointer', color: '#bcd' }}>
+          <input type="checkbox" checked={includeLegendary} onChange={(e) => setIncludeLegendary(e.target.checked)} />
+          Permitir legendarios
+        </label>
+
+        <button onClick={apply} style={afApplyBtn}>✨ Generar y rellenar</button>
+        <div style={{ color: '#665', fontSize: 10, marginTop: 8, textAlign: 'center' }}>Reemplaza la tabla actual. Puedes ajustar a mano después.</div>
+      </div>
+    </div>
+  );
+}
+
+function AutofillTrainersModal({ scope, count, onApply, onClose }: {
+  scope: 'one' | 'all';
+  count: number;
+  onApply: (cfg: TrainerAutofillConfig) => void;
+  onClose: () => void;
+}) {
+  const [gen, setGen] = useState<GenChoice>('both');
+  const [types, setTypes] = useState<string[]>([]);
+  const [difficulty, setDifficulty] = useState(4);
+  const [minLevel, setMinLevel] = useState(5);
+  const [maxLevel, setMaxLevel] = useState(15);
+  const [size, setSize] = useState(scope === 'one' ? 3 : 3);
+  const [keepSize, setKeepSize] = useState(true);
+
+  const toggleType = (t: string) => setTypes((cur) => cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]);
+  const TYPE_ES: Record<string, string> = {
+    normal: 'Normal', fire: 'Fuego', water: 'Agua', electric: 'Eléctrico', grass: 'Planta',
+    ice: 'Hielo', fighting: 'Lucha', poison: 'Veneno', ground: 'Tierra', flying: 'Volador',
+    psychic: 'Psíquico', bug: 'Bicho', rock: 'Roca', ghost: 'Fantasma', dragon: 'Dragón',
+    dark: 'Siniestro', steel: 'Acero',
+  };
+
+  return (
+    <div style={afOverlayStyle} onClick={onClose}>
+      <div style={afCardStyle} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontWeight: 700, color: '#a0d0ff', fontSize: 15 }}>
+            ✨ Auto-equipo {scope === 'all' ? `· todos (${count})` : ''}
+          </span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#888', fontSize: 18, cursor: 'pointer' }}>×</button>
+        </div>
+        <div style={{ color: '#778', fontSize: 11, marginTop: 4 }}>
+          {scope === 'all'
+            ? 'Genera un equipo para CADA entrenador del mapa.'
+            : 'Genera el equipo de este entrenador.'}
+        </div>
+
+        <label style={afLabel}>Generación</label>
+        <GenPicker value={gen} onChange={setGen} />
+
+        <label style={afLabel}>Tipos (vacío = cualquiera)</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          {ALL_TYPES.map((t) => (
+            <button key={t} onClick={() => toggleType(t)} style={{
+              padding: '3px 8px', fontSize: 11, cursor: 'pointer', borderRadius: 4,
+              background: types.includes(t) ? '#3a2a5a' : '#1a1a2a',
+              border: `1px solid ${types.includes(t) ? '#9a7aff' : '#3a3a5a'}`,
+              color: types.includes(t) ? '#d8c8ff' : '#888',
+            }}>{TYPE_ES[t] ?? t}</button>
+          ))}
+        </div>
+
+        <label style={afLabel}>Dificultad: {difficulty} / 10</label>
+        <input type="range" min={1} max={10} value={difficulty} onChange={(e) => setDifficulty(parseInt(e.target.value, 10))} style={{ width: '100%' }} />
+        <div style={{ color: '#667', fontSize: 10 }}>
+          ↑ dificultad = especies más fuertes (BST), niveles más altos{difficulty >= 9 ? ' y legendarios' : ''}.
+        </div>
+
+        <label style={afLabel}>Rango de niveles</label>
+        <AfLevelRange min={minLevel} max={maxLevel} setMin={setMinLevel} setMax={setMaxLevel} />
+
+        {scope === 'all' && (
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, cursor: 'pointer', color: '#bcd' }}>
+            <input type="checkbox" checked={keepSize} onChange={(e) => setKeepSize(e.target.checked)} />
+            Conservar el tamaño de equipo actual de cada entrenador
+          </label>
+        )}
+        <label style={afLabel}>{scope === 'all' && keepSize ? 'Tamaño si el equipo está vacío' : 'Tamaño del equipo'}: {size}</label>
+        <input type="range" min={1} max={6} value={size} onChange={(e) => setSize(parseInt(e.target.value, 10))} style={{ width: '100%' }} />
+
+        <button onClick={() => onApply({ gen, types, difficulty, minLevel, maxLevel, size, keepSize })} style={afApplyBtn}>
+          ✨ Generar {scope === 'all' ? 'equipos' : 'equipo'}
+        </button>
+        <div style={{ color: '#665', fontSize: 10, marginTop: 8, textAlign: 'center' }}>Reemplaza el equipo actual. Ajustable a mano después.</div>
+      </div>
     </div>
   );
 }
 
 // ── Inspector Panel ────────────────────────────────────────────────────────
 
-function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, currentMapId }: {
+function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, onAutofill, currentMapId }: {
   trainer: Trainer;
   idx: number;
   onChange: (patch: Partial<Trainer>) => void;
   onDelete: () => void;
   openPicker: (s: PickerState) => void;
+  onAutofill: () => void;
   currentMapId: string;
 }) {
   const reg = NPC_REGISTRY[trainer.npcKey];
@@ -4852,13 +5529,18 @@ function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, currentM
             <button onClick={() => onChange({ pokemon: trainer.pokemon.filter((_, j) => j !== i) })} style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: 16, padding: 0, lineHeight: 1 }}>×</button>
           </div>
         ))}
-        <button onClick={() => openPicker({
-          kind: 'pokemon',
-          title: 'Añadir Pokémon al entrenador',
-          onPick: (id) => onChange({ pokemon: [...trainer.pokemon, { id, level: 5 }] }),
-        })} style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', padding: '3px 10px' }}>
-          + Pokémon
-        </button>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <button onClick={() => openPicker({
+            kind: 'pokemon',
+            title: 'Añadir Pokémon al entrenador',
+            onPick: (id) => onChange({ pokemon: [...trainer.pokemon, { id, level: 5 }] }),
+          })} style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', padding: '3px 10px' }}>
+            + Pokémon
+          </button>
+          <button onClick={onAutofill} title="Auto-generar el equipo (tipo, dificultad, niveles…)" style={{ fontSize: 12, background: '#1f1a2e', border: '1px solid #6a5a9a', borderRadius: 4, color: '#c8b0ff', cursor: 'pointer', padding: '3px 10px' }}>
+            ✨ Auto-equipo
+          </button>
+        </div>
       </div>
 
       {/* postGame (solo lectura) */}
