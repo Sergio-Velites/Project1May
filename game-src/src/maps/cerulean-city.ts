@@ -131,7 +131,7 @@ const ceruleanCity: MapType = {
     outtro: [
       "Todavía no es tu hora....",
       "Estás seguro de que puedes mejorar el tiempo de Marta y Sergio?",
-      ""
+      "Menudas patas de gallina me llevas."
     ],
     money: 0,
     persistent: true,
