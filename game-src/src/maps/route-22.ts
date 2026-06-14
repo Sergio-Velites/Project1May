@@ -12,10 +12,7 @@ const route22: MapType = {
   image,
   height: 18,
   width: 40,
-  start: {
-    x: 38,
-    y: 8,
-  },
+  start: { x: 38, y: 8 },
 walls: {
     1: [30, 31, 32, 33, 34, 35, 36],
     2: [29, 36],
@@ -38,16 +35,13 @@ walls: {
     3: [30, 31, 32, 34, 35],
     7: [16, 17, 18, 19, 20, 21, 30, 32, 33],
     9: [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13],
-    13: [
-      2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-      22, 23, 24, 25, 30, 31, 32, 34, 35, 36, 37,
-    ],
+    13: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 30, 31, 32, 34, 35, 36, 37],
   },
   text: {
     11: {
       7: [
         "RUTA 22: La ruta del desafío.",
-        "¡Solo los fuertes merecen bailar!",
+        "¡Solo los fuertes merecen bailar!"
       ],
     },
   },
@@ -76,82 +70,79 @@ walls: {
   },
 
   exitReturnMap: MapId.ViridianCity,
-  exitReturnPos: {
-    x: 1,
-    y: 16,
-  },
+  exitReturnPos: { x: 1, y: 16 },
 // Trainers para "route-22"
 // Trainers para "route-22"
 // Trainers para "route-22"
 trainers: [
   {
-  npc: rival,
-  pokemon: [{ id: 2, level: 12 }, { id: 8, level: 12 }, { id: 5, level: 12 }],
-  facing: Direction.Right,
-  pos: { x: 26, y: 5 },
-  intro: [
-    "¡Ey!",
-    "¿Vas a la LIGA PKMN?",
-    "¡Ni lo sueñes! ¡Seguro que no tienes ninguna MEDALLA!",
-    "¡El guardia no te dejará pasar!",
-    "Por cierto, ¿tus PKMN se han hecho más fuertes?",
-    "Pero que dices de una boda?"
-  ],
-  outtro: [
-    "¡Vaya suerte la tuya!",
-    "Con lo tajao que parece que vas"
-  ],
-  money: 280,
-  persistent: true,
-},
+    npc: rival,
+    pokemon: [{ id: 2, level: 12 }, { id: 8, level: 12 }, { id: 5, level: 12 }],
+    facing: Direction.Right,
+    pos: { x: 26, y: 5 },
+    intro: [
+      "¡Ey!",
+      "¿Vas a la LIGA PKMN?",
+      "¡Ni lo sueñes! ¡Seguro que no tienes ninguna MEDALLA!",
+      "¡El guardia no te dejará pasar!",
+      "Por cierto, ¿tus PKMN se han hecho más fuertes?",
+      "Pero que dices de una boda?"
+    ],
+    outtro: [
+      "¡Vaya suerte la tuya!",
+      "Con lo tajao que parece que vas"
+    ],
+    money: 280,
+    persistent: true,
+  },
   {
-  npc: youngster,
-  pokemon: [{ id: 32, level: 8 }, { id: 21, level: 9 }],
-  facing: Direction.Right,
-  pos: { x: 16, y: 11 },
-  intro: [
-    "¡Yo también voy a la preboda!",
-    "¡Pero como solo hay un sitio libre en la mesa,",
-    "¡tendrás que ganártelo!"
-  ],
-  outtro: [
-    "Está bien... disfruta del banquete."
-  ],
-  money: 160,
-  persistent: true,
-},
+    npc: youngster,
+    pokemon: [{ id: 32, level: 8 }, { id: 21, level: 9 }],
+    facing: Direction.Right,
+    pos: { x: 16, y: 11 },
+    intro: [
+      "¡Yo también voy a la preboda!",
+      "¡Pero como solo hay un sitio libre en la mesa,",
+      "¡tendrás que ganártelo!"
+    ],
+    outtro: [
+      "Está bien... disfruta del banquete."
+    ],
+    money: 160,
+    persistent: true,
+  },
   {
-  npc: lass,
-  pokemon: [{ id: 29, level: 8 }, { id: 19, level: 8 }],
-  facing: Direction.Down,
-  pos: { x: 9, y: 6 },
-  intro: [
-    "Este camino lleva al lago de los novios.",
-    "¡Nadie que no sepa luchar puede cruzarlo!"
-  ],
-  outtro: [
-    "¡Bonito equipo! Te han guardado sitio en el banquete."
-  ],
-  money: 120,
-  persistent: true,
-},
+    npc: lass,
+    pokemon: [{ id: 29, level: 8 }, { id: 19, level: 8 }],
+    facing: Direction.Down,
+    pos: { x: 9, y: 6 },
+    intro: [
+      "Este camino lleva al lago de los novios.",
+      "¡Nadie que no sepa luchar puede cruzarlo!"
+    ],
+    outtro: [
+      "¡Bonito equipo! Te han guardado sitio en el banquete."
+    ],
+    money: 120,
+    persistent: true,
+  },
   {
-  npc: fisher,
-  pokemon: [{ id: 60, level: 8 }, { id: 98, level: 10 }, { id: 116, level: 12 }],
-  facing: Direction.Left,
-  pos: { x: 35, y: 2 },
-  intro: [
-    "El hermano del novio me ha dejado custodiando este objeto.",
-    "No permitiré que lo roben!"
+    npc: fisher,
+    pokemon: [{ id: 60, level: 8 }, { id: 98, level: 10 }, { id: 116, level: 12 }],
+    facing: Direction.Left,
+    pos: { x: 35, y: 2 },
+    intro: [
+      "El hermano del novio me ha dejado custodiando este objeto.",
+      "No permitiré que lo roben!"
+    ],
+    outtro: [
+      "En realidad, creo que ha ido a por otra caña mejor",
+      "que le pueda servir para pescar algo en la boda."
+    ],
+    money: 200,
+    persistent: true,
+  }
   ],
-  outtro: [
-    "En realidad, creo que ha ido a por otra caña mejor",
-    "que le pueda servir para pescar algo en la boda."
-  ],
-  money: 200,
-  persistent: true,
-}
-],
 encounters: {
   walk: {
     rate: 21,
@@ -220,6 +211,7 @@ items: [
       pos: { x: 30, y: 2 },
     },
   ],
+  minimapPos: { x: 41, y: 103 },
 };
 
 export default route22;
