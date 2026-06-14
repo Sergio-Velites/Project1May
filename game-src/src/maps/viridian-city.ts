@@ -359,7 +359,7 @@ const viridianCity: MapType = {
     persistent: true,
   }
   ],
-  minimapPos: { x: 52, y: 100 },
+  minimapPos: { x: 54, y: 118 },
   flyable: true,
   flySpot: { x: 23, y: 26 },
 }
