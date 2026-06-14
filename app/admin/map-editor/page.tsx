@@ -2645,6 +2645,38 @@ export default function MapEditor() {
     setAutofillTr(null);
   }
 
+  // ── Cambiar el grupo de un mapa (incluir/excluir desde el minimapa) ─────
+  // value: null = automático (por nombre); "" = suelto; "<id>" = forzar a ese
+  // grupo. Para el mapa cargado se edita el estado local (se guarda al pulsar
+  // Guardar). Para CUALQUIER otro mapa se persiste al instante en Supabase
+  // re-enviando sus trainers/walls actuales (columnas NOT NULL: no se pueden
+  // omitir sin borrarlos), sin tocar el .ts (metadato editor-only).
+  async function setMapGroup(mapId: string, value: string | null) {
+    if (mapId === selectedMapId) {
+      setMinimapParent(value);
+      setDirty(true);
+      return;
+    }
+    const m = mapData[mapId];
+    if (!m) return;
+    setMapData((d) => ({ ...d, [mapId]: { ...d[mapId], minimapParent: value } }));
+    try {
+      await fetch('/api/admin/map-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mapId,
+          trainers: m.trainers ?? [],
+          walls: m.walls ?? {},
+          overrides: { minimapParent: value },
+        }),
+      });
+    } catch {
+      // Silencioso: el cambio ya está reflejado localmente; reintenta al volver
+      // a tocarlo. No bloquea el flujo de edición.
+    }
+  }
+
   // ── Walls / Fences / Grass (mismo formato Record<row, col[]>) ──────────
   function setMaskAt(
     src: Record<string, number[]>,
@@ -4156,44 +4188,68 @@ export default function MapEditor() {
                   </div>
                 </div>
               </div>
-            ) : openGroupData && openGroupData.members.length > 1 ? (
-              /* Grupo desplegado: lista de sus sub-mapas (casas, plantas, gimnasio…) */
+            ) : openGroupData ? (
+              /* Grupo abierto: ir a sus mapas + incluir/excluir (móvil-friendly) */
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-                  <span style={{ color: '#ffd166', fontWeight: 700 }}>{openGroupData.name} · {openGroupData.members.length} mapas</span>
+                  <span style={{ color: '#ffd166', fontWeight: 700 }}>{openGroupData.name} · {openGroupData.members.length} {openGroupData.members.length === 1 ? 'mapa' : 'mapas'}</span>
                   <button onClick={() => setOpenGroup(null)} style={{
-                    padding: '1px 7px', fontSize: 11, cursor: 'pointer', borderRadius: 4,
+                    padding: '4px 10px', fontSize: 13, cursor: 'pointer', borderRadius: 6,
                     background: '#1a1a2a', border: '1px solid #3a3a5a', color: '#aaa',
                   }}>✕</button>
                 </div>
-                <div style={{ color: '#667', fontSize: 10, marginBottom: 6 }}>★ = mapa principal · ● tiene posición propia · ○ hereda la del grupo</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 3, maxHeight: 200, overflowY: 'auto' }}>
+                <div style={{ color: '#667', fontSize: 10, marginBottom: 6 }}>★ = principal · ● posición propia · ○ hereda · «Sacar» lo deja suelto</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 240, overflowY: 'auto' }}>
                   {openGroupData.members.map((m) => {
                     const isSel = m === selectedMapId;
                     const hasPos = !!mapData[m]?.minimapPos;
+                    const isPrincipal = m === openGroupData!.key;
                     return (
-                      <button key={m} onClick={() => selectMap(m)} title={m} style={{
-                        textAlign: 'left', padding: '3px 8px', fontSize: 11, borderRadius: 4, cursor: 'pointer',
-                        background: isSel ? '#0a2a4a' : '#141428',
-                        border: `1px solid ${isSel ? '#4488ff' : '#2a2a44'}`,
-                        color: isSel ? '#bcd8ff' : '#cfcfe8',
-                        display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center',
-                      }}>
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {m === openGroupData.key ? '★ ' : ''}{mapData[m]?.name ?? m}
-                        </span>
-                        <span title={hasPos ? 'Con posición propia' : 'Sin posición propia (hereda)'} style={{ color: hasPos ? '#5ad17a' : '#5a5a6a', fontSize: 10 }}>
-                          {hasPos ? '●' : '○'}
-                        </span>
-                      </button>
+                      <div key={m} style={{ display: 'flex', gap: 5, alignItems: 'stretch' }}>
+                        <button onClick={() => selectMap(m)} title={`Ir a ${m}`} style={{
+                          flex: 1, minWidth: 0, textAlign: 'left', padding: '7px 10px', fontSize: 12, borderRadius: 6, cursor: 'pointer',
+                          background: isSel ? '#0a2a4a' : '#141428',
+                          border: `1px solid ${isSel ? '#4488ff' : '#2a2a44'}`,
+                          color: isSel ? '#bcd8ff' : '#cfcfe8',
+                          display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center',
+                        }}>
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {isPrincipal ? '★ ' : ''}{mapData[m]?.name ?? m}
+                          </span>
+                          <span title={hasPos ? 'Con posición propia' : 'Sin posición propia (hereda)'} style={{ color: hasPos ? '#5ad17a' : '#5a5a6a', fontSize: 11, flexShrink: 0 }}>
+                            {hasPos ? '●' : '○'}
+                          </span>
+                        </button>
+                        {!isPrincipal && (
+                          <button onClick={() => setMapGroup(m, '')} title="Sacar de este grupo (dejar suelto)" style={{
+                            flexShrink: 0, padding: '0 10px', fontSize: 11, cursor: 'pointer', borderRadius: 6,
+                            background: '#2a1414', border: '1px solid #6a3a3a', color: '#ff9a9a',
+                          }}>Sacar</button>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
+                {/* Incluir un mapa cualquiera en este grupo (select nativo = cómodo en móvil) */}
+                <select
+                  value=""
+                  onChange={(e) => { if (e.target.value) setMapGroup(e.target.value, openGroupData!.key); }}
+                  style={{ ...inputStyle, fontSize: 12, height: 32, marginTop: 8 }}
+                >
+                  <option value="">➕ Incluir un mapa en este grupo…</option>
+                  {allMapIds
+                    .filter((id) => !openGroupData!.members.includes(id))
+                    .sort((a, b) => (mapData[a]?.name ?? a).localeCompare(mapData[b]?.name ?? b))
+                    .map((id) => (
+                      <option key={id} value={id}>{mapData[id]?.name ?? id}</option>
+                    ))}
+                </select>
               </div>
             ) : (
               <div style={{ color: '#555', fontSize: 11, lineHeight: 1.7 }}>
                 Toca un punto para ir a ese mapa. Si es una ciudad/zona 🟡, además
-                se listan aquí sus interiores (casas, gimnasio, plantas…) para entrar.
+                se listan sus interiores aquí, donde puedes <b>sacarlos</b> del grupo o
+                <b> incluir</b> otros mapas.
                 <br />Las cercanas se solapan: usa el zoom (dos dedos o ＋) para separarlas.
                 <br />También puedes usar las flechas del teclado.
               </div>
