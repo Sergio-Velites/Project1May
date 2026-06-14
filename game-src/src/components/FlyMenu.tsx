@@ -21,6 +21,8 @@ import {
 import kantoMap from "../assets/map/kanto_region.png";
 import birdDown from "../assets/walk-sprites/bird-down.png";
 
+// Layout en COLUMNA: cabecera (nombre) · mapa entero · pie (controles). El mapa
+// nunca queda tapado por la UI — la UI vive fuera de él (filas separadas).
 const Container = styled.div`
   position: absolute;
   top: 0;
@@ -28,76 +30,61 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
   z-index: 100;
-  background: #081820;
+  background: #181010;
+  display: flex;
+  flex-direction: column;
+`;
+
+// Fila central: ocupa el espacio restante y centra el mapa contenido al 100%.
+// min-height: 0 es imprescindible en flex-column para que la imagen respete
+// max-height y el mapa SIEMPRE se vea entero.
+const MapRow = styled.div`
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1.5cqw;
 `;
 
-// Caja con la relación de aspecto EXACTA del PNG (237×213). Así los puntos
-// posicionados por porcentaje quedan perfectamente alineados con el mapa,
-// independientemente del tamaño de la pantalla.
+// Caja con la relación de aspecto EXACTA del mapa (237×213). En la pantalla GB
+// (apaisada) la fila queda limitada por el ALTO, así que `height: 100%` +
+// `aspect-ratio` escala el mapa para llenar sin distorsión; `max-width: 100%`
+// lo protege si la fila fuese más estrecha que el mapa. El cursor, posicionado
+// por % sobre esta caja, queda siempre perfectamente alineado.
 const MapBox = styled.div`
   position: relative;
+  height: 100%;
   aspect-ratio: ${KANTO_MINIMAP_WIDTH} / ${KANTO_MINIMAP_HEIGHT};
-  width: min(100%, calc(100vh * ${KANTO_MINIMAP_WIDTH} / ${KANTO_MINIMAP_HEIGHT}));
-  max-height: 100%;
+  max-width: 100%;
 `;
 
 const MapImg = styled.img`
-  position: absolute;
-  inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
 `;
 
-const Dot = styled.div<{ $x: number; $y: number; $selected: boolean }>`
-  position: absolute;
-  left: ${(p) => (p.$x / KANTO_MINIMAP_WIDTH) * 100}%;
-  top: ${(p) => (p.$y / KANTO_MINIMAP_HEIGHT) * 100}%;
-  width: ${(p) => (p.$selected ? 0 : 8)}px;
-  height: ${(p) => (p.$selected ? 0 : 8)}px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: #d82800;
-  border: 1px solid #fff;
-  box-shadow: 0 0 0 1px #000;
+const blink = keyframes`
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0.25; }
 `;
 
-const bob = keyframes`
-  0%, 100% { transform: translate(-50%, -90%); }
-  50%      { transform: translate(-50%, -110%); }
-`;
-
+// Cursor pájaro centrado SOBRE la ciudad seleccionada (parpadea como el cursor
+// del Mapa Pueblo de Pokémon Rojo). Tamaño relativo al ancho del mapa para que
+// escale y nunca se salga de los bordes.
 const BirdCursor = styled.img<{ $x: number; $y: number }>`
   position: absolute;
   left: ${(p) => (p.$x / KANTO_MINIMAP_WIDTH) * 100}%;
   top: ${(p) => (p.$y / KANTO_MINIMAP_HEIGHT) * 100}%;
-  width: 22px;
-  height: 22px;
+  width: 10%;
+  transform: translate(-50%, -50%);
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
-  transform: translate(-50%, -100%);
-  animation: ${bob} 0.6s steps(2, end) infinite;
-  filter: drop-shadow(0 1px 0 #000);
-`;
-
-const NameBar = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 110;
-`;
-
-const Hint = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 110;
+  animation: ${blink} 0.7s steps(1, end) infinite;
+  filter: drop-shadow(0 0 1px #fff);
 `;
 
 /**
@@ -191,31 +178,21 @@ const FlyMenu = () => {
 
   return (
     <Container>
-      <MapBox>
-        <MapImg src={kantoMap} alt="Mapa de Kanto" />
-        {destinations.map((d, i) => (
-          <Dot
-            key={d.map}
-            $x={d.minimapPos.x}
-            $y={d.minimapPos.y}
-            $selected={i === safeIndex}
-          />
-        ))}
-        {selected && (
-          <BirdCursor
-            src={birdDown}
-            alt="cursor"
-            $x={selected.minimapPos.x}
-            $y={selected.minimapPos.y}
-          />
-        )}
-      </MapBox>
-      <NameBar>
-        <Frame wide>{selected ? selected.name : ""}</Frame>
-      </NameBar>
-      <Hint>
-        <Frame wide>A: VOLAR &nbsp; B: SALIR</Frame>
-      </Hint>
+      <Frame wide>{selected ? selected.name : ""}</Frame>
+      <MapRow>
+        <MapBox>
+          <MapImg src={kantoMap} alt="Mapa de Kanto" />
+          {selected && (
+            <BirdCursor
+              src={birdDown}
+              alt="cursor"
+              $x={selected.minimapPos.x}
+              $y={selected.minimapPos.y}
+            />
+          )}
+        </MapBox>
+      </MapRow>
+      <Frame wide>A: VOLAR &nbsp; B: SALIR</Frame>
     </Container>
   );
 };
