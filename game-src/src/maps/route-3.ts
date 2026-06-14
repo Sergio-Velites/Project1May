@@ -348,7 +348,7 @@ const route3: MapType = {
     persistent: true,
   }
   ],
-  minimapPos: { x: 65, y: 40 },
+  minimapPos: { x: 89, y: 40 },
   flyable: true,
   flySpot: { x: 61, y: 6 },
 }
