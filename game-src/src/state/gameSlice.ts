@@ -7,7 +7,7 @@ import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
-import { boulderIdAt, canWalk, getFenceDirection, isBerryTree, isCuttableTree, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater, mapHasWater } from "../app/map-helper";
+import { boulderIdAt, canWalk, getFenceDirection, isBerryTree, isCuttableTree, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater } from "../app/map-helper";
 import { BASE_FRIENDSHIP, STEPS_PER_FRIENDSHIP, friendshipOnWalk, getFriendship } from "../app/evolution-helper";
 import { rollGender } from "../app/gender-helper";
 import {
@@ -308,8 +308,10 @@ export const gameSlice = createSlice({
       state.flashActive = map.dark ? (state.flashActive ?? false) : false;
       // Auto-desmonte si el nuevo mapa no permite bici (interiores).
       if (!map.allowBicycle && state.onBicycle) state.onBicycle = false;
-      // Auto-desmonte de surf si el nuevo mapa no tiene tiles de agua.
-      if (state.onSurfing && !mapHasWater(map)) state.onSurfing = false;
+      // El surf se conserva al cambiar de mapa solo si la casilla de aterrizaje
+      // es agua (el mapa Y la posición deciden). Si aterrizas en tierra, te
+      // bajas — igual que la bici depende de si el mapa la permite.
+      if (state.onSurfing) state.onSurfing = isWater(map.water, state.pos.x, state.pos.y);
       recordVisit(state, action.payload);
     },
     setMapWithPos: (state, action: PayloadAction<MapWithPos>) => {
@@ -322,7 +324,8 @@ export const gameSlice = createSlice({
       const map = mapData[action.payload.map];
       state.flashActive = map && map.dark ? (state.flashActive ?? false) : false;
       if (map && !map.allowBicycle && state.onBicycle) state.onBicycle = false;
-      if (map && state.onSurfing && !mapHasWater(map)) state.onSurfing = false;
+      // Surf conservado solo si la casilla de aterrizaje es agua (mapa + posición).
+      if (map && state.onSurfing) state.onSurfing = isWater(map.water, state.pos.x, state.pos.y);
       recordVisit(state, action.payload.map);
     },
     exitMap(state) {
@@ -341,7 +344,8 @@ export const gameSlice = createSlice({
       state.strengthActive = false;
       state.flashActive = previousMap.dark ? (state.flashActive ?? false) : false;
         if (!previousMap.allowBicycle && state.onBicycle) state.onBicycle = false;
-        if (state.onSurfing && !mapHasWater(previousMap)) state.onSurfing = false;
+        // Surf conservado solo si la casilla de aterrizaje es agua (mapa + posición).
+        if (state.onSurfing) state.onSurfing = isWater(previousMap.water, state.pos.x, state.pos.y);
         recordVisit(state, map.exitReturnMap);
       }
     },
