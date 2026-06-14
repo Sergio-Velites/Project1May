@@ -13,6 +13,9 @@ const route23: MapType = {
   exits: {},
   music: "/game/music/maps-original/victory-road.mp3",
   grass: {},
+  fences: {},
+  minimapPos: { x: 10, y: 114 },
+  trainers: [],
 };
 
 export default route23;
