@@ -8,7 +8,7 @@ const ceruleanCity: MapType = {
   image,
   height: 35,
   width: 38,
-  start: { x: 20, y: 34 },
+  start: { x: 0, y: 18 },
   walls: {
     0: [11, 17, 20, 24],
     1: [11, 17, 20, 24],
@@ -198,6 +198,7 @@ const ceruleanCity: MapType = {
       21: Direction.Down,
     },
   },
+  recoverLocation: { x: 17, y: 18 },
 };
 
 export default ceruleanCity;
