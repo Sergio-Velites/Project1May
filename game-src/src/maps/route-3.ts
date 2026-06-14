@@ -83,7 +83,7 @@ const route3: MapType = {
   },
   maps: {
     5: {
-      61: MapId.Route3pokemonCenter,
+      61: MapId.Route3PokemonCenter,
       68: MapId.MtMoon1f,
     },
   },
@@ -349,6 +349,8 @@ const route3: MapType = {
   }
   ],
   minimapPos: { x: 65, y: 52 },
+  flyable: true,
+  flySpot: { x: 61, y: 6 },
 }
 
 export default route3;

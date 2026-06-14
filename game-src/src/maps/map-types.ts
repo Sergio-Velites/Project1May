@@ -35,7 +35,6 @@ export enum MapId {
   MtMoon1f = "mt-moon-1f",
   MtMoon2f = "mt-moon-2f",
   MtMoon3f = "mt-moon-3f",
-  Route3pokemonCenter = "Route3pokemonCenter",
 
   // ── Rutas nuevas ──────────────────────────────────────────────────────────
   Route4 = "route-4",
@@ -467,4 +466,14 @@ export interface MapType {
   allowBicycle?: boolean;
   /** Posición de este mapa en el minimapa de Kanto (píxeles sobre kanto_region.png 237×213). */
   minimapPos?: PosType;
+  /**
+   * Destino válido para la MO Vuelo (Gen I). Para que el jugador pueda volar
+   * aquí deben cumplirse TRES condiciones: `flyable === true`, tener `minimapPos`
+   * (punto en el mapa de Kanto) y `flySpot` (casilla de aterrizaje), y que el
+   * mapa esté en `visitedMaps` (el jugador ya ha estado). Se configura desde el
+   * Map Editor (checkbox "Disponible para Vuelo" + casilla flySpot).
+   */
+  flyable?: boolean;
+  /** Casilla (coordenadas de tile) donde aterriza el jugador al volar a este mapa. */
+  flySpot?: PosType;
 }

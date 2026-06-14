@@ -360,6 +360,8 @@ const viridianCity: MapType = {
   }
   ],
   minimapPos: { x: 52, y: 112 },
+  flyable: true,
+  flySpot: { x: 23, y: 26 },
 }
 
 export default viridianCity;

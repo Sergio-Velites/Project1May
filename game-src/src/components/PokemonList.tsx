@@ -32,7 +32,7 @@ import {
   showText,
   showTextThenAction,
 } from "../state/uiSlice";
-import { MapId } from "../maps/map-types";
+import { getAllFlyDestinations } from "../app/fly-helper";
 import { directionModifier, isWater } from "../app/map-helper";
 import { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import PokemonRow from "./PokemonRow";
@@ -245,14 +245,11 @@ const PokemonList = ({
         // Nota: a diferencia de Gen I, sí permitimos usar Vuelo desde mapas
         // interiores (gimnasios, centros, casas). En una invitación de boda
         // es preferible no bloquear al jugador por una convención del juego.
-        const flyDestinations: MapId[] = [
-          MapId.PalletTown,
-          MapId.ViridianCity,
-          MapId.Route3PokemonCenter,
-          MapId.PewterCity,
-        ];
-        const reachableFlyTargets = flyDestinations.filter(
-          (m) => visitedMaps.includes(m) && m !== mapId
+        // Destinos data-driven: derivados de los mapas con `flyable` +
+        // `minimapPos` + `flySpot` (configurados en el Map Editor). Conforme se
+        // marquen más mapas como flyable, aparecerán aquí sin tocar este código.
+        const reachableFlyTargets = getAllFlyDestinations().filter(
+          (d) => visitedMaps.includes(d.map) && d.map !== mapId
         );
         const canFly =
           !!target &&

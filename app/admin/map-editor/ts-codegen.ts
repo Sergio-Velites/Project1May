@@ -337,8 +337,10 @@ function buildFieldOps(state: MapWriteState): FieldOp[] {
   if (state.allowBicycle !== undefined) push('allowBicycle', state.allowBicycle ? 'allowBicycle: true' : null);
   if (state.cave !== undefined) push('cave', state.cave ? 'cave: true' : null);
   if (state.dark !== undefined) push('dark', state.dark ? 'dark: true' : null);
-  // NOTA: `flyable`/`flySpot` son SOLO del editor (no existen en MapType del
-  // juego). NO se escriben al .ts o el juego no compilaría.
+  // `flyable`/`flySpot` SÍ se escriben al .ts: existen en MapType y los consume
+  // la MO Vuelo (mapa de Kanto). flyable:false / flySpot null → se elimina.
+  if (state.flyable !== undefined) push('flyable', state.flyable ? 'flyable: true' : null);
+  if (state.flySpot !== undefined) push('flySpot', state.flySpot ? serPos('flySpot', state.flySpot) : null);
   if (state.music !== undefined) push('music', state.music && state.music.trim() ? `music: ${state.music.trim()}` : null);
   if (state.start !== undefined && state.start) push('start', serPos('start', state.start));
   if (state.walls !== undefined) push('walls', serRowColMap(state.walls, 'walls'));

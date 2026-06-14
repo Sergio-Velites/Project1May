@@ -2005,7 +2005,8 @@ export default function MapEditor() {
     return {
       start: startPos,
       cave, dark, allowBicycle,
-      // flyable/flySpot son solo del editor; no se escriben al .ts (no existen en MapType).
+      // flyable/flySpot SÍ se escriben al .ts: los consume la MO Vuelo.
+      flyable, flySpot,
       music: musicField,
       trainers,
       walls, fences, fenceDirections, grass, water,

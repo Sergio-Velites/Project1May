@@ -453,10 +453,15 @@ export const gameSlice = createSlice({
       state.strengthActive = false;
       state.flashActive = false;
       state.sessionCutTrees = [];
-      state.visitedMaps =
-        savedGameState.visitedMaps && savedGameState.visitedMaps.length > 0
-          ? savedGameState.visitedMaps
-          : inferVisitedMaps(savedGameState);
+      // UNIÓN (aditiva, nunca quita): mapas ya guardados + los inferidos de
+      // defeatedTrainers/semillas/mapa actual. Auto-cura saves con visitedMaps
+      // parcial sin riesgo de regresión y habilita Vuelo a toda zona ya pisada.
+      state.visitedMaps = Array.from(
+        new Set([
+          ...(savedGameState.visitedMaps ?? []),
+          ...inferVisitedMaps(savedGameState),
+        ])
+      );
       recordVisit(state, savedGameState.map);
     },
     loadFromState: (state, action: PayloadAction<GameState>) => {
@@ -495,10 +500,11 @@ export const gameSlice = createSlice({
       state.strengthActive = false;
       state.flashActive = false;
       state.sessionCutTrees = [];
-      state.visitedMaps =
-        s.visitedMaps && s.visitedMaps.length > 0
-          ? s.visitedMaps
-          : inferVisitedMaps(s);
+      // UNIÓN (aditiva, nunca quita): ver nota en `load`. Auto-cura saves con
+      // visitedMaps parcial y habilita Vuelo a toda zona ya visitada.
+      state.visitedMaps = Array.from(
+        new Set([...(s.visitedMaps ?? []), ...inferVisitedMaps(s)])
+      );
       state.lastHealLocation = s.lastHealLocation ?? undefined;
       // Árboles de bayas (Gen II): restaurar fechas de recogida del save.
       state.berryTreesPicked = s.berryTreesPicked ?? {};

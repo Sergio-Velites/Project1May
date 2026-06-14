@@ -840,6 +840,12 @@ for (const file of MAP_FILES) {
   const start = parsePos(tsText, "start");
   const cave = parseBooleanField(tsText, "cave");
   const allowBicycle = parseBooleanField(tsText, "allowBicycle");
+  // MO Vuelo: flyable + flySpot (casilla de aterrizaje) + minimapPos (punto en
+  // el mapa de Kanto). CRÍTICO parsearlos: si no, un setup-editor fresco los
+  // borraría del map-data.json y al guardar el editor enviaría vacío.
+  const flyable = parseBooleanField(tsText, "flyable");
+  const flySpot = parsePos(tsText, "flySpot");
+  const minimapPos = parsePos(tsText, "minimapPos");
   const music = parseMusicField(tsText);
 
   // Extraer imagen
@@ -942,6 +948,9 @@ for (const file of MAP_FILES) {
     start,
     cave,
     allowBicycle,
+    flyable,
+    flySpot,
+    minimapPos,
     music,
     trainers,
     walls,

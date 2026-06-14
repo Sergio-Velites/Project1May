@@ -133,7 +133,7 @@ const pewterCity: MapType = {
     },
   },
   exits: {},
-  exitReturnMap: MapId.Route2gateNorth,
+  exitReturnMap: MapId.Route2GateNorth,
   exitReturnPos: { x: 5, y: 1 },
   recoverLocation: { x: 13, y: 26 },
   staticPokemon: [
@@ -307,6 +307,8 @@ const pewterCity: MapType = {
   }
   ],
   minimapPos: { x: 54, y: 52 },
+  flyable: true,
+  flySpot: { x: 13, y: 26 },
 }
 
 export default pewterCity;

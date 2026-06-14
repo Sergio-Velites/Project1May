@@ -71,7 +71,7 @@ walls: {
       11: MapId.Route1,
     },
     5: {
-      5: MapId.PalletTownHouseA1f,
+      5: MapId.PalletTownHouseA1F,
       13: MapId.PalletTownHouseB,
     },
     11: {
@@ -207,6 +207,8 @@ encounters: {
 },
   fences: {},
   minimapPos: { x: 54, y: 148 },
+  flyable: true,
+  flySpot: { x: 5, y: 6 },
 };
 
 export default palletTown;

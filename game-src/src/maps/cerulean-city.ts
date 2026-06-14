@@ -97,6 +97,8 @@ const ceruleanCity: MapType = {
     },
   ],
   minimapPos: { x: 148, y: 41 },
+  flyable: true,
+  flySpot: { x: 17, y: 18 },
   trainers: [
   {
     npc: teamRocketGrunt,
