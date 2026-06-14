@@ -47,13 +47,30 @@ const MapChangeHandler = () => {
 
     const transition = (action: () => void) => {
       dispatch(setBlackScreen(true));
+      // Primero fundir a negro (la transición del overlay dura 0.3s).
       setTimeout(() => {
         emitter.emit(Event.EnterDoor);
+
+        // Levantar el telón SOLO cuando la imagen del nuevo mapa haya cargado
+        // y se haya pintado a la escala correcta (MapBackground emite
+        // Event.MapReady tras un doble rAF). Antes se usaba un temporizador
+        // ciego que descubría el mapa antes de que los tiles estuvieran
+        // maquetados, mostrando un fotograma a escala equivocada.
+        let done = false;
+        let fallback: ReturnType<typeof setTimeout>;
+        const reveal = () => {
+          if (done) return;
+          done = true;
+          emitter.off(Event.MapReady, reveal);
+          clearTimeout(fallback);
+          dispatch(setBlackScreen(false));
+        };
+        emitter.on(Event.MapReady, reveal);
+        // Red de seguridad: nunca quedarse en negro indefinidamente.
+        fallback = setTimeout(reveal, 1500);
+
         action();
       }, 300);
-      setTimeout(() => {
-        dispatch(setBlackScreen(false));
-      }, 600);
     };
 
     if (nextMap) {

@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import Frame from "./Frame";
 import {
   hideFlyMenu,
@@ -81,19 +82,106 @@ const BottomBar = styled.div`
   color: black;
 `;
 
-const CityName = styled.span`
+// Marquee retro: el nombre de la ciudad SIEMPRE se ve entero. Si no cabe en el
+// ancho disponible, se desliza en bucle (como los letreros de los centros
+// comerciales de Gen II); si cabe, se queda quieto. La "ventana" recorta y la
+// "pista" se anima.
+const NameViewport = styled.div`
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+`;
+
+const marquee = keyframes`
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-1 * var(--shift, 0px))); }
+`;
+
+const NameTrack = styled.div<{ $animate: boolean }>`
+  display: inline-flex;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  will-change: transform;
+  ${(p) =>
+    p.$animate
+      ? css`
+          animation: ${marquee} linear infinite;
+        `
+      : ""}
+`;
+
+const NameText = styled.span`
   font-size: 1.7cqw;
   letter-spacing: 0.1cqw;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 `;
 
 const Controls = styled.span`
-  font-size: 1.25cqw;
+  font-size: 1.5cqw;
   white-space: nowrap;
   flex-shrink: 0;
 `;
+
+/**
+ * Nombre de la ciudad con desplazamiento en bucle SOLO cuando no cabe. Mide el
+ * ancho real del texto vs. el de la ventana (re-mide al cambiar de nombre, al
+ * redimensionar y cuando la fuente pixel-art termina de cargar, ya que el ancho
+ * depende de ella). Cuando se desplaza, deja un hueco del ancho de la ventana
+ * para que el texto salga del todo y vuelva a entrar limpio (bucle sin saltos).
+ */
+const ScrollingName = ({ text }: { text: string }) => {
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [anim, setAnim] = useState<{ shift: number; gap: number; duration: number } | null>(null);
+
+  useLayoutEffect(() => {
+    let cancelled = false;
+    const measure = () => {
+      if (cancelled) return;
+      const vp = viewportRef.current;
+      const tx = textRef.current;
+      if (!vp || !tx) return;
+      const contentW = tx.offsetWidth;
+      const boxW = vp.clientWidth;
+      if (contentW > boxW + 1) {
+        const gap = Math.max(24, boxW); // hueco = ancho de ventana → salida limpia
+        const shift = contentW + gap;
+        const duration = shift / 45; // px/segundo → velocidad constante y legible
+        setAnim({ shift, gap, duration });
+      } else {
+        setAnim(null);
+      }
+    };
+    measure();
+    const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
+    if (fonts?.ready) fonts.ready.then(measure).catch(() => {});
+    window.addEventListener("resize", measure);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("resize", measure);
+    };
+  }, [text]);
+
+  const trackStyle: CSSProperties | undefined = anim
+    ? ({
+        animationDuration: `${anim.duration}s`,
+        "--shift": `${anim.shift}px`,
+      } as CSSProperties)
+    : undefined;
+
+  return (
+    <NameViewport ref={viewportRef}>
+      <NameTrack $animate={!!anim} style={trackStyle}>
+        <NameText ref={textRef}>{text}</NameText>
+        {anim && (
+          <NameText aria-hidden style={{ marginLeft: `${anim.gap}px` }}>
+            {text}
+          </NameText>
+        )}
+      </NameTrack>
+    </NameViewport>
+  );
+};
 
 const blink = keyframes`
   0%, 49%   { opacity: 1; }
@@ -221,7 +309,7 @@ const FlyMenu = () => {
       </MapRow>
       <Frame wide>
         <BottomBar>
-          <CityName>{selected ? selected.name : ""}</CityName>
+          <ScrollingName text={selected ? selected.name : ""} />
           <Controls>A:VOLAR&nbsp;&nbsp;B:SALIR</Controls>
         </BottomBar>
       </Frame>

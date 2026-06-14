@@ -30,6 +30,7 @@ export enum Event {
   EvolutionEnd = "evolution-end",
   PokemonCaught = "pokemon-caught",
   PokemonObtained = "pokemon-obtained",
+  MapReady = "map-ready",
 }
 
 const emitter = mitt();
