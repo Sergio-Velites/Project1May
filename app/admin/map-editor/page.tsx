@@ -3,6 +3,10 @@
 import { useEffect, useLayoutEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { parseMapTS } from './parse-ts';
 import { ITEM_NAMES } from '../item-names';
+import {
+  ALL_TYPES, buildEncounterTable, buildTrainerTeam,
+  type GenChoice, type TimeSegment, type TerrainKind,
+} from './pokemon-pool';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────
 
@@ -1765,6 +1769,9 @@ export default function MapEditor() {
   const [editMode, setEditMode] = useState<EditMode>('npc');
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [picker, setPicker] = useState<PickerState>(null);
+  // Auto-relleno de contenido (Pokémon salvajes / equipos de entrenador).
+  const [autofillEnc, setAutofillEnc] = useState<{ tables: EncounterTableKey[]; isCave: boolean } | null>(null);
+  const [autofillTr, setAutofillTr] = useState<{ scope: 'one' | 'all'; index: number | null } | null>(null);
   const [zoom, setZoom] = useState(32);
   const [showGrid, setShowGrid] = useState(true);
   const [showWalls, setShowWalls] = useState(true);
@@ -2551,6 +2558,73 @@ export default function MapEditor() {
     setTrainers(next);
     setSelectedIdx(null);
     setDirty(true);
+  }
+
+  // ── Auto-relleno de Pokémon salvajes ──────────────────────────────────
+  // Mapea cada tabla a su terreno (la tabla `walk` cambia de pool según el
+  // mapa sea cueva o no) y a una ventana de niveles dentro del rango global,
+  // para que la Caña Vieja saque debiluchos y la Súper Caña ejemplares fuertes.
+  function applyEncounterAutofill(cfg: EncounterAutofillConfig) {
+    if (!autofillEnc) return;
+    const lo = Math.min(cfg.minLevel, cfg.maxLevel);
+    const hi = Math.max(cfg.minLevel, cfg.maxLevel);
+    const span = hi - lo;
+    const slice = (a: number, b: number): [number, number] => [
+      Math.round(lo + span * a),
+      Math.round(lo + span * b),
+    ];
+    const TABLE_TERRAIN: Record<EncounterTableKey, TerrainKind> = {
+      walk: autofillEnc.isCave ? 'cave' : 'grass',
+      oldRod: 'oldRod', goodRod: 'goodRod', superRod: 'superRod', surfSpots: 'surf',
+    };
+    const TABLE_LEVELS: Record<EncounterTableKey, [number, number]> = {
+      walk: [lo, hi],
+      oldRod: slice(0, 0.35),
+      goodRod: slice(0.25, 0.7),
+      superRod: slice(0.5, 1),
+      surfSpots: slice(0.3, 1),
+    };
+    const TABLE_COUNT: Record<EncounterTableKey, number> = {
+      walk: cfg.count, oldRod: 2, goodRod: 3, superRod: 3, surfSpots: 3,
+    };
+    const patch: EncountersOverride = {};
+    for (const key of autofillEnc.tables) {
+      const [tlo, thi] = TABLE_LEVELS[key];
+      patch[key] = buildEncounterTable({
+        gen: cfg.gen,
+        terrain: TABLE_TERRAIN[key],
+        minLevel: tlo,
+        maxLevel: thi,
+        count: TABLE_COUNT[key],
+        allowedTimes: cfg.allowedTimes,
+        autoTimeBias: cfg.autoTimeBias,
+        includeLegendary: cfg.includeLegendary,
+      });
+    }
+    setEncounters((e) => ({ ...e, ...patch }));
+    setDirty(true);
+    setAutofillEnc(null);
+  }
+
+  // ── Auto-relleno de equipos de entrenador ─────────────────────────────
+  function applyTrainerAutofill(cfg: TrainerAutofillConfig) {
+    if (!autofillTr) return;
+    const makeTeam = (currentSize: number) => buildTrainerTeam({
+      gen: cfg.gen,
+      types: cfg.types,
+      difficulty: cfg.difficulty,
+      minLevel: cfg.minLevel,
+      maxLevel: cfg.maxLevel,
+      size: cfg.keepSize && currentSize > 0 ? currentSize : cfg.size,
+    });
+    if (autofillTr.scope === 'one' && autofillTr.index !== null) {
+      const idx = autofillTr.index;
+      setTrainers((prev) => prev.map((t, i) => i === idx ? { ...t, pokemon: makeTeam(t.pokemon.length) } : t));
+    } else if (autofillTr.scope === 'all') {
+      setTrainers((prev) => prev.map((t) => ({ ...t, pokemon: makeTeam(t.pokemon.length) })));
+    }
+    setDirty(true);
+    setAutofillTr(null);
   }
 
   // ── Walls / Fences / Grass (mismo formato Record<row, col[]>) ──────────
@@ -3652,6 +3726,15 @@ export default function MapEditor() {
         {/* Botón añadir */}
         <button onClick={addNpc} disabled={editMode !== 'npc'} style={{ padding: '4px 12px', background: editMode === 'npc' ? '#2a4a2a' : '#1a1a2a', border: '1px solid #4a8a4a', borderRadius: 4, color: editMode === 'npc' ? '#88ff88' : '#444', cursor: editMode === 'npc' ? 'pointer' : 'not-allowed', fontSize: 13 }}>
           + NPC
+        </button>
+        <button
+          className="me-tb-secondary"
+          onClick={() => setAutofillTr({ scope: 'all', index: null })}
+          disabled={editMode !== 'npc' || trainers.length === 0}
+          title="Auto-generar el equipo de TODOS los entrenadores del mapa"
+          style={{ padding: '4px 12px', background: editMode === 'npc' && trainers.length ? '#2a2a4a' : '#1a1a2a', border: '1px solid #6a5a9a', borderRadius: 4, color: editMode === 'npc' && trainers.length ? '#c8b0ff' : '#444', cursor: editMode === 'npc' && trainers.length ? 'pointer' : 'not-allowed', fontSize: 12 }}
+        >
+          ✨ Auto-equipos
         </button>
 
         {/* Guardar */}
@@ -4785,6 +4868,12 @@ export default function MapEditor() {
                   countLabel="grass"
                   sourceFile={currentMap?.sourceFile}
                 />
+                <button
+                  onClick={() => setAutofillEnc({ tables: ['walk'], isCave: !!cave })}
+                  style={{ width: '100%', padding: '6px 0', fontSize: 12, cursor: 'pointer', borderRadius: 6, background: '#1a2e3a', border: '1px solid #4a7a8a', color: '#a0e0ff', marginBottom: 8 }}
+                >
+                  ✨ Auto-rellenar {cave ? 'cueva' : 'hierba'} (rango, gen, horario…)
+                </button>
                 <EncountersTableEditor
                   title="🌿 Pokémon en hierba"
                   tableKey="walk"
@@ -4811,6 +4900,12 @@ export default function MapEditor() {
                   countLabel="water"
                   sourceFile={currentMap?.sourceFile}
                 />
+                <button
+                  onClick={() => setAutofillEnc({ tables: ['oldRod', 'goodRod', 'superRod', 'surfSpots'], isCave: false })}
+                  style={{ width: '100%', padding: '6px 0', fontSize: 12, cursor: 'pointer', borderRadius: 6, background: '#1a2e3a', border: '1px solid #4a7a8a', color: '#a0e0ff', marginBottom: 8 }}
+                >
+                  ✨ Auto-rellenar pesca + surf (3 cañas diferenciadas)
+                </button>
                 <EncountersTableEditor
                   title="🎣 Caña Vieja"
                   tableKey="oldRod"
@@ -5052,6 +5147,7 @@ export default function MapEditor() {
                 onChange={updateSelected}
                 onDelete={() => deleteNpc(selectedIdx!)}
                 openPicker={setPicker}
+                onAutofill={() => setAutofillTr({ scope: 'one', index: selectedIdx! })}
                 currentMapId={selectedMapId}
               />
             )}
@@ -5078,18 +5174,269 @@ export default function MapEditor() {
           onClose={() => setShowGraph(false)}
         />
       )}
+
+      {/* Auto-relleno de Pokémon salvajes */}
+      {autofillEnc && (
+        <AutofillEncountersModal
+          tables={autofillEnc.tables}
+          isCave={autofillEnc.isCave}
+          onApply={applyEncounterAutofill}
+          onClose={() => setAutofillEnc(null)}
+        />
+      )}
+
+      {/* Auto-relleno de equipos de entrenador */}
+      {autofillTr && (
+        <AutofillTrainersModal
+          scope={autofillTr.scope}
+          count={autofillTr.scope === 'all' ? trainers.length : 1}
+          onApply={applyTrainerAutofill}
+          onClose={() => setAutofillTr(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Auto-relleno de contenido (Pokémon salvajes / equipos) ─────────────────
+
+export interface EncounterAutofillConfig {
+  gen: GenChoice;
+  minLevel: number;
+  maxLevel: number;
+  count: number;
+  allowedTimes: TimeSegment[] | null;
+  autoTimeBias: boolean;
+  includeLegendary: boolean;
+}
+
+export interface TrainerAutofillConfig {
+  gen: GenChoice;
+  types: string[];
+  difficulty: number;
+  minLevel: number;
+  maxLevel: number;
+  size: number;       // tamaño objetivo del equipo
+  keepSize: boolean;  // (scope all) conservar el tamaño actual de cada equipo
+}
+
+const afOverlayStyle: React.CSSProperties = {
+  position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.62)', zIndex: 120,
+  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+};
+const afCardStyle: React.CSSProperties = {
+  background: '#12122a', border: '1px solid #3a3a5a', borderRadius: 8,
+  padding: '18px 20px', width: 380, maxWidth: '100%', maxHeight: '92vh', overflowY: 'auto',
+  color: '#cfcfe8', fontSize: 13, boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
+};
+const afLabel: React.CSSProperties = { display: 'block', color: '#9090c0', fontSize: 11, marginBottom: 4, marginTop: 14 };
+const afApplyBtn: React.CSSProperties = {
+  marginTop: 18, width: '100%', padding: '8px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+  borderRadius: 6, background: '#2a5a2a', border: '1px solid #4a8a4a', color: '#bfffbf',
+};
+
+function GenPicker({ value, onChange }: { value: GenChoice; onChange: (g: GenChoice) => void }) {
+  const opts: { v: GenChoice; l: string }[] = [{ v: 1, l: 'Gen I' }, { v: 2, l: 'Gen II' }, { v: 'both', l: 'Ambas' }];
+  return (
+    <div style={{ display: 'flex', gap: 6 }}>
+      {opts.map((o) => (
+        <button key={String(o.v)} onClick={() => onChange(o.v)} style={{
+          flex: 1, padding: '5px 0', fontSize: 12, cursor: 'pointer', borderRadius: 4,
+          background: value === o.v ? '#2a3a6a' : '#1a1a2a',
+          border: `1px solid ${value === o.v ? '#5a7aff' : '#3a3a5a'}`,
+          color: value === o.v ? '#bcd0ff' : '#888',
+        }}>{o.l}</button>
+      ))}
+    </div>
+  );
+}
+
+function AfLevelRange({ min, max, setMin, setMax }: { min: number; max: number; setMin: (n: number) => void; setMax: (n: number) => void }) {
+  const clamp = (n: number) => Math.max(2, Math.min(100, n || 2));
+  return (
+    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+      <div style={{ flex: 1 }}>
+        <span style={{ color: '#888', fontSize: 10 }}>Nivel mín.</span>
+        <input type="number" min={2} max={100} value={min} onChange={(e) => setMin(clamp(parseInt(e.target.value, 10)))} style={{ ...inputStyle, fontSize: 12, padding: '3px 6px' }} />
+      </div>
+      <div style={{ flex: 1 }}>
+        <span style={{ color: '#888', fontSize: 10 }}>Nivel máx.</span>
+        <input type="number" min={2} max={100} value={max} onChange={(e) => setMax(clamp(parseInt(e.target.value, 10)))} style={{ ...inputStyle, fontSize: 12, padding: '3px 6px' }} />
+      </div>
+    </div>
+  );
+}
+
+function AutofillEncountersModal({ tables, isCave, onApply, onClose }: {
+  tables: EncounterTableKey[];
+  isCave: boolean;
+  onApply: (cfg: EncounterAutofillConfig) => void;
+  onClose: () => void;
+}) {
+  const isWater = tables.some((t) => t !== 'walk');
+  const [gen, setGen] = useState<GenChoice>('both');
+  const [minLevel, setMinLevel] = useState(isWater ? 5 : 3);
+  const [maxLevel, setMaxLevel] = useState(isWater ? 35 : 7);
+  const [count, setCount] = useState(7);
+  const segs: TimeSegment[] = ['morning', 'day', 'night'];
+  const [times, setTimes] = useState<Record<TimeSegment, boolean>>({ morning: true, day: true, night: true });
+  const [autoTimeBias, setAutoTimeBias] = useState(true);
+  const [includeLegendary, setIncludeLegendary] = useState(false);
+  const segLabel: Record<TimeSegment, string> = { morning: '🌅 Mañana', day: '☀️ Día', night: '🌙 Noche' };
+
+  const apply = () => {
+    const selected = segs.filter((s) => times[s]);
+    const allowedTimes = selected.length === 0 || selected.length === 3 ? null : selected;
+    onApply({ gen, minLevel, maxLevel, count, allowedTimes, autoTimeBias, includeLegendary });
+  };
+
+  return (
+    <div style={afOverlayStyle} onClick={onClose}>
+      <div style={afCardStyle} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontWeight: 700, color: '#a0d0ff', fontSize: 15 }}>
+            ✨ Auto-rellenar {isWater ? 'pesca y surf' : isCave ? 'cueva' : 'hierba'}
+          </span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#888', fontSize: 18, cursor: 'pointer' }}>×</button>
+        </div>
+        <div style={{ color: '#778', fontSize: 11, marginTop: 4 }}>
+          {isWater
+            ? 'Rellena Caña Vieja, Buena, Súper y Surf con especies de agua adecuadas a cada nivel.'
+            : isCave
+              ? 'Especies típicas de cueva (roca, tierra, veneno, murciélagos…).'
+              : 'Especies comunes de ruta. Las raras salen a nivel algo más alto.'}
+        </div>
+
+        <label style={afLabel}>Generación</label>
+        <GenPicker value={gen} onChange={setGen} />
+
+        <label style={afLabel}>Rango de niveles</label>
+        <AfLevelRange min={minLevel} max={maxLevel} setMin={setMinLevel} setMax={setMaxLevel} />
+
+        {!isWater && (
+          <>
+            <label style={afLabel}>Nº de especies: {count}</label>
+            <input type="range" min={2} max={10} value={count} onChange={(e) => setCount(parseInt(e.target.value, 10))} style={{ width: '100%' }} />
+          </>
+        )}
+
+        <label style={afLabel}>Franjas horarias</label>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {segs.map((s) => (
+            <button key={s} onClick={() => setTimes((t) => ({ ...t, [s]: !t[s] }))} style={{
+              flex: 1, padding: '5px 0', fontSize: 11, cursor: 'pointer', borderRadius: 4,
+              background: times[s] ? '#2a3a5a' : '#1a1a2a',
+              border: `1px solid ${times[s] ? '#5a7aaa' : '#3a3a5a'}`,
+              color: times[s] ? '#bcd' : '#666',
+            }}>{segLabel[s]}</button>
+          ))}
+        </div>
+        <div style={{ color: '#667', fontSize: 10, marginTop: 4 }}>Las tres (o ninguna) = 24 h.</div>
+
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, cursor: 'pointer', color: '#bcd' }}>
+          <input type="checkbox" checked={autoTimeBias} onChange={(e) => setAutoTimeBias(e.target.checked)} />
+          Asignar día/noche según la especie (fantasmas/siniestros de noche…)
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, cursor: 'pointer', color: '#bcd' }}>
+          <input type="checkbox" checked={includeLegendary} onChange={(e) => setIncludeLegendary(e.target.checked)} />
+          Permitir legendarios
+        </label>
+
+        <button onClick={apply} style={afApplyBtn}>✨ Generar y rellenar</button>
+        <div style={{ color: '#665', fontSize: 10, marginTop: 8, textAlign: 'center' }}>Reemplaza la tabla actual. Puedes ajustar a mano después.</div>
+      </div>
+    </div>
+  );
+}
+
+function AutofillTrainersModal({ scope, count, onApply, onClose }: {
+  scope: 'one' | 'all';
+  count: number;
+  onApply: (cfg: TrainerAutofillConfig) => void;
+  onClose: () => void;
+}) {
+  const [gen, setGen] = useState<GenChoice>('both');
+  const [types, setTypes] = useState<string[]>([]);
+  const [difficulty, setDifficulty] = useState(4);
+  const [minLevel, setMinLevel] = useState(5);
+  const [maxLevel, setMaxLevel] = useState(15);
+  const [size, setSize] = useState(scope === 'one' ? 3 : 3);
+  const [keepSize, setKeepSize] = useState(true);
+
+  const toggleType = (t: string) => setTypes((cur) => cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]);
+  const TYPE_ES: Record<string, string> = {
+    normal: 'Normal', fire: 'Fuego', water: 'Agua', electric: 'Eléctrico', grass: 'Planta',
+    ice: 'Hielo', fighting: 'Lucha', poison: 'Veneno', ground: 'Tierra', flying: 'Volador',
+    psychic: 'Psíquico', bug: 'Bicho', rock: 'Roca', ghost: 'Fantasma', dragon: 'Dragón',
+    dark: 'Siniestro', steel: 'Acero',
+  };
+
+  return (
+    <div style={afOverlayStyle} onClick={onClose}>
+      <div style={afCardStyle} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontWeight: 700, color: '#a0d0ff', fontSize: 15 }}>
+            ✨ Auto-equipo {scope === 'all' ? `· todos (${count})` : ''}
+          </span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#888', fontSize: 18, cursor: 'pointer' }}>×</button>
+        </div>
+        <div style={{ color: '#778', fontSize: 11, marginTop: 4 }}>
+          {scope === 'all'
+            ? 'Genera un equipo para CADA entrenador del mapa.'
+            : 'Genera el equipo de este entrenador.'}
+        </div>
+
+        <label style={afLabel}>Generación</label>
+        <GenPicker value={gen} onChange={setGen} />
+
+        <label style={afLabel}>Tipos (vacío = cualquiera)</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          {ALL_TYPES.map((t) => (
+            <button key={t} onClick={() => toggleType(t)} style={{
+              padding: '3px 8px', fontSize: 11, cursor: 'pointer', borderRadius: 4,
+              background: types.includes(t) ? '#3a2a5a' : '#1a1a2a',
+              border: `1px solid ${types.includes(t) ? '#9a7aff' : '#3a3a5a'}`,
+              color: types.includes(t) ? '#d8c8ff' : '#888',
+            }}>{TYPE_ES[t] ?? t}</button>
+          ))}
+        </div>
+
+        <label style={afLabel}>Dificultad: {difficulty} / 10</label>
+        <input type="range" min={1} max={10} value={difficulty} onChange={(e) => setDifficulty(parseInt(e.target.value, 10))} style={{ width: '100%' }} />
+        <div style={{ color: '#667', fontSize: 10 }}>
+          ↑ dificultad = especies más fuertes (BST), niveles más altos{difficulty >= 9 ? ' y legendarios' : ''}.
+        </div>
+
+        <label style={afLabel}>Rango de niveles</label>
+        <AfLevelRange min={minLevel} max={maxLevel} setMin={setMinLevel} setMax={setMaxLevel} />
+
+        {scope === 'all' && (
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, cursor: 'pointer', color: '#bcd' }}>
+            <input type="checkbox" checked={keepSize} onChange={(e) => setKeepSize(e.target.checked)} />
+            Conservar el tamaño de equipo actual de cada entrenador
+          </label>
+        )}
+        <label style={afLabel}>{scope === 'all' && keepSize ? 'Tamaño si el equipo está vacío' : 'Tamaño del equipo'}: {size}</label>
+        <input type="range" min={1} max={6} value={size} onChange={(e) => setSize(parseInt(e.target.value, 10))} style={{ width: '100%' }} />
+
+        <button onClick={() => onApply({ gen, types, difficulty, minLevel, maxLevel, size, keepSize })} style={afApplyBtn}>
+          ✨ Generar {scope === 'all' ? 'equipos' : 'equipo'}
+        </button>
+        <div style={{ color: '#665', fontSize: 10, marginTop: 8, textAlign: 'center' }}>Reemplaza el equipo actual. Ajustable a mano después.</div>
+      </div>
     </div>
   );
 }
 
 // ── Inspector Panel ────────────────────────────────────────────────────────
 
-function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, currentMapId }: {
+function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, onAutofill, currentMapId }: {
   trainer: Trainer;
   idx: number;
   onChange: (patch: Partial<Trainer>) => void;
   onDelete: () => void;
   openPicker: (s: PickerState) => void;
+  onAutofill: () => void;
   currentMapId: string;
 }) {
   const reg = NPC_REGISTRY[trainer.npcKey];
@@ -5182,13 +5529,18 @@ function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, currentM
             <button onClick={() => onChange({ pokemon: trainer.pokemon.filter((_, j) => j !== i) })} style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: 16, padding: 0, lineHeight: 1 }}>×</button>
           </div>
         ))}
-        <button onClick={() => openPicker({
-          kind: 'pokemon',
-          title: 'Añadir Pokémon al entrenador',
-          onPick: (id) => onChange({ pokemon: [...trainer.pokemon, { id, level: 5 }] }),
-        })} style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', padding: '3px 10px' }}>
-          + Pokémon
-        </button>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <button onClick={() => openPicker({
+            kind: 'pokemon',
+            title: 'Añadir Pokémon al entrenador',
+            onPick: (id) => onChange({ pokemon: [...trainer.pokemon, { id, level: 5 }] }),
+          })} style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', padding: '3px 10px' }}>
+            + Pokémon
+          </button>
+          <button onClick={onAutofill} title="Auto-generar el equipo (tipo, dificultad, niveles…)" style={{ fontSize: 12, background: '#1f1a2e', border: '1px solid #6a5a9a', borderRadius: 4, color: '#c8b0ff', cursor: 'pointer', padding: '3px 10px' }}>
+            ✨ Auto-equipo
+          </button>
+        </div>
       </div>
 
       {/* postGame (solo lectura) */}
