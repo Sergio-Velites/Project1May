@@ -3290,7 +3290,9 @@ export default function MapEditor() {
       setDirty(true);
       return;
     }
-    // Navegar: grupo más cercano. Singleton → ir directo; grupo → desplegar.
+    // Navegar: grupo más cercano. SIEMPRE navega a su mapa principal (el padre
+    // si es un mapa real, si no el primer miembro) y, si tiene interiores, abre
+    // su lista en el panel para poder entrar a cualquiera.
     let best: typeof minimapGroups[number] | null = null;
     let bestDist = Infinity;
     for (const grp of minimapGroups) {
@@ -3299,7 +3301,8 @@ export default function MapEditor() {
     }
     if (best && bestDist < 16) {
       setOpenGroup(best.key);
-      if (best.members.length === 1) selectMap(best.members[0]);
+      const target = mapData[best.key] ? best.key : best.members[0];
+      selectMap(target);
     }
   };
   const onMmPointerDown = (e: React.PointerEvent) => {
@@ -3938,20 +3941,28 @@ export default function MapEditor() {
                 const isCurrent = grp.key === currentGroupKey;
                 const isOpen = grp.key === openGroup;
                 const multi = grp.members.length > 1;
+                const sz = multi ? 15 : (isCurrent ? 12 : 9);
                 return (
-                  <div key={grp.key} title={`${grp.name}${multi ? ` · ${grp.members.length} mapas` : ''} (${grp.coord.x}, ${grp.coord.y})`} style={{
+                  <div key={grp.key} title={`${grp.name}${multi ? ` · ${grp.members.length} mapas (toca para ir y ver la lista)` : ''} (${grp.coord.x}, ${grp.coord.y})`} style={{
                     position: 'absolute',
                     left: `${(grp.coord.x / MINIMAP_WIDTH) * 100}%`,
                     top: `${(grp.coord.y / MINIMAP_HEIGHT) * 100}%`,
                     transform: `translate(-50%, -50%) scale(${1 / mmView.scale})`,
-                    width: isCurrent ? 12 : 9,
-                    height: isCurrent ? 12 : 9,
+                    width: sz,
+                    height: sz,
                     borderRadius: '50%',
                     background: isCurrent ? '#ff2222' : (multi ? '#ffcc44' : '#4488ff'),
-                    border: isOpen ? '2px solid #fff' : (multi ? '1.5px solid rgba(255,255,255,0.85)' : '1px solid rgba(255,255,255,0.5)'),
+                    border: isOpen ? '2px solid #fff' : (multi ? '1.5px solid rgba(0,0,0,0.55)' : '1px solid rgba(255,255,255,0.5)'),
                     boxShadow: isCurrent ? '0 0 4px 2px rgba(255,60,60,0.7)' : '0 0 3px rgba(0,0,0,0.85)',
                     pointerEvents: 'none',
-                  }} />
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {multi && (
+                      <span style={{ fontSize: 8, fontWeight: 800, lineHeight: 1, color: isCurrent ? '#fff' : '#3a2a00' }}>
+                        {grp.members.length}
+                      </span>
+                    )}
+                  </div>
                 );
               })}
               {/* Modo editar: puntos de referencia (tenues) + punto editable */}
@@ -4015,8 +4026,17 @@ export default function MapEditor() {
               <button onClick={() => setMmView({ scale: 1, tx: 0, ty: 0 })} title="Ajustar a la vista" style={{ ...zoomBtnStyle, width: 'auto', padding: '2px 8px' }}>⤢ Ajustar</button>
             </div>
             <div style={{ color: '#556', fontSize: 10, marginBottom: 8 }}>
-              📱 Dos dedos para mover y escalar · un dedo para {minimapMode === 'edit' ? 'fijar la posición' : 'elegir grupo'}.
+              📱 Dos dedos para mover y escalar · un dedo para {minimapMode === 'edit' ? 'fijar la posición' : 'ir a un mapa'}.
             </div>
+
+            {/* Leyenda de colores (siempre visible en Navegar) */}
+            {minimapMode === 'navigate' && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px 10px', fontSize: 10, color: '#889', marginBottom: 8 }}>
+                <span><span style={{ color: '#ffcc44' }}>🟡</span> ciudad/zona (con interiores; el nº = cuántos mapas)</span>
+                <span><span style={{ color: '#4488ff' }}>🔵</span> mapa suelto</span>
+                <span><span style={{ color: '#ff4444' }}>🔴</span> mapa actual</span>
+              </div>
+            )}
 
             {minimapMode === 'edit' ? (
               <div style={{ color: '#ccc', lineHeight: 1.7 }}>
@@ -4083,13 +4103,14 @@ export default function MapEditor() {
             ) : openGroupData && openGroupData.members.length > 1 ? (
               /* Grupo desplegado: lista de sus sub-mapas (casas, plantas, gimnasio…) */
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <span style={{ color: '#ffd166', fontWeight: 700 }}>{openGroupData.name} · {openGroupData.members.length}</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
+                  <span style={{ color: '#ffd166', fontWeight: 700 }}>{openGroupData.name} · {openGroupData.members.length} mapas</span>
                   <button onClick={() => setOpenGroup(null)} style={{
                     padding: '1px 7px', fontSize: 11, cursor: 'pointer', borderRadius: 4,
                     background: '#1a1a2a', border: '1px solid #3a3a5a', color: '#aaa',
                   }}>✕</button>
                 </div>
+                <div style={{ color: '#667', fontSize: 10, marginBottom: 6 }}>★ = mapa principal · ● tiene posición propia · ○ hereda la del grupo</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3, maxHeight: 200, overflowY: 'auto' }}>
                   {openGroupData.members.map((m) => {
                     const isSel = m === selectedMapId;
@@ -4115,8 +4136,9 @@ export default function MapEditor() {
               </div>
             ) : (
               <div style={{ color: '#555', fontSize: 11, lineHeight: 1.7 }}>
-                Toca un punto para ir a ese mapa o desplegar su grupo.
-                <br />🟡 Grupo (ciudad/mazmorra con interiores) · 🔵 Mapa suelto · 🔴 Mapa actual.
+                Toca un punto para ir a ese mapa. Si es una ciudad/zona 🟡, además
+                se listan aquí sus interiores (casas, gimnasio, plantas…) para entrar.
+                <br />Las cercanas se solapan: usa el zoom (dos dedos o ＋) para separarlas.
                 <br />También puedes usar las flechas del teclado.
               </div>
             )}
