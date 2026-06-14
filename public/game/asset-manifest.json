@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/game/static/css/main.84e6e57a.css",
-    "main.js": "/game/static/js/main.d5a338c1.js",
+    "main.js": "/game/static/js/main.6b532971.js",
     "static/media/pewter-city.mp3": "/game/static/media/pewter-city.dbfe2794208a91f807e7.mp3",
     "static/media/mt-moon.mp3": "/game/static/media/mt-moon.d3c96e8c603b742504e6.mp3",
     "static/media/intro.mp4": "/game/static/media/intro.635c67d841e2fe0b7a4e.mp4",
@@ -51,6 +51,7 @@
     "static/media/victory-road-2f.png": "/game/static/media/victory-road-2f.45be944b63b77ea374a8.png",
     "static/media/silph-co-9f.png": "/game/static/media/silph-co-9f.f8b50932db90fdc96ffb.png",
     "static/media/silph-co-11f.png": "/game/static/media/silph-co-11f.32550f0c1abb5bd9994e.png",
+    "static/media/kanto_region.png": "/game/static/media/kanto_region.1ac935ca93e5f4c56ede.png",
     "static/media/route-7.png": "/game/static/media/route-7.74e96ff56d792d035ffb.png",
     "static/media/button-press.wav": "/game/static/media/button-press.8a824ede28efe6b70d20.wav",
     "static/media/route-24.png": "/game/static/media/route-24.b3bfe8d2b9ba878a176e.png",
@@ -99,7 +100,6 @@
     "static/media/route-14.png": "/game/static/media/route-14.4de05f22cb0191b2a8ec.png",
     "static/media/pokemon-tower-6f.png": "/game/static/media/pokemon-tower-6f.d2258e66117f29161173.png",
     "static/media/gate-house-route16.png": "/game/static/media/gate-house-route16.0289605eb421a4c1c73c.png",
-    "static/media/kanto_region.png": "/game/static/media/kanto_region.ae1c844749e976b19116.png",
     "static/media/Pokemon-GB.ttf": "/game/static/media/Pokemon-GB.6211ee48ea626f34681e.ttf",
     "static/media/route-6.png": "/game/static/media/route-6.eb6c6681273eb0fd8342.png",
     "static/media/route-4-gate.png": "/game/static/media/route-4-gate.6643285c8bebe5e26ead.png",
@@ -108,6 +108,6 @@
   },
   "entrypoints": [
     "static/css/main.84e6e57a.css",
-    "static/js/main.d5a338c1.js"
+    "static/js/main.6b532971.js"
   ]
 }

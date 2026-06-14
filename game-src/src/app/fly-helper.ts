@@ -26,7 +26,7 @@ export interface FlyDestination {
 
 /** Dimensiones del PNG del minimapa de Kanto (fuente de verdad para %). */
 export const KANTO_MINIMAP_WIDTH = 237;
-export const KANTO_MINIMAP_HEIGHT = 213;
+export const KANTO_MINIMAP_HEIGHT = 201;
 
 /**
  * Todos los destinos de Vuelo configurados en los mapas. Se calcula una vez
