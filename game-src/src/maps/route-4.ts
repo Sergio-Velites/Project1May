@@ -33,7 +33,6 @@ const route4: MapType = {
   },
   allowBicycle: true,
   fences: {
-    1: [17],
     2: [17, 22, 24, 29, 33, 39],
     3: [17, 22, 24, 29, 33, 39],
     4: [17, 22, 24, 29, 33, 39],
@@ -135,6 +134,49 @@ const route4: MapType = {
     persistent: true,
   }
   ],
+  fenceDirections: {
+    2: {
+      17: Direction.Left,
+      22: Direction.Right,
+      24: Direction.Right,
+      29: Direction.Left,
+      33: Direction.Left,
+      39: Direction.Left,
+    },
+    3: {
+      17: Direction.Left,
+      22: Direction.Right,
+      24: Direction.Right,
+      29: Direction.Left,
+      33: Direction.Left,
+      39: Direction.Left,
+    },
+    4: {
+      17: Direction.Left,
+      22: Direction.Right,
+      24: Direction.Right,
+      29: Direction.Left,
+      33: Direction.Left,
+      39: Direction.Left,
+    },
+    5: {
+      24: Direction.Right,
+      33: Direction.Left,
+    },
+    6: {
+      24: Direction.Right,
+      29: Direction.Left,
+      33: Direction.Left,
+    },
+    7: {
+      24: Direction.Right,
+      29: Direction.Left,
+    },
+    8: {
+      24: Direction.Right,
+      29: Direction.Left,
+    },
+  },
 };
 
 export default route4;
