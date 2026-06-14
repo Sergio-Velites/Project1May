@@ -13,6 +13,9 @@ const indigoPlateau: MapType = {
   exits: {},
   music: "/game/music/maps-original/indigo-plateau.mp3",
   grass: {},
+  fences: {},
+  minimapPos: { x: 26, y: 29 },
+  trainers: [],
 };
 
 export default indigoPlateau;
