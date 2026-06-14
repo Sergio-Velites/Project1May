@@ -46,6 +46,9 @@ import acRight1 from "../assets/walk-sprites/ac-right-1.png";
 import { useDispatch, useSelector } from "react-redux";
 import {
   moveDown,
+  moveLeft,
+  moveRight,
+  moveUp,
   selectDirection,
   selectJumping,
   selectMap,
@@ -137,12 +140,33 @@ const Character = () => {
   const onSurfingRef = useRef(onSurfing);
   useEffect(() => { onSurfingRef.current = onSurfing; }, [onSurfing]);
   const wasOnWaterRef = useRef(false);
+  // El salto de saliente es una maniobra de 2 tiles: el reducer mueve +1 tile
+  // encima del saliente y este efecto dispara el segundo paso para aterrizar al
+  // otro lado. Ese segundo paso debe seguir la MISMA dirección del salto (no
+  // siempre Down), por eso leemos la dirección actual desde un ref — así no
+  // alteramos cuándo se dispara el efecto (sigue siendo una vez por salto).
+  const directionRef = useRef(direction);
+  useEffect(() => { directionRef.current = direction; }, [direction]);
 
   useEffect(() => {
     if (jumping) {
       setAnimateJumping(true);
       setTimeout(() => {
-        dispatch(moveDown());
+        switch (directionRef.current) {
+          case Direction.Up:
+            dispatch(moveUp());
+            break;
+          case Direction.Left:
+            dispatch(moveLeft());
+            break;
+          case Direction.Right:
+            dispatch(moveRight());
+            break;
+          case Direction.Down:
+          default:
+            dispatch(moveDown());
+            break;
+        }
         setAnimateJumping(false);
       }, moveSpeed * 0.9);
       setTimeout(() => {
