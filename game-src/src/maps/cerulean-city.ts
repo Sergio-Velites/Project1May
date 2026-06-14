@@ -111,6 +111,11 @@ const ceruleanCity: MapType = {
     persistent: true,
   }
   ],
+  water: {
+    14: [0, 1, 2, 3, 4],
+    15: [0, 1, 2, 3, 4],
+    16: [0, 1, 2, 3, 4],
+  },
 };
 
 export default ceruleanCity;
