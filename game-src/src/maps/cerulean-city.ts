@@ -95,6 +95,14 @@ const ceruleanCity: MapType = {
       pos: { x: 25, y: 12 },
       id: "boulder-cerulean-city-25-12",
     },
+    {
+      pos: { x: 2, y: 18 },
+      id: "boulder-cerulean-city-2-18",
+    },
+    {
+      pos: { x: 2, y: 19 },
+      id: "boulder-cerulean-city-2-19",
+    },
   ],
   minimapPos: { x: 149, y: 29 },
   flyable: true,
