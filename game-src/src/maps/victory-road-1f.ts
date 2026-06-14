@@ -13,6 +13,9 @@ const victoryRoad1f: MapType = {
   exits: {},
   music: "/game/music/maps-original/victory-road.mp3",
   grass: {},
+  fences: {},
+  minimapPos: { x: 27, y: 54 },
+  trainers: [],
 };
 
 export default victoryRoad1f;
