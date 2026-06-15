@@ -2830,6 +2830,213 @@
     },
     "sourceFile": "gate-house.ts"
   },
+  "gb-pallet-town": {
+    "id": "gb-pallet-town",
+    "name": "PUEBLO PALETA (GB · PoC)",
+    "imageFile": "gb-pallet-town.png",
+    "height": 18,
+    "width": 20,
+    "start": {
+      "x": 8,
+      "y": 13
+    },
+    "cave": false,
+    "allowBicycle": true,
+    "flyable": false,
+    "flySpot": null,
+    "minimapPos": null,
+    "music": null,
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        13,
+        14,
+        15,
+        16,
+        17,
+        19
+      ],
+      "2": [
+        1,
+        18
+      ],
+      "3": [
+        1,
+        5,
+        6,
+        13,
+        14,
+        18
+      ],
+      "4": [
+        1,
+        4,
+        5,
+        6,
+        7,
+        12,
+        13,
+        14,
+        15,
+        18
+      ],
+      "5": [
+        1,
+        4,
+        5,
+        6,
+        7,
+        12,
+        13,
+        14,
+        15,
+        18
+      ],
+      "6": [
+        1,
+        18
+      ],
+      "7": [
+        1,
+        18
+      ],
+      "8": [
+        1,
+        11,
+        12,
+        13,
+        14,
+        18
+      ],
+      "9": [
+        1,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        18
+      ],
+      "10": [
+        1,
+        4,
+        5,
+        6,
+        7,
+        14,
+        15,
+        18
+      ],
+      "11": [
+        1,
+        4,
+        5,
+        6,
+        7,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        18
+      ],
+      "12": [
+        1,
+        18
+      ],
+      "13": [
+        1,
+        18
+      ],
+      "14": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        18
+      ],
+      "15": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        18
+      ],
+      "16": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        18
+      ],
+      "17": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {},
+    "exits": {},
+    "exitReturnMap": null,
+    "exitReturnPos": null,
+    "sourceFile": "gb-pallet-town.ts"
+  },
   "pallet-town-house-a-1f": {
     "id": "pallet-town-house-a-1f",
     "name": "Casa 1F",
