@@ -1,16 +1,58 @@
 import image from "../assets/map/route-7.png";
-import { MapType } from "./map-types";
+import { Direction } from "../state/state-types";import { MapType } from "./map-types";
 
 const route7: MapType = {
   name: "Ruta 7",
   image,
-  height: 20,
-  width: 30,
-  start: { x: 15, y: 18 },
-  walls: {},
+  height: 18,
+  width: 20,
+  start: { x: 15, y: 15 },
+  walls: {
+    0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+    2: [17],
+    3: [17],
+    4: [0, 1, 17],
+    5: [0, 1, 17],
+    6: [0, 1, 17],
+    7: [0, 1, 17],
+    8: [0, 1, 11, 12, 13, 14, 15, 16, 17],
+    9: [0, 1, 12, 13, 14, 15, 16, 17],
+    10: [0, 1, 4, 5, 6, 7, 12, 13, 14, 15, 16, 17],
+    11: [0, 1, 4, 5, 6, 7, 12, 13, 14, 15, 16, 17, 18, 19],
+    12: [0, 1, 4, 5, 6, 7, 17],
+    13: [0, 1, 3, 4, 6, 7, 17],
+    14: [0, 1, 17],
+    15: [0, 1, 17],
+    16: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+    17: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+  },
+  fenceDirections: {
+    2: { 7: Direction.Right },
+    3: { 7: Direction.Right },
+    4: { 7: Direction.Right },
+    5: { 7: Direction.Right },
+    6: { 7: Direction.Right },
+    7: { 2: Direction.Down, 3: Direction.Down, 5: Direction.Down, 6: Direction.Down, 7: Direction.Down },
+    11: { 2: Direction.Down, 3: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down },
+  },
+  fences: {
+    2: [7],
+    3: [7],
+    4: [7],
+    5: [7],
+    6: [7],
+    7: [2, 3, 5, 6, 7],
+    11: [2, 3, 9, 10, 11],
+  },
   text: {},
-  maps: {},
-  exits: {},
+  maps: {
+    2: { 0: MapId.CeladonCity },
+    3: { 0: MapId.CeladonCity },
+  },
+  exits: {
+
+  },
   music: "/game/music/maps-original/route-11.mp3",
   grass: {},
 };

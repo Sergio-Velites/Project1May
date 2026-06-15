@@ -90,15 +90,18 @@ def _objects(camel):
 _DIMS=_dims(); _C2C_TS=_const_to_camel(); _BST=_blockset_file(); _COLL=_collision_sets()
 _HDRS,_CONST2CAMEL=_headers()
 
+# ledges overworld: tile-id -> dirección de salto (Direction del proyecto)
+LEDGE_DIR={0x37:'Down',0x36:'Down',0x27:'Left',0x0D:'Right',0x1D:'Right'}
+
 def walls_of(camel):
-    """set de (x,y) NO transitables en tiles 16px, regla BL."""
+    """walls (no transitables) y fences (salientes) en tiles 16px, regla BL."""
     hdr=_HDRS[camel]; const=hdr['const']
     Wb,Hb=_DIMS[const]; Wt,Ht=Wb*2,Hb*2
     blk=open(os.path.join(PK,'maps',camel+'.blk'),'rb').read()
     ts_camel=_C2C_TS[hdr['tileset']]
     bst=open(os.path.join(PK,'blocksets',_BST[ts_camel]),'rb').read()
     coll=_COLL[ts_camel]
-    # 8px tilemap
+    is_ow=(hdr['tileset']=='OVERWORLD')
     TH8,TW8=Hb*4,Wb*4
     tmap=[[0]*TW8 for _ in range(TH8)]
     for by in range(Hb):
@@ -108,21 +111,23 @@ def walls_of(camel):
             for r in range(4):
                 for c in range(4):
                     tmap[by*4+r][bx*4+c]=t[r*4+c]
-    walls=set()
+    walls=set(); fences={}
     for y in range(Ht):
         for x in range(Wt):
             bl=tmap[2*y+1][2*x]   # sub-tile inferior-izquierdo
-            if bl not in coll: walls.add((x,y))
-    return walls,(Wt,Ht)
+            if bl in coll: continue
+            if is_ow and bl in LEDGE_DIR: fences[(x,y)]=LEDGE_DIR[bl]
+            else: walls.add((x,y))
+    return walls,fences,(Wt,Ht)
 
 def map_info(camel):
     hdr=_HDRS[camel]; const=hdr['const']; Wb,Hb=_DIMS[const]
-    walls,(Wt,Ht)=walls_of(camel)
+    walls,fences,(Wt,Ht)=walls_of(camel)
     obj=_objects(camel)
     conns=[(d,_CONST2CAMEL.get(c,cam),cam,off) for (d,cam,c,off) in hdr['connections']]
     return {'camel':camel,'const':const,'tiles':(Wt,Ht),'tileset':hdr['tileset'],
-            'walls':walls,'warps':obj['warps'],'signs':obj['signs'],'npcs':obj['npcs'],
-            'connections':conns}
+            'walls':walls,'fences':fences,'warps':obj['warps'],'signs':obj['signs'],
+            'npcs':obj['npcs'],'connections':conns}
 
 if __name__=='__main__':
     import sys,json
