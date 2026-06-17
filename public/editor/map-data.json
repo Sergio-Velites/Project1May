@@ -3,11 +3,11 @@
     "id": "celadon-city-dept-store-1f",
     "name": "Grandes Almacenes 1F",
     "imageFile": "celadon-city-dept-store-1f.png",
-    "height": 18,
+    "height": 8,
     "width": 20,
     "start": {
       "x": 10,
-      "y": 16
+      "y": 7
     },
     "cave": false,
     "allowBicycle": false,
@@ -16,7 +16,68 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "1": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "2": [
+        6,
+        11,
+        16,
+        17
+      ],
+      "3": [
+        6,
+        11
+      ],
+      "4": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -38,9 +99,20 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {},
+    "maps": {
+      "1": {
+        "12": "celadon-city-dept-store-2f"
+      }
+    },
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "7": [
+        2,
+        3,
+        16,
+        17
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "celadon-city-dept-store-1f.ts"
@@ -49,11 +121,11 @@
     "id": "celadon-city-dept-store-2f",
     "name": "Grandes Almacenes 2F",
     "imageFile": "celadon-city-dept-store-2f.png",
-    "height": 18,
+    "height": 8,
     "width": 20,
     "start": {
-      "x": 10,
-      "y": 16
+      "x": 9,
+      "y": 7
     },
     "cave": false,
     "allowBicycle": false,
@@ -62,7 +134,99 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "1": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        17,
+        18,
+        19
+      ],
+      "2": [
+        4,
+        7
+      ],
+      "3": [
+        4,
+        7,
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19
+      ],
+      "4": [
+        4,
+        5,
+        6,
+        7,
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19
+      ],
+      "6": [
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19
+      ],
+      "7": [
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -84,7 +248,12 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {},
+    "maps": {
+      "1": {
+        "12": "celadon-city-dept-store-1f",
+        "16": "celadon-city-dept-store-3f"
+      }
+    },
     "teleports": {},
     "exits": {},
     "exitReturnMap": null,
@@ -95,11 +264,11 @@
     "id": "celadon-city-dept-store-3f",
     "name": "Grandes Almacenes 3F",
     "imageFile": "celadon-city-dept-store-3f.png",
-    "height": 18,
+    "height": 8,
     "width": 20,
     "start": {
       "x": 10,
-      "y": 16
+      "y": 7
     },
     "cave": false,
     "allowBicycle": false,
@@ -108,7 +277,90 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "1": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        17,
+        18,
+        19
+      ],
+      "2": [
+        18,
+        19
+      ],
+      "4": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "5": [
+        12
+      ],
+      "6": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        12,
+        16,
+        17,
+        18,
+        19
+      ],
+      "7": [
+        12,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -130,7 +382,12 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {},
+    "maps": {
+      "1": {
+        "12": "celadon-city-dept-store-4f",
+        "16": "celadon-city-dept-store-2f"
+      }
+    },
     "teleports": {},
     "exits": {},
     "exitReturnMap": null,
@@ -141,11 +398,11 @@
     "id": "celadon-city-dept-store-4f",
     "name": "Grandes Almacenes 4F",
     "imageFile": "celadon-city-dept-store-4f.png",
-    "height": 18,
+    "height": 8,
     "width": 20,
     "start": {
       "x": 10,
-      "y": 16
+      "y": 7
     },
     "cave": false,
     "allowBicycle": false,
@@ -154,7 +411,108 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "1": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        17,
+        18,
+        19
+      ],
+      "3": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "4": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "6": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "7": [
+        9,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -176,7 +534,12 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {},
+    "maps": {
+      "1": {
+        "12": "celadon-city-dept-store-3f",
+        "16": "celadon-city-dept-store-5f"
+      }
+    },
     "teleports": {},
     "exits": {},
     "exitReturnMap": null,
@@ -187,11 +550,11 @@
     "id": "celadon-city-dept-store-5f",
     "name": "Grandes Almacenes 5F",
     "imageFile": "celadon-city-dept-store-5f.png",
-    "height": 18,
+    "height": 8,
     "width": 20,
     "start": {
-      "x": 10,
-      "y": 16
+      "x": 9,
+      "y": 7
     },
     "cave": false,
     "allowBicycle": false,
@@ -200,7 +563,99 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "1": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        17,
+        18,
+        19
+      ],
+      "2": [
+        4,
+        7
+      ],
+      "3": [
+        4,
+        7,
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19
+      ],
+      "4": [
+        4,
+        5,
+        6,
+        7,
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19
+      ],
+      "6": [
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19
+      ],
+      "7": [
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -222,7 +677,11 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {},
+    "maps": {
+      "1": {
+        "16": "celadon-city-dept-store-4f"
+      }
+    },
     "teleports": {},
     "exits": {},
     "exitReturnMap": null,
@@ -233,11 +692,11 @@
     "id": "celadon-city-dept-store-6f",
     "name": "Grandes Almacenes 6F",
     "imageFile": "celadon-city-dept-store-6f.png",
-    "height": 18,
+    "height": 8,
     "width": 20,
     "start": {
       "x": 10,
-      "y": 16
+      "y": 6
     },
     "cave": false,
     "allowBicycle": false,
@@ -246,7 +705,109 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "1": [
+        0,
+        1,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "2": [
+        0,
+        1,
+        4,
+        5,
+        12,
+        13,
+        14,
+        16,
+        17,
+        18,
+        19
+      ],
+      "3": [
+        0,
+        1,
+        4,
+        5,
+        18,
+        19
+      ],
+      "4": [
+        0,
+        1,
+        8,
+        9,
+        18,
+        19
+      ],
+      "5": [
+        0,
+        1,
+        8,
+        9,
+        18,
+        19
+      ],
+      "6": [
+        0,
+        1,
+        18,
+        19
+      ],
+      "7": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -268,7 +829,11 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {},
+    "maps": {
+      "2": {
+        "15": "celadon-city-dept-store-5f"
+      }
+    },
     "teleports": {},
     "exits": {},
     "exitReturnMap": null,
@@ -292,7 +857,225 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/rocket-game-corner.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "1": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "2": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "3": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "4": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        18,
+        19
+      ],
+      "5": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "6": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "7": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "9": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13,
+        18,
+        19
+      ],
+      "10": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13,
+        18,
+        19
+      ],
+      "11": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13,
+        18,
+        19
+      ],
+      "12": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13,
+        18,
+        19
+      ],
+      "13": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13,
+        18,
+        19
+      ],
+      "14": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13,
+        18,
+        19
+      ],
+      "15": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13,
+        18,
+        19
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -316,7 +1099,12 @@
     "stoppers": {},
     "maps": {},
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "17": [
+        15,
+        16
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "celadon-city-game-corner.ts"
@@ -326,9 +1114,9 @@
     "name": "Gimnasio Ciudad Celedon",
     "imageFile": "celadon-city-gym.png",
     "height": 18,
-    "width": 20,
+    "width": 10,
     "start": {
-      "x": 10,
+      "x": 9,
       "y": 16
     },
     "cave": false,
@@ -338,7 +1126,90 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/pokemon-gym.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "2": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "3": [
+        2,
+        7
+      ],
+      "4": [
+        2,
+        7
+      ],
+      "5": [
+        2,
+        7
+      ],
+      "6": [
+        2,
+        7
+      ],
+      "7": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "8": [
+        2,
+        3,
+        6,
+        7
+      ],
+      "9": [
+        2,
+        3,
+        6,
+        7
+      ],
+      "10": [
+        9
+      ],
+      "11": [
+        0
+      ],
+      "12": [
+        2,
+        3,
+        6,
+        7
+      ],
+      "13": [
+        2,
+        3,
+        6,
+        7
+      ],
+      "14": [
+        3,
+        6
+      ],
+      "15": [
+        3,
+        6
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -362,7 +1233,12 @@
     "stoppers": {},
     "maps": {},
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "17": [
+        4,
+        5
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "celadon-city-gym.ts"
@@ -384,7 +1260,48 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "3": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "4": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "6": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "7": [
+        0,
+        1,
+        6,
+        7
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -408,7 +1325,12 @@
     "stoppers": {},
     "maps": {},
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "7": [
+        2,
+        3
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "celadon-city-house-a.ts"
@@ -418,7 +1340,7 @@
     "name": "Casa Ciudad Celedon",
     "imageFile": "celadon-city-npc-a.png",
     "height": 8,
-    "width": 8,
+    "width": 10,
     "start": {
       "x": 4,
       "y": 6
@@ -430,7 +1352,49 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "1": [
+        6
+      ],
+      "2": [
+        0,
+        1,
+        6
+      ],
+      "3": [
+        0,
+        1,
+        6
+      ],
+      "4": [
+        6
+      ],
+      "5": [
+        0,
+        1,
+        6
+      ],
+      "6": [
+        0,
+        1,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -454,7 +1418,12 @@
     "stoppers": {},
     "maps": {},
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "7": [
+        3,
+        4
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "celadon-city-house-b.ts"
@@ -513,7 +1482,7 @@
     "width": 14,
     "start": {
       "x": 7,
-      "y": 6
+      "y": 5
     },
     "cave": false,
     "allowBicycle": false,
@@ -522,7 +1491,70 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/pokemon-center.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13
+      ],
+      "1": [
+        0,
+        1,
+        2,
+        5,
+        6,
+        7
+      ],
+      "2": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        13
+      ],
+      "3": [
+        13
+      ],
+      "4": [
+        0
+      ],
+      "5": [
+        0
+      ],
+      "6": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13
+      ],
+      "7": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -546,7 +1578,12 @@
     "stoppers": {},
     "maps": {},
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "7": [
+        3,
+        4
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "celadon-city-pokemon-center.ts"
@@ -555,11 +1592,11 @@
     "id": "celadon-city-prize-room",
     "name": "Sala de Premios",
     "imageFile": "celadon-city-game-corner-prize-room.png",
-    "height": 18,
-    "width": 20,
+    "height": 8,
+    "width": 10,
     "start": {
-      "x": 10,
-      "y": 16
+      "x": 9,
+      "y": 5
     },
     "cave": false,
     "allowBicycle": false,
@@ -568,7 +1605,64 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "1": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "2": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "6": [
+        0,
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9
+      ],
+      "7": [
+        0,
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -592,7 +1686,12 @@
     "stoppers": {},
     "maps": {},
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "7": [
+        4,
+        5
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "celadon-city-prize-room.ts"
@@ -4492,7 +5591,159 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/pokemon-gym.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "1": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        10,
+        11
+      ],
+      "2": [
+        0,
+        6,
+        8,
+        14
+      ],
+      "3": [
+        0,
+        6,
+        8,
+        14
+      ],
+      "4": [
+        0,
+        6,
+        8,
+        14
+      ],
+      "5": [
+        0,
+        6,
+        8,
+        14
+      ],
+      "6": [
+        0,
+        1,
+        2,
+        3,
+        6,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15,
+        16,
+        17
+      ],
+      "7": [
+        0,
+        1,
+        6,
+        8,
+        9,
+        14,
+        15
+      ],
+      "8": [
+        0,
+        6,
+        8,
+        14
+      ],
+      "9": [
+        0,
+        6,
+        8,
+        14
+      ],
+      "10": [
+        0,
+        6,
+        8,
+        14
+      ],
+      "11": [
+        0,
+        6,
+        8,
+        14,
+        15,
+        16,
+        17
+      ],
+      "12": [
+        0,
+        1,
+        2,
+        3,
+        6,
+        8,
+        9,
+        10,
+        11,
+        14,
+        17
+      ],
+      "13": [
+        0,
+        1,
+        6,
+        8,
+        9,
+        14,
+        17
+      ],
+      "14": [
+        0,
+        6,
+        8,
+        14
+      ],
+      "15": [
+        0,
+        6,
+        7,
+        8,
+        14
+      ],
+      "16": [
+        0,
+        14
+      ],
+      "17": [
+        0,
+        14
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -4516,7 +5767,12 @@
     "stoppers": {},
     "maps": {},
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "17": [
+        16,
+        17
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "cinnabar-island-gym.ts"
@@ -4525,11 +5781,11 @@
     "id": "cinnabar-island-lab",
     "name": "Laboratorio de Cinabria",
     "imageFile": "cinnabar-island-lab.png",
-    "height": 18,
-    "width": 20,
+    "height": 8,
+    "width": 18,
     "start": {
       "x": 10,
-      "y": 16
+      "y": 7
     },
     "cave": false,
     "allowBicycle": false,
@@ -4538,7 +5794,95 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/pokemon-lab.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "1": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "2": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "3": [
+        0,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "4": [
+        6,
+        7,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        17
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -4562,7 +5906,12 @@
     "stoppers": {},
     "maps": {},
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "7": [
+        2,
+        3
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "cinnabar-island-lab.ts"
@@ -4584,7 +5933,51 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/cinnabar-island.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "3": [
+        0,
+        1,
+        4,
+        5,
+        6,
+        7
+      ],
+      "4": [
+        0,
+        1,
+        4,
+        5,
+        6,
+        7
+      ],
+      "5": [
+        1
+      ],
+      "6": [
+        0,
+        1
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -4608,7 +6001,12 @@
     "stoppers": {},
     "maps": {},
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "7": [
+        3,
+        4
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "cinnabar-island-poke-mart.ts"
@@ -4621,7 +6019,7 @@
     "width": 14,
     "start": {
       "x": 7,
-      "y": 6
+      "y": 5
     },
     "cave": false,
     "allowBicycle": false,
@@ -4630,7 +6028,70 @@
     "minimapPos": null,
     "music": "\"/game/music/maps-original/pokemon-center.mp3\"",
     "trainers": [],
-    "walls": {},
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13
+      ],
+      "1": [
+        0,
+        1,
+        2,
+        5,
+        6,
+        7
+      ],
+      "2": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        13
+      ],
+      "3": [
+        13
+      ],
+      "4": [
+        0
+      ],
+      "5": [
+        0
+      ],
+      "6": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13
+      ],
+      "7": [
+        0,
+        1,
+        6,
+        7,
+        12,
+        13
+      ]
+    },
     "fences": {},
     "fenceDirections": {},
     "grass": {},
@@ -4654,7 +6115,12 @@
     "stoppers": {},
     "maps": {},
     "teleports": {},
-    "exits": {},
+    "exits": {
+      "7": [
+        3,
+        4
+      ]
+    },
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "cinnabar-island-pokemon-center.ts"
