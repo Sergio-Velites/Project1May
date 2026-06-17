@@ -189,6 +189,7 @@ export enum MapId {
   VictoryRoad2f = "victory-road-2f",
   VictoryRoad3f = "victory-road-3f",
   IndigoPlateau = "indigo-plateau",
+  IndigoPlateauLobby = "indigo-plateau-lobby",
   EliteFour1 = "elite-four-1",
   EliteFour2 = "elite-four-2",
   EliteFour3 = "elite-four-3",

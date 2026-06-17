@@ -101,7 +101,7 @@ const route21: MapType = {
   },
   text: {},
   maps: {
-
+    89: { 10: MapId.CinnabarIsland, 11: MapId.CinnabarIsland },
   },
   exits: {
 

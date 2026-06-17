@@ -24,6 +24,7 @@ const eliteFour1: MapType = {
   text: {},
   maps: {
     0: { 4: MapId.EliteFour2, 5: MapId.EliteFour2 },
+    11: { 4: MapId.IndigoPlateauLobby, 5: MapId.IndigoPlateauLobby },
   },
   exits: {
 

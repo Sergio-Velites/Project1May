@@ -80,7 +80,7 @@ const lavenderTown: MapType = {
     10: { 0: MapId.Route8 },
     11: { 0: MapId.Route8 },
     12: { 0: MapId.Route8 },
-    13: { 0: MapId.Route8, 15: MapId.LavenderTownPokeMart },
+    13: { 0: MapId.Route8, 3: MapId.LavenderTownHouseB, 15: MapId.LavenderTownPokeMart },
     14: { 0: MapId.Route8 },
     15: { 0: MapId.Route8 },
     17: { 8: MapId.Route12, 9: MapId.Route12, 10: MapId.Route12 },

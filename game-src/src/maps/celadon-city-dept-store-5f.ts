@@ -18,7 +18,7 @@ const celadonCityDeptStore5f: MapType = {
   },
   text: {},
   maps: {
-    1: { 16: MapId.CeladonCityDeptStore4f },
+    1: { 12: MapId.CeladonCityDeptStore6f, 16: MapId.CeladonCityDeptStore4f },
   },
   exits: {
 

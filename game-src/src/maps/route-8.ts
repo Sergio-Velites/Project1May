@@ -62,7 +62,9 @@ const route8: MapType = {
   text: {},
   maps: {
     7: { 59: MapId.LavenderTown },
-    8: { 59: MapId.LavenderTown },
+    8: { 0: MapId.SaffronCity, 59: MapId.LavenderTown },
+    9: { 0: MapId.SaffronCity },
+    10: { 0: MapId.SaffronCity },
   },
   exits: {
 

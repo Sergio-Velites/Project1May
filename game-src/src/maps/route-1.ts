@@ -105,8 +105,8 @@ const route1: MapType = {
       },
     },
   maps: {
-    0: { 10: MapId.ViridianCity, 11: MapId.ViridianCity },
-    35: { 10: MapId.PalletTown, 11: MapId.PalletTown },
+    0: { 0: MapId.ViridianCity, 1: MapId.ViridianCity, 2: MapId.ViridianCity, 4: MapId.ViridianCity, 5: MapId.ViridianCity, 6: MapId.ViridianCity, 7: MapId.ViridianCity, 8: MapId.ViridianCity, 10: MapId.ViridianCity, 11: MapId.ViridianCity, 13: MapId.ViridianCity, 14: MapId.ViridianCity, 15: MapId.ViridianCity, 16: MapId.ViridianCity, 17: MapId.ViridianCity, 19: MapId.ViridianCity },
+    35: { 0: MapId.PalletTown, 1: MapId.PalletTown, 2: MapId.PalletTown, 4: MapId.PalletTown, 5: MapId.PalletTown, 6: MapId.PalletTown, 7: MapId.PalletTown, 8: MapId.PalletTown, 10: MapId.PalletTown, 11: MapId.PalletTown, 13: MapId.PalletTown, 14: MapId.PalletTown, 15: MapId.PalletTown, 16: MapId.PalletTown, 17: MapId.PalletTown, 19: MapId.PalletTown },
   },
   exits: {
 

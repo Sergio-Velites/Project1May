@@ -185,6 +185,7 @@ import victoryRoad1f from "./victory-road-1f";
 import victoryRoad2f from "./victory-road-2f";
 import victoryRoad3f from "./victory-road-3f";
 import indigoPlateau from "./indigo-plateau";
+import indigoPlateauLobby from "./indigo-plateau-lobby";
 import eliteFour1 from "./elite-four-1";
 import eliteFour2 from "./elite-four-2";
 import eliteFour3 from "./elite-four-3";
@@ -384,6 +385,7 @@ const mapData: Record<string, MapType> = {
   [MapId.VictoryRoad2f]: victoryRoad2f,
   [MapId.VictoryRoad3f]: victoryRoad3f,
   [MapId.IndigoPlateau]: indigoPlateau,
+  [MapId.IndigoPlateauLobby]: indigoPlateauLobby,
   [MapId.EliteFour1]: eliteFour1,
   [MapId.EliteFour2]: eliteFour2,
   [MapId.EliteFour3]: eliteFour3,

@@ -45,7 +45,7 @@ text: {
     },
   },
   maps: {
-    7: { 7: MapId.PewterCityNpcA },
+    7: { 7: MapId.PewterCityMuseum1f },
   },
   exits: {
 

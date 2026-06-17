@@ -40,6 +40,7 @@ const pokemonMansion1f: MapType = {
   text: {},
   maps: {
     10: { 5: MapId.PokemonMansion2f },
+    23: { 21: MapId.PokemonMansion4f },
   },
   exits: {
     27: [4, 5, 6, 7, 26, 27],

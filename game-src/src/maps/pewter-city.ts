@@ -125,8 +125,9 @@ const pewterCity: MapType = {
     },
   },
   maps: {
-    5: { 19: MapId.PewterCityNpcA },
-    7: { 14: MapId.PewterCityNpcA },
+    0: { 39: MapId.Route3 },
+    5: { 19: MapId.PewterCityMuseum1f },
+    7: { 14: MapId.PewterCityMuseum1f },
     13: { 29: MapId.PewterCityNpcB },
     15: { 39: MapId.Route3 },
     16: { 39: MapId.Route3 },
@@ -137,13 +138,13 @@ const pewterCity: MapType = {
     26: { 39: MapId.Route3 },
     27: { 39: MapId.Route3 },
     28: { 39: MapId.Route3 },
-    29: { 39: MapId.Route3 },
+    29: { 7: MapId.PewterCityNpcA, 39: MapId.Route3 },
     30: { 39: MapId.Route3 },
     31: { 39: MapId.Route3 },
     32: { 39: MapId.Route3 },
     33: { 39: MapId.Route3 },
     34: { 39: MapId.Route3 },
-    35: { 18: MapId.Route2, 19: MapId.Route2, 26: MapId.Route2, 27: MapId.Route2, 28: MapId.Route2, 29: MapId.Route2, 30: MapId.Route2, 31: MapId.Route2, 32: MapId.Route2, 33: MapId.Route2, 34: MapId.Route2, 35: MapId.Route2, 36: MapId.Route2, 37: MapId.Route2, 38: MapId.Route2, 39: MapId.Route3 },
+    35: { 0: MapId.Route2, 1: MapId.Route2, 2: MapId.Route2, 3: MapId.Route2, 4: MapId.Route2, 5: MapId.Route2, 6: MapId.Route2, 7: MapId.Route2, 8: MapId.Route2, 9: MapId.Route2, 10: MapId.Route2, 11: MapId.Route2, 18: MapId.Route2, 19: MapId.Route2, 26: MapId.Route2, 27: MapId.Route2, 28: MapId.Route2, 29: MapId.Route2, 30: MapId.Route2, 31: MapId.Route2, 32: MapId.Route2, 33: MapId.Route2, 34: MapId.Route2, 35: MapId.Route2, 36: MapId.Route2, 37: MapId.Route2, 38: MapId.Route2, 39: MapId.Route3 },
   },
   teleports: {
 

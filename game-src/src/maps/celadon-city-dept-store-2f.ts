@@ -18,7 +18,7 @@ const celadonCityDeptStore2f: MapType = {
   },
   text: {},
   maps: {
-    1: { 12: MapId.CeladonCityDeptStore1f, 16: MapId.CeladonCityDeptStore3f },
+    1: { 12: MapId.CeladonCityPokeMart, 16: MapId.CeladonCityDeptStore3f },
   },
   exits: {
 

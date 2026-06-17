@@ -64,17 +64,10 @@ walls: {
     },
   },
   maps: {
-    0: {
-      10: MapId.Route1,
-      11: MapId.Route1,
-    },
-    5: {
-      5: MapId.PalletTownHouseA1F,
-      13: MapId.PalletTownHouseB,
-    },
-    11: {
-      12: MapId.PalletTownLab,
-    },
+    0: { 0: MapId.Route1, 1: MapId.Route1, 2: MapId.Route1, 4: MapId.Route1, 5: MapId.Route1, 6: MapId.Route1, 7: MapId.Route1, 8: MapId.Route1, 10: MapId.Route1, 11: MapId.Route1, 13: MapId.Route1, 14: MapId.Route1, 15: MapId.Route1, 16: MapId.Route1, 17: MapId.Route1 },
+    5: { 5: MapId.PalletTownHouseA1F, 13: MapId.PalletTownHouseB },
+    11: { 12: MapId.PalletTownLab },
+    17: { 2: MapId.Route21, 3: MapId.Route21 },
   },
   exits: {},
   music: music,

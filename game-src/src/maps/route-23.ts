@@ -140,7 +140,9 @@ const route23: MapType = {
   },
   text: {},
   maps: {
+    0: { 9: MapId.IndigoPlateau, 10: MapId.IndigoPlateau },
     31: { 4: MapId.VictoryRoad1f, 14: MapId.VictoryRoad2f },
+    143: { 0: MapId.Route22, 1: MapId.Route22, 14: MapId.Route22, 15: MapId.Route22, 16: MapId.Route22, 17: MapId.Route22, 18: MapId.Route22, 19: MapId.Route22 },
   },
   exits: {
 

@@ -29,7 +29,11 @@ const route16: MapType = {
   },
   text: {},
   maps: {
-    17: { 1: MapId.Route17, 2: MapId.Route17, 3: MapId.Route17, 4: MapId.Route17, 6: MapId.Route17, 7: MapId.Route17, 8: MapId.Route17, 9: MapId.Route17, 10: MapId.Route17, 11: MapId.Route17 },
+    4: { 17: MapId.Route16Gate, 24: MapId.Route16Gate },
+    5: { 17: MapId.Route16Gate, 24: MapId.Route16Gate },
+    10: { 17: MapId.Route16Gate, 24: MapId.Route16Gate, 39: MapId.CeladonCity },
+    11: { 17: MapId.Route16Gate, 24: MapId.Route16Gate },
+    17: { 1: MapId.Route17, 2: MapId.Route17, 3: MapId.Route17, 4: MapId.Route17, 6: MapId.Route17, 7: MapId.Route17, 8: MapId.Route17, 9: MapId.Route17, 10: MapId.Route17, 11: MapId.Route17, 13: MapId.Route17 },
   },
   exits: {
 

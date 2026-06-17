@@ -138,9 +138,10 @@ const route2: MapType = {
       },
     },
   maps: {
+    0: { 8: MapId.PewterCity, 9: MapId.PewterCity },
     9: { 12: MapId.DiglettsCave },
-    35: { 16: MapId.Route2GateNorth },
-    39: { 15: MapId.Route2GateNorth },
+    35: { 16: MapId.Route4Gate },
+    39: { 15: MapId.Route4Gate },
     71: { 7: MapId.ViridianCity, 8: MapId.ViridianCity, 9: MapId.ViridianCity },
   },
   teleports: {

@@ -25,7 +25,9 @@ const houseA2f: MapType = {
       0: ["Enciendes el PC.", "No funciona..."],
     },
   },
-  maps: {},
+  maps: {
+    1: { 7: MapId.PalletTownHouseA1F },
+  },
   exits: {
     1: [7],
   },

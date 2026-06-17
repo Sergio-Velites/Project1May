@@ -106,6 +106,7 @@ const route3: MapType = {
     9: { 0: MapId.PewterCity },
     10: { 0: MapId.PewterCity },
     11: { 0: MapId.PewterCity },
+    17: { 0: MapId.PewterCity },
   },
   exits: {
 

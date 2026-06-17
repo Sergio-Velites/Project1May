@@ -9,7 +9,9 @@ const celadonCityPokeMart: MapType = {
   start: { x: 10, y: 16 },
   walls: {},
   text: {},
-  maps: {},
+  maps: {
+    1: { 12: MapId.CeladonCityDeptStore2f },
+  },
   exits: {},
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},

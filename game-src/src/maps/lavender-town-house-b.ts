@@ -9,7 +9,9 @@ const lavenderTownHouseB: MapType = {
   start: { x: 4, y: 6 },
   walls: {},
   text: {},
-  maps: {},
+  maps: {
+
+  },
   exits: {},
   music: "/game/music/maps-original/lavender-town.mp3",
   grass: {},

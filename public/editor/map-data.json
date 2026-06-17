@@ -250,7 +250,7 @@
     "stoppers": {},
     "maps": {
       "1": {
-        "12": "celadon-city-dept-store-1f",
+        "12": "celadon-city-poke-mart",
         "16": "celadon-city-dept-store-3f"
       }
     },
@@ -679,6 +679,7 @@
     "stoppers": {},
     "maps": {
       "1": {
+        "12": "celadon-city-dept-store-6f",
         "16": "celadon-city-dept-store-4f"
       }
     },
@@ -1467,7 +1468,11 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {},
+    "maps": {
+      "1": {
+        "12": "celadon-city-dept-store-2f"
+      }
+    },
     "teleports": {},
     "exits": {},
     "exitReturnMap": null,
@@ -2678,8 +2683,8 @@
         "49": "route-7"
       },
       "13": {
-        "8": "celadon-city-dept-store-1f",
-        "10": "celadon-city-dept-store-1f"
+        "8": "celadon-city-poke-mart",
+        "10": "celadon-city-poke-mart"
       },
       "18": {
         "0": "route-16"
@@ -2690,7 +2695,9 @@
         "39": "celadon-city-dept-store-5f"
       },
       "27": {
-        "12": "celadon-city-gym"
+        "12": "celadon-city-gym",
+        "31": "celadon-city-house-b",
+        "35": "celadon-city-house-a"
       }
     },
     "teleports": {},
@@ -5524,12 +5531,34 @@
         "24": "route-24",
         "25": "route-24"
       },
+      "6": {
+        "39": "route-9"
+      },
+      "7": {
+        "39": "route-9"
+      },
+      "8": {
+        "39": "route-9"
+      },
       "9": {
-        "27": "cerulean-city-house-b"
+        "27": "cerulean-city-house-b",
+        "39": "route-9"
       },
       "11": {
+        "0": "route-4",
         "4": "cerulean-cave-1f",
         "27": "cerulean-city-house-b"
+      },
+      "12": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "13": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "14": {
+        "39": "route-9"
       },
       "15": {
         "13": "cerulean-city-house-a"
@@ -5546,13 +5575,81 @@
       },
       "19": {
         "0": "route-4",
-        "30": "cerulean-city-gym"
+        "30": "cerulean-city-gym",
+        "39": "route-9"
+      },
+      "20": {
+        "39": "route-9"
+      },
+      "21": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "22": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "23": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "24": {
+        "0": "route-4",
+        "39": "route-9"
       },
       "25": {
+        "0": "route-4",
         "13": "cerulean-city-bike-shop",
-        "25": "cerulean-city-poke-mart"
+        "25": "cerulean-city-poke-mart",
+        "39": "route-9"
+      },
+      "26": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "27": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "28": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "29": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "30": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "31": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "32": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "33": {
+        "0": "route-4",
+        "39": "route-9"
+      },
+      "34": {
+        "0": "route-4",
+        "39": "route-9"
       },
       "35": {
+        "0": "route-4",
+        "1": "route-5",
+        "2": "route-5",
+        "3": "route-5",
+        "4": "route-5",
+        "5": "route-5",
+        "6": "route-5",
+        "7": "route-5",
+        "8": "route-5",
+        "9": "route-5",
         "11": "route-5",
         "12": "route-5",
         "13": "route-5",
@@ -5568,7 +5665,17 @@
         "25": "route-5",
         "26": "route-5",
         "27": "route-5",
-        "28": "route-5"
+        "28": "route-5",
+        "30": "route-5",
+        "31": "route-5",
+        "32": "route-5",
+        "33": "route-5",
+        "34": "route-5",
+        "35": "route-5",
+        "36": "route-5",
+        "37": "route-5",
+        "38": "route-5",
+        "39": "route-9"
       }
     },
     "teleports": {},
@@ -6846,6 +6953,10 @@
       "0": {
         "4": "elite-four-2",
         "5": "elite-four-2"
+      },
+      "11": {
+        "4": "indigo-plateau-lobby",
+        "5": "indigo-plateau-lobby"
       }
     },
     "teleports": {},
@@ -9182,12 +9293,31 @@
         "0": "route-18",
         "39": "route-15"
       },
+      "24": {
+        "31": "fuchsia-city-house-b"
+      },
       "27": {
         "5": "fuchsia-city-gym",
+        "11": "fuchsia-city-house-a",
         "19": "fuchsia-city-pokemon-center",
-        "27": "fuchsia-city-warden-house"
+        "27": "fuchsia-city-warden-house",
+        "31": "fuchsia-city-house-b"
+      },
+      "34": {
+        "0": "route-18"
       },
       "35": {
+        "0": "route-18",
+        "1": "route-19",
+        "2": "route-19",
+        "3": "route-19",
+        "4": "route-19",
+        "5": "route-19",
+        "6": "route-19",
+        "7": "route-19",
+        "8": "route-19",
+        "9": "route-19",
+        "10": "route-19",
         "16": "route-19",
         "17": "route-19",
         "18": "route-19",
@@ -9396,6 +9526,183 @@
       "y": 6
     },
     "sourceFile": "gate-house.ts"
+  },
+  "indigo-plateau-lobby": {
+    "id": "indigo-plateau-lobby",
+    "name": "Liga Pokémon",
+    "imageFile": "indigo-plateau-lobby.png",
+    "height": 12,
+    "width": 16,
+    "start": {
+      "x": 7,
+      "y": 10
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "minimapPos": null,
+    "music": null,
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "1": [
+        0,
+        1,
+        2,
+        3,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "2": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "3": [
+        0,
+        1,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "4": [
+        0,
+        1,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        15
+      ],
+      "5": [
+        1,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "6": [
+        0,
+        1,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        15
+      ],
+      "7": [
+        15
+      ],
+      "8": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "9": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "10": [
+        12,
+        13,
+        14,
+        15
+      ],
+      "11": [
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {
+      "0": {
+        "8": "elite-four-1"
+      }
+    },
+    "teleports": {},
+    "exits": {
+      "11": [
+        7,
+        8
+      ]
+    },
+    "exitReturnMap": "indigo-plateau",
+    "exitReturnPos": {
+      "x": 9,
+      "y": 6
+    },
+    "sourceFile": "indigo-plateau-lobby.ts"
   },
   "indigo-plateau": {
     "id": "indigo-plateau",
@@ -9706,6 +10013,10 @@
     "spinners": {},
     "stoppers": {},
     "maps": {
+      "5": {
+        "9": "indigo-plateau-lobby",
+        "10": "indigo-plateau-lobby"
+      },
       "17": {
         "9": "route-23",
         "10": "route-23"
@@ -10460,6 +10771,7 @@
       },
       "13": {
         "0": "route-8",
+        "3": "lavender-town-house-b",
         "15": "lavender-town-poke-mart"
       },
       "14": {
@@ -12394,7 +12706,26 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {},
+    "maps": {
+      "0": {
+        "9": "indigo-plateau",
+        "10": "indigo-plateau"
+      },
+      "31": {
+        "4": "victory-road-1f",
+        "14": "victory-road-2f"
+      },
+      "143": {
+        "0": "route-22",
+        "1": "route-22",
+        "14": "route-22",
+        "15": "route-22",
+        "16": "route-22",
+        "17": "route-22",
+        "18": "route-22",
+        "19": "route-22"
+      }
+    },
     "teleports": {
       "157": {
         "7": {
@@ -15823,7 +16154,11 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {},
+    "maps": {
+      "1": {
+        "7": "pallet-town-house-a-1f"
+      }
+    },
     "teleports": {},
     "exits": {
       "1": [
@@ -16468,8 +16803,21 @@
     "stoppers": {},
     "maps": {
       "0": {
+        "0": "route-1",
+        "1": "route-1",
+        "2": "route-1",
+        "4": "route-1",
+        "5": "route-1",
+        "6": "route-1",
+        "7": "route-1",
+        "8": "route-1",
         "10": "route-1",
-        "11": "route-1"
+        "11": "route-1",
+        "13": "route-1",
+        "14": "route-1",
+        "15": "route-1",
+        "16": "route-1",
+        "17": "route-1"
       },
       "5": {
         "5": "pallet-town-house-a-1f",
@@ -16477,6 +16825,10 @@
       },
       "11": {
         "12": "pallet-town-lab"
+      },
+      "17": {
+        "2": "route-21",
+        "3": "route-21"
       }
     },
     "teleports": {},
@@ -17286,7 +17638,7 @@
     "stoppers": {},
     "maps": {
       "7": {
-        "7": "pewter-city-npc-a"
+        "7": "pewter-city-museum-1f"
       }
     },
     "teleports": {},
@@ -19004,11 +19356,14 @@
     "spinners": {},
     "stoppers": {},
     "maps": {
+      "0": {
+        "39": "route-3"
+      },
       "5": {
-        "19": "pewter-city-npc-a"
+        "19": "pewter-city-museum-1f"
       },
       "7": {
-        "14": "pewter-city-npc-a"
+        "14": "pewter-city-museum-1f"
       },
       "13": {
         "29": "pewter-city-npc-b"
@@ -19044,6 +19399,7 @@
         "39": "route-3"
       },
       "29": {
+        "7": "pewter-city-npc-a",
         "39": "route-3"
       },
       "30": {
@@ -19062,6 +19418,18 @@
         "39": "route-3"
       },
       "35": {
+        "0": "route-2",
+        "1": "route-2",
+        "2": "route-2",
+        "3": "route-2",
+        "4": "route-2",
+        "5": "route-2",
+        "6": "route-2",
+        "7": "route-2",
+        "8": "route-2",
+        "9": "route-2",
+        "10": "route-2",
+        "11": "route-2",
         "18": "route-2",
         "19": "route-2",
         "26": "route-2",
@@ -19487,6 +19855,9 @@
     "maps": {
       "10": {
         "5": "pokemon-mansion-2f"
+      },
+      "23": {
+        "21": "pokemon-mansion-4f"
       }
     },
     "teleports": {},
@@ -25480,12 +25851,40 @@
     "stoppers": {},
     "maps": {
       "0": {
+        "0": "viridian-city",
+        "1": "viridian-city",
+        "2": "viridian-city",
+        "4": "viridian-city",
+        "5": "viridian-city",
+        "6": "viridian-city",
+        "7": "viridian-city",
+        "8": "viridian-city",
         "10": "viridian-city",
-        "11": "viridian-city"
+        "11": "viridian-city",
+        "13": "viridian-city",
+        "14": "viridian-city",
+        "15": "viridian-city",
+        "16": "viridian-city",
+        "17": "viridian-city",
+        "19": "viridian-city"
       },
       "35": {
+        "0": "pallet-town",
+        "1": "pallet-town",
+        "2": "pallet-town",
+        "4": "pallet-town",
+        "5": "pallet-town",
+        "6": "pallet-town",
+        "7": "pallet-town",
+        "8": "pallet-town",
         "10": "pallet-town",
-        "11": "pallet-town"
+        "11": "pallet-town",
+        "13": "pallet-town",
+        "14": "pallet-town",
+        "15": "pallet-town",
+        "16": "pallet-town",
+        "17": "pallet-town",
+        "19": "pallet-town"
       }
     },
     "teleports": {},
@@ -27050,6 +27449,9 @@
     "spinners": {},
     "stoppers": {},
     "maps": {
+      "1": {
+        "0": "route-9"
+      },
       "4": {
         "0": "route-9"
       },
@@ -27073,6 +27475,13 @@
       },
       "53": {
         "8": "rock-tunnel-1f"
+      },
+      "71": {
+        "6": "lavender-town",
+        "7": "lavender-town",
+        "8": "lavender-town",
+        "9": "lavender-town",
+        "10": "lavender-town"
       }
     },
     "teleports": {},
@@ -27423,6 +27832,12 @@
       },
       "7": {
         "0": "vermilion-city"
+      },
+      "8": {
+        "59": "route-12"
+      },
+      "9": {
+        "59": "route-12"
       }
     },
     "teleports": {},
@@ -29337,6 +29752,18 @@
     "spinners": {},
     "stoppers": {},
     "maps": {
+      "0": {
+        "8": "lavender-town",
+        "9": "lavender-town",
+        "10": "lavender-town"
+      },
+      "15": {
+        "10": "route-12-gate",
+        "11": "route-12-gate"
+      },
+      "21": {
+        "10": "route-12-gate"
+      },
       "37": {
         "0": "route-11"
       },
@@ -29346,7 +29773,120 @@
       "62": {
         "0": "route-11"
       },
+      "72": {
+        "0": "route-11"
+      },
+      "73": {
+        "0": "route-11"
+      },
+      "74": {
+        "0": "route-11"
+      },
+      "75": {
+        "0": "route-11"
+      },
+      "76": {
+        "0": "route-11"
+      },
+      "77": {
+        "0": "route-11"
+      },
+      "78": {
+        "0": "route-11"
+      },
+      "79": {
+        "0": "route-11"
+      },
+      "80": {
+        "0": "route-11"
+      },
+      "81": {
+        "0": "route-11"
+      },
+      "82": {
+        "0": "route-11"
+      },
+      "83": {
+        "0": "route-11"
+      },
+      "84": {
+        "0": "route-11"
+      },
+      "85": {
+        "0": "route-11"
+      },
+      "86": {
+        "0": "route-11"
+      },
+      "87": {
+        "0": "route-11"
+      },
+      "88": {
+        "0": "route-11"
+      },
+      "89": {
+        "0": "route-11"
+      },
+      "90": {
+        "0": "route-11"
+      },
+      "91": {
+        "0": "route-11"
+      },
+      "92": {
+        "0": "route-11"
+      },
+      "93": {
+        "0": "route-11"
+      },
+      "94": {
+        "0": "route-11"
+      },
+      "95": {
+        "0": "route-11"
+      },
+      "96": {
+        "0": "route-11"
+      },
+      "97": {
+        "0": "route-11"
+      },
+      "98": {
+        "0": "route-11"
+      },
+      "99": {
+        "0": "route-11"
+      },
+      "100": {
+        "0": "route-11"
+      },
+      "101": {
+        "0": "route-11"
+      },
+      "102": {
+        "0": "route-11"
+      },
+      "103": {
+        "0": "route-11"
+      },
+      "104": {
+        "0": "route-11"
+      },
+      "105": {
+        "0": "route-11"
+      },
+      "106": {
+        "0": "route-11"
+      },
       "107": {
+        "0": "route-11",
+        "1": "route-13",
+        "2": "route-13",
+        "4": "route-13",
+        "5": "route-13",
+        "6": "route-13",
+        "7": "route-13",
+        "8": "route-13",
         "10": "route-13",
         "11": "route-13"
       }
@@ -30074,8 +30614,50 @@
     "stoppers": {},
     "maps": {
       "0": {
+        "0": "route-14",
+        "1": "route-12",
+        "2": "route-12",
+        "3": "route-12",
+        "4": "route-12",
+        "5": "route-12",
+        "6": "route-12",
+        "7": "route-12",
+        "8": "route-12",
+        "9": "route-12",
+        "10": "route-12",
+        "11": "route-12",
+        "12": "route-12",
+        "13": "route-12",
+        "14": "route-12",
+        "15": "route-12",
+        "16": "route-12",
+        "17": "route-12",
+        "18": "route-12",
+        "19": "route-12",
+        "20": "route-12",
+        "21": "route-12",
+        "22": "route-12",
+        "23": "route-12",
+        "24": "route-12",
+        "25": "route-12",
+        "26": "route-12",
+        "27": "route-12",
+        "28": "route-12",
+        "29": "route-12",
+        "30": "route-12",
+        "31": "route-12",
+        "32": "route-12",
+        "33": "route-12",
+        "34": "route-12",
+        "35": "route-12",
         "50": "route-12",
         "51": "route-12"
+      },
+      "1": {
+        "0": "route-14"
+      },
+      "2": {
+        "0": "route-14"
       },
       "4": {
         "0": "route-14"
@@ -30593,20 +31175,121 @@
     "spinners": {},
     "stoppers": {},
     "maps": {
-      "4": {
+      "0": {
+        "0": "route-15",
         "19": "route-13"
+      },
+      "1": {
+        "0": "route-15",
+        "19": "route-13"
+      },
+      "2": {
+        "0": "route-15",
+        "19": "route-13"
+      },
+      "3": {
+        "0": "route-15"
+      },
+      "4": {
+        "0": "route-15",
+        "19": "route-13"
+      },
+      "5": {
+        "0": "route-15"
       },
       "6": {
+        "0": "route-15",
         "19": "route-13"
+      },
+      "7": {
+        "0": "route-15"
       },
       "8": {
+        "0": "route-15",
         "19": "route-13"
+      },
+      "9": {
+        "0": "route-15"
       },
       "10": {
+        "0": "route-15",
         "19": "route-13"
       },
+      "11": {
+        "0": "route-15"
+      },
       "12": {
+        "0": "route-15",
         "19": "route-13"
+      },
+      "13": {
+        "0": "route-15"
+      },
+      "14": {
+        "0": "route-15"
+      },
+      "15": {
+        "0": "route-15"
+      },
+      "16": {
+        "0": "route-15"
+      },
+      "17": {
+        "0": "route-15"
+      },
+      "18": {
+        "0": "route-15"
+      },
+      "19": {
+        "0": "route-15"
+      },
+      "20": {
+        "0": "route-15"
+      },
+      "21": {
+        "0": "route-15"
+      },
+      "22": {
+        "0": "route-15"
+      },
+      "23": {
+        "0": "route-15"
+      },
+      "24": {
+        "0": "route-15"
+      },
+      "25": {
+        "0": "route-15"
+      },
+      "26": {
+        "0": "route-15"
+      },
+      "27": {
+        "0": "route-15"
+      },
+      "28": {
+        "0": "route-15"
+      },
+      "29": {
+        "0": "route-15"
+      },
+      "30": {
+        "0": "route-15"
+      },
+      "31": {
+        "0": "route-15"
+      },
+      "32": {
+        "0": "route-15"
+      },
+      "33": {
+        "0": "route-15"
+      },
+      "34": {
+        "0": "route-15"
+      },
+      "35": {
+        "0": "route-15"
       },
       "40": {
         "0": "route-15"
@@ -30636,6 +31319,15 @@
         "0": "route-15"
       },
       "49": {
+        "0": "route-15"
+      },
+      "51": {
+        "0": "route-15"
+      },
+      "52": {
+        "0": "route-15"
+      },
+      "53": {
         "0": "route-15"
       }
     },
@@ -31097,6 +31789,15 @@
     "spinners": {},
     "stoppers": {},
     "maps": {
+      "0": {
+        "0": "fuchsia-city"
+      },
+      "1": {
+        "0": "fuchsia-city"
+      },
+      "2": {
+        "0": "fuchsia-city"
+      },
       "4": {
         "59": "route-14"
       },
@@ -31110,9 +31811,15 @@
         "59": "route-14"
       },
       "8": {
+        "0": "fuchsia-city",
+        "7": "route-15-gate",
+        "14": "route-15-gate",
         "59": "route-14"
       },
       "9": {
+        "0": "fuchsia-city",
+        "7": "route-15-gate",
+        "14": "route-15-gate",
         "59": "route-14"
       },
       "10": {
@@ -31125,6 +31832,18 @@
         "59": "route-14"
       },
       "13": {
+        "59": "route-14"
+      },
+      "15": {
+        "0": "fuchsia-city",
+        "59": "route-14"
+      },
+      "16": {
+        "0": "fuchsia-city",
+        "59": "route-14"
+      },
+      "17": {
+        "0": "fuchsia-city",
         "59": "route-14"
       }
     },
@@ -31679,6 +32398,23 @@
     "spinners": {},
     "stoppers": {},
     "maps": {
+      "4": {
+        "17": "route-16-gate",
+        "24": "route-16-gate"
+      },
+      "5": {
+        "17": "route-16-gate",
+        "24": "route-16-gate"
+      },
+      "10": {
+        "17": "route-16-gate",
+        "24": "route-16-gate",
+        "39": "celadon-city"
+      },
+      "11": {
+        "17": "route-16-gate",
+        "24": "route-16-gate"
+      },
       "17": {
         "1": "route-17",
         "2": "route-17",
@@ -31689,7 +32425,8 @@
         "8": "route-17",
         "9": "route-17",
         "10": "route-17",
-        "11": "route-17"
+        "11": "route-17",
+        "13": "route-17"
       }
     },
     "teleports": {},
@@ -33259,7 +33996,8 @@
         "8": "route-16",
         "9": "route-16",
         "10": "route-16",
-        "11": "route-16"
+        "11": "route-16",
+        "13": "route-16"
       },
       "143": {
         "6": "route-18",
@@ -33859,7 +34597,57 @@
         "10": "route-17",
         "11": "route-17",
         "12": "route-17",
-        "13": "route-17"
+        "13": "route-17",
+        "24": "route-17",
+        "25": "route-17",
+        "26": "route-17",
+        "27": "route-17",
+        "28": "route-17",
+        "29": "route-17",
+        "30": "route-17",
+        "31": "route-17",
+        "32": "route-17",
+        "33": "route-17",
+        "34": "route-17",
+        "35": "route-17",
+        "36": "route-17",
+        "37": "route-17",
+        "38": "route-17",
+        "39": "route-17",
+        "40": "route-17",
+        "41": "route-17",
+        "42": "route-17",
+        "43": "route-17",
+        "44": "route-17",
+        "45": "route-17",
+        "46": "route-17",
+        "47": "route-17",
+        "48": "route-17",
+        "49": "fuchsia-city"
+      },
+      "1": {
+        "49": "fuchsia-city"
+      },
+      "2": {
+        "49": "fuchsia-city"
+      },
+      "3": {
+        "49": "fuchsia-city"
+      },
+      "4": {
+        "49": "fuchsia-city"
+      },
+      "5": {
+        "49": "fuchsia-city"
+      },
+      "6": {
+        "49": "fuchsia-city"
+      },
+      "8": {
+        "49": "fuchsia-city"
+      },
+      "9": {
+        "49": "fuchsia-city"
       }
     },
     "teleports": {},
@@ -36765,14 +37553,18 @@
     "spinners": {},
     "stoppers": {},
     "maps": {
+      "0": {
+        "8": "pewter-city",
+        "9": "pewter-city"
+      },
       "9": {
         "12": "diglets-cave"
       },
       "35": {
-        "16": "route-2-gate-north"
+        "16": "route-4-gate"
       },
       "39": {
-        "15": "route-2-gate-north"
+        "15": "route-4-gate"
       },
       "71": {
         "7": "viridian-city",
@@ -40484,7 +41276,12 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {},
+    "maps": {
+      "89": {
+        "10": "cinnabar-island",
+        "11": "cinnabar-island"
+      }
+    },
     "teleports": {},
     "exits": {},
     "exitReturnMap": null,
@@ -43614,9 +44411,23 @@
     "spinners": {},
     "stoppers": {},
     "maps": {
+      "0": {
+        "9": "indigo-plateau",
+        "10": "indigo-plateau"
+      },
       "31": {
         "4": "victory-road-1f",
         "14": "victory-road-2f"
+      },
+      "143": {
+        "0": "route-22",
+        "1": "route-22",
+        "14": "route-22",
+        "15": "route-22",
+        "16": "route-22",
+        "17": "route-22",
+        "18": "route-22",
+        "19": "route-22"
       }
     },
     "teleports": {},
@@ -44322,9 +45133,17 @@
       "9": {
         "19": "route-25"
       },
+      "11": {
+        "19": "route-25"
+      },
+      "21": {
+        "19": "route-25"
+      },
       "35": {
         "10": "cerulean-city",
-        "11": "cerulean-city"
+        "11": "cerulean-city",
+        "13": "cerulean-city",
+        "14": "cerulean-city"
       }
     },
     "teleports": {},
@@ -47051,6 +47870,9 @@
       },
       "11": {
         "0": "pewter-city"
+      },
+      "17": {
+        "0": "pewter-city"
       }
     },
     "teleports": {},
@@ -48705,12 +49527,41 @@
         "89": "cerulean-city"
       },
       "5": {
-        "18": "mt-moon-1f"
+        "11": "route-3-pokemon-center",
+        "18": "mt-moon-1f",
+        "24": "mt-moon-2f"
       },
       "10": {
         "89": "cerulean-city"
       },
       "11": {
+        "89": "cerulean-city"
+      },
+      "13": {
+        "89": "cerulean-city"
+      },
+      "14": {
+        "89": "cerulean-city"
+      },
+      "15": {
+        "89": "cerulean-city"
+      },
+      "16": {
+        "89": "cerulean-city"
+      },
+      "17": {
+        "6": "route-3",
+        "7": "route-3",
+        "8": "route-3",
+        "9": "route-3",
+        "10": "route-3",
+        "11": "route-3",
+        "12": "route-3",
+        "13": "route-3",
+        "14": "route-3",
+        "86": "route-3",
+        "87": "route-3",
+        "88": "route-3",
         "89": "cerulean-city"
       }
     },
@@ -49146,8 +49997,25 @@
         "17": "cerulean-city",
         "18": "cerulean-city"
       },
-      "27": {
-        "17": "underground-path-ns"
+      "35": {
+        "0": "saffron-city",
+        "2": "saffron-city",
+        "3": "saffron-city",
+        "4": "saffron-city",
+        "5": "saffron-city",
+        "6": "saffron-city",
+        "7": "saffron-city",
+        "8": "saffron-city",
+        "9": "saffron-city",
+        "10": "saffron-city",
+        "11": "saffron-city",
+        "12": "saffron-city",
+        "13": "saffron-city",
+        "14": "saffron-city",
+        "15": "saffron-city",
+        "16": "saffron-city",
+        "17": "saffron-city",
+        "19": "saffron-city"
       }
     },
     "teleports": {},
@@ -49491,9 +50359,38 @@
     "spinners": {},
     "stoppers": {},
     "maps": {
+      "0": {
+        "0": "saffron-city",
+        "1": "saffron-city",
+        "2": "saffron-city",
+        "3": "saffron-city",
+        "4": "saffron-city",
+        "5": "saffron-city",
+        "6": "saffron-city",
+        "7": "saffron-city",
+        "8": "saffron-city",
+        "10": "saffron-city",
+        "12": "saffron-city",
+        "13": "saffron-city",
+        "14": "saffron-city",
+        "15": "saffron-city",
+        "16": "saffron-city",
+        "17": "saffron-city",
+        "18": "saffron-city",
+        "19": "saffron-city"
+      },
       "35": {
         "8": "vermilion-city",
-        "9": "vermilion-city"
+        "9": "vermilion-city",
+        "11": "vermilion-city",
+        "12": "vermilion-city",
+        "13": "vermilion-city",
+        "14": "vermilion-city",
+        "15": "vermilion-city",
+        "16": "vermilion-city",
+        "17": "vermilion-city",
+        "18": "vermilion-city",
+        "19": "vermilion-city"
       }
     },
     "teleports": {},
@@ -49797,10 +50694,45 @@
     "stoppers": {},
     "maps": {
       "2": {
-        "0": "celadon-city"
+        "0": "celadon-city",
+        "19": "saffron-city"
       },
       "3": {
-        "0": "celadon-city"
+        "0": "celadon-city",
+        "19": "saffron-city"
+      },
+      "4": {
+        "19": "saffron-city"
+      },
+      "5": {
+        "19": "saffron-city"
+      },
+      "6": {
+        "19": "saffron-city"
+      },
+      "7": {
+        "19": "saffron-city"
+      },
+      "8": {
+        "19": "saffron-city"
+      },
+      "9": {
+        "19": "saffron-city"
+      },
+      "10": {
+        "19": "saffron-city"
+      },
+      "12": {
+        "19": "saffron-city"
+      },
+      "13": {
+        "19": "saffron-city"
+      },
+      "14": {
+        "19": "saffron-city"
+      },
+      "15": {
+        "19": "saffron-city"
       }
     },
     "teleports": {},
@@ -50529,7 +51461,14 @@
         "59": "lavender-town"
       },
       "8": {
+        "0": "saffron-city",
         "59": "lavender-town"
+      },
+      "9": {
+        "0": "saffron-city"
+      },
+      "10": {
+        "0": "saffron-city"
       }
     },
     "teleports": {},
@@ -51543,10 +52482,33 @@
         "59": "route-10"
       },
       "8": {
+        "0": "cerulean-city",
         "59": "route-10"
       },
       "9": {
+        "0": "cerulean-city",
         "59": "route-10"
+      },
+      "11": {
+        "0": "cerulean-city"
+      },
+      "12": {
+        "0": "cerulean-city"
+      },
+      "13": {
+        "0": "cerulean-city"
+      },
+      "14": {
+        "0": "cerulean-city"
+      },
+      "15": {
+        "0": "cerulean-city"
+      },
+      "16": {
+        "0": "cerulean-city"
+      },
+      "17": {
+        "0": "cerulean-city"
       }
     },
     "teleports": {},
@@ -54708,6 +55670,17 @@
     "stoppers": {},
     "maps": {
       "0": {
+        "0": "route-7",
+        "1": "route-5",
+        "2": "route-5",
+        "3": "route-5",
+        "4": "route-5",
+        "5": "route-5",
+        "6": "route-5",
+        "7": "route-5",
+        "8": "route-5",
+        "9": "route-5",
+        "10": "route-5",
         "12": "route-5",
         "13": "route-5",
         "14": "route-5",
@@ -54717,7 +55690,11 @@
         "18": "route-5",
         "19": "route-5",
         "20": "route-5",
-        "21": "route-5"
+        "21": "route-5",
+        "36": "route-5",
+        "37": "route-5",
+        "38": "route-5",
+        "39": "route-8"
       },
       "3": {
         "26": "saffron-city-fighting-dojo",
@@ -54731,6 +55708,7 @@
       },
       "11": {
         "0": "route-7",
+        "13": "saffron-city-house-b",
         "25": "saffron-city-poke-mart"
       },
       "12": {
@@ -61691,11 +62669,7 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
-      "4": {
-        "5": "underground-path-ns"
-      }
-    },
+    "maps": {},
     "teleports": {},
     "exits": {},
     "exitReturnMap": null,
@@ -63336,10 +64310,61 @@
     "maps": {
       "0": {
         "18": "route-6",
-        "19": "route-6"
+        "19": "route-6",
+        "24": "route-6",
+        "25": "route-6",
+        "26": "route-6",
+        "27": "route-6",
+        "28": "route-6",
+        "29": "route-6",
+        "30": "route-6",
+        "31": "route-6",
+        "32": "route-6",
+        "33": "route-6",
+        "34": "route-6",
+        "35": "route-6",
+        "36": "route-6",
+        "37": "route-6",
+        "38": "route-6",
+        "39": "route-11"
+      },
+      "1": {
+        "39": "route-11"
+      },
+      "2": {
+        "39": "route-11"
       },
       "3": {
-        "11": "vermilion-city-pokemon-center"
+        "7": "vermilion-city-house-a",
+        "11": "vermilion-city-pokemon-center",
+        "39": "route-11"
+      },
+      "4": {
+        "39": "route-11"
+      },
+      "5": {
+        "39": "route-11"
+      },
+      "6": {
+        "39": "route-11"
+      },
+      "7": {
+        "39": "route-11"
+      },
+      "8": {
+        "39": "route-11"
+      },
+      "9": {
+        "39": "route-11"
+      },
+      "10": {
+        "39": "route-11"
+      },
+      "11": {
+        "39": "route-11"
+      },
+      "12": {
+        "39": "route-11"
       },
       "13": {
         "9": "vermilion-city-fan-club",
@@ -63352,7 +64377,8 @@
         "39": "route-11"
       },
       "19": {
-        "12": "vermilion-city-gym"
+        "12": "vermilion-city-gym",
+        "23": "vermilion-city-house-b"
       }
     },
     "teleports": {},
@@ -66137,7 +67163,7 @@
         "19": "route-2"
       },
       "7": {
-        "32": "viridian-city-pokemon-acadamy"
+        "32": "viridian-city-gym"
       },
       "9": {
         "21": "viridian-city-npc-house"
@@ -66149,7 +67175,8 @@
         "0": "route-22"
       },
       "15": {
-        "0": "route-22"
+        "0": "route-22",
+        "21": "viridian-city-pokemon-acadamy"
       },
       "16": {
         "0": "route-22"
@@ -66201,8 +67228,29 @@
         "10": "route-1",
         "11": "route-1",
         "12": "route-1",
+        "14": "route-1",
+        "15": "route-1",
+        "16": "route-1",
+        "17": "route-1",
+        "18": "route-1",
         "20": "route-1",
-        "21": "route-1"
+        "21": "route-1",
+        "23": "route-1",
+        "24": "route-1",
+        "25": "route-1",
+        "26": "route-1",
+        "27": "route-1",
+        "29": "route-1",
+        "30": "route-1",
+        "31": "route-1",
+        "32": "route-1",
+        "33": "route-1",
+        "34": "route-1",
+        "35": "route-1",
+        "36": "route-1",
+        "37": "route-1",
+        "38": "route-1",
+        "39": "route-1"
       }
     },
     "teleports": {},

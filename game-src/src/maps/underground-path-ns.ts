@@ -59,7 +59,7 @@ const undergroundPathNS: MapType = {
   },
   text: {},
   maps: {
-    4: { 5: MapId.UndergroundPathNS },
+
   },
   exits: {
 

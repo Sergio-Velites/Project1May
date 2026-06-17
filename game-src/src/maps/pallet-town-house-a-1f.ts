@@ -27,9 +27,7 @@ const houseA1f: MapType = {
     },
   },
   maps: {
-    1: {
-      7: MapId.PalletTownHouseA2F,
-    },
+    1: { 7: MapId.PalletTownHouseA2F },
   },
   exits: {
     7: [2, 3],

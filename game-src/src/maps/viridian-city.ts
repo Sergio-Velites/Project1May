@@ -133,11 +133,11 @@ const viridianCity: MapType = {
   },
   maps: {
     0: { 17: MapId.Route2, 18: MapId.Route2, 19: MapId.Route2 },
-    7: { 32: MapId.ViridianCityPokemonAcadamy },
+    7: { 32: MapId.ViridianCityGym },
     9: { 21: MapId.ViridianCityNpcHouse },
     13: { 0: MapId.Route22 },
     14: { 0: MapId.Route22 },
-    15: { 0: MapId.Route22 },
+    15: { 0: MapId.Route22, 21: MapId.ViridianCityPokemonAcadamy },
     16: { 0: MapId.Route22 },
     17: { 0: MapId.Route22 },
     19: { 29: MapId.ViridianCityPokeMart },
@@ -150,7 +150,7 @@ const viridianCity: MapType = {
     32: { 0: MapId.Route22 },
     33: { 0: MapId.Route22 },
     34: { 0: MapId.Route22 },
-    35: { 0: MapId.Route22, 1: MapId.Route1, 2: MapId.Route1, 3: MapId.Route1, 4: MapId.Route1, 5: MapId.Route1, 6: MapId.Route1, 7: MapId.Route1, 8: MapId.Route1, 9: MapId.Route1, 10: MapId.Route1, 11: MapId.Route1, 12: MapId.Route1, 20: MapId.Route1, 21: MapId.Route1 },
+    35: { 0: MapId.Route22, 1: MapId.Route1, 2: MapId.Route1, 3: MapId.Route1, 4: MapId.Route1, 5: MapId.Route1, 6: MapId.Route1, 7: MapId.Route1, 8: MapId.Route1, 9: MapId.Route1, 10: MapId.Route1, 11: MapId.Route1, 12: MapId.Route1, 14: MapId.Route1, 15: MapId.Route1, 16: MapId.Route1, 17: MapId.Route1, 18: MapId.Route1, 20: MapId.Route1, 21: MapId.Route1, 23: MapId.Route1, 24: MapId.Route1, 25: MapId.Route1, 26: MapId.Route1, 27: MapId.Route1, 29: MapId.Route1, 30: MapId.Route1, 31: MapId.Route1, 32: MapId.Route1, 33: MapId.Route1, 34: MapId.Route1, 35: MapId.Route1, 36: MapId.Route1, 37: MapId.Route1, 38: MapId.Route1, 39: MapId.Route1 },
   },
   exits: {
 

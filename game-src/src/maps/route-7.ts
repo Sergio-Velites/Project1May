@@ -47,8 +47,19 @@ const route7: MapType = {
   },
   text: {},
   maps: {
-    2: { 0: MapId.CeladonCity },
-    3: { 0: MapId.CeladonCity },
+    2: { 0: MapId.CeladonCity, 19: MapId.SaffronCity },
+    3: { 0: MapId.CeladonCity, 19: MapId.SaffronCity },
+    4: { 19: MapId.SaffronCity },
+    5: { 19: MapId.SaffronCity },
+    6: { 19: MapId.SaffronCity },
+    7: { 19: MapId.SaffronCity },
+    8: { 19: MapId.SaffronCity },
+    9: { 19: MapId.SaffronCity },
+    10: { 19: MapId.SaffronCity },
+    12: { 19: MapId.SaffronCity },
+    13: { 19: MapId.SaffronCity },
+    14: { 19: MapId.SaffronCity },
+    15: { 19: MapId.SaffronCity },
   },
   exits: {
 

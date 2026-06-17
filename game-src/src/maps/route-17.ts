@@ -161,7 +161,7 @@ const route17: MapType = {
   },
   text: {},
   maps: {
-    0: { 1: MapId.Route16, 2: MapId.Route16, 3: MapId.Route16, 4: MapId.Route16, 5: MapId.Route16, 6: MapId.Route16, 7: MapId.Route16, 8: MapId.Route16, 9: MapId.Route16, 10: MapId.Route16, 11: MapId.Route16 },
+    0: { 1: MapId.Route16, 2: MapId.Route16, 3: MapId.Route16, 4: MapId.Route16, 5: MapId.Route16, 6: MapId.Route16, 7: MapId.Route16, 8: MapId.Route16, 9: MapId.Route16, 10: MapId.Route16, 11: MapId.Route16, 13: MapId.Route16 },
     143: { 6: MapId.Route18, 7: MapId.Route18, 8: MapId.Route18, 9: MapId.Route18, 10: MapId.Route18, 11: MapId.Route18, 12: MapId.Route18, 13: MapId.Route18 },
   },
   exits: {

@@ -75,8 +75,15 @@ const route9: MapType = {
     5: { 0: MapId.CeruleanCity },
     6: { 0: MapId.CeruleanCity },
     7: { 59: MapId.Route10 },
-    8: { 59: MapId.Route10 },
-    9: { 59: MapId.Route10 },
+    8: { 0: MapId.CeruleanCity, 59: MapId.Route10 },
+    9: { 0: MapId.CeruleanCity, 59: MapId.Route10 },
+    11: { 0: MapId.CeruleanCity },
+    12: { 0: MapId.CeruleanCity },
+    13: { 0: MapId.CeruleanCity },
+    14: { 0: MapId.CeruleanCity },
+    15: { 0: MapId.CeruleanCity },
+    16: { 0: MapId.CeruleanCity },
+    17: { 0: MapId.CeruleanCity },
   },
   exits: {
 

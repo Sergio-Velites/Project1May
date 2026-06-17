@@ -46,6 +46,8 @@ const route11: MapType = {
     4: { 0: MapId.VermilionCity },
     6: { 0: MapId.VermilionCity },
     7: { 0: MapId.VermilionCity },
+    8: { 59: MapId.Route12 },
+    9: { 59: MapId.Route12 },
   },
   exits: {
 

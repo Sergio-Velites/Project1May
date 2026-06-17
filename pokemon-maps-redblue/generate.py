@@ -86,10 +86,15 @@ def main_component(Wt,Ht,walls):
     return best
 
 def build_maps_field(info, reach):
-    Wt,Ht=info['tiles']
+    Wt,Ht=info['tiles']; walls=info['walls']
+    walk=lambda x,y: 0<=x<Wt and 0<=y<Ht and (x,y) not in walls
+    # apertura real: tile de borde transitable con vecino interior transitable
+    # (evita esquinas selladas pero NO exige la componente principal — las rutas
+    # largas se fragmentan por salientes y la apertura puede estar en otra sección)
+    def opening(x,y):
+        return walk(x,y) and any(walk(x+dx,y+dy) for dx,dy in ((0,1),(0,-1),(1,0),(-1,0)))
     cells={}  # (col,row)->MapId key
     def add(x,y,key): cells[(x,y)]=key
-    # conexiones por borde: SOLO tiles del borde alcanzables (apertura del camino)
     edge={'north':[(x,0) for x in range(Wt)],
           'south':[(x,Ht-1) for x in range(Wt)],
           'west':[(0,y) for y in range(Ht)],
@@ -98,8 +103,7 @@ def build_maps_field(info, reach):
         pid=REV.get(camel); key=ENUM.get(pid) if pid else None
         if not key: continue
         for (x,y) in edge.get(d,[]):
-            if (x,y) in reach:  # solo la apertura transitable y alcanzable
-                add(x,y,key)
+            if opening(x,y): add(x,y,key)
     # warps (puertas/escaleras) -> tile exacto
     for (x,y,dest_const,wid) in info['warps']:
         if dest_const==DIR_NONE: continue

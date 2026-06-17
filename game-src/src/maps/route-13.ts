@@ -29,7 +29,9 @@ const route13: MapType = {
   },
   text: {},
   maps: {
-    0: { 50: MapId.Route12, 51: MapId.Route12 },
+    0: { 0: MapId.Route14, 1: MapId.Route12, 2: MapId.Route12, 3: MapId.Route12, 4: MapId.Route12, 5: MapId.Route12, 6: MapId.Route12, 7: MapId.Route12, 8: MapId.Route12, 9: MapId.Route12, 10: MapId.Route12, 11: MapId.Route12, 12: MapId.Route12, 13: MapId.Route12, 14: MapId.Route12, 15: MapId.Route12, 16: MapId.Route12, 17: MapId.Route12, 18: MapId.Route12, 19: MapId.Route12, 20: MapId.Route12, 21: MapId.Route12, 22: MapId.Route12, 23: MapId.Route12, 24: MapId.Route12, 25: MapId.Route12, 26: MapId.Route12, 27: MapId.Route12, 28: MapId.Route12, 29: MapId.Route12, 30: MapId.Route12, 31: MapId.Route12, 32: MapId.Route12, 33: MapId.Route12, 34: MapId.Route12, 35: MapId.Route12, 50: MapId.Route12, 51: MapId.Route12 },
+    1: { 0: MapId.Route14 },
+    2: { 0: MapId.Route14 },
     4: { 0: MapId.Route14 },
     6: { 0: MapId.Route14 },
     8: { 0: MapId.Route14 },

@@ -29,7 +29,15 @@ const route18: MapType = {
   },
   text: {},
   maps: {
-    0: { 6: MapId.Route17, 7: MapId.Route17, 8: MapId.Route17, 9: MapId.Route17, 10: MapId.Route17, 11: MapId.Route17, 12: MapId.Route17, 13: MapId.Route17 },
+    0: { 6: MapId.Route17, 7: MapId.Route17, 8: MapId.Route17, 9: MapId.Route17, 10: MapId.Route17, 11: MapId.Route17, 12: MapId.Route17, 13: MapId.Route17, 24: MapId.Route17, 25: MapId.Route17, 26: MapId.Route17, 27: MapId.Route17, 28: MapId.Route17, 29: MapId.Route17, 30: MapId.Route17, 31: MapId.Route17, 32: MapId.Route17, 33: MapId.Route17, 34: MapId.Route17, 35: MapId.Route17, 36: MapId.Route17, 37: MapId.Route17, 38: MapId.Route17, 39: MapId.Route17, 40: MapId.Route17, 41: MapId.Route17, 42: MapId.Route17, 43: MapId.Route17, 44: MapId.Route17, 45: MapId.Route17, 46: MapId.Route17, 47: MapId.Route17, 48: MapId.Route17, 49: MapId.FuchsiaCity },
+    1: { 49: MapId.FuchsiaCity },
+    2: { 49: MapId.FuchsiaCity },
+    3: { 49: MapId.FuchsiaCity },
+    4: { 49: MapId.FuchsiaCity },
+    5: { 49: MapId.FuchsiaCity },
+    6: { 49: MapId.FuchsiaCity },
+    8: { 49: MapId.FuchsiaCity },
+    9: { 49: MapId.FuchsiaCity },
   },
   exits: {
 

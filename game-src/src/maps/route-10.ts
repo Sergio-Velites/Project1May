@@ -221,6 +221,7 @@ const route10: MapType = {
   },
   text: {},
   maps: {
+    1: { 0: MapId.Route9 },
     4: { 0: MapId.Route9 },
     6: { 0: MapId.Route9 },
     7: { 0: MapId.Route9 },
@@ -229,6 +230,7 @@ const route10: MapType = {
     17: { 8: MapId.RockTunnel1f },
     39: { 6: MapId.PowerPlant },
     53: { 8: MapId.RockTunnel1f },
+    71: { 6: MapId.LavenderTown, 7: MapId.LavenderTown, 8: MapId.LavenderTown, 9: MapId.LavenderTown, 10: MapId.LavenderTown },
   },
   exits: {
 

@@ -29,6 +29,7 @@ const indigoPlateau: MapType = {
   },
   text: {},
   maps: {
+    5: { 9: MapId.IndigoPlateauLobby, 10: MapId.IndigoPlateauLobby },
     17: { 9: MapId.Route23, 10: MapId.Route23 },
   },
   exits: {

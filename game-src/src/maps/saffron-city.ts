@@ -47,11 +47,11 @@ const saffronCity: MapType = {
   },
   text: {},
   maps: {
-    0: { 12: MapId.Route5, 13: MapId.Route5, 14: MapId.Route5, 15: MapId.Route5, 16: MapId.Route5, 17: MapId.Route5, 18: MapId.Route5, 19: MapId.Route5, 20: MapId.Route5, 21: MapId.Route5 },
+    0: { 0: MapId.Route7, 1: MapId.Route5, 2: MapId.Route5, 3: MapId.Route5, 4: MapId.Route5, 5: MapId.Route5, 6: MapId.Route5, 7: MapId.Route5, 8: MapId.Route5, 9: MapId.Route5, 10: MapId.Route5, 12: MapId.Route5, 13: MapId.Route5, 14: MapId.Route5, 15: MapId.Route5, 16: MapId.Route5, 17: MapId.Route5, 18: MapId.Route5, 19: MapId.Route5, 20: MapId.Route5, 21: MapId.Route5, 36: MapId.Route5, 37: MapId.Route5, 38: MapId.Route5, 39: MapId.Route8 },
     3: { 26: MapId.SaffronCityFightingDojo, 34: MapId.SaffronCityGym },
     5: { 7: MapId.SaffronCityCopycatHouse },
     10: { 0: MapId.Route7 },
-    11: { 0: MapId.Route7, 25: MapId.SaffronCityPokeMart },
+    11: { 0: MapId.Route7, 13: MapId.SaffronCityHouseB, 25: MapId.SaffronCityPokeMart },
     12: { 0: MapId.Route7 },
     13: { 0: MapId.Route7 },
     14: { 0: MapId.Route7 },

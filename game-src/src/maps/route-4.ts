@@ -40,9 +40,14 @@ const route4: MapType = {
   maps: {
     3: { 89: MapId.CeruleanCity },
     4: { 89: MapId.CeruleanCity },
-    5: { 18: MapId.MtMoon1f },
+    5: { 11: MapId.Route3PokemonCenter, 18: MapId.MtMoon1f, 24: MapId.MtMoon2f },
     10: { 89: MapId.CeruleanCity },
     11: { 89: MapId.CeruleanCity },
+    13: { 89: MapId.CeruleanCity },
+    14: { 89: MapId.CeruleanCity },
+    15: { 89: MapId.CeruleanCity },
+    16: { 89: MapId.CeruleanCity },
+    17: { 6: MapId.Route3, 7: MapId.Route3, 8: MapId.Route3, 9: MapId.Route3, 10: MapId.Route3, 11: MapId.Route3, 12: MapId.Route3, 13: MapId.Route3, 14: MapId.Route3, 86: MapId.Route3, 87: MapId.Route3, 88: MapId.Route3, 89: MapId.CeruleanCity },
   },
   exits: {
 

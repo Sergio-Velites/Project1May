@@ -86,7 +86,9 @@ const route24: MapType = {
     7: { 19: MapId.Route25 },
     8: { 19: MapId.Route25 },
     9: { 19: MapId.Route25 },
-    35: { 10: MapId.CeruleanCity, 11: MapId.CeruleanCity },
+    11: { 19: MapId.Route25 },
+    21: { 19: MapId.Route25 },
+    35: { 10: MapId.CeruleanCity, 11: MapId.CeruleanCity, 13: MapId.CeruleanCity, 14: MapId.CeruleanCity },
   },
   exits: {
 

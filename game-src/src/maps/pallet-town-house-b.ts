@@ -21,7 +21,9 @@ const houseB: MapType = {
     6: [0, 7],
   },
   text: {},
-  maps: {},
+  maps: {
+
+  },
   exits: {
     7: [2, 3],
   },
