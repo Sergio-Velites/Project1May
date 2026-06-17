@@ -10,24 +10,27 @@ const gateHouse: MapType = {
   width: 10,
   start: { x: 4, y: 6 },
   walls: {
-      0: [0, 1, 2, 3, 6, 7, 8, 9],
-      1: [3, 6],
-      6: [3, 6],
-      7: [3, 6],
-    },
+    0: [0, 1, 2, 3, 4, 6, 7, 8, 9],
+    2: [0, 6, 8, 9],
+    3: [0, 6, 8, 9],
+    4: [0, 9],
+    5: [0, 6, 8, 9],
+    6: [0, 6, 8, 9],
+    7: [0, 9],
+  },
   fences: {},
   grass: {},
   text: {},
-  maps: {},
+  maps: {
+
+  },
   teleports: {
-      0: {
-        4: { map: MapId.LeagueRoute, pos: { x: 8, y: 156 } },
-        5: { map: MapId.LeagueRoute, pos: { x: 9, y: 156 } },
-      },
-    },
+
+  },
   exits: {
-      7: [4, 5],
-    },
+    0: [4, 5],
+    7: [4, 5],
+  },
   exitReturnMap: MapId.Route22,
   exitReturnPos: { x: 8, y: 6 },
   gifts: [

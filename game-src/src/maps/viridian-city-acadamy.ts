@@ -35,7 +35,9 @@ const viridianCityAcadamy: MapType = {
       ],
     },
   },
-  maps: {},
+  maps: {
+
+  },
   exits: {
     7: [2, 3],
   },

@@ -44,9 +44,11 @@ text: {
       },
     },
   },
-  maps: {},
+  maps: {
+    7: { 7: MapId.PewterCityNpcA },
+  },
   exits: {
-    7: [7],
+
   },
   exitReturnPos: {
     x: 7,

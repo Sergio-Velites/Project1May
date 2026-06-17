@@ -22,7 +22,9 @@ const peweterCityNpcA: MapType = {
     7: [0, 7],
   },
   text: {},
-  maps: {},
+  maps: {
+
+  },
   exits: {
     7: [2, 3],
   },

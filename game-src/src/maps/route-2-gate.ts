@@ -23,11 +23,10 @@ const route2Gate: MapType = {
   grass: {},
   text: {},
   maps: {
-    0: {
-      5: MapId.ViridianForrest,
-    },
+
   },
   exits: {
+    0: [4, 5],
     7: [4, 5],
   },
   exitReturnPos: {
