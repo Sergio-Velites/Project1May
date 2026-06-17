@@ -8586,328 +8586,6 @@
     },
     "sourceFile": "gate-house.ts"
   },
-  "pallet-town-house-a-1f": {
-    "id": "pallet-town-house-a-1f",
-    "name": "Casa 1F",
-    "imageFile": "house-a-1f.png",
-    "height": 8,
-    "width": 8,
-    "start": {
-      "x": 3,
-      "y": 6
-    },
-    "cave": false,
-    "allowBicycle": false,
-    "flyable": false,
-    "flySpot": null,
-    "minimapPos": null,
-    "music": null,
-    "trainers": [
-      {
-        "npcKey": "beauty",
-        "pos": {
-          "x": 6,
-          "y": 3
-        },
-        "facing": "up",
-        "money": 0,
-        "persistent": true,
-        "isOnline": false,
-        "hideCondition": null,
-        "sightRange": null,
-        "intro": [],
-        "outtro": [
-          "¡Espabila pringao!"
-        ],
-        "pokemon": [
-          {
-            "id": 19,
-            "level": 1
-          }
-        ],
-        "postGame": null
-      }
-    ],
-    "walls": {
-      "0": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
-      "1": [
-        0,
-        1,
-        3
-      ],
-      "4": [
-        3,
-        4
-      ],
-      "5": [
-        3,
-        4
-      ]
-    },
-    "fences": {},
-    "fenceDirections": {},
-    "grass": {},
-    "water": {},
-    "encounters": null,
-    "texts": {
-      "1": {
-        "3": [
-          "Hoy es un día muy especial.",
-          "¡El Profesor Oak está esperando!"
-        ]
-      }
-    },
-    "textRewards": {},
-    "items": [],
-    "gifts": [],
-    "staticPokemon": [],
-    "boulders": [],
-    "berryTrees": [],
-    "cuttableTrees": [],
-    "pokemonCenter": null,
-    "pc": null,
-    "store": null,
-    "storeItems": [],
-    "recoverLocation": null,
-    "onlineBattleNpc": null,
-    "spinners": {},
-    "stoppers": {},
-    "maps": {
-      "1": {
-        "7": "pallet-town-house-a-2f"
-      }
-    },
-    "teleports": {},
-    "exits": {
-      "7": [
-        2,
-        3
-      ]
-    },
-    "exitReturnMap": "pallet-town",
-    "exitReturnPos": {
-      "x": 5,
-      "y": 6
-    },
-    "sourceFile": "house-a-1f.ts"
-  },
-  "pallet-town-house-a-2f": {
-    "id": "pallet-town-house-a-2f",
-    "name": "Casa 2F",
-    "imageFile": "house-a-2f.png",
-    "height": 8,
-    "width": 8,
-    "start": {
-      "x": 6,
-      "y": 2
-    },
-    "cave": false,
-    "allowBicycle": false,
-    "flyable": false,
-    "flySpot": null,
-    "minimapPos": null,
-    "music": null,
-    "trainers": [],
-    "walls": {
-      "0": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
-      "1": [
-        0,
-        1,
-        2
-      ],
-      "4": [
-        3
-      ],
-      "6": [
-        0,
-        6
-      ],
-      "7": [
-        0
-      ]
-    },
-    "fences": {},
-    "fenceDirections": {},
-    "grass": {},
-    "water": {},
-    "encounters": null,
-    "texts": {
-      "1": {
-        "0": [
-          "Enciendes el PC.",
-          "No funciona..."
-        ]
-      },
-      "5": {
-        "3": [
-          "¡Estás jugando al Super Smash Brosh en la Nintendo 64!",
-          "... ¡Vamos! ¡Es hora de salir!"
-        ]
-      }
-    },
-    "textRewards": {},
-    "items": [],
-    "gifts": [],
-    "staticPokemon": [],
-    "boulders": [],
-    "berryTrees": [],
-    "cuttableTrees": [],
-    "pokemonCenter": null,
-    "pc": null,
-    "store": null,
-    "storeItems": [],
-    "recoverLocation": null,
-    "onlineBattleNpc": null,
-    "spinners": {},
-    "stoppers": {},
-    "maps": {},
-    "teleports": {},
-    "exits": {
-      "1": [
-        7
-      ]
-    },
-    "exitReturnMap": "pallet-town-house-a-1f",
-    "exitReturnPos": {
-      "x": 6,
-      "y": 2
-    },
-    "sourceFile": "house-a-2f.ts"
-  },
-  "pallet-town-house-b": {
-    "id": "pallet-town-house-b",
-    "name": "Casa B",
-    "imageFile": "house-b.png",
-    "height": 8,
-    "width": 8,
-    "start": {
-      "x": 3,
-      "y": 6
-    },
-    "cave": false,
-    "allowBicycle": false,
-    "flyable": false,
-    "flySpot": null,
-    "minimapPos": null,
-    "music": null,
-    "trainers": [
-      {
-        "npcKey": "fisher",
-        "pos": {
-          "x": 5,
-          "y": 5
-        },
-        "facing": "down",
-        "money": 0,
-        "persistent": true,
-        "isOnline": false,
-        "hideCondition": null,
-        "sightRange": null,
-        "intro": [],
-        "outtro": [
-          "El puto Peri y Aos se fueron de ",
-          "pesca sin mi..."
-        ],
-        "pokemon": [
-          {
-            "id": 19,
-            "level": 2
-          }
-        ],
-        "postGame": null
-      }
-    ],
-    "walls": {
-      "0": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
-      "1": [
-        0,
-        1,
-        7
-      ],
-      "3": [
-        3,
-        4
-      ],
-      "4": [
-        3,
-        4
-      ],
-      "6": [
-        0,
-        7
-      ]
-    },
-    "fences": {},
-    "fenceDirections": {},
-    "grass": {},
-    "water": {},
-    "encounters": null,
-    "texts": {},
-    "textRewards": {},
-    "items": [
-      {
-        "itemKey": "OldRod",
-        "pos": {
-          "x": 4,
-          "y": 3
-        }
-      }
-    ],
-    "gifts": [],
-    "staticPokemon": [],
-    "boulders": [],
-    "berryTrees": [],
-    "cuttableTrees": [],
-    "pokemonCenter": null,
-    "pc": null,
-    "store": null,
-    "storeItems": [],
-    "recoverLocation": null,
-    "onlineBattleNpc": null,
-    "spinners": {},
-    "stoppers": {},
-    "maps": {},
-    "teleports": {},
-    "exits": {
-      "7": [
-        2,
-        3
-      ]
-    },
-    "exitReturnMap": "pallet-town",
-    "exitReturnPos": {
-      "x": 13,
-      "y": 6
-    },
-    "sourceFile": "house-b.ts"
-  },
   "indigo-plateau": {
     "id": "indigo-plateau",
     "name": "Meseta Anil",
@@ -9227,149 +8905,6 @@
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "indigo-plateau.ts"
-  },
-  "pallet-town-lab": {
-    "id": "pallet-town-lab",
-    "name": "DESTILERÍA DEL PROF. OAK",
-    "imageFile": "lab.png",
-    "height": 12,
-    "width": 10,
-    "start": {
-      "x": 5,
-      "y": 10
-    },
-    "cave": false,
-    "allowBicycle": false,
-    "flyable": false,
-    "flySpot": null,
-    "minimapPos": null,
-    "music": "music",
-    "trainers": [
-      {
-        "npcKey": "oak",
-        "pos": {
-          "x": 5,
-          "y": 1
-        },
-        "facing": "down",
-        "money": 0,
-        "persistent": true,
-        "isOnline": false,
-        "hideCondition": "trainer-defeated:pewter-city-gym-4-1",
-        "sightRange": null,
-        "intro": [],
-        "outtro": [
-          "Hoy no hay tiempo de tonterías.",
-          "Pon las pilas que es un día importante.",
-          "Te esperan en EL BOSQUECILLO.",
-          "hip!",
-          "Yo ya voy bien borraja.",
-          "hip!",
-          "Date prisa!",
-          "¡Elige uno de los tres POKEMON de la mesa!",
-          "Y corre a merendar!",
-          "He oido que hay un tal Juanre",
-          "que no perdona a los rezagados."
-        ],
-        "pokemon": [
-          {
-            "id": 19,
-            "level": 2
-          }
-        ],
-        "postGame": null
-      }
-    ],
-    "walls": {
-      "0": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9
-      ],
-      "1": [
-        0,
-        1,
-        6,
-        7,
-        8,
-        9
-      ],
-      "6": [
-        0,
-        1,
-        2,
-        3,
-        6,
-        7,
-        8,
-        9
-      ],
-      "7": [
-        0,
-        1,
-        2,
-        3,
-        6,
-        7,
-        8,
-        9
-      ]
-    },
-    "fences": {},
-    "fenceDirections": {},
-    "grass": {},
-    "water": {},
-    "encounters": null,
-    "texts": {
-      "1": {
-        "0": [
-          "Enciendes el PC.",
-          "No funciona..."
-        ],
-        "5": [
-          "¡Hip! ¡Hoy estamos todos de boda!",
-          "¡Elige un POKEMON de la mesa... hip!",
-          "¡Y date prisa al BOSQUECILLO!",
-          "¡Yo ya voy de buen borraja!"
-        ]
-      }
-    },
-    "textRewards": {},
-    "items": [],
-    "gifts": [],
-    "staticPokemon": [],
-    "boulders": [],
-    "berryTrees": [],
-    "cuttableTrees": [],
-    "pokemonCenter": null,
-    "pc": null,
-    "store": null,
-    "storeItems": [],
-    "recoverLocation": null,
-    "onlineBattleNpc": null,
-    "spinners": {},
-    "stoppers": {},
-    "maps": {},
-    "teleports": {},
-    "exits": {
-      "11": [
-        4,
-        5
-      ]
-    },
-    "exitReturnMap": "pallet-town",
-    "exitReturnPos": {
-      "x": 12,
-      "y": 12
-    },
-    "sourceFile": "lab.ts"
   },
   "lavender-town-house-a": {
     "id": "lavender-town-house-a",
@@ -15285,6 +14820,471 @@
     },
     "sourceFile": "mt-moon-3f.ts"
   },
+  "pallet-town-house-a-1f": {
+    "id": "pallet-town-house-a-1f",
+    "name": "Casa 1F",
+    "imageFile": "house-a-1f.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "minimapPos": null,
+    "music": null,
+    "trainers": [
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 6,
+          "y": 3
+        },
+        "facing": "up",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "¡Espabila pringao!"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      }
+    ],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        3
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "5": [
+        3,
+        4
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {
+      "1": {
+        "3": [
+          "Hoy es un día muy especial.",
+          "¡El Profesor Oak está esperando!"
+        ]
+      }
+    },
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {
+      "1": {
+        "7": "pallet-town-house-a-2f"
+      }
+    },
+    "teleports": {},
+    "exits": {
+      "7": [
+        2,
+        3
+      ]
+    },
+    "exitReturnMap": "pallet-town",
+    "exitReturnPos": {
+      "x": 5,
+      "y": 6
+    },
+    "sourceFile": "pallet-town-house-a-1f.ts"
+  },
+  "pallet-town-house-a-2f": {
+    "id": "pallet-town-house-a-2f",
+    "name": "Casa 2F",
+    "imageFile": "house-a-2f.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 6,
+      "y": 2
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "minimapPos": null,
+    "music": null,
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        2
+      ],
+      "4": [
+        3
+      ],
+      "6": [
+        0,
+        6
+      ],
+      "7": [
+        0
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {
+      "1": {
+        "0": [
+          "Enciendes el PC.",
+          "No funciona..."
+        ]
+      },
+      "5": {
+        "3": [
+          "¡Estás jugando al Super Smash Brosh en la Nintendo 64!",
+          "... ¡Vamos! ¡Es hora de salir!"
+        ]
+      }
+    },
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {},
+    "exits": {
+      "1": [
+        7
+      ]
+    },
+    "exitReturnMap": "pallet-town-house-a-1f",
+    "exitReturnPos": {
+      "x": 6,
+      "y": 2
+    },
+    "sourceFile": "pallet-town-house-a-2f.ts"
+  },
+  "pallet-town-house-b": {
+    "id": "pallet-town-house-b",
+    "name": "Casa B",
+    "imageFile": "house-b.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "minimapPos": null,
+    "music": null,
+    "trainers": [
+      {
+        "npcKey": "fisher",
+        "pos": {
+          "x": 5,
+          "y": 5
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "El puto Peri y Aos se fueron de ",
+          "pesca sin mi..."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ],
+        "postGame": null
+      }
+    ],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [
+      {
+        "itemKey": "OldRod",
+        "pos": {
+          "x": 4,
+          "y": 3
+        }
+      }
+    ],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {},
+    "exits": {
+      "7": [
+        2,
+        3
+      ]
+    },
+    "exitReturnMap": "pallet-town",
+    "exitReturnPos": {
+      "x": 13,
+      "y": 6
+    },
+    "sourceFile": "pallet-town-house-b.ts"
+  },
+  "pallet-town-lab": {
+    "id": "pallet-town-lab",
+    "name": "DESTILERÍA DEL PROF. OAK",
+    "imageFile": "lab.png",
+    "height": 12,
+    "width": 10,
+    "start": {
+      "x": 5,
+      "y": 10
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "minimapPos": null,
+    "music": "music",
+    "trainers": [
+      {
+        "npcKey": "oak",
+        "pos": {
+          "x": 5,
+          "y": 1
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": "trainer-defeated:pewter-city-gym-4-1",
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Hoy no hay tiempo de tonterías.",
+          "Pon las pilas que es un día importante.",
+          "Te esperan en EL BOSQUECILLO.",
+          "hip!",
+          "Yo ya voy bien borraja.",
+          "hip!",
+          "Date prisa!",
+          "¡Elige uno de los tres POKEMON de la mesa!",
+          "Y corre a merendar!",
+          "He oido que hay un tal Juanre",
+          "que no perdona a los rezagados."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ],
+        "postGame": null
+      }
+    ],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "1": [
+        0,
+        1,
+        6,
+        7,
+        8,
+        9
+      ],
+      "6": [
+        0,
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9
+      ],
+      "7": [
+        0,
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {
+      "1": {
+        "0": [
+          "Enciendes el PC.",
+          "No funciona..."
+        ],
+        "5": [
+          "¡Hip! ¡Hoy estamos todos de boda!",
+          "¡Elige un POKEMON de la mesa... hip!",
+          "¡Y date prisa al BOSQUECILLO!",
+          "¡Yo ya voy de buen borraja!"
+        ]
+      }
+    },
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {},
+    "exits": {
+      "11": [
+        4,
+        5
+      ]
+    },
+    "exitReturnMap": "pallet-town",
+    "exitReturnPos": {
+      "x": 12,
+      "y": 12
+    },
+    "sourceFile": "pallet-town-lab.ts"
+  },
   "pallet-town": {
     "id": "pallet-town",
     "name": "PUEBLO PALETA",
@@ -16192,6 +16192,300 @@
       "y": 18
     },
     "sourceFile": "pewter-city-gym.ts"
+  },
+  "pewter-city-museum-1f": {
+    "id": "pewter-city-museum-1f",
+    "name": "Museo de Villamayor 1F",
+    "imageFile": "pewter-museum-1f.png",
+    "height": 8,
+    "width": 20,
+    "start": {
+      "x": 10,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "minimapPos": null,
+    "music": null,
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "1": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "2": [
+        1,
+        2,
+        3,
+        4,
+        11,
+        16
+      ],
+      "3": [
+        1,
+        2,
+        3,
+        4,
+        11
+      ],
+      "4": [
+        11
+      ],
+      "5": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        11,
+        12,
+        13,
+        14
+      ],
+      "6": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        13,
+        14,
+        19
+      ],
+      "7": [
+        8,
+        13,
+        14,
+        19
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {
+      "4": {
+        "11": [
+          "¡Tómate tu tiempo para mirar!"
+        ]
+      },
+      "6": {
+        "2": [
+          "Hay como movidas pero no se muy bien que son"
+        ]
+      }
+    },
+    "textRewards": {
+      "3": {
+        "2": {
+          "type": "pokemon",
+          "questId": "text-reward-pewter-city-museum-1f-2-3",
+          "pokemonId": 142,
+          "level": 20
+        }
+      }
+    },
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [
+      {
+        "pokemonId": 142,
+        "level": 20,
+        "pos": {
+          "x": 2,
+          "y": 3
+        },
+        "sprite": "none",
+        "questId": "pewter-city-museum-1f-static-2-3",
+        "intro": [
+          "Un fosil de AERODACTYL,",
+          "un pokemon antgüo extingido...",
+          "un fosil?"
+        ]
+      }
+    ],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {
+      "7": {
+        "7": "pewter-city-museum-2f"
+      }
+    },
+    "teleports": {},
+    "exits": {
+      "7": [
+        10,
+        11,
+        16,
+        17
+      ]
+    },
+    "exitReturnMap": "pewter-city",
+    "exitReturnPos": {
+      "x": 14,
+      "y": 8
+    },
+    "sourceFile": "pewter-city-museum-1f.ts"
+  },
+  "pewter-city-museum-2f": {
+    "id": "pewter-city-museum-2f",
+    "name": "Museo de Villamayor 2F",
+    "imageFile": "pewter-museum-2f.png",
+    "height": 8,
+    "width": 14,
+    "start": {
+      "x": 7,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "minimapPos": null,
+    "music": null,
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "1": [
+        10,
+        11,
+        12
+      ],
+      "2": [
+        10,
+        11,
+        12
+      ],
+      "4": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "5": [
+        1,
+        2,
+        3,
+        4,
+        8
+      ],
+      "6": [
+        8
+      ],
+      "7": [
+        8
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {
+      "2": {
+        "11": [
+          "Esta claro que te aburres agusto. Anda toma"
+        ]
+      },
+      "5": {
+        "2": [
+          "Mas movidas raras sin sentio... que haces aquí?"
+        ]
+      }
+    },
+    "textRewards": {
+      "2": {
+        "11": {
+          "type": "item",
+          "questId": "text-reward-pewter-city-museum-2f-11-2",
+          "itemKey": "RareCandy",
+          "amount": 30
+        }
+      }
+    },
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {
+      "7": {
+        "7": "pewter-city-npc-a"
+      }
+    },
+    "teleports": {},
+    "exits": {},
+    "exitReturnMap": "pewter-city-museum-1f",
+    "exitReturnPos": {
+      "x": 7,
+      "y": 6
+    },
+    "sourceFile": "pewter-city-museum-2f.ts"
   },
   "pewter-city-npc-a": {
     "id": "pewter-city-npc-a",
@@ -17983,300 +18277,6 @@
       "y": 1
     },
     "sourceFile": "pewter-city.ts"
-  },
-  "pewter-city-museum-1f": {
-    "id": "pewter-city-museum-1f",
-    "name": "Museo de Villamayor 1F",
-    "imageFile": "pewter-museum-1f.png",
-    "height": 8,
-    "width": 20,
-    "start": {
-      "x": 10,
-      "y": 6
-    },
-    "cave": false,
-    "allowBicycle": false,
-    "flyable": false,
-    "flySpot": null,
-    "minimapPos": null,
-    "music": null,
-    "trainers": [],
-    "walls": {
-      "0": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19
-      ],
-      "1": [
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19
-      ],
-      "2": [
-        1,
-        2,
-        3,
-        4,
-        11,
-        16
-      ],
-      "3": [
-        1,
-        2,
-        3,
-        4,
-        11
-      ],
-      "4": [
-        11
-      ],
-      "5": [
-        1,
-        2,
-        3,
-        4,
-        8,
-        11,
-        12,
-        13,
-        14
-      ],
-      "6": [
-        1,
-        2,
-        3,
-        4,
-        8,
-        13,
-        14,
-        19
-      ],
-      "7": [
-        8,
-        13,
-        14,
-        19
-      ]
-    },
-    "fences": {},
-    "fenceDirections": {},
-    "grass": {},
-    "water": {},
-    "encounters": null,
-    "texts": {
-      "4": {
-        "11": [
-          "¡Tómate tu tiempo para mirar!"
-        ]
-      },
-      "6": {
-        "2": [
-          "Hay como movidas pero no se muy bien que son"
-        ]
-      }
-    },
-    "textRewards": {
-      "3": {
-        "2": {
-          "type": "pokemon",
-          "questId": "text-reward-pewter-city-museum-1f-2-3",
-          "pokemonId": 142,
-          "level": 20
-        }
-      }
-    },
-    "items": [],
-    "gifts": [],
-    "staticPokemon": [
-      {
-        "pokemonId": 142,
-        "level": 20,
-        "pos": {
-          "x": 2,
-          "y": 3
-        },
-        "sprite": "none",
-        "questId": "pewter-city-museum-1f-static-2-3",
-        "intro": [
-          "Un fosil de AERODACTYL,",
-          "un pokemon antgüo extingido...",
-          "un fosil?"
-        ]
-      }
-    ],
-    "boulders": [],
-    "berryTrees": [],
-    "cuttableTrees": [],
-    "pokemonCenter": null,
-    "pc": null,
-    "store": null,
-    "storeItems": [],
-    "recoverLocation": null,
-    "onlineBattleNpc": null,
-    "spinners": {},
-    "stoppers": {},
-    "maps": {
-      "7": {
-        "7": "pewter-city-museum-2f"
-      }
-    },
-    "teleports": {},
-    "exits": {
-      "7": [
-        10,
-        11,
-        16,
-        17
-      ]
-    },
-    "exitReturnMap": "pewter-city",
-    "exitReturnPos": {
-      "x": 14,
-      "y": 8
-    },
-    "sourceFile": "pewter-museum-1f.ts"
-  },
-  "pewter-city-museum-2f": {
-    "id": "pewter-city-museum-2f",
-    "name": "Museo de Villamayor 2F",
-    "imageFile": "pewter-museum-2f.png",
-    "height": 8,
-    "width": 14,
-    "start": {
-      "x": 7,
-      "y": 6
-    },
-    "cave": false,
-    "allowBicycle": false,
-    "flyable": false,
-    "flySpot": null,
-    "minimapPos": null,
-    "music": null,
-    "trainers": [],
-    "walls": {
-      "0": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13
-      ],
-      "1": [
-        10,
-        11,
-        12
-      ],
-      "2": [
-        10,
-        11,
-        12
-      ],
-      "4": [
-        1,
-        2,
-        3,
-        4
-      ],
-      "5": [
-        1,
-        2,
-        3,
-        4,
-        8
-      ],
-      "6": [
-        8
-      ],
-      "7": [
-        8
-      ]
-    },
-    "fences": {},
-    "fenceDirections": {},
-    "grass": {},
-    "water": {},
-    "encounters": null,
-    "texts": {
-      "2": {
-        "11": [
-          "Esta claro que te aburres agusto. Anda toma"
-        ]
-      },
-      "5": {
-        "2": [
-          "Mas movidas raras sin sentio... que haces aquí?"
-        ]
-      }
-    },
-    "textRewards": {
-      "2": {
-        "11": {
-          "type": "item",
-          "questId": "text-reward-pewter-city-museum-2f-11-2",
-          "itemKey": "RareCandy",
-          "amount": 30
-        }
-      }
-    },
-    "items": [],
-    "gifts": [],
-    "staticPokemon": [],
-    "boulders": [],
-    "berryTrees": [],
-    "cuttableTrees": [],
-    "pokemonCenter": null,
-    "pc": null,
-    "store": null,
-    "storeItems": [],
-    "recoverLocation": null,
-    "onlineBattleNpc": null,
-    "spinners": {},
-    "stoppers": {},
-    "maps": {
-      "7": {
-        "7": "pewter-city-npc-a"
-      }
-    },
-    "teleports": {},
-    "exits": {},
-    "exitReturnMap": "pewter-city-museum-1f",
-    "exitReturnPos": {
-      "x": 7,
-      "y": 6
-    },
-    "sourceFile": "pewter-museum-2f.ts"
   },
   "pokemon-mansion-1f": {
     "id": "pokemon-mansion-1f",
@@ -63304,106 +63304,6 @@
     "exitReturnPos": null,
     "sourceFile": "victory-road-3f.ts"
   },
-  "viridian-city-pokemon-acadamy": {
-    "id": "viridian-city-pokemon-acadamy",
-    "name": "Antigua Casa de Jonny",
-    "imageFile": "viridian-city-pokemon-acadamy.png",
-    "height": 8,
-    "width": 8,
-    "start": {
-      "x": 2,
-      "y": 6
-    },
-    "cave": false,
-    "allowBicycle": false,
-    "flyable": false,
-    "flySpot": null,
-    "minimapPos": null,
-    "music": null,
-    "trainers": [],
-    "walls": {
-      "0": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
-      "1": [
-        7
-      ],
-      "3": [
-        3,
-        4
-      ],
-      "4": [
-        3,
-        4
-      ],
-      "6": [
-        0,
-        7
-      ],
-      "7": [
-        0,
-        7
-      ]
-    },
-    "fences": {},
-    "fenceDirections": {},
-    "grass": {},
-    "water": {},
-    "encounters": null,
-    "texts": {
-      "0": {
-        "3": [
-          "TITULO: EL AMOR Y LOS POKEMON.",
-          "Cap. 1: El primer encuentro.",
-          "Cap. 2: La batalla del corazon."
-        ]
-      },
-      "4": {
-        "3": [
-          "Encontrado este curioso pokemon.",
-          "No sabemos su procedencia",
-          "Juraría que le he oído susurrar algo....",
-          "'Soy Jonny, Soy Jonny...'"
-        ]
-      }
-    },
-    "textRewards": {},
-    "items": [],
-    "gifts": [],
-    "staticPokemon": [],
-    "boulders": [],
-    "berryTrees": [],
-    "cuttableTrees": [],
-    "pokemonCenter": null,
-    "pc": null,
-    "store": null,
-    "storeItems": [],
-    "recoverLocation": null,
-    "onlineBattleNpc": null,
-    "spinners": {},
-    "stoppers": {},
-    "maps": {},
-    "teleports": {},
-    "exits": {
-      "7": [
-        2,
-        3
-      ]
-    },
-    "exitReturnMap": "viridian-city",
-    "exitReturnPos": {
-      "x": 21,
-      "y": 16
-    },
-    "sourceFile": "viridian-city-acadamy.ts"
-  },
   "viridian-city-gym": {
     "id": "viridian-city-gym",
     "name": "Gimnasio de Soto Lezkairu",
@@ -63951,6 +63851,106 @@
       "y": 20
     },
     "sourceFile": "viridian-city-poke-mart.ts"
+  },
+  "viridian-city-pokemon-acadamy": {
+    "id": "viridian-city-pokemon-acadamy",
+    "name": "Antigua Casa de Jonny",
+    "imageFile": "viridian-city-pokemon-acadamy.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 2,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "minimapPos": null,
+    "music": null,
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {
+      "0": {
+        "3": [
+          "TITULO: EL AMOR Y LOS POKEMON.",
+          "Cap. 1: El primer encuentro.",
+          "Cap. 2: La batalla del corazon."
+        ]
+      },
+      "4": {
+        "3": [
+          "Encontrado este curioso pokemon.",
+          "No sabemos su procedencia",
+          "Juraría que le he oído susurrar algo....",
+          "'Soy Jonny, Soy Jonny...'"
+        ]
+      }
+    },
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {},
+    "exits": {
+      "7": [
+        2,
+        3
+      ]
+    },
+    "exitReturnMap": "viridian-city",
+    "exitReturnPos": {
+      "x": 21,
+      "y": 16
+    },
+    "sourceFile": "viridian-city-pokemon-acadamy.ts"
   },
   "viridian-city-pokemon-center": {
     "id": "viridian-city-pokemon-center",
