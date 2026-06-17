@@ -1,4 +1,4 @@
-import labImage from "../assets/map/lab.png";
+import labImage from "../assets/map/pallet-town-lab.png";
 import { MapId, MapType } from "./map-types";
 import { Direction } from "../state/state-types";
 import { oak } from "../app/npcs";

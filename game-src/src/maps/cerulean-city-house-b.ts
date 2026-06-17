@@ -1,4 +1,4 @@
-import image from "../assets/map/cerulean-city-npc-b.png";
+import image from "../assets/map/cerulean-city-house-b.png";
 import { MapType } from "./map-types";
 
 const ceruleanCityHouseB: MapType = {

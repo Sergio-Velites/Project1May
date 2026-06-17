@@ -1,4 +1,4 @@
-import image from "../assets/map/ss-anne-b1f.png";
+import image from "../assets/map/ss-anne-bf1.png";
 import { MapType } from "./map-types";
 
 const ssAnneBf1: MapType = {

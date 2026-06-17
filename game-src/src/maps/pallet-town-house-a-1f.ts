@@ -1,4 +1,4 @@
-import houseA1FImage from "../assets/map/house-a-1f.png";
+import houseA1FImage from "../assets/map/pallet-town-house-a-1f.png";
 import { MapId, MapType } from "./map-types";
 import { Direction } from "../state/state-types";
 import { beauty } from "../app/npcs";

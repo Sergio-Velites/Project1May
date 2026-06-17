@@ -1246,7 +1246,7 @@
   "celadon-city-house-a": {
     "id": "celadon-city-house-a",
     "name": "Casa Ciudad Celedon",
-    "imageFile": "celadon-city-npc-a.png",
+    "imageFile": "celadon-city-house-a.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -1338,7 +1338,7 @@
   "celadon-city-house-b": {
     "id": "celadon-city-house-b",
     "name": "Casa Ciudad Celedon",
-    "imageFile": "celadon-city-npc-a.png",
+    "imageFile": "celadon-city-house-b.png",
     "height": 8,
     "width": 10,
     "start": {
@@ -1431,7 +1431,7 @@
   "celadon-city-poke-mart": {
     "id": "celadon-city-poke-mart",
     "name": "Tienda Pokemon",
-    "imageFile": "celadon-city-game-corner.png",
+    "imageFile": "celadon-city-poke-mart.png",
     "height": 18,
     "width": 20,
     "start": {
@@ -1591,7 +1591,7 @@
   "celadon-city-prize-room": {
     "id": "celadon-city-prize-room",
     "name": "Sala de Premios",
-    "imageFile": "celadon-city-game-corner-prize-room.png",
+    "imageFile": "celadon-city-prize-room.png",
     "height": 8,
     "width": 10,
     "start": {
@@ -3844,7 +3844,7 @@
   "cerulean-city-bike-shop": {
     "id": "cerulean-city-bike-shop",
     "name": "Ciclo Club",
-    "imageFile": "cerulean-city-npc-a.png",
+    "imageFile": "cerulean-city-bike-shop.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -4076,7 +4076,7 @@
   "cerulean-city-house-a": {
     "id": "cerulean-city-house-a",
     "name": "Casa Ciudad Celeste",
-    "imageFile": "cerulean-city-npc-a.png",
+    "imageFile": "cerulean-city-house-a.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -4159,7 +4159,7 @@
   "cerulean-city-house-b": {
     "id": "cerulean-city-house-b",
     "name": "Casa Ciudad Celeste",
-    "imageFile": "cerulean-city-npc-b.png",
+    "imageFile": "cerulean-city-house-b.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -5580,7 +5580,7 @@
   "champion-room": {
     "id": "champion-room",
     "name": "Campeon",
-    "imageFile": "indigo-plateau.png",
+    "imageFile": "champion-room.png",
     "height": 36,
     "width": 40,
     "start": {
@@ -6546,7 +6546,7 @@
   "diglets-cave": {
     "id": "diglets-cave",
     "name": "Cueva Diglett",
-    "imageFile": "digletts-cave.png",
+    "imageFile": "diglets-cave.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -6651,7 +6651,7 @@
   "elite-four-1": {
     "id": "elite-four-1",
     "name": "Alto Mando - Sala 1",
-    "imageFile": "indigo-plateau.png",
+    "imageFile": "elite-four-1.png",
     "height": 36,
     "width": 40,
     "start": {
@@ -6697,7 +6697,7 @@
   "elite-four-2": {
     "id": "elite-four-2",
     "name": "Alto Mando - Sala 2",
-    "imageFile": "indigo-plateau.png",
+    "imageFile": "elite-four-2.png",
     "height": 36,
     "width": 40,
     "start": {
@@ -6743,7 +6743,7 @@
   "elite-four-3": {
     "id": "elite-four-3",
     "name": "Alto Mando - Sala 3",
-    "imageFile": "indigo-plateau.png",
+    "imageFile": "elite-four-3.png",
     "height": 36,
     "width": 40,
     "start": {
@@ -6789,7 +6789,7 @@
   "elite-four-4": {
     "id": "elite-four-4",
     "name": "Alto Mando - Sala 4",
-    "imageFile": "indigo-plateau.png",
+    "imageFile": "elite-four-4.png",
     "height": 36,
     "width": 40,
     "start": {
@@ -6965,7 +6965,7 @@
   "fuchsia-city-house-a": {
     "id": "fuchsia-city-house-a",
     "name": "Casa Ciudad Fucsia",
-    "imageFile": "fuchsia-city-npc-a.png",
+    "imageFile": "fuchsia-city-house-a.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -7048,7 +7048,7 @@
   "fuchsia-city-house-b": {
     "id": "fuchsia-city-house-b",
     "name": "Casa Ciudad Fucsia",
-    "imageFile": "fuchsia-city-npc-a.png",
+    "imageFile": "fuchsia-city-house-b.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -7332,7 +7332,7 @@
   "fuchsia-city-warden-house": {
     "id": "fuchsia-city-warden-house",
     "name": "Casa del Guarda",
-    "imageFile": "fuchsia-city-warden.png",
+    "imageFile": "fuchsia-city-warden-house.png",
     "height": 8,
     "width": 10,
     "start": {
@@ -8909,7 +8909,7 @@
   "lavender-town-house-a": {
     "id": "lavender-town-house-a",
     "name": "Casa Pueblo Lavanda",
-    "imageFile": "lavender-town-npc-a.png",
+    "imageFile": "lavender-town-house-a.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -8992,7 +8992,7 @@
   "lavender-town-house-b": {
     "id": "lavender-town-house-b",
     "name": "Casa Pueblo Lavanda",
-    "imageFile": "lavender-town-npc-a.png",
+    "imageFile": "lavender-town-house-b.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -14823,7 +14823,7 @@
   "pallet-town-house-a-1f": {
     "id": "pallet-town-house-a-1f",
     "name": "Casa 1F",
-    "imageFile": "house-a-1f.png",
+    "imageFile": "pallet-town-house-a-1f.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -14937,7 +14937,7 @@
   "pallet-town-house-a-2f": {
     "id": "pallet-town-house-a-2f",
     "name": "Casa 2F",
-    "imageFile": "house-a-2f.png",
+    "imageFile": "pallet-town-house-a-2f.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -15029,7 +15029,7 @@
   "pallet-town-house-b": {
     "id": "pallet-town-house-b",
     "name": "Casa B",
-    "imageFile": "house-b.png",
+    "imageFile": "pallet-town-house-b.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -15145,7 +15145,7 @@
   "pallet-town-lab": {
     "id": "pallet-town-lab",
     "name": "DESTILERÍA DEL PROF. OAK",
-    "imageFile": "lab.png",
+    "imageFile": "pallet-town-lab.png",
     "height": 12,
     "width": 10,
     "start": {
@@ -16196,7 +16196,7 @@
   "pewter-city-museum-1f": {
     "id": "pewter-city-museum-1f",
     "name": "Museo de Villamayor 1F",
-    "imageFile": "pewter-museum-1f.png",
+    "imageFile": "pewter-city-museum-1f.png",
     "height": 8,
     "width": 20,
     "start": {
@@ -16371,7 +16371,7 @@
   "pewter-city-museum-2f": {
     "id": "pewter-city-museum-2f",
     "name": "Museo de Villamayor 2F",
-    "imageFile": "pewter-museum-2f.png",
+    "imageFile": "pewter-city-museum-2f.png",
     "height": 8,
     "width": 14,
     "start": {
@@ -16490,7 +16490,7 @@
   "pewter-city-npc-a": {
     "id": "pewter-city-npc-a",
     "name": "Casa de Ciudad Plateada",
-    "imageFile": "pewter-city-npc-house.png",
+    "imageFile": "pewter-city-npc-a.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -16613,7 +16613,7 @@
   "pewter-city-npc-b": {
     "id": "pewter-city-npc-b",
     "name": "Casa de Ciudad Plateada",
-    "imageFile": "pewter-city-npc-house.png",
+    "imageFile": "pewter-city-npc-b.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -19469,7 +19469,7 @@
   "pokemon-mansion-4f": {
     "id": "pokemon-mansion-4f",
     "name": "Mansion Pokemon 4F",
-    "imageFile": "pokemon-mansion-b1f.png",
+    "imageFile": "pokemon-mansion-4f.png",
     "height": 28,
     "width": 30,
     "start": {
@@ -26623,7 +26623,7 @@
   "route-12-gate": {
     "id": "route-12-gate",
     "name": "Caseta Ruta 12",
-    "imageFile": "gate-house.png",
+    "imageFile": "route-12-gate.png",
     "height": 8,
     "width": 10,
     "start": {
@@ -29837,7 +29837,7 @@
   "route-15-gate": {
     "id": "route-15-gate",
     "name": "Caseta Ruta 15",
-    "imageFile": "gate-house-route15.png",
+    "imageFile": "route-15-gate.png",
     "height": 10,
     "width": 8,
     "start": {
@@ -30326,7 +30326,7 @@
   "route-16-gate": {
     "id": "route-16-gate",
     "name": "Caseta Ruta 16",
-    "imageFile": "gate-house-route16.png",
+    "imageFile": "route-16-gate.png",
     "height": 14,
     "width": 8,
     "start": {
@@ -34323,7 +34323,7 @@
   "route-2-gate-north": {
     "id": "route-2-gate-north",
     "name": "Control Ruta 2 Norte",
-    "imageFile": "route-2-gate.png",
+    "imageFile": "route-2-gate-north.png",
     "height": 8,
     "width": 10,
     "start": {
@@ -44399,7 +44399,7 @@
   "route-3-pokemon-center": {
     "id": "route-3-pokemon-center",
     "name": "Centro Pokémon Camino de la Resaca",
-    "imageFile": "viridian-city-pokemon-center.png",
+    "imageFile": "route-3-pokemon-center.png",
     "height": 8,
     "width": 14,
     "start": {
@@ -50747,7 +50747,7 @@
   "safari-zone-area-1": {
     "id": "safari-zone-area-1",
     "name": "Zona Safari - Area 1",
-    "imageFile": "safari-zone-east.png",
+    "imageFile": "safari-zone-area-1.png",
     "height": 26,
     "width": 30,
     "start": {
@@ -51133,7 +51133,7 @@
   "safari-zone-area-2": {
     "id": "safari-zone-area-2",
     "name": "Zona Safari - Area 2",
-    "imageFile": "safari-zone-west.png",
+    "imageFile": "safari-zone-area-2.png",
     "height": 36,
     "width": 40,
     "start": {
@@ -51627,7 +51627,7 @@
   "safari-zone-area-3": {
     "id": "safari-zone-area-3",
     "name": "Zona Safari - Area 3",
-    "imageFile": "safari-zone-center.png",
+    "imageFile": "safari-zone-area-3.png",
     "height": 26,
     "width": 30,
     "start": {
@@ -52302,7 +52302,7 @@
   "saffron-city-copycat-house": {
     "id": "saffron-city-copycat-house",
     "name": "Casa Mimica",
-    "imageFile": "saffron-city-npc-a.png",
+    "imageFile": "saffron-city-copycat-house.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -52724,7 +52724,7 @@
   "saffron-city-house-a": {
     "id": "saffron-city-house-a",
     "name": "Casa Ciudad Azafran",
-    "imageFile": "saffron-city-npc-a.png",
+    "imageFile": "saffron-city-house-a.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -52807,7 +52807,7 @@
   "saffron-city-house-b": {
     "id": "saffron-city-house-b",
     "name": "Casa Ciudad Azafran",
-    "imageFile": "saffron-city-npc-a.png",
+    "imageFile": "saffron-city-house-b.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -60036,7 +60036,7 @@
   "ss-anne-bf1": {
     "id": "ss-anne-bf1",
     "name": "S.S. Aguamarina BF1",
-    "imageFile": "ss-anne-b1f.png",
+    "imageFile": "ss-anne-bf1.png",
     "height": 8,
     "width": 30,
     "start": {
@@ -60894,7 +60894,7 @@
   "vermilion-city-fan-club": {
     "id": "vermilion-city-fan-club",
     "name": "Club de Aficionados Pokemon",
-    "imageFile": "vermilion-city-npc-a.png",
+    "imageFile": "vermilion-city-fan-club.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -61107,7 +61107,7 @@
   "vermilion-city-house-a": {
     "id": "vermilion-city-house-a",
     "name": "Casa Ciudad Carmin",
-    "imageFile": "vermilion-city-npc-a.png",
+    "imageFile": "vermilion-city-house-a.png",
     "height": 8,
     "width": 8,
     "start": {
@@ -61190,7 +61190,7 @@
   "vermilion-city-house-b": {
     "id": "vermilion-city-house-b",
     "name": "Casa Ciudad Carmin",
-    "imageFile": "vermilion-city-npc-b.png",
+    "imageFile": "vermilion-city-house-b.png",
     "height": 8,
     "width": 8,
     "start": {

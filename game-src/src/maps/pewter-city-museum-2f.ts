@@ -1,5 +1,5 @@
 import { ItemType } from "../app/use-item-data";
-import image from "../assets/map/pewter-museum-2f.png";
+import image from "../assets/map/pewter-city-museum-2f.png";
 import { MapId, MapType } from "./map-types";
 
 const pewterMuseum2f: MapType = {

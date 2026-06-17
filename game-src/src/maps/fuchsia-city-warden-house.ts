@@ -1,4 +1,4 @@
-import image from "../assets/map/fuchsia-city-warden.png";
+import image from "../assets/map/fuchsia-city-warden-house.png";
 import { MapType } from "./map-types";
 
 const fuchsiaCityWardenHouse: MapType = {

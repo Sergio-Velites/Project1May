@@ -1,4 +1,4 @@
-import image from "../assets/map/digletts-cave.png";
+import image from "../assets/map/diglets-cave.png";
 import { MapType } from "./map-types";
 
 const digletsCave: MapType = {

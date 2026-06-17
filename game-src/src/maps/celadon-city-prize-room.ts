@@ -1,4 +1,4 @@
-import image from "../assets/map/celadon-city-game-corner-prize-room.png";
+import image from "../assets/map/celadon-city-prize-room.png";
 import { MapType } from "./map-types";
 
 const celadonCityPrizeRoom: MapType = {

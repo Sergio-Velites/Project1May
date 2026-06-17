@@ -1,4 +1,4 @@
-import image from "../assets/map/safari-zone-center.png";
+import image from "../assets/map/safari-zone-area-3.png";
 import { MapType } from "./map-types";
 
 const safariZoneArea3: MapType = {

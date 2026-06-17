@@ -1,6 +1,6 @@
 import { beauty, blackBelt } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
-import image from "../assets/map/route-2-gate.png";
+import image from "../assets/map/route-2-gate-north.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 

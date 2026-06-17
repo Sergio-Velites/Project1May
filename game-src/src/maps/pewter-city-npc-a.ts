@@ -1,6 +1,6 @@
 import { biker } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
-import image from "../assets/map/pewter-city-npc-house.png";
+import image from "../assets/map/pewter-city-npc-a.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 

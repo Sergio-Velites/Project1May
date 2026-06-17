@@ -1,4 +1,4 @@
-import houseA2FImage from "../assets/map/house-a-2f.png";
+import houseA2FImage from "../assets/map/pallet-town-house-a-2f.png";
 import { MapId, MapType } from "./map-types";
 
 const houseA2f: MapType = {

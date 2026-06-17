@@ -1,4 +1,4 @@
-import image from "../assets/map/pewter-museum-1f.png";
+import image from "../assets/map/pewter-city-museum-1f.png";
 import { MapId, MapType } from "./map-types";
 
 import arodactyl from "../assets/map/pewter-museum-photo-1.png";

@@ -1,4 +1,4 @@
-import image from "../assets/map/indigo-plateau.png";
+import image from "../assets/map/champion-room.png";
 import { MapType } from "./map-types";
 
 const championRoom: MapType = {

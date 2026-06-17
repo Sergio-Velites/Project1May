@@ -1,6 +1,6 @@
 import { fisher } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
-import houseBImage from "../assets/map/house-b.png";
+import houseBImage from "../assets/map/pallet-town-house-b.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 

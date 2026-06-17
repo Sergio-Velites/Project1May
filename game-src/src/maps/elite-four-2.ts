@@ -1,4 +1,4 @@
-import image from "../assets/map/indigo-plateau.png";
+import image from "../assets/map/elite-four-2.png";
 import { MapType } from "./map-types";
 
 const eliteFour2: MapType = {

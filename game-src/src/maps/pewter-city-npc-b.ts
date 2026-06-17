@@ -1,5 +1,5 @@
 import { beauty, gentleman, jrTrainerMale, youngster } from "../app/npcs";
-import image from "../assets/map/pewter-city-npc-house.png";
+import image from "../assets/map/pewter-city-npc-b.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 

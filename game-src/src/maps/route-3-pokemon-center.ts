@@ -1,4 +1,4 @@
-import image from "../assets/map/viridian-city-pokemon-center.png";
+import image from "../assets/map/route-3-pokemon-center.png";
 import { MapId, MapType } from "./map-types";
 import { Direction } from "../state/state-types";
 import { scientist } from "../app/npcs";

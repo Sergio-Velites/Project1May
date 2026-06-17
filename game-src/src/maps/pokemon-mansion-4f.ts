@@ -1,4 +1,4 @@
-import image from "../assets/map/pokemon-mansion-b1f.png";
+import image from "../assets/map/pokemon-mansion-4f.png";
 import { MapType } from "./map-types";
 
 const pokemonMansion4f: MapType = {

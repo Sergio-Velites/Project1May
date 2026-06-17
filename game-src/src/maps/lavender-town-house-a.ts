@@ -1,4 +1,4 @@
-import image from "../assets/map/lavender-town-npc-a.png";
+import image from "../assets/map/lavender-town-house-a.png";
 import { MapType } from "./map-types";
 
 const lavenderTownHouseA: MapType = {

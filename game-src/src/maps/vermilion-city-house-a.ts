@@ -1,4 +1,4 @@
-import image from "../assets/map/vermilion-city-npc-a.png";
+import image from "../assets/map/vermilion-city-house-a.png";
 import { MapType } from "./map-types";
 
 const vermilionCityHouseA: MapType = {

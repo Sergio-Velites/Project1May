@@ -1,4 +1,4 @@
-import image from "../assets/map/celadon-city-game-corner.png";
+import image from "../assets/map/celadon-city-poke-mart.png";
 import { MapType } from "./map-types";
 
 const celadonCityPokeMart: MapType = {

@@ -1,4 +1,4 @@
-import image from "../assets/map/celadon-city-npc-a.png";
+import image from "../assets/map/celadon-city-house-b.png";
 import { MapType } from "./map-types";
 
 const celadonCityHouseB: MapType = {

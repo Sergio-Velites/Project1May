@@ -1,4 +1,4 @@
-import image from "../assets/map/saffron-city-npc-a.png";
+import image from "../assets/map/saffron-city-copycat-house.png";
 import { MapType } from "./map-types";
 
 const saffronCityCopycatHouse: MapType = {
