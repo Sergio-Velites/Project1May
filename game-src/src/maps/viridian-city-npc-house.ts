@@ -2,7 +2,7 @@ import image from "../assets/map/viridian-city-npc-house.png";
 import { MapId, MapType } from "./map-types";
 
 const viridianCityNpcHouse: MapType = {
-  name: "Viridian City NPC House",
+  name: "Casa de Ciudad Verde",
   image,
   height: 8,
   width: 8,

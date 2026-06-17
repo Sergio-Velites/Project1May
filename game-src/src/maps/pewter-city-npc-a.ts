@@ -5,7 +5,7 @@ import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 
 const peweterCityNpcA: MapType = {
-  name: "Pewter City NPC House A",
+  name: "Casa de Ciudad Plateada",
   image,
   height: 8,
   width: 8,

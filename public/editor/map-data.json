@@ -16195,7 +16195,7 @@
   },
   "pewter-city-npc-a": {
     "id": "pewter-city-npc-a",
-    "name": "Pewter City NPC House A",
+    "name": "Casa de Ciudad Plateada",
     "imageFile": "pewter-city-npc-house.png",
     "height": 8,
     "width": 8,
@@ -16318,7 +16318,7 @@
   },
   "pewter-city-npc-b": {
     "id": "pewter-city-npc-b",
-    "name": "Pewter City NPC House B",
+    "name": "Casa de Ciudad Plateada",
     "imageFile": "pewter-city-npc-house.png",
     "height": 8,
     "width": 8,
@@ -63725,7 +63725,7 @@
   },
   "viridian-city-npc-house": {
     "id": "viridian-city-npc-house",
-    "name": "Viridian City NPC House",
+    "name": "Casa de Ciudad Verde",
     "imageFile": "viridian-city-npc-house.png",
     "height": 8,
     "width": 8,
