@@ -1722,6 +1722,10 @@ export default function MapEditor() {
   const [showMinimap, setShowMinimap] = useState(false);
   const [minimapMode, setMinimapMode] = useState<'edit' | 'navigate'>('navigate');
   const [minimapPos, setMinimapPos] = useState<{ x: number; y: number } | null>(null);
+  // Selector de cluster: cuando varios mapas comparten (o casi) la misma posición
+  // en el minimapa (ciudad + sus interiores agrupados), al pulsar el punto se
+  // abre esta lista para elegir el mapa concreto.
+  const [clusterPick, setClusterPick] = useState<{ x: number; y: number; ids: string[] } | null>(null);
 
   const dragging = useRef<{ idx: number; startX: number; startY: number } | null>(null);
   // Drag genérico para texts/items/gifts/portals
@@ -3042,6 +3046,21 @@ export default function MapEditor() {
     .map((id) => ({ id, coord: mapData[id]?.minimapPos ?? BASE_MINIMAP_COORDS[id], name: mapData[id]?.name ?? id }))
     .filter((entry): entry is { id: string; coord: { x: number; y: number }; name: string } => !!entry.coord);
 
+  // Agrupar entradas que comparten (o casi) la misma posición en el minimapa:
+  // ciudad/ruta + sus interiores quedan en un solo punto. Dentro de cada cluster
+  // se ordena por tamaño de mapa desc (el de mayor magnitud — ciudad/ruta — primero).
+  const minimapClusters = (() => {
+    const groups: { x: number; y: number; ids: string[] }[] = [];
+    for (const { id, coord } of minimapEntries) {
+      const g = groups.find((q) => Math.hypot(q.x - coord.x, q.y - coord.y) <= 3);
+      if (g) g.ids.push(id);
+      else groups.push({ x: coord.x, y: coord.y, ids: [id] });
+    }
+    const area = (id: string) => (mapData[id]?.width ?? 0) * (mapData[id]?.height ?? 0);
+    for (const g of groups) g.ids.sort((a, b) => area(b) - area(a));
+    return groups;
+  })();
+
   const sortedMapIds = Object.keys(mapData).sort((a, b) =>
     (mapData[a]?.name ?? a).localeCompare(mapData[b]?.name ?? b),
   );
@@ -3557,14 +3576,19 @@ export default function MapEditor() {
                 setMinimapPos({ x: px, y: py });
                 setDirty(true);
               } else {
-                // Navegar: buscar el mapa más cercano
-                let bestId = '';
+                // Navegar: buscar el CLUSTER más cercano
+                let best: { x: number; y: number; ids: string[] } | null = null;
                 let bestDist = Infinity;
-                for (const { id, coord } of minimapEntries) {
-                  const d = Math.hypot(coord.x - px, coord.y - py);
-                  if (d < bestDist) { bestDist = d; bestId = id; }
+                for (const c of minimapClusters) {
+                  const d = Math.hypot(c.x - px, c.y - py);
+                  if (d < bestDist) { bestDist = d; best = c; }
                 }
-                if (bestId && bestDist < 20) selectMap(bestId);
+                if (best && bestDist < 20) {
+                  if (best.ids.length === 1) { setClusterPick(null); selectMap(best.ids[0]); }
+                  else setClusterPick(best); // varios mapas: abrir selector
+                } else {
+                  setClusterPick(null); // click en zona vacía: cerrar selector
+                }
               }
             }}
           >
@@ -3577,25 +3601,61 @@ export default function MapEditor() {
               style={{ imageRendering: 'pixelated', display: 'block' }}
               draggable={false}
             />
-            {/* Todos los puntos conocidos (modo navegar) */}
-            {minimapMode === 'navigate' && minimapEntries.map(({ id, coord, name }) => {
-              const isCurrent = id === selectedMapId;
+            {/* Un punto por CLUSTER (modo navegar). Badge con nº si agrupa varios. */}
+            {minimapMode === 'navigate' && minimapClusters.map((c) => {
+              const isCurrent = c.ids.includes(selectedMapId);
+              const n = c.ids.length;
+              const label = mapData[c.ids[0]]?.name ?? c.ids[0];
               return (
-                <div key={id} title={`${name} · ${id} (${coord.x}, ${coord.y})`} style={{
-                  position: 'absolute',
-                  left: `${(coord.x / MINIMAP_WIDTH) * 100}%`,
-                  top: `${(coord.y / MINIMAP_HEIGHT) * 100}%`,
-                  transform: 'translate(-50%, -50%)',
-                  width: isCurrent ? 10 : 6,
-                  height: isCurrent ? 10 : 6,
-                  borderRadius: '50%',
-                  background: isCurrent ? '#ff2222' : (mapData[id]?.minimapPos ? '#4488ff' : '#7788aa'),
-                  boxShadow: isCurrent ? '0 0 4px 2px rgba(255,60,60,0.7)' : '0 0 2px rgba(80,140,255,0.6)',
-                  pointerEvents: 'none',
-                  opacity: isCurrent ? 1 : (mapData[id]?.minimapPos ? 0.78 : 0.48),
-                }} />
+                <div key={`${c.x},${c.y}`}
+                  title={n > 1 ? `${n} mapas aquí — click para elegir (${label}…)` : `${label} · ${c.ids[0]}`}
+                  style={{
+                    position: 'absolute',
+                    left: `${(c.x / MINIMAP_WIDTH) * 100}%`,
+                    top: `${(c.y / MINIMAP_HEIGHT) * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                    width: isCurrent ? 12 : (n > 1 ? 11 : 7),
+                    height: isCurrent ? 12 : (n > 1 ? 11 : 7),
+                    borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 7, fontWeight: 700, color: '#fff', lineHeight: 1,
+                    background: isCurrent ? '#ff2222' : '#4488ff',
+                    border: n > 1 ? '1px solid #cfe0ff' : 'none',
+                    boxShadow: isCurrent ? '0 0 4px 2px rgba(255,60,60,0.7)' : '0 0 2px rgba(80,140,255,0.6)',
+                    pointerEvents: 'none',
+                    opacity: isCurrent ? 1 : 0.85,
+                  }}>{n > 1 ? n : ''}</div>
               );
             })}
+            {/* Selector de cluster: lista de los mapas que comparten ese punto */}
+            {minimapMode === 'navigate' && clusterPick && (
+              <div style={{
+                position: 'absolute',
+                left: `min(${(clusterPick.x / MINIMAP_WIDTH) * 100}%, calc(100% - 180px))`,
+                top: `${(clusterPick.y / MINIMAP_HEIGHT) * 100}%`,
+                transform: 'translate(8px, -50%)',
+                zIndex: 50, background: '#15152a', border: '1px solid #4488ff',
+                borderRadius: 4, boxShadow: '0 4px 16px rgba(0,0,0,0.6)',
+                maxHeight: 220, overflowY: 'auto', minWidth: 160, padding: 4,
+              }}>
+                <div style={{ fontSize: 10, color: '#a0a0ff', padding: '2px 6px 4px', fontWeight: 700 }}>
+                  {clusterPick.ids.length} mapas aquí
+                </div>
+                {clusterPick.ids.map((id) => (
+                  <div key={id}
+                    onClick={(ev) => { ev.stopPropagation(); selectMap(id); setClusterPick(null); }}
+                    style={{
+                      fontSize: 11, padding: '4px 6px', cursor: 'pointer', borderRadius: 3,
+                      color: id === selectedMapId ? '#ff8888' : '#cfe0ff',
+                      background: id === selectedMapId ? '#2a2a4a' : 'transparent',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={(ev) => { (ev.currentTarget as HTMLDivElement).style.background = '#26264a'; }}
+                    onMouseLeave={(ev) => { (ev.currentTarget as HTMLDivElement).style.background = id === selectedMapId ? '#2a2a4a' : 'transparent'; }}
+                  >{mapData[id]?.name ?? id}<span style={{ color: '#667', fontSize: 9, marginLeft: 6 }}>{id}</span></div>
+                ))}
+              </div>
+            )}
             {/* Punto editable del mapa actual (modo editar) */}
             {minimapMode === 'edit' && (() => {
               const dot = minimapPos ?? minimapCoords;
