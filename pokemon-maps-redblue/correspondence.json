@@ -158,6 +158,11 @@
   "route-4-gate": "Route2Gate",
   "route-12-gate": "Route12Gate1F",
   "route-15-gate": "Route15Gate1F",
-  "route-16-gate": "Route16Gate1F"
+  "route-16-gate": "Route16Gate1F",
+  "elite-four-1": "LoreleisRoom",
+  "elite-four-2": "BrunosRoom",
+  "elite-four-3": "AgathasRoom",
+  "elite-four-4": "LancesRoom",
+  "celadon-city-poke-mart": "CeladonMart1F"
  }
 }
