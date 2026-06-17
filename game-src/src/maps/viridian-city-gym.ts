@@ -46,7 +46,9 @@ const viridianCityGym: MapType = {
       ],
     },
   },
-  maps: {},
+  maps: {
+
+  },
   exits: {
     17: [16, 17],
   },
