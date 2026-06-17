@@ -25,6 +25,7 @@ const route4Gate: MapType = {
     7: [4, 5],
   },
   grass: {},
+  minimapPos: { x: 148, y: 75 },
 };
 
 export default route4Gate;

@@ -70,6 +70,9 @@ const vermilionCity: MapType = {
   },
   music: "/game/music/maps-original/vermilion-city.mp3",
   grass: {},
+  minimapPos: { x: 162, y: 130 },
+  flyable: true,
+  flySpot: { x: 11, y: 4 },
 };
 
 export default vermilionCity;

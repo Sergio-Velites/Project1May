@@ -23,6 +23,7 @@ const fuchsiaCityHouseB: MapType = {
   },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
+  minimapPos: { x: 118, y: 140 },
 };
 
 export default fuchsiaCityHouseB;

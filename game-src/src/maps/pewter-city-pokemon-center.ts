@@ -72,6 +72,7 @@ const pewterCityPokemonCenter: MapType = {
     },
   ],
 
+  minimapPos: { x: 84, y: 75 },
 };
 
 export default pewterCityPokemonCenter;

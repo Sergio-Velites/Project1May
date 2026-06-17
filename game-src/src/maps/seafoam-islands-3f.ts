@@ -40,6 +40,7 @@ const seafoamIslands3f: MapType = {
 
   },
   grass: {},
+  minimapPos: { x: 100, y: 165 },
 };
 
 export default seafoamIslands3f;

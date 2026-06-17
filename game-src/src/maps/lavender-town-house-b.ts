@@ -15,6 +15,7 @@ const lavenderTownHouseB: MapType = {
   exits: {},
   music: "/game/music/maps-original/lavender-town.mp3",
   grass: {},
+  minimapPos: { x: 200, y: 87 },
 };
 
 export default lavenderTownHouseB;

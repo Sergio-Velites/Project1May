@@ -70,6 +70,7 @@ const viridianCityPokemonCenter: MapType = {
       isOnline: true,
     },
   ],
+  minimapPos: { x: 84, y: 130 },
 };
 
 export default viridianCityPokemonCenter;

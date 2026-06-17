@@ -55,6 +55,7 @@ const route25: MapType = {
   },
   music: "/game/music/maps-original/route-24-welcome.mp3",
   grass: {},
+  minimapPos: { x: 175, y: 55 },
 };
 
 export default route25;

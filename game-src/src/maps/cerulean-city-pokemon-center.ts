@@ -26,6 +26,7 @@ const ceruleanCityPokemonCenter: MapType = {
   },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
+  minimapPos: { x: 162, y: 75 },
 };
 
 export default ceruleanCityPokemonCenter;

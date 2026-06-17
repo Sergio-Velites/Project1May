@@ -132,6 +132,7 @@ trainers: [
       questId: "viridian-city-gym-gift-2-2",
     },
   ],
+  minimapPos: { x: 84, y: 130 },
 };
 
 export default viridianCityGym;

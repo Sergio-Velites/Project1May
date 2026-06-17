@@ -96,6 +96,7 @@ trainers: [
   persistent: true,
 }
 ],
+  minimapPos: { x: 84, y: 75 },
 };
 
 export default peweterCityNpcB;

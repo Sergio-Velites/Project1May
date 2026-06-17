@@ -61,6 +61,7 @@ trainers: [
       pos: { x: 7, y: 5 },
     },
   ],
+  minimapPos: { x: 84, y: 75 },
 };
 
 export default peweterCityNpcA;

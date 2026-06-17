@@ -52,6 +52,7 @@ const houseA1f: MapType = {
       money: 0,
     },
   ],
+  minimapPos: { x: 84, y: 179 },
 };
 
 export default houseA1f;

@@ -48,6 +48,7 @@ const viridianCityPokeMart: MapType = {
     // ItemType.ParalyzeHeal, TODO Add this
     // ItemType.BurnHeal, TODO Add this
   ],
+  minimapPos: { x: 84, y: 130 },
 };
 
 export default viridianCityPokeMart;

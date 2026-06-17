@@ -38,6 +38,7 @@ const pokemonMansion3f: MapType = {
   },
   music: "/game/music/maps-original/pokemon-mansion.mp3",
   grass: {},
+  minimapPos: { x: 84, y: 175 },
 };
 
 export default pokemonMansion3f;

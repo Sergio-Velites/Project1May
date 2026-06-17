@@ -71,6 +71,9 @@ const saffronCity: MapType = {
   },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
+  minimapPos: { x: 162, y: 93 },
+  flyable: true,
+  flySpot: { x: 9, y: 30 },
 };
 
 export default saffronCity;

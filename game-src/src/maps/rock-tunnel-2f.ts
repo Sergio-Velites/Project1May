@@ -55,6 +55,7 @@ const rockTunnel2f: MapType = {
 
   },
   grass: {},
+  minimapPos: { x: 183, y: 87 },
 };
 
 export default rockTunnel2f;

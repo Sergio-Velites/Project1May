@@ -23,6 +23,7 @@ const celadonCityPrizeRoom: MapType = {
   },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
+  minimapPos: { x: 118, y: 93 },
 };
 
 export default celadonCityPrizeRoom;

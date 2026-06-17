@@ -149,6 +149,7 @@ const route23: MapType = {
   },
   music: "/game/music/maps-original/victory-road.mp3",
   grass: {},
+  minimapPos: { x: 84, y: 55 },
 };
 
 export default route23;

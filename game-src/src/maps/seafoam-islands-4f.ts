@@ -37,6 +37,7 @@ const seafoamIslands4f: MapType = {
 
   },
   grass: {},
+  minimapPos: { x: 100, y: 165 },
 };
 
 export default seafoamIslands4f;

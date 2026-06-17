@@ -26,6 +26,7 @@ const ssAnneBf1: MapType = {
   },
   music: "/game/music/maps-original/ss-anne.mp3",
   grass: {},
+  minimapPos: { x: 162, y: 130 },
 };
 
 export default ssAnneBf1;

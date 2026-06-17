@@ -46,6 +46,7 @@ const safariZoneArea3: MapType = {
   },
   music: "/game/music/maps-original/safari-zone.mp3",
   grass: {},
+  minimapPos: { x: 118, y: 120 },
 };
 
 export default safariZoneArea3;

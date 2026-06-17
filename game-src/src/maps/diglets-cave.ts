@@ -25,6 +25,7 @@ const digletsCave: MapType = {
     7: [2, 3],
   },
   grass: {},
+  minimapPos: { x: 84, y: 105 },
 };
 
 export default digletsCave;

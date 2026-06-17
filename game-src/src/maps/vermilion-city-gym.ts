@@ -29,6 +29,7 @@ const vermilionCityGym: MapType = {
   },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
+  minimapPos: { x: 162, y: 130 },
 };
 
 export default vermilionCityGym;

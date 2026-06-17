@@ -57,6 +57,7 @@ items: [
       pos: { x: 4, y: 3 },
     },
   ],
+  minimapPos: { x: 84, y: 179 },
 };
 
 export default houseB;

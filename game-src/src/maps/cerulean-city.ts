@@ -133,9 +133,9 @@ const ceruleanCity: MapType = {
       id: "boulder-cerulean-city-25-12",
     },
   ],
-  minimapPos: { x: 148, y: 41 },
+  minimapPos: { x: 162, y: 75 },
   flyable: true,
-  flySpot: { x: 17, y: 18 },
+  flySpot: { x: 19, y: 18 },
   trainers: [
   {
     npc: teamRocketGrunt,

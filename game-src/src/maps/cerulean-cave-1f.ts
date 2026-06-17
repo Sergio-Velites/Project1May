@@ -40,6 +40,7 @@ const ceruleanCave1f: MapType = {
     17: [24, 25],
   },
   grass: {},
+  minimapPos: { x: 162, y: 75 },
 };
 
 export default ceruleanCave1f;

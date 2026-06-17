@@ -36,6 +36,7 @@ const pokemonTower3f: MapType = {
   },
   music: "/game/music/maps-original/pokemon-tower.mp3",
   grass: {},
+  minimapPos: { x: 200, y: 87 },
 };
 
 export default pokemonTower3f;

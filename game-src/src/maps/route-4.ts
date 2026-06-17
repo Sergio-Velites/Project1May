@@ -114,7 +114,7 @@ const route4: MapType = {
       item: ItemType.MiracleBerry,
     },
   ],
-  minimapPos: { x: 122, y: 41 },
+  minimapPos: { x: 148, y: 75 },
   trainers: [
   {
     npc: youngster,
@@ -169,6 +169,8 @@ const route4: MapType = {
     15: { 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 20: Direction.Left },
     17: { 12: Direction.Down, 13: Direction.Down, 14: Direction.Left },
   },
+  flyable: true,
+  flySpot: { x: 11, y: 6 },
 };
 
 export default route4;

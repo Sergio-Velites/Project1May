@@ -33,6 +33,7 @@ const celadonCityGameCorner: MapType = {
   },
   music: "/game/music/maps-original/rocket-game-corner.mp3",
   grass: {},
+  minimapPos: { x: 118, y: 93 },
 };
 
 export default celadonCityGameCorner;

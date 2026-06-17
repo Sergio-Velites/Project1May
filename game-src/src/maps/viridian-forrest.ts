@@ -331,6 +331,7 @@ trainers: [
       },
     },
   ],
+  minimapPos: { x: 84, y: 90 },
 };
 
 export default viridianForrest;
