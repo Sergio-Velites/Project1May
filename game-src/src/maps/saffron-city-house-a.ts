@@ -24,7 +24,7 @@ const saffronCityHouseA: MapType = {
   },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
-  minimapPos: { x: 162, y: 93 },
+  minimapPos: { x: 147, y: 76 },
 };
 
 export default saffronCityHouseA;

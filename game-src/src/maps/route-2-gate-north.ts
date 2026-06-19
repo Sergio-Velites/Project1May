@@ -83,7 +83,7 @@ trainers: [
   persistent: true,
 }
 ],
-  minimapPos: { x: 84, y: 105 },
+  minimapPos: { x: 53, y: 82 },
 };
 
 export default route2GateNorth;

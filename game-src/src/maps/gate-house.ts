@@ -94,7 +94,7 @@ const gateHouse: MapType = {
     hideCondition: "trainer-defeated:pewter-city-gym-4-1",
   }
   ],
-  minimapPos: { x: 84, y: 105 },
+  minimapPos: { x: 53, y: 82 },
 }
 
 export default gateHouse;

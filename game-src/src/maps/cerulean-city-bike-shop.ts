@@ -26,7 +26,7 @@ const ceruleanCityBikeShop: MapType = {
   },
   music: "/game/music/maps-original/cerulean-city.mp3",
   grass: {},
-  minimapPos: { x: 162, y: 75 },
+  minimapPos: { x: 147, y: 41 },
 };
 
 export default ceruleanCityBikeShop;

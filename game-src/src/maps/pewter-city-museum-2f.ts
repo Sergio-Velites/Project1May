@@ -55,7 +55,7 @@ text: {
     y: 6,
   },
   exitReturnMap: MapId.PewterCityMuseum1f,
-  minimapPos: { x: 84, y: 75 },
+  minimapPos: { x: 53, y: 52 },
 };
 
 export default pewterMuseum2f;

@@ -26,7 +26,7 @@ const lavenderTownPokemonCenter: MapType = {
   },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
-  minimapPos: { x: 200, y: 87 },
+  minimapPos: { x: 194, y: 76 },
 };
 
 export default lavenderTownPokemonCenter;

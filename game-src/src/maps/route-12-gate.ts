@@ -26,7 +26,7 @@ const route12Gate: MapType = {
     7: [4, 5],
   },
   grass: {},
-  minimapPos: { x: 200, y: 100 },
+  minimapPos: { x: 166, y: 114 },
 };
 
 export default route12Gate;

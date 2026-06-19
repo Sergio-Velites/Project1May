@@ -28,7 +28,7 @@ const route16Gate: MapType = {
     9: [0, 7],
   },
   grass: {},
-  minimapPos: { x: 105, y: 100 },
+  minimapPos: { x: 114, y: 95 },
 };
 
 export default route16Gate;

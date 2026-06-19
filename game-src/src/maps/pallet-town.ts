@@ -197,7 +197,7 @@ encounters: {
   roughTerrain: { rate: 0, pokemon: [] }, gift: { rate: 0, pokemon: [] }, giftEgg: { rate: 0, pokemon: [] }, onlyOne: { rate: 0, pokemon: [] },
 },
   fences: {},
-  minimapPos: { x: 84, y: 179 },
+  minimapPos: { x: 53, y: 147 },
   flyable: true,
   flySpot: { x: 5, y: 6 },
 };

@@ -63,7 +63,7 @@ text: {
       questId: "viridian-city-npc-house-static-7-7",
     },
   ],
-  minimapPos: { x: 84, y: 130 },
+  minimapPos: { x: 53, y: 112 },
 };
 
 export default viridianCityNpcHouse;

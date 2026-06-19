@@ -95,7 +95,7 @@ const route24: MapType = {
   },
   music: "/game/music/maps-original/route-24-welcome.mp3",
   grass: {},
-  minimapPos: { x: 162, y: 60 },
+  minimapPos: { x: 147, y: 28 },
 };
 
 export default route24;

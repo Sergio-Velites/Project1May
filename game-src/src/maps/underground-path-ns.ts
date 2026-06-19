@@ -65,7 +65,7 @@ const undergroundPathNS: MapType = {
 
   },
   grass: {},
-  minimapPos: { x: 162, y: 93 },
+  minimapPos: { x: 147, y: 58 },
 };
 
 export default undergroundPathNS;

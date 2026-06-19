@@ -93,7 +93,7 @@ const route19: MapType = {
   },
   music: "/game/music/maps-original/surf.mp3",
   grass: {},
-  minimapPos: { x: 118, y: 155 },
+  minimapPos: { x: 96, y: 180 },
 };
 
 export default route19;

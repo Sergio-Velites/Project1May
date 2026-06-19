@@ -47,7 +47,7 @@ const viridianCityAcadamy: MapType = {
     x: 21,
     y: 16,
   },
-  minimapPos: { x: 84, y: 130 },
+  minimapPos: { x: 53, y: 112 },
 };
 
 export default viridianCityAcadamy;

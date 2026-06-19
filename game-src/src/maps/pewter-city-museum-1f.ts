@@ -68,7 +68,7 @@ text: {
       intro: ["Un fosil de AERODACTYL,", "un pokemon antgüo extingido...", "un fosil?"],
     },
   ],
-  minimapPos: { x: 84, y: 75 },
+  minimapPos: { x: 53, y: 52 },
 };
 
 export default pewterMuseum1f;

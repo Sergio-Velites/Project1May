@@ -34,7 +34,7 @@ const route2Gate: MapType = {
     y: 44,
   },
   exitReturnMap: MapId.Route2,
-  minimapPos: { x: 84, y: 105 },
+  minimapPos: { x: 53, y: 82 },
 };
 
 export default route2Gate;

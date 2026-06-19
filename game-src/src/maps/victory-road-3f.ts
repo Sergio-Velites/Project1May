@@ -39,7 +39,7 @@ const victoryRoad3f: MapType = {
   },
   music: "/game/music/maps-original/victory-road.mp3",
   grass: {},
-  minimapPos: { x: 84, y: 55 },
+  minimapPos: { x: 30, y: 75 },
 };
 
 export default victoryRoad3f;

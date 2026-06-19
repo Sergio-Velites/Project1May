@@ -24,7 +24,7 @@ const route15Gate: MapType = {
     5: [0, 7],
   },
   grass: {},
-  minimapPos: { x: 175, y: 130 },
+  minimapPos: { x: 138, y: 151 },
 };
 
 export default route15Gate;
