@@ -40,7 +40,7 @@ const route16: MapType = {
   },
   music: "/game/music/maps-original/bicycle.mp3",
   grass: {},
-  minimapPos: { x: 114, y: 95 },
+  minimapPos: { x: 94, y: 98 },
 };
 
 export default route16;

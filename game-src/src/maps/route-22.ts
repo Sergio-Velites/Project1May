@@ -247,7 +247,7 @@ items: [
       pos: { x: 30, y: 2 },
     },
   ],
-  minimapPos: { x: 30, y: 120 },
+  minimapPos: { x: 30, y: 116 },
 };
 
 export default route22;

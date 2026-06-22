@@ -54,7 +54,7 @@ const powerPlant: MapType = {
     35: [4, 5],
   },
   grass: {},
-  minimapPos: { x: 180, y: 100 },
+  minimapPos: { x: 190, y: 100 },
 };
 
 export default powerPlant;

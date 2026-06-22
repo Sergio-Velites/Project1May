@@ -259,7 +259,7 @@ const mtMoon1f: MapType = {
       },
     },
   ],
-  minimapPos: { x: 108, y: 46 },
+  minimapPos: { x: 108, y: 45 },
 };
 
 export default mtMoon1f;

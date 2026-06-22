@@ -209,7 +209,7 @@ const mtMoon2f: MapType = {
       intro: ["..."],
     },
   ],
-  minimapPos: { x: 108, y: 46 },
+  minimapPos: { x: 108, y: 45 },
 };
 
 export default mtMoon2f;

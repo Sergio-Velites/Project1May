@@ -122,7 +122,7 @@ const mtMoon3f: MapType = {
   ],
 
   exitReturnMap: MapId.Route4,
-  minimapPos: { x: 108, y: 46 },
+  minimapPos: { x: 108, y: 45 },
 };
 
 export default mtMoon3f;
