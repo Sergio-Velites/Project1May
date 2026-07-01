@@ -2915,7 +2915,39 @@ export default function MapEditor() {
   // al partir/redimensionar un mapa). Mueve solo coordenadas de ESTE mapa; NO
   // toca el destino de teleports/puertas (destPos), exitReturnPos ni el
   // minimapa de Kanto (minimapPos), que viven en otro sistema de coordenadas.
+  // Mínima coordenada (x, y) de TODO el contenido posicional del mapa. Se usa
+  // para CLAMPAR los desplazamientos: nada puede salir por el borde 0, lo que
+  // generaría coordenadas negativas (claves negativas = TS inválido al guardar).
+  function contentMin(): { x: number; y: number } {
+    let minX = Infinity, minY = Infinity;
+    const rc = (m: Record<string, number[]>) => {
+      for (const [r, cols] of Object.entries(m)) {
+        const y = Number(r); if (y < minY) minY = y;
+        for (const c of cols) if (c < minX) minX = c;
+      }
+    };
+    const rcm = (m: Record<string, Record<string, unknown>>) => {
+      for (const [r, cols] of Object.entries(m)) {
+        const y = Number(r); if (y < minY) minY = y;
+        for (const c of Object.keys(cols)) { const x = Number(c); if (x < minX) minX = x; }
+      }
+    };
+    const arr = (a: { pos: { x: number; y: number } }[]) => {
+      for (const e of a) { if (e.pos.x < minX) minX = e.pos.x; if (e.pos.y < minY) minY = e.pos.y; }
+    };
+    const pt = (p: { x: number; y: number } | null) => { if (p) { if (p.x < minX) minX = p.x; if (p.y < minY) minY = p.y; } };
+    rc(walls); rc(fences); rc(grass); rc(water); rc(stoppers);
+    rcm(fenceDirections); rcm(spinners); rcm(texts); rcm(textRewards);
+    arr(trainers); arr(items); arr(gifts); arr(staticPokemon); arr(cuttableTrees); arr(boulders); arr(berryTrees); arr(portals);
+    pt(startPos); pt(pokemonCenter); pt(pcPos); pt(storePos); pt(recoverLocation); pt(onlineBattleNpc); pt(flySpot);
+    return { x: minX === Infinity ? 0 : minX, y: minY === Infinity ? 0 : minY };
+  }
+
   function shiftAllElements(dx: number, dy: number) {
+    // Clamp: no permitir empujar contenido por debajo de la fila/columna 0.
+    const { x: minX, y: minY } = contentMin();
+    if (dx < 0) dx = Math.max(dx, -minX);
+    if (dy < 0) dy = Math.max(dy, -minY);
     if (dx === 0 && dy === 0) return;
     setWalls((m) => shiftRowCols(m, dx, dy));
     setFences((m) => shiftRowCols(m, dx, dy));
@@ -3031,8 +3063,12 @@ export default function MapEditor() {
   }
   // Mover el bloque seleccionado sin tocar el portapapeles del usuario.
   function moveSelection(dx: number, dy: number) {
-    if (!selRect || (dx === 0 && dy === 0)) return;
+    if (!selRect) return;
     const r = selRect;
+    // Clamp: la selección no puede salir por el borde 0 (evita coords negativas).
+    if (dx < 0) dx = Math.max(dx, -r.x0);
+    if (dy < 0) dy = Math.max(dy, -r.y0);
+    if (dx === 0 && dy === 0) return;
     const block = buildClip(r);
     deleteRectContent(r);
     applyPaste(block, r.x0 + dx, r.y0 + dy);

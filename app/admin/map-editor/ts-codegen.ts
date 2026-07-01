@@ -165,13 +165,24 @@ function sortedNumKeys(obj: Record<string, unknown>): number[] {
     .sort((a, b) => a - b);
 }
 
+/**
+ * Clave de objeto TS válida a partir de un número. Los enteros >= 0 pueden ir
+ * sin comillas (`5:`), pero los NEGATIVOS deben ir entrecomillados (`"-5":`),
+ * porque `-5:` es un error de sintaxis. Red de seguridad: si una edición del
+ * editor deja coordenadas negativas (contenido empujado fuera del borde), el
+ * `.ts` generado sigue compilando en vez de romper el build del juego.
+ */
+function objKey(n: number): string {
+  return n < 0 ? `"${n}"` : `${n}`;
+}
+
 // ── Serializadores por campo (devuelven `field: value` SIN coma final) ──────
 // La coma y la indentación las añade el ensamblador.
 
 function serRowColMap(data: Record<string, number[]>, field: string): string {
   const rows = sortedNumKeys(data);
   if (rows.length === 0) return `${field}: {}`;
-  const lines = rows.map((r) => `    ${r}: [${(data[String(r)] ?? []).slice().sort((a, b) => a - b).join(', ')}],`);
+  const lines = rows.map((r) => `    ${objKey(r)}: [${(data[String(r)] ?? []).slice().sort((a, b) => a - b).join(', ')}],`);
   return `${field}: {\n${lines.join('\n')}\n  }`;
 }
 
@@ -183,9 +194,9 @@ function serTexts(texts: Record<string, Record<string, string[]>>): string {
     const colLines = cols.map((c) => {
       const arr = texts[String(r)][String(c)] ?? [];
       const items = arr.map((s) => `        "${escapeTSString(s)}"`).join(',\n');
-      return `      ${c}: [\n${items}\n      ],`;
+      return `      ${objKey(c)}: [\n${items}\n      ],`;
     });
-    return `    ${r}: {\n${colLines.join('\n')}\n    },`;
+    return `    ${objKey(r)}: {\n${colLines.join('\n')}\n    },`;
   });
   return `text: {\n${rowLines.join('\n')}\n  }`;
 }
@@ -206,9 +217,9 @@ function serTextRewards(rewards: Record<string, Record<string, TextRewardState>>
         if (rw.amount && rw.amount !== 1) inner.push(`        amount: ${rw.amount},`);
       }
       inner.push(`        questId: "${escapeTSString(rw.questId)}",`);
-      return `      ${c}: {\n${inner.join('\n')}\n      },`;
+      return `      ${objKey(c)}: {\n${inner.join('\n')}\n      },`;
     });
-    return `    ${r}: {\n${colLines.join('\n')}\n    },`;
+    return `    ${objKey(r)}: {\n${colLines.join('\n')}\n    },`;
   });
   return `textRewards: {\n${rowLines.join('\n')}\n  }`;
 }
@@ -301,8 +312,8 @@ function serDirectionRowColMap(data: Record<string, Record<string, DirectionName
   if (rows.length === 0) return `${field}: {}`;
   const rowLines = rows.map((r) => {
     const cols = sortedNumKeys(data[String(r)] ?? {});
-    const colLines = cols.map((c) => `      ${c}: ${directionToEnum(data[String(r)][String(c)])},`);
-    return `    ${r}: {\n${colLines.join('\n')}\n    },`;
+    const colLines = cols.map((c) => `      ${objKey(c)}: ${directionToEnum(data[String(r)][String(c)])},`);
+    return `    ${objKey(r)}: {\n${colLines.join('\n')}\n    },`;
   });
   return `${field}: {\n${rowLines.join('\n')}\n  }`;
 }
@@ -316,8 +327,8 @@ function serMaps(maps: Record<string, Record<string, string>>, resolve: (t: stri
   if (rows.length === 0) return 'maps: {}';
   const rowLines = rows.map((r) => {
     const cols = sortedNumKeys(maps[String(r)] ?? {});
-    const colLines = cols.map((c) => `      ${c}: MapId.${resolve(maps[String(r)][String(c)])},`);
-    return `    ${r}: {\n${colLines.join('\n')}\n    },`;
+    const colLines = cols.map((c) => `      ${objKey(c)}: MapId.${resolve(maps[String(r)][String(c)])},`);
+    return `    ${objKey(r)}: {\n${colLines.join('\n')}\n    },`;
   });
   return `maps: {\n${rowLines.join('\n')}\n  }`;
 }
@@ -329,9 +340,9 @@ function serTeleports(teleports: Record<string, Record<string, { map: string; po
     const cols = sortedNumKeys(teleports[String(r)] ?? {});
     const colLines = cols.map((c) => {
       const t = teleports[String(r)][String(c)];
-      return `      ${c}: { map: MapId.${resolve(t.map)}, pos: { x: ${t.pos.x}, y: ${t.pos.y} } },`;
+      return `      ${objKey(c)}: { map: MapId.${resolve(t.map)}, pos: { x: ${t.pos.x}, y: ${t.pos.y} } },`;
     });
-    return `    ${r}: {\n${colLines.join('\n')}\n    },`;
+    return `    ${objKey(r)}: {\n${colLines.join('\n')}\n    },`;
   });
   return `teleports: {\n${rowLines.join('\n')}\n  }`;
 }
