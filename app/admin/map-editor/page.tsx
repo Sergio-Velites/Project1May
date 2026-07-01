@@ -134,7 +134,7 @@ type EncountersOverride = Partial<Record<EncounterTableKey, EncounterTable>>;
 
 const EMPTY_TABLE = (): EncounterTable => ({ rate: 0, pokemon: [] });
 
-type EditMode = 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'berry-trees' | 'boulders' | 'spots' | 'mechanics' | 'portals' | 'map';
+type EditMode = 'select' | 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'berry-trees' | 'boulders' | 'spots' | 'mechanics' | 'portals' | 'map';
 
 /** Bayas válidas para árboles de bayas (nombres del enum ItemType del juego). */
 const BERRY_ITEM_KEYS = [
@@ -565,6 +565,124 @@ function shiftPosArray<T extends { pos: { x: number; y: number } }>(arr: T[], dx
 /** Punto suelto (o null) → desplazado. */
 function shiftPoint(p: { x: number; y: number } | null, dx: number, dy: number): { x: number; y: number } | null {
   return p ? { x: p.x + dx, y: p.y + dy } : p;
+}
+
+// ── Selección rectangular: cortar / copiar / pegar bloques de contenido ──────
+// Un rectángulo en coords de tile (normalizado: x0<=x1, y0<=y1). Las funciones
+// EXTRAEN (coords relativas a la esquina sup-izq), ELIMINAN (in-rect) y FUSIONAN
+// (pegar con desplazamiento). Solo contenido posicional de ESTE mapa; los
+// singletons de config (start/PC/centro/…) y el minimapa quedan fuera a
+// propósito. En portales se copia la casilla local; el destino (destMap/destPos)
+// viaja tal cual (referencia a otro mapa).
+
+interface SelRect { x0: number; y0: number; x1: number; y1: number }
+
+const inRect = (x: number, y: number, r: SelRect) => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1;
+
+/** Portapapeles de bloque: todo con coords RELATIVAS a la esquina sup-izq. */
+interface MapClipboard {
+  w: number;
+  h: number;
+  walls: Record<string, number[]>;
+  fences: Record<string, number[]>;
+  fenceDirections: Record<string, Record<string, DirectionName>>;
+  grass: Record<string, number[]>;
+  water: Record<string, number[]>;
+  stoppers: Record<string, number[]>;
+  spinners: Record<string, Record<string, DirectionName>>;
+  texts: Record<string, Record<string, string[]>>;
+  textRewards: Record<string, Record<string, TextRewardEntry>>;
+  trainers: Trainer[];
+  items: ItemEntry[];
+  gifts: GiftEntry[];
+  staticPokemon: StaticPokemonEntry[];
+  cuttableTrees: { pos: { x: number; y: number }; questId: string }[];
+  boulders: { pos: { x: number; y: number }; id: string }[];
+  berryTrees: { pos: { x: number; y: number }; itemKey: string }[];
+  portals: PortalEntry[];
+}
+
+// -- Record<fila, col[]> --
+function extractRowCols(m: Record<string, number[]>, r: SelRect): Record<string, number[]> {
+  const out: Record<string, number[]> = {};
+  for (const [row, cols] of Object.entries(m)) {
+    const y = Number(row);
+    if (y < r.y0 || y > r.y1) continue;
+    const kept = cols.filter((x) => x >= r.x0 && x <= r.x1).map((x) => x - r.x0);
+    if (kept.length) out[String(y - r.y0)] = kept.sort((a, b) => a - b);
+  }
+  return out;
+}
+function removeRowCols(m: Record<string, number[]>, r: SelRect): Record<string, number[]> {
+  const out: Record<string, number[]> = {};
+  for (const [row, cols] of Object.entries(m)) {
+    const y = Number(row);
+    const kept = (y < r.y0 || y > r.y1) ? cols.slice() : cols.filter((x) => x < r.x0 || x > r.x1);
+    if (kept.length) out[row] = kept.sort((a, b) => a - b);
+  }
+  return out;
+}
+function mergeRowCols(a: Record<string, number[]>, b: Record<string, number[]>): Record<string, number[]> {
+  const out: Record<string, number[]> = {};
+  for (const [row, cols] of Object.entries(a)) out[row] = cols.slice();
+  for (const [row, cols] of Object.entries(b)) out[row] = Array.from(new Set([...(out[row] ?? []), ...cols])).sort((x, y) => x - y);
+  return out;
+}
+
+// -- Record<fila, Record<col, V>> --
+function extractRowColMap<V>(m: Record<string, Record<string, V>>, r: SelRect): Record<string, Record<string, V>> {
+  const out: Record<string, Record<string, V>> = {};
+  for (const [row, cols] of Object.entries(m)) {
+    const y = Number(row);
+    if (y < r.y0 || y > r.y1) continue;
+    for (const [col, v] of Object.entries(cols)) {
+      const x = Number(col);
+      if (x < r.x0 || x > r.x1) continue;
+      (out[String(y - r.y0)] ??= {})[String(x - r.x0)] = v;
+    }
+  }
+  return out;
+}
+function removeRowColMap<V>(m: Record<string, Record<string, V>>, r: SelRect): Record<string, Record<string, V>> {
+  const out: Record<string, Record<string, V>> = {};
+  for (const [row, cols] of Object.entries(m)) {
+    const y = Number(row);
+    for (const [col, v] of Object.entries(cols)) {
+      const x = Number(col);
+      if (inRect(x, y, r)) continue;
+      (out[row] ??= {})[col] = v;
+    }
+  }
+  return out;
+}
+function mergeRowColMap<V>(a: Record<string, Record<string, V>>, b: Record<string, Record<string, V>>): Record<string, Record<string, V>> {
+  const out: Record<string, Record<string, V>> = {};
+  for (const [row, cols] of Object.entries(a)) out[row] = { ...cols };
+  for (const [row, cols] of Object.entries(b)) out[row] = { ...(out[row] ?? {}), ...cols };
+  return out;
+}
+
+// -- Arrays con .pos --
+function extractPos<T extends { pos: { x: number; y: number } }>(arr: T[], r: SelRect): T[] {
+  return arr.filter((e) => inRect(e.pos.x, e.pos.y, r)).map((e) => ({ ...e, pos: { x: e.pos.x - r.x0, y: e.pos.y - r.y0 } }));
+}
+function removePos<T extends { pos: { x: number; y: number } }>(arr: T[], r: SelRect): T[] {
+  return arr.filter((e) => !inRect(e.pos.x, e.pos.y, r));
+}
+
+/** Estilo de los botones de la barra de selección (habilitado / activo). */
+function selToolBtnStyle(enabled: boolean, active = false): React.CSSProperties {
+  return {
+    padding: '4px 9px',
+    fontSize: 12,
+    background: active ? '#2a4a6a' : '#12243a',
+    border: `1px solid ${active ? '#5ac8ff' : '#3a5a7a'}`,
+    borderRadius: 4,
+    color: enabled ? '#aadcff' : '#667',
+    cursor: enabled ? 'pointer' : 'default',
+    opacity: enabled ? 1 : 0.5,
+    whiteSpace: 'nowrap',
+  };
 }
 
 // ── Portales: flatten/nest entre el shape de MapType y un array plano editable ──
@@ -1885,6 +2003,13 @@ export default function MapEditor() {
   // Panel "Desplazar todo": realinea todos los elementos del mapa a la vez.
   const [shiftPanelOpen, setShiftPanelOpen] = useState(false);
   const [shiftStep, setShiftStep] = useState(1);
+  // Selección rectangular (modo 'select'): cortar/copiar/pegar bloques.
+  const [selRect, setSelRect] = useState<SelRect | null>(null);
+  const selDrag = useRef<{ startX: number; startY: number } | null>(null);
+  // El portapapeles vive fuera del mapa → sobrevive al cambiar de mapa (pegar en otro).
+  const [clipboard, setClipboard] = useState<MapClipboard | null>(null);
+  // Al pulsar "Pegar", el siguiente clic en el lienzo fija la esquina sup-izq.
+  const [pastePending, setPastePending] = useState(false);
 
   // ── Maximizar el lienzo (más espacio para pintar agua/paredes, etc.) ──────
   // Dos ejes independientes + un atajo que los combina:
@@ -2163,6 +2288,10 @@ export default function MapEditor() {
     setSelectedMapId(id);
     if (mapData[id]) loadFromEntry(mapData[id]);
     setSelectedIdx(null);
+    // Limpiar la selección al cambiar de mapa; el portapapeles SÍ se conserva
+    // (para poder cortar en un mapa y pegar en otro).
+    setSelRect(null);
+    setPastePending(false);
     setDirty(false);
   }
 
@@ -2817,6 +2946,98 @@ export default function MapEditor() {
     setDirty(true);
   }
 
+  // ── Selección rectangular: copiar / cortar / pegar / mover bloque ─────────
+  // Construye el portapapeles (coords relativas a la esquina sup-izq del rect).
+  function buildClip(r: SelRect): MapClipboard {
+    return {
+      w: r.x1 - r.x0 + 1,
+      h: r.y1 - r.y0 + 1,
+      walls: extractRowCols(walls, r),
+      fences: extractRowCols(fences, r),
+      fenceDirections: extractRowColMap(fenceDirections, r),
+      grass: extractRowCols(grass, r),
+      water: extractRowCols(water, r),
+      stoppers: extractRowCols(stoppers, r),
+      spinners: extractRowColMap(spinners, r),
+      texts: extractRowColMap(texts, r),
+      textRewards: extractRowColMap(textRewards, r),
+      trainers: extractPos(trainers, r),
+      items: extractPos(items, r),
+      gifts: extractPos(gifts, r),
+      staticPokemon: extractPos(staticPokemon, r),
+      cuttableTrees: extractPos(cuttableTrees, r),
+      boulders: extractPos(boulders, r),
+      berryTrees: extractPos(berryTrees, r),
+      portals: extractPos(portals, r),
+    };
+  }
+
+  // Elimina TODO el contenido dentro de un rectángulo (in-place).
+  function deleteRectContent(r: SelRect) {
+    setWalls((m) => removeRowCols(m, r));
+    setFences((m) => removeRowCols(m, r));
+    setFenceDirections((m) => removeRowColMap(m, r));
+    setGrass((m) => removeRowCols(m, r));
+    setWater((m) => removeRowCols(m, r));
+    setStoppers((m) => removeRowCols(m, r));
+    setSpinners((m) => removeRowColMap(m, r));
+    setTexts((m) => removeRowColMap(m, r));
+    setTextRewards((m) => removeRowColMap(m, r));
+    setTrainers((a) => removePos(a, r));
+    setItems((a) => removePos(a, r));
+    setGifts((a) => removePos(a, r));
+    setStaticPokemon((a) => removePos(a, r));
+    setCuttableTrees((a) => removePos(a, r));
+    setBoulders((a) => removePos(a, r));
+    setBerryTrees((a) => removePos(a, r));
+    setPortals((a) => removePos(a, r));
+    setDirty(true);
+  }
+
+  // Fusiona un portapapeles en el mapa actual con su esquina sup-izq en (ax, ay).
+  function applyPaste(c: MapClipboard, ax: number, ay: number) {
+    setWalls((m) => mergeRowCols(m, shiftRowCols(c.walls, ax, ay)));
+    setFences((m) => mergeRowCols(m, shiftRowCols(c.fences, ax, ay)));
+    setFenceDirections((m) => mergeRowColMap(m, shiftRowColMap(c.fenceDirections, ax, ay)));
+    setGrass((m) => mergeRowCols(m, shiftRowCols(c.grass, ax, ay)));
+    setWater((m) => mergeRowCols(m, shiftRowCols(c.water, ax, ay)));
+    setStoppers((m) => mergeRowCols(m, shiftRowCols(c.stoppers, ax, ay)));
+    setSpinners((m) => mergeRowColMap(m, shiftRowColMap(c.spinners, ax, ay)));
+    setTexts((m) => mergeRowColMap(m, shiftRowColMap(c.texts, ax, ay)));
+    setTextRewards((m) => mergeRowColMap(m, shiftRowColMap(c.textRewards, ax, ay)));
+    setTrainers((a) => [...a, ...shiftPosArray(c.trainers, ax, ay)]);
+    setItems((a) => [...a, ...shiftPosArray(c.items, ax, ay)]);
+    setGifts((a) => [...a, ...shiftPosArray(c.gifts, ax, ay)]);
+    setStaticPokemon((a) => [...a, ...shiftPosArray(c.staticPokemon, ax, ay)]);
+    setCuttableTrees((a) => [...a, ...shiftPosArray(c.cuttableTrees, ax, ay)]);
+    setBoulders((a) => [...a, ...shiftPosArray(c.boulders, ax, ay)]);
+    setBerryTrees((a) => [...a, ...shiftPosArray(c.berryTrees, ax, ay)]);
+    setPortals((a) => [...a, ...shiftPosArray(c.portals, ax, ay)]);
+    setSelRect({ x0: ax, y0: ay, x1: ax + c.w - 1, y1: ay + c.h - 1 });
+    setDirty(true);
+  }
+
+  function copySelection() {
+    if (!selRect) return;
+    setClipboard(buildClip(selRect));
+  }
+  function cutSelection() {
+    if (!selRect) return;
+    setClipboard(buildClip(selRect));
+    deleteRectContent(selRect);
+  }
+  function pasteClipboardAt(ax: number, ay: number) {
+    if (clipboard) applyPaste(clipboard, ax, ay);
+  }
+  // Mover el bloque seleccionado sin tocar el portapapeles del usuario.
+  function moveSelection(dx: number, dy: number) {
+    if (!selRect || (dx === 0 && dy === 0)) return;
+    const r = selRect;
+    const block = buildClip(r);
+    deleteRectContent(r);
+    applyPaste(block, r.x0 + dx, r.y0 + dy);
+  }
+
   // ── Actualizar campo del NPC seleccionado ───────────────────────────────
   function updateSelected(patch: Partial<Trainer>) {
     if (selectedIdx === null) return;
@@ -2865,6 +3086,21 @@ export default function MapEditor() {
       const tileX = tile.x;
       const tileY = tile.y;
 
+      // Selección rectangular: arrastrar define el rectángulo (clamp al mapa).
+      if (editMode === 'select') {
+        if (!selDrag.current) return;
+        const w = currentMap?.width ?? 1;
+        const h = currentMap?.height ?? 1;
+        const cx = Math.max(0, Math.min(w - 1, tileX));
+        const cy = Math.max(0, Math.min(h - 1, tileY));
+        const s = selDrag.current;
+        setSelRect({
+          x0: Math.min(s.startX, cx), y0: Math.min(s.startY, cy),
+          x1: Math.max(s.startX, cx), y1: Math.max(s.startY, cy),
+        });
+        return;
+      }
+
       // Drag de entidades (texts/items/gifts/portals)
       if (entityDrag.current) {
         moveEntityToTile(tileX, tileY);
@@ -2902,14 +3138,16 @@ export default function MapEditor() {
       );
       setDirty(true);
     },
-    [tileFromClientPoint, editMode, activeFenceDir, panMode]
+    [tileFromClientPoint, editMode, activeFenceDir, panMode, currentMap]
   );
 
   const onPointerUp = useCallback(() => {
     if (entityDrag.current?.moved) suppressNextClick.current = true;
+    if (selDrag.current) suppressNextClick.current = true; // no colocar tras arrastrar la selección
     dragging.current = null;
     entityDrag.current = null;
     wallPaint.current = null;
+    selDrag.current = null;
   }, []);
 
   // Drag handler genérico para entidades (texts/items/gifts/portals)
@@ -2992,6 +3230,24 @@ export default function MapEditor() {
   // En modo walls/fences/grass/water: pointerdown en canvas inicia pintura.
   function onCanvasPointerDown(e: React.PointerEvent<HTMLDivElement>) {
     if (panMode || isSecondaryTouch(e)) return; // gesto/Mover: el lienzo hace pan, no se pinta.
+    if (editMode === 'select') {
+      const t = tileFromEvent(e);
+      if (!t) return;
+      const w = currentMap?.width ?? 1;
+      const h = currentMap?.height ?? 1;
+      const cx = Math.max(0, Math.min(w - 1, t.x));
+      const cy = Math.max(0, Math.min(h - 1, t.y));
+      // Pegado pendiente: este clic fija la esquina superior-izquierda del bloque.
+      if (pastePending && clipboard) {
+        pasteClipboardAt(cx, cy);
+        setPastePending(false);
+        return;
+      }
+      selDrag.current = { startX: cx, startY: cy };
+      setSelRect({ x0: cx, y0: cy, x1: cx, y1: cy });
+      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      return;
+    }
     if (editMode !== 'walls' && editMode !== 'fences' && editMode !== 'grass' && editMode !== 'water') return;
     const tile = tileFromEvent(e);
     if (!tile) return;
@@ -3030,6 +3286,7 @@ export default function MapEditor() {
     }
     const tile = tileFromEvent(e);
     if (!tile) return;
+    if (editMode === 'select') return; // la selección se maneja en pointerDown/Move/Up
     if (editMode === 'npc') {
       const hitIdx = trainers.findIndex((t) => t.pos.x === tile.x && t.pos.y === tile.y);
       setSelectedIdx(hitIdx >= 0 ? hitIdx : null);
@@ -3888,8 +4145,9 @@ export default function MapEditor() {
         {/* Modo edición — flexWrap: el grupo de 16 botones era un bloque
             indivisible de ~1100px que desbordaba en cualquier portátil. */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
-          {(['npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'berry-trees', 'boulders', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
+          {(['select', 'npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'berry-trees', 'boulders', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
+              select: '#2a6a8a',
               npc: '#5050b0',
               walls: '#7a3030',
               fences: '#7a5a30',
@@ -3923,7 +4181,7 @@ export default function MapEditor() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {m === 'npc' ? 'NPCs' : m}
+                {m === 'npc' ? 'NPCs' : m === 'select' ? '⬚ Sel.' : m}
               </button>
             );
           })}
@@ -4012,6 +4270,32 @@ export default function MapEditor() {
         {/* Exportar TS según modo — cluster secundario (oculto en barra compacta;
             el guardado commitea igualmente, así que exportar es opcional). */}
         <div className="me-tb-secondary" style={{ display: 'contents' }}>
+        {editMode === 'select' && (
+          <>
+            <span style={{ fontSize: 11, color: '#8ad0ff', alignSelf: 'center', whiteSpace: 'nowrap' }}>
+              {selRect
+                ? `sel ${selRect.x1 - selRect.x0 + 1}×${selRect.y1 - selRect.y0 + 1}`
+                : 'arrastra un rectángulo'}
+            </span>
+            <button onClick={copySelection} disabled={!selRect} title="Copiar el bloque seleccionado (muros, hierba, NPCs, portales, textos…) al portapapeles" style={selToolBtnStyle(!!selRect)}>⧉ Copiar</button>
+            <button onClick={cutSelection} disabled={!selRect} title="Cortar: copia y borra del mapa el contenido de la selección" style={selToolBtnStyle(!!selRect)}>✂ Cortar</button>
+            <button onClick={() => selRect && deleteRectContent(selRect)} disabled={!selRect} title="Borrar el contenido dentro de la selección (sin copiar)" style={selToolBtnStyle(!!selRect)}>🗑 Borrar</button>
+            <button
+              onClick={() => setPastePending((v) => !v)}
+              disabled={!clipboard}
+              title="Pegar el bloque del portapapeles (funciona en ESTE u otro mapa): pulsa y luego haz clic donde quieras la esquina superior-izquierda"
+              style={selToolBtnStyle(!!clipboard, pastePending)}
+            >
+              {pastePending ? '📋 clic en el mapa…' : `📋 Pegar${clipboard ? ` ${clipboard.w}×${clipboard.h}` : ''}`}
+            </button>
+            {([['←', -1, 0], ['↑', 0, -1], ['↓', 0, 1], ['→', 1, 0]] as const).map(([lbl, dx, dy]) => (
+              <button key={lbl} onClick={() => moveSelection(dx, dy)} disabled={!selRect} title={`Mover la selección 1 tile ${lbl}`} style={{ ...selToolBtnStyle(!!selRect), padding: '4px 7px' }}>{lbl}</button>
+            ))}
+            {selRect && (
+              <button onClick={() => { setSelRect(null); setPastePending(false); }} title="Quitar la selección" style={selToolBtnStyle(true)}>✕</button>
+            )}
+          </>
+        )}
         {editMode === 'npc' && (
           <button onClick={doExport} style={{ padding: '4px 12px', background: '#1a2a3a', border: '1px solid #3a5a7a', borderRadius: 4, color: '#88ccff', cursor: 'pointer', fontSize: 12 }}>
             📋 Trainers
@@ -4464,6 +4748,25 @@ export default function MapEditor() {
                   `,
                   backgroundSize: `${zoom}px ${zoom}px`,
                 }} />
+              )}
+
+              {/* Selección rectangular (modo select): rectángulo azul con asa */}
+              {editMode === 'select' && selRect && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: selRect.x0 * zoom,
+                    top: selRect.y0 * zoom,
+                    width: (selRect.x1 - selRect.x0 + 1) * zoom,
+                    height: (selRect.y1 - selRect.y0 + 1) * zoom,
+                    background: pastePending ? 'rgba(80,180,255,0.10)' : 'rgba(80,180,255,0.22)',
+                    border: '2px dashed #5ac8ff',
+                    boxShadow: '0 0 0 1px rgba(0,0,0,0.5) inset',
+                    pointerEvents: 'none',
+                    boxSizing: 'border-box',
+                    zIndex: 50,
+                  }}
+                />
               )}
 
               {/* Walls overlay (puramente visual, no captura clicks) */}
