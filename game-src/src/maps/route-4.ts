@@ -97,6 +97,16 @@ const route4: MapType = {
     11: {
       89: { map: MapId.CeruleanCity, pos: { x: 1, y: 19 } },
     },
+    17: {
+      6: { map: MapId.Route3, pos: { x: 57, y: 1 } },
+      7: { map: MapId.Route3, pos: { x: 58, y: 1 } },
+      8: { map: MapId.Route3, pos: { x: 59, y: 1 } },
+      9: { map: MapId.Route3, pos: { x: 60, y: 1 } },
+      10: { map: MapId.Route3, pos: { x: 60, y: 1 } },
+      11: { map: MapId.Route3, pos: { x: 61, y: 1 } },
+      12: { map: MapId.Route3, pos: { x: 62, y: 1 } },
+      13: { map: MapId.Route3, pos: { x: 63, y: 1 } },
+    },
   },
   exitReturnMap: MapId.MtMoon3f,
   exitReturnPos: { x: 27, y: 2 },
@@ -112,15 +122,15 @@ const route4: MapType = {
   ],
   berryTrees: [
     {
-      pos: { x: 41, y: 3 },
+      pos: { x: 20, y: 3 },
       item: ItemType.Berry,
     },
     {
-      pos: { x: 57, y: 3 },
+      pos: { x: 36, y: 3 },
       item: ItemType.BitterBerry,
     },
     {
-      pos: { x: 62, y: 3 },
+      pos: { x: 41, y: 3 },
       item: ItemType.MiracleBerry,
     },
   ],
