@@ -271,6 +271,17 @@ const route3: MapType = {
   minimapPos: { x: 89, y: 40 },
   flyable: true,
   flySpot: { x: 61, y: -12 },
+  teleports: {
+    0: {
+      57: { map: MapId.Route4, pos: { x: 6, y: 16 } },
+      58: { map: MapId.Route4, pos: { x: 7, y: 16 } },
+      59: { map: MapId.Route4, pos: { x: 8, y: 16 } },
+      60: { map: MapId.Route4, pos: { x: 9, y: 16 } },
+      61: { map: MapId.Route4, pos: { x: 11, y: 16 } },
+      62: { map: MapId.Route4, pos: { x: 12, y: 16 } },
+      63: { map: MapId.Route4, pos: { x: 13, y: 16 } },
+    },
+  },
 }
 
 export default route3;
