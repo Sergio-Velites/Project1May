@@ -529,6 +529,44 @@ function exportTextRewardsTS(textRewards: Record<string, Record<string, TextRewa
 }
 
 
+// ── Desplazamiento global de elementos (dx, dy en tiles) ────────────────────
+// Reubica TODOS los elementos del mapa a la vez, para realinear cuando la
+// imagen y los datos quedan descuadrados (p.ej. tras partir/redimensionar un
+// mapa). Solo mueve coordenadas de ESTE mapa; NO toca posiciones que viven en
+// otro mapa (destino de teleport, exitReturnPos) ni el minimapa de Kanto.
+
+/** Record<fila, col[]> → desplazado (fila+dy, col+dx), deduplicado y ordenado. */
+function shiftRowCols(m: Record<string, number[]>, dx: number, dy: number): Record<string, number[]> {
+  const out: Record<string, number[]> = {};
+  for (const [r, cols] of Object.entries(m)) {
+    const nr = String(Number(r) + dy);
+    out[nr] = (out[nr] ?? []).concat(cols.map((c) => c + dx));
+  }
+  for (const k of Object.keys(out)) out[k] = Array.from(new Set(out[k])).sort((a, b) => a - b);
+  return out;
+}
+
+/** Record<fila, Record<col, V>> → desplazado (fila+dy, col+dx), conserva el valor. */
+function shiftRowColMap<V>(m: Record<string, Record<string, V>>, dx: number, dy: number): Record<string, Record<string, V>> {
+  const out: Record<string, Record<string, V>> = {};
+  for (const [r, cols] of Object.entries(m)) {
+    const nr = String(Number(r) + dy);
+    out[nr] ??= {};
+    for (const [c, v] of Object.entries(cols)) out[nr][String(Number(c) + dx)] = v;
+  }
+  return out;
+}
+
+/** Array de entradas con `.pos` → cada pos desplazada (conserva el resto). */
+function shiftPosArray<T extends { pos: { x: number; y: number } }>(arr: T[], dx: number, dy: number): T[] {
+  return arr.map((e) => ({ ...e, pos: { x: e.pos.x + dx, y: e.pos.y + dy } }));
+}
+
+/** Punto suelto (o null) → desplazado. */
+function shiftPoint(p: { x: number; y: number } | null, dx: number, dy: number): { x: number; y: number } | null {
+  return p ? { x: p.x + dx, y: p.y + dy } : p;
+}
+
 // ── Portales: flatten/nest entre el shape de MapType y un array plano editable ──
 
 function flattenPortals(m: MapEntry): PortalEntry[] {
@@ -1844,6 +1882,9 @@ export default function MapEditor() {
   //    editores táctiles (Figma, mapas) y funciona sea cual sea la escala.
   //  • Escritorio / explícito: el botón ✋ Mover activa el arrastre con ratón.
   const [panMode, setPanMode] = useState(false);
+  // Panel "Desplazar todo": realinea todos los elementos del mapa a la vez.
+  const [shiftPanelOpen, setShiftPanelOpen] = useState(false);
+  const [shiftStep, setShiftStep] = useState(1);
 
   // ── Maximizar el lienzo (más espacio para pintar agua/paredes, etc.) ──────
   // Dos ejes independientes + un atajo que los combina:
@@ -2738,6 +2779,42 @@ export default function MapEditor() {
     if (Object.keys(row).length === 0) delete next[rowKey];
     else next[rowKey] = row;
     return next;
+  }
+
+  // ── Desplazar TODOS los elementos del mapa a la vez (dx, dy en tiles) ─────
+  // Realinea el contenido cuando quedó descuadrado respecto a la imagen (p.ej.
+  // al partir/redimensionar un mapa). Mueve solo coordenadas de ESTE mapa; NO
+  // toca el destino de teleports/puertas (destPos), exitReturnPos ni el
+  // minimapa de Kanto (minimapPos), que viven en otro sistema de coordenadas.
+  function shiftAllElements(dx: number, dy: number) {
+    if (dx === 0 && dy === 0) return;
+    setWalls((m) => shiftRowCols(m, dx, dy));
+    setFences((m) => shiftRowCols(m, dx, dy));
+    setGrass((m) => shiftRowCols(m, dx, dy));
+    setWater((m) => shiftRowCols(m, dx, dy));
+    setStoppers((m) => shiftRowCols(m, dx, dy));
+    setFenceDirections((m) => shiftRowColMap(m, dx, dy));
+    setTexts((m) => shiftRowColMap(m, dx, dy));
+    setTextRewards((m) => shiftRowColMap(m, dx, dy));
+    setSpinners((m) => shiftRowColMap(m, dx, dy));
+    setTrainers((a) => shiftPosArray(a, dx, dy));
+    setItems((a) => shiftPosArray(a, dx, dy));
+    setGifts((a) => shiftPosArray(a, dx, dy));
+    setStaticPokemon((a) => shiftPosArray(a, dx, dy));
+    setCuttableTrees((a) => shiftPosArray(a, dx, dy));
+    setBoulders((a) => shiftPosArray(a, dx, dy));
+    setBerryTrees((a) => shiftPosArray(a, dx, dy));
+    // Portales: se mueve la casilla del portal en ESTE mapa (pos), nunca el
+    // destino (destPos), que es una casilla del mapa al que se viaja.
+    setPortals((a) => a.map((p) => ({ ...p, pos: { x: p.pos.x + dx, y: p.pos.y + dy } })));
+    setStartPos((p) => shiftPoint(p, dx, dy));
+    setPokemonCenter((p) => shiftPoint(p, dx, dy));
+    setPcPos((p) => shiftPoint(p, dx, dy));
+    setStorePos((p) => shiftPoint(p, dx, dy));
+    setRecoverLocation((p) => shiftPoint(p, dx, dy));
+    setOnlineBattleNpc((p) => shiftPoint(p, dx, dy));
+    setFlySpot((p) => shiftPoint(p, dx, dy));
+    setDirty(true);
   }
 
   // ── Actualizar campo del NPC seleccionado ───────────────────────────────
@@ -3663,6 +3740,81 @@ export default function MapEditor() {
         >
           ✋ Mover
         </button>
+
+        {/* Desplazar TODOS los elementos a la vez (realinear tras redimensionar) */}
+        <button
+          onClick={() => setShiftPanelOpen((v) => !v)}
+          title="Desplazar TODOS los elementos del mapa (muros, hierba, NPCs, portales, textos…) a la vez, para realinearlos con la imagen. No toca el destino de portales ni el minimapa."
+          style={{
+            padding: '2px 8px',
+            fontSize: 12,
+            background: shiftPanelOpen ? '#2a3a5a' : '#1a1a3a',
+            border: `1px solid ${shiftPanelOpen ? '#5a8aff' : '#3a3a5a'}`,
+            borderRadius: 4,
+            color: shiftPanelOpen ? '#aaccff' : '#e0e0ff',
+            cursor: 'pointer',
+            fontWeight: shiftPanelOpen ? 700 : 400,
+          }}
+        >
+          ✥ Desplazar todo
+        </button>
+        {shiftPanelOpen && (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '2px 6px',
+              background: '#141428',
+              border: '1px solid #3a3a5a',
+              borderRadius: 4,
+            }}
+            title="Paso en tiles y dirección. Cada flecha mueve TODO el contenido; obsérvalo alinearse sobre la imagen."
+          >
+            <span style={{ fontSize: 11, color: '#8a8ab0' }}>paso</span>
+            <input
+              type="number"
+              min={1}
+              value={shiftStep}
+              onChange={(e) => setShiftStep(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+              style={{
+                width: 38,
+                fontSize: 12,
+                textAlign: 'center',
+                background: '#0c0c1c',
+                border: '1px solid #3a3a5a',
+                borderRadius: 3,
+                color: '#e0e0ff',
+                padding: '1px 2px',
+              }}
+            />
+            {([
+              { label: '←', dx: -1, dy: 0 },
+              { label: '↑', dx: 0, dy: -1 },
+              { label: '↓', dx: 0, dy: 1 },
+              { label: '→', dx: 1, dy: 0 },
+            ] as const).map((b) => (
+              <button
+                key={b.label}
+                onClick={() => shiftAllElements(b.dx * shiftStep, b.dy * shiftStep)}
+                title={`Desplazar todo ${shiftStep} tile(s) ${b.label}`}
+                style={{
+                  width: 24,
+                  height: 22,
+                  fontSize: 13,
+                  lineHeight: '20px',
+                  background: '#1a1a3a',
+                  border: '1px solid #4a4a7a',
+                  borderRadius: 3,
+                  color: '#e0e0ff',
+                  cursor: 'pointer',
+                }}
+              >
+                {b.label}
+              </button>
+            ))}
+          </span>
+        )}
 
         {/* Maximizar lienzo (colapsa inspector + compacta barra a la vez) */}
         <button
