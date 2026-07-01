@@ -44,6 +44,8 @@ export interface EntryForDashboard {
   money?: number;
   map?: string | null;
   pos?: { x: number; y: number } | null;
+  /** Token firmado para el link de recuperación (generado en el servidor). */
+  recoverToken?: string;
 }
 
 // ── Helpers visuales ────────────────────────────────────────────────────
@@ -757,7 +759,7 @@ export default function AdminDashboard({ entries }: Props) {
 
                 {/* ── Acciones de impersonación ── */}
                 {e.user_id && (
-                  <ImpersonateButtons userId={e.user_id} playerName={e.player_name} />
+                  <ImpersonateButtons userId={e.user_id} playerName={e.player_name} recoverToken={e.recoverToken} />
                 )}
 
                 {/* ── Editar / Eliminar ── */}

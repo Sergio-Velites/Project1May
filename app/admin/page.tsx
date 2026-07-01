@@ -5,11 +5,26 @@
  */
 export const dynamic = "force-dynamic"; // siempre server-render, nunca caché estática
 
+import { createHmac } from "node:crypto";
 import CsvDownload from "./CsvDownload";
 import AdminDashboard from "./AdminDashboard";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+
+/**
+ * Token de recuperación firmado (HMAC-SHA256 de "recover:<uuid>" con ADMIN_SECRET,
+ * base64url sin padding). Va en el link `?recover=<uuid>&rt=<token>` y lo valida
+ * webauthn-register-start con el MISMO secreto (Vercel y Supabase comparten
+ * ADMIN_SECRET — get-all-rsvp ya lo usa). Debe coincidir byte a byte con el HMAC
+ * que calcula la edge function en Deno. Se genera en el servidor: el secreto
+ * nunca llega al navegador.
+ */
+function recoverTokenFor(userId: string): string {
+  const secret = process.env.ADMIN_SECRET ?? "";
+  if (!secret) return "";
+  return createHmac("sha256", secret).update(`recover:${userId}`).digest("base64url");
+}
 
 interface PokemonInst {
   id: number;
@@ -112,6 +127,12 @@ export default async function AdminPage() {
   const adminSecret = process.env.ADMIN_SECRET ?? "";
 
   const { entries, httpStatus, errorMsg } = await fetchRsvps(adminSecret);
+
+  // Firma en servidor el token de recuperación de cada cuenta para el link
+  // `?recover=<uuid>&rt=<token>` (el secreto nunca llega al cliente).
+  for (const e of entries) {
+    if (e.user_id) (e as { recoverToken?: string }).recoverToken = recoverTokenFor(e.user_id);
+  }
 
   const rsvpEntries    = entries.filter((e) => e.hasRsvp !== false);
   const savesOnly      = entries.filter((e) => e.hasRsvp === false);

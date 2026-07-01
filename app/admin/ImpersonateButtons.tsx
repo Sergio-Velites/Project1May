@@ -5,6 +5,9 @@ import { useState } from "react";
 interface Props {
   userId: string;
   playerName: string;
+  /** Token firmado (HMAC) que autoriza recuperar ESTA cuenta desde el móvil del
+   *  invitado sin exponer el secreto. Se genera en el servidor (page.tsx). */
+  recoverToken?: string;
 }
 
 /**
@@ -20,15 +23,16 @@ interface Props {
  *   que registra una nueva passkey de este dispositivo asociada a ese UUID.
  *   Tras vincular, ese dispositivo queda enlazado permanentemente a esa cuenta.
  */
-export default function ImpersonateButtons({ userId, playerName }: Props) {
+export default function ImpersonateButtons({ userId, playerName, recoverToken }: Props) {
   const [copied, setCopied] = useState<string | null>(null);
 
+  const rtParam = recoverToken ? `&rt=${encodeURIComponent(recoverToken)}` : "";
   const playAsUrl = typeof window !== "undefined"
     ? `${window.location.origin}/?play_as=${encodeURIComponent(userId)}`
     : `/?play_as=${userId}`;
   const recoverUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/?recover=${encodeURIComponent(userId)}`
-    : `/?recover=${userId}`;
+    ? `${window.location.origin}/?recover=${encodeURIComponent(userId)}${rtParam}`
+    : `/?recover=${userId}${rtParam}`;
 
   const copy = async (url: string, label: string) => {
     try {

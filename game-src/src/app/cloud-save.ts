@@ -38,6 +38,12 @@ export const setImpersonatedUserId = (
 export const getImpersonationMode = () => impersonationMode;
 export const isImpersonating = () => impersonatedUserId !== null;
 
+// Token de recuperación firmado (del link `?recover=<uuid>&rt=<token>`). Prueba
+// que el admin autorizó recuperar esta cuenta; se envía a webauthn-register-start
+// para poder añadir una passkey a una cuenta que ya tiene credenciales.
+let recoverToken: string | null = null;
+export const setRecoverToken = (token: string | null) => { recoverToken = token; };
+
 export const setCurrentUserId = (id: string) => {
   currentUserId = id;
   localStorage.setItem("wedding_user_id", id);
@@ -65,6 +71,7 @@ export const callEdge = (
   endpoint: string,
   body: unknown,
   timeoutMs: number = EDGE_TIMEOUT_MS,
+  extraHeaders?: Record<string, string>,
 ) => {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
@@ -74,6 +81,7 @@ export const callEdge = (
       "Content-Type": "application/json",
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      ...(extraHeaders ?? {}),
     },
     body: JSON.stringify(body),
     signal: ctrl.signal,
@@ -422,7 +430,12 @@ export const webauthnRegister = async (
 ): Promise<string | null> => {
   try {
     const startBody = existingUserId ? { userId: existingUserId } : {};
-    const startRes = await callEdge("webauthn-register-start", startBody);
+    // En recuperación, adjuntar el token firmado del link para que el servidor
+    // permita añadir una passkey a una cuenta que ya tiene credenciales.
+    const startHeaders = existingUserId && recoverToken
+      ? { "x-recover-token": recoverToken }
+      : undefined;
+    const startRes = await callEdge("webauthn-register-start", startBody, EDGE_TIMEOUT_MS, startHeaders);
     if (!startRes.ok) return null;
     const { challengeId, userId, options } = await startRes.json();
 

@@ -19,6 +19,7 @@ import {
   createUser,
   setCurrentUserId,
   setImpersonatedUserId,
+  setRecoverToken,
   findLocalGameState,
 } from "../app/cloud-save";
 import OakIntro from "./OakIntro";
@@ -160,6 +161,7 @@ const LoadScreen = () => {
       const search = new URLSearchParams(window.location.search);
       const playAs = search.get("play_as");
       const recover = search.get("recover");
+      const rt = search.get("rt"); // token firmado de recuperación (link del admin)
       const target = (recover || playAs)?.trim();
       const mode: "play_as" | "recover" | null = recover
         ? "recover"
@@ -178,6 +180,9 @@ const LoadScreen = () => {
       ) {
         impersonationRef.current = { userId: target, mode };
         setImpersonatedUserId(target, mode);
+        // Token de recuperación (si viene en el link) para poder vincular una
+        // passkey a una cuenta que ya tiene credenciales.
+        if (mode === "recover" && rt) setRecoverToken(rt.trim());
         const save = await loadFromCloud(target);
         if (save) {
           cloudSave.current = save as GameState;
