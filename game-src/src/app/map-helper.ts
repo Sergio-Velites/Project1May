@@ -65,6 +65,27 @@ export const isExit = (
   return !!exits && exits[y] && exits[y].includes(x);
 };
 
+/**
+ * ¿La casilla (x, y) es un portal (puerta/teleport/salida)? Se usa para permitir
+ * PISAR una casilla FUERA del mapa (coords negativas o ≥ ancho/alto) únicamente
+ * cuando ahí hay un portal — así el jugador cambia de mapa al intentar salir por
+ * el borde, pero no puede caminar hacia el vacío. Funciona con claves negativas
+ * (acceso por índice de objeto: teleports[-1] === teleports["-1"]).
+ */
+export const isPortalTile = (
+  map: {
+    maps?: Record<number, Record<number, unknown>>;
+    teleports?: Record<number, Record<number, unknown>>;
+    exits?: Record<number, number[]>;
+  },
+  x: number,
+  y: number
+): boolean => {
+  if (map.maps && map.maps[y] && map.maps[y][x] != null) return true;
+  if (map.teleports && map.teleports[y] && map.teleports[y][x] != null) return true;
+  return isExit(map.exits, x, y);
+};
+
 export const isTrainer = (
   trainers: TrainerType[] | undefined,
   x: number,

@@ -7,7 +7,7 @@ import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
-import { boulderIdAt, canWalk, getFenceDirection, isBerryTree, isCuttableTree, isGift, isItem, isStaticPokemon, isTrainer, isWall, isWater } from "../app/map-helper";
+import { boulderIdAt, canWalk, getFenceDirection, isBerryTree, isCuttableTree, isGift, isItem, isPortalTile, isStaticPokemon, isTrainer, isWall, isWater } from "../app/map-helper";
 import { BASE_FRIENDSHIP, STEPS_PER_FRIENDSHIP, friendshipOnWalk, getFriendship } from "../app/evolution-helper";
 import { rollGender } from "../app/gender-helper";
 import {
@@ -177,7 +177,11 @@ export const gameSlice = createSlice({
   reducers: {
     moveLeft: (state) => {
       state.direction = Direction.Left;
-      if (state.pos.x === 0) return;
+      if (state.pos.x === 0) {
+        // Salir por el borde izquierdo: solo si fuera hay un portal (MapChangeHandler transporta).
+        if (isPortalTile(mapData[state.map], -1, state.pos.y)) state.pos.x = -1;
+        return;
+      }
       const boulder = tryBoulderInteraction(state, -1, 0);
       if (boulder === "blocked") return;
       if (boulder === "pushed") {
@@ -202,7 +206,10 @@ export const gameSlice = createSlice({
     moveRight: (state) => {
       state.direction = Direction.Right;
       const map = mapData[state.map];
-      if (state.pos.x === map.width - 1) return;
+      if (state.pos.x === map.width - 1) {
+        if (isPortalTile(map, map.width, state.pos.y)) state.pos.x = map.width;
+        return;
+      }
       const boulder = tryBoulderInteraction(state, 1, 0);
       if (boulder === "blocked") return;
       if (boulder === "pushed") {
@@ -225,7 +232,10 @@ export const gameSlice = createSlice({
     },
     moveUp: (state) => {
       state.direction = Direction.Up;
-      if (state.pos.y === 0) return;
+      if (state.pos.y === 0) {
+        if (isPortalTile(mapData[state.map], state.pos.x, -1)) state.pos.y = -1;
+        return;
+      }
       const boulder = tryBoulderInteraction(state, 0, -1);
       if (boulder === "blocked") return;
       if (boulder === "pushed") {
@@ -249,7 +259,10 @@ export const gameSlice = createSlice({
     moveDown: (state) => {
       state.direction = Direction.Down;
       const map = mapData[state.map];
-      if (state.pos.y === map.height - 1) return;
+      if (state.pos.y === map.height - 1) {
+        if (isPortalTile(map, state.pos.x, map.height)) state.pos.y = map.height;
+        return;
+      }
       const boulder = tryBoulderInteraction(state, 0, 1);
       if (boulder === "blocked") return;
       if (boulder === "pushed") {

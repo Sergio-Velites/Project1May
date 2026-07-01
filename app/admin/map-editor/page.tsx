@@ -136,6 +136,12 @@ const EMPTY_TABLE = (): EncounterTable => ({ rate: 0, pokemon: [] });
 
 type EditMode = 'select' | 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'berry-trees' | 'boulders' | 'spots' | 'mechanics' | 'portals' | 'map';
 
+// Nº de tiles clicables ALREDEDOR del mapa. Permite colocar portales/muros fuera
+// del borde visible (p.ej. un portal justo fuera → el jugador cambia de mapa al
+// intentar salir). Las coordenadas resultantes son negativas o ≥ ancho/alto; se
+// serializan bien porque el codegen entrecomilla las claves negativas.
+const CANVAS_MARGIN = 4;
+
 /** Bayas válidas para árboles de bayas (nombres del enum ItemType del juego). */
 const BERRY_ITEM_KEYS = [
   'Berry', 'GoldBerry', 'PrzCureBerry', 'PsnCureBerry', 'MintBerry',
@@ -3151,8 +3157,9 @@ export default function MapEditor() {
       let x = Math.floor((clientX - rect.left) / tileWidth);
       let y = Math.floor((clientY - rect.top) / tileHeight);
       if (clamp) {
-        x = Math.max(0, Math.min(x, currentMap.width - 1));
-        y = Math.max(0, Math.min(y, currentMap.height - 1));
+        // Clamp al rango EXTENDIDO (mapa + margen) para poder pintar fuera del borde.
+        x = Math.max(-CANVAS_MARGIN, Math.min(x, currentMap.width - 1 + CANVAS_MARGIN));
+        y = Math.max(-CANVAS_MARGIN, Math.min(y, currentMap.height - 1 + CANVAS_MARGIN));
       }
       return { x, y };
     },
@@ -3346,10 +3353,11 @@ export default function MapEditor() {
     if (editMode !== 'walls' && editMode !== 'fences' && editMode !== 'grass' && editMode !== 'water') return;
     const tile = tileFromEvent(e);
     if (!tile) return;
+    // Rango EXTENDIDO (mapa + margen): permite pintar muros/hierba/etc. fuera del borde.
     if (
-      tile.x < 0 || tile.y < 0 ||
-      tile.x >= (currentMap?.width ?? 0) ||
-      tile.y >= (currentMap?.height ?? 0)
+      tile.x < -CANVAS_MARGIN || tile.y < -CANVAS_MARGIN ||
+      tile.x >= (currentMap?.width ?? 0) + CANVAS_MARGIN ||
+      tile.y >= (currentMap?.height ?? 0) + CANVAS_MARGIN
     ) return;
     const src =
       editMode === 'walls' ? walls
@@ -4817,28 +4825,49 @@ export default function MapEditor() {
           }}
         >
           {currentMap && (
+            /* Contenedor EXTERIOR: incluye un margen clicable alrededor del mapa
+               (para colocar portales/muros fuera del borde) y lleva los handlers.
+               tileFromClientPoint mide contra el MAPA (canvasRef interior), así que
+               los clicks en el margen dan coords negativas / ≥ ancho de forma natural. */
             <div
-              ref={canvasRef}
               onClick={onCanvasClick}
               onPointerDown={onCanvasPointerDown}
               onPointerMove={onPointerMove}
               onPointerUp={onPointerUp}
               style={{
                 position: 'relative',
-                width: currentMap.width * zoom,
-                height: currentMap.height * zoom,
-                backgroundImage: `url(/api/admin/map-image/${currentMap.imageFile})`,
-                backgroundSize: '100% 100%',
-                backgroundRepeat: 'no-repeat',
-                imageRendering: 'pixelated',
+                boxSizing: 'border-box',
+                width: (currentMap.width + 2 * CANVAS_MARGIN) * zoom,
+                height: (currentMap.height + 2 * CANVAS_MARGIN) * zoom,
+                padding: CANVAS_MARGIN * zoom,
+                // Tramado diagonal = zona "fuera del mapa".
+                background: 'repeating-linear-gradient(45deg, #17172f, #17172f 5px, #0d0d1c 5px, #0d0d1c 10px)',
                 cursor: editMode === 'walls' ? 'cell' : 'crosshair',
                 touchAction: 'none',
-                ...(showGrid ? {
-                  backgroundBlendMode: 'normal',
-                  outline: 'none',
-                } : {}),
               }}
             >
+              {/* Rejilla también sobre el margen (alineada, para colocar con precisión) */}
+              {showGrid && (
+                <div style={{
+                  position: 'absolute', inset: 0, pointerEvents: 'none',
+                  backgroundImage: `linear-gradient(to right, rgba(100,100,200,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(100,100,200,0.14) 1px, transparent 1px)`,
+                  backgroundSize: `${zoom}px ${zoom}px`,
+                }} />
+              )}
+              {/* Contenedor INTERIOR = el MAPA. overflow visible (por defecto) →
+                  los overlays con coords fuera del borde se pintan en el margen. */}
+              <div
+                ref={canvasRef}
+                style={{
+                  position: 'relative',
+                  width: currentMap.width * zoom,
+                  height: currentMap.height * zoom,
+                  backgroundImage: `url(/api/admin/map-image/${currentMap.imageFile})`,
+                  backgroundSize: '100% 100%',
+                  backgroundRepeat: 'no-repeat',
+                  imageRendering: 'pixelated',
+                }}
+              >
               {/* Grid overlay */}
               {showGrid && (
                 <div style={{
@@ -5439,6 +5468,7 @@ export default function MapEditor() {
                   </div>
                 );
               })}
+              </div>
             </div>
           )}
 
