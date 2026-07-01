@@ -1,5 +1,5 @@
 import image from "../assets/map/ss-anne-3f.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const ssAnne3f: MapType = {
   name: "S.S. Aguamarina 3F",

@@ -1,5 +1,5 @@
 import image from "../assets/map/indigo-plateau.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const indigoPlateau: MapType = {
   name: "Meseta Anil",

@@ -1,5 +1,5 @@
 import image from "../assets/map/seafoam-islands-3f.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const seafoamIslands3f: MapType = {
   name: "Islas Espuma 3F",

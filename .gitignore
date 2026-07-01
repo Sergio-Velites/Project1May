@@ -31,3 +31,4 @@ Thumbs.db
 
 # Supabase CLI temp files
 supabase/.temp/
+__pycache__/

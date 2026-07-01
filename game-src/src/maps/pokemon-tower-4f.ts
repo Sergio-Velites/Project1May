@@ -1,5 +1,5 @@
 import image from "../assets/map/pokemon-tower-4f.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const pokemonTower4f: MapType = {
   name: "Torre Pokemon 4F",

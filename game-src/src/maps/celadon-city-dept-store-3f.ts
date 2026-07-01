@@ -1,5 +1,5 @@
 import image from "../assets/map/celadon-city-dept-store-3f.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const celadonCityDeptStore3f: MapType = {
   name: "Grandes Almacenes 3F",

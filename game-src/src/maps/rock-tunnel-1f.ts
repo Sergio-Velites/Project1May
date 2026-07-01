@@ -1,5 +1,5 @@
 import image from "../assets/map/rock-tunnel-1f.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const rockTunnel1f: MapType = {
   name: "Tunel Roca 1F",

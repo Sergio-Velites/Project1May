@@ -1,5 +1,5 @@
 import image from "../assets/map/saffron-city.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const saffronCity: MapType = {
   name: "Ciudad Azafran",

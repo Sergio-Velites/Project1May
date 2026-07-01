@@ -1,5 +1,5 @@
 import image from "../assets/map/vermilion-city.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const vermilionCity: MapType = {
   name: "Ciudad Carmin",

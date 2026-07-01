@@ -1,5 +1,5 @@
 import image from "../assets/map/celadon-city.png";
-import { Direction } from "../state/state-types";import { MapType } from "./map-types";
+import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
 
 const celadonCity: MapType = {
   name: "Ciudad Celedon",

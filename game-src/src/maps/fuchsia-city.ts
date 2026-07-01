@@ -1,5 +1,5 @@
 import image from "../assets/map/fuchsia-city.png";
-import { Direction } from "../state/state-types";import { MapType } from "./map-types";
+import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
 
 const fuchsiaCity: MapType = {
   name: "Ciudad Fucsia",

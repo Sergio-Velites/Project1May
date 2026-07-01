@@ -1,5 +1,5 @@
 import image from "../assets/map/cerulean-cave-3f.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const ceruleanCave3f: MapType = {
   name: "Cueva Celeste 3F",

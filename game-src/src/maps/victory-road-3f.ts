@@ -1,5 +1,5 @@
 import image from "../assets/map/victory-road-3f.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const victoryRoad3f: MapType = {
   name: "Camino Victoria 3F",

@@ -1,5 +1,5 @@
 import image from "../assets/map/lavender-town.png";
-import { Direction } from "../state/state-types";import { MapType } from "./map-types";
+import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
 
 const lavenderTown: MapType = {
   name: "Pueblo Lavanda",

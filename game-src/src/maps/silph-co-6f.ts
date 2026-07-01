@@ -1,5 +1,5 @@
 import image from "../assets/map/silph-co-6f.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const silphCo6f: MapType = {
   name: "Silph S.A. 6F",

@@ -1,5 +1,5 @@
 import image from "../assets/map/saffron-city-gym.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const saffronCityGym: MapType = {
   name: "Gimnasio Ciudad Azafran",

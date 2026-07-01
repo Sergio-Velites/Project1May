@@ -9,6 +9,20 @@ const GlobalStyle = createGlobalStyle`
         --red: #d05030;
     }
 
+    /*
+     * El juego es una pantalla Game Boy de tamaño fijo: no debe hacer zoom por
+     * doble-tap ni por pinch en el navegador (antes molestaba en móvil/trackpad).
+     * touch-action: manipulation elimina el doble-tap-zoom (y el delay de 300 ms);
+     * user-scalable=no (en index.html) desactiva el pinch. Solo afecta al bundle
+     * del juego, NO al Map Editor (que vive en la app Next, otro scope de CSS).
+     */
+    html, body {
+        touch-action: manipulation;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+        overscroll-behavior: none;
+    }
+
     * {
         box-sizing: border-box;
         margin: 0;

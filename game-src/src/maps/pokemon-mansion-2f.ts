@@ -1,5 +1,5 @@
 import image from "../assets/map/pokemon-mansion-2f.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const pokemonMansion2f: MapType = {
   name: "Mansion Pokemon 2F",

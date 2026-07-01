@@ -1,5 +1,5 @@
 import image from "../assets/map/safari-zone-area-3.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const safariZoneArea3: MapType = {
   name: "Zona Safari - Area 3",

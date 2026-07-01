@@ -1,5 +1,5 @@
 import image from "../assets/map/champion-room.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const championRoom: MapType = {
   name: "Campeon",

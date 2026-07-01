@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { ReactNode } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { selectPos, selectMap, selectDefeatedTrainers, selectMapId, selectPokemon } from "../state/gameSlice";
@@ -96,8 +97,29 @@ const ColorOverlay = styled.div`
   opacity: 0.5;
 `;
 
-const Game = () => {
+/**
+ * Solo este componente se suscribe a `pos`, de modo que caminar (que actualiza
+ * `pos` en CADA paso) re-renderiza ÚNICAMENTE el contenedor que aplica el
+ * `translate` del mapa — no todo el árbol de <Game> (overlays de combate como
+ * PokemonEncounter, menús, handlers, etc.). Los hijos se pasan como `children`:
+ * al NO re-renderizarse <Game> en cada paso, sus referencias son estables y
+ * React omite volver a renderizarlos. Es el arreglo estándar al patrón "el
+ * componente raíz se suscribe a la posición y re-pinta el mundo entero".
+ */
+const MapViewport = ({ children }: { children: ReactNode }) => {
   const pos = useSelector(selectPos);
+  return (
+    <BackgroundContainer
+      style={{
+        transform: `translate(${xToPx(-pos.x)}, ${yToPx(-pos.y)})`,
+      }}
+    >
+      {children}
+    </BackgroundContainer>
+  );
+};
+
+const Game = () => {
   const map = useSelector(selectMap);
   const mapId = useSelector(selectMapId);
   const defeatedTrainers = useSelector(selectDefeatedTrainers);
@@ -108,11 +130,7 @@ const Game = () => {
   return (
     <Container>
       <StyledGame>
-        <BackgroundContainer
-          style={{
-            transform: `translate(${xToPx(-pos.x)}, ${yToPx(-pos.y)})`,
-          }}
-        >
+        <MapViewport>
           <MapBackground image={map.image} width={map.width} height={map.height} />
           {map.trainers &&
             map.trainers
@@ -142,7 +160,7 @@ const Game = () => {
           <Boulder />
           <StaticPokemonNpc />
           <DebugOverlay />
-        </BackgroundContainer>
+        </MapViewport>
         <Character />
       </StyledGame>
 

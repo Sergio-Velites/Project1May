@@ -1,5 +1,5 @@
 import image from "../assets/map/route-21.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const route21: MapType = {
   name: "Ruta 21",

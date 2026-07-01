@@ -1,5 +1,5 @@
 import image from "../assets/map/cerulean-city.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 import { scientist, tamer, teamRocketGrunt } from "../app/npcs";
 import { Direction } from "../state/state-types";
 

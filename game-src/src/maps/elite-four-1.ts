@@ -1,5 +1,5 @@
 import image from "../assets/map/elite-four-1.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const eliteFour1: MapType = {
   name: "Alto Mando - Sala 1",
