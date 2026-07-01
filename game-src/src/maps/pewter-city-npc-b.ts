@@ -1,10 +1,10 @@
 import { beauty, gentleman, jrTrainerMale, youngster } from "../app/npcs";
-import image from "../assets/map/pewter-city-npc-house.png";
+import image from "../assets/map/pewter-city-npc-b.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 
 const peweterCityNpcB: MapType = {
-  name: "Pewter City NPC House B",
+  name: "Casa de Ciudad Plateada",
   image,
   height: 8,
   width: 8,
@@ -21,7 +21,9 @@ const peweterCityNpcB: MapType = {
     7: [0, 7],
   },
   text: {},
-  maps: {},
+  maps: {
+
+  },
   exits: {
     7: [2, 3],
   },
@@ -94,6 +96,7 @@ trainers: [
   persistent: true,
 }
 ],
+  minimapPos: { x: 53, y: 52 },
 };
 
 export default peweterCityNpcB;

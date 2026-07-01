@@ -1,6 +1,6 @@
 import { beauty, blackBelt } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
-import image from "../assets/map/route-2-gate.png";
+import image from "../assets/map/route-2-gate-north.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 
@@ -27,13 +27,14 @@ const route2GateNorth: MapType = {
   text: {},
   
 
-maps: {},
+maps: {
+
+  },
 teleports: {
-    0: {
-      5: { map: MapId.Route2, pos: { x: 3, y: 10 } },
-    },
+
   },
 exits: {
+    0: [4, 5],
     7: [4, 5],
   },
 exitReturnMap: MapId.ViridianForrest,
@@ -82,6 +83,7 @@ trainers: [
   persistent: true,
 }
 ],
+  minimapPos: { x: 53, y: 82 },
 };
 
 export default route2GateNorth;

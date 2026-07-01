@@ -46,7 +46,9 @@ const viridianCityGym: MapType = {
       ],
     },
   },
-  maps: {},
+  maps: {
+
+  },
   exits: {
     17: [16, 17],
   },
@@ -130,6 +132,7 @@ trainers: [
       questId: "viridian-city-gym-gift-2-2",
     },
   ],
+  minimapPos: { x: 53, y: 112 },
 };
 
 export default viridianCityGym;

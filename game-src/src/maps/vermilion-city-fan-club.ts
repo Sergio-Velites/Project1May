@@ -1,4 +1,4 @@
-import image from "../assets/map/vermilion-city-npc-a.png";
+import image from "../assets/map/vermilion-city-fan-club.png";
 import { MapType } from "./map-types";
 
 const vermilionCityFanClub: MapType = {
@@ -7,12 +7,22 @@ const vermilionCityFanClub: MapType = {
   height: 8,
   width: 8,
   start: { x: 4, y: 6 },
-  walls: {},
+  walls: {
+    0: [0, 1, 2, 3, 4, 5, 6, 7],
+    2: [2, 3, 4, 5],
+    3: [2, 3, 4, 5],
+    4: [2, 3, 4, 5],
+  },
   text: {},
-  maps: {},
-  exits: {},
+  maps: {
+
+  },
+  exits: {
+    7: [2, 3],
+  },
   music: "/game/music/maps-original/vermilion-city.mp3",
   grass: {},
+  minimapPos: { x: 147, y: 123 },
 };
 
 export default vermilionCityFanClub;

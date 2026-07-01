@@ -1,4 +1,4 @@
-import image from "../assets/map/celadon-city-game-corner.png";
+import image from "../assets/map/celadon-city-poke-mart.png";
 import { MapType } from "./map-types";
 
 const celadonCityPokeMart: MapType = {
@@ -9,10 +9,13 @@ const celadonCityPokeMart: MapType = {
   start: { x: 10, y: 16 },
   walls: {},
   text: {},
-  maps: {},
+  maps: {
+    1: { 12: MapId.CeladonCityDeptStore2f },
+  },
   exits: {},
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
+  minimapPos: { x: 111, y: 76 },
 };
 
 export default celadonCityPokeMart;

@@ -14,14 +14,17 @@ const pewterCityPokeMart: MapType = {
     y: 6,
   },
   walls: {
+    0: [0, 1, 2, 3, 4, 5, 6, 7],
     1: [0, 1, 2, 3, 4, 5, 6, 7],
     3: [0, 1, 4, 5, 6, 7],
-    4: [1, 4, 5, 6, 7],
+    4: [0, 1, 4, 5, 6, 7],
     5: [1],
     6: [0, 1],
   },
   text: {},
-  maps: {},
+  maps: {
+
+  },
   exits: {
     7: [3, 4],
   },
@@ -48,6 +51,7 @@ const pewterCityPokeMart: MapType = {
     ItemType.WaterStone,
     ItemType.ThunderStone,
   ],
+  minimapPos: { x: 53, y: 52 },
 };
 
 export default pewterCityPokeMart;

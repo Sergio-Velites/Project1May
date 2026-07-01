@@ -8,7 +8,10 @@ const celadonCityGameCorner: MapType = {
   width: 20,
   start: { x: 10, y: 16 },
   walls: {
-    3: [17],
+    0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+    2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+    3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
     4: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19],
     5: [0, 1, 2, 3, 4, 5, 6, 7],
     6: [12, 13, 14, 15, 16, 17, 18, 19],
@@ -22,14 +25,15 @@ const celadonCityGameCorner: MapType = {
     15: [0, 1, 6, 7, 12, 13, 18, 19],
   },
   text: {},
-  maps: {},
+  maps: {
+
+  },
   exits: {
     17: [15, 16],
   },
   music: "/game/music/maps-original/rocket-game-corner.mp3",
   grass: {},
-  fences: {},
-  trainers: [],
+  minimapPos: { x: 111, y: 76 },
 };
 
 export default celadonCityGameCorner;

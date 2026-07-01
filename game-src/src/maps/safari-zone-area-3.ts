@@ -1,18 +1,52 @@
-import image from "../assets/map/safari-zone-center.png";
+import image from "../assets/map/safari-zone-area-3.png";
 import { MapType } from "./map-types";
 
 const safariZoneArea3: MapType = {
   name: "Zona Safari - Area 3",
   image,
-  height: 36,
-  width: 40,
-  start: { x: 20, y: 34 },
-  walls: {},
+  height: 26,
+  width: 30,
+  start: { x: 20, y: 24 },
+  walls: {
+    0: [0, 1, 6, 7, 18, 19, 22, 23, 24, 25, 28, 29],
+    1: [0, 1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 28, 29],
+    2: [1, 2, 3, 4, 5, 6, 24, 29],
+    3: [1, 2, 4, 5, 6, 17, 24, 29],
+    4: [1, 6, 24, 26, 29],
+    5: [1, 6, 24, 29],
+    6: [1, 10, 17, 24, 29],
+    7: [1, 10, 17, 24, 29],
+    8: [1, 10, 17, 24, 29],
+    9: [1, 10, 11, 12, 13, 14, 17, 24, 29],
+    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 24, 29],
+    11: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 17, 24, 29],
+    12: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 17, 24, 29],
+    13: [1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 17, 24, 29],
+    14: [0, 1, 14, 23, 29],
+    15: [0, 1, 14, 23, 29],
+    16: [0, 4, 23, 29],
+    17: [0, 4, 17, 18, 19, 20, 22, 23, 29],
+    18: [0, 4, 17, 29],
+    19: [0, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 29],
+    20: [0, 18, 29],
+    21: [0, 18, 29],
+    22: [0, 18, 24],
+    23: [0, 18],
+    24: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 16, 17, 22, 23, 24, 25, 26, 27, 28, 29],
+    25: [0, 1, 10, 11, 12, 13, 14, 15, 18, 19, 20, 21],
+  },
   text: {},
-  maps: {},
-  exits: {},
+  maps: {
+    0: { 20: MapId.SafariZoneArea2, 21: MapId.SafariZoneArea2, 26: MapId.SafariZoneArea2, 27: MapId.SafariZoneArea2 },
+    22: { 29: MapId.SafariZoneCenter },
+    23: { 29: MapId.SafariZoneCenter },
+  },
+  exits: {
+
+  },
   music: "/game/music/maps-original/safari-zone.mp3",
   grass: {},
+  minimapPos: { x: 124, y: 150 },
 };
 
 export default safariZoneArea3;

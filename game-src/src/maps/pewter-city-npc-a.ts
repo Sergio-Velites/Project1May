@@ -1,11 +1,11 @@
 import { biker } from "../app/npcs";
 import { ItemType } from "../app/use-item-data";
-import image from "../assets/map/pewter-city-npc-house.png";
+import image from "../assets/map/pewter-city-npc-a.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 
 const peweterCityNpcA: MapType = {
-  name: "Pewter City NPC House A",
+  name: "Casa de Ciudad Plateada",
   image,
   height: 8,
   width: 8,
@@ -22,7 +22,9 @@ const peweterCityNpcA: MapType = {
     7: [0, 7],
   },
   text: {},
-  maps: {},
+  maps: {
+
+  },
   exits: {
     7: [2, 3],
   },
@@ -59,6 +61,7 @@ trainers: [
       pos: { x: 7, y: 5 },
     },
   ],
+  minimapPos: { x: 53, y: 52 },
 };
 
 export default peweterCityNpcA;
