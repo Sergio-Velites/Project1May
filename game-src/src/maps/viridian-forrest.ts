@@ -160,7 +160,7 @@ text: {
 trainers: [
   {
     npc: bugCatcher,
-    pokemon: [],
+    pokemon: [{ id: 204, level: 9 }, { id: 48, level: 9 }, { id: 214, level: 10 }],
     facing: Direction.Left,
     pos: { x: 29, y: 19 },
     intro: [
@@ -175,7 +175,7 @@ trainers: [
   },
   {
     npc: bugCatcher,
-    pokemon: [],
+    pokemon: [{ id: 127, level: 7 }, { id: 48, level: 7 }, { id: 123, level: 8 }],
     facing: Direction.Left,
     pos: { x: 28, y: 33 },
     intro: [
@@ -190,7 +190,7 @@ trainers: [
   },
   {
     npc: bugCatcher,
-    pokemon: [],
+    pokemon: [{ id: 212, level: 8 }, { id: 168, level: 9 }, { id: 214, level: 11 }],
     facing: Direction.Left,
     pos: { x: 2, y: 19 },
     intro: [
@@ -205,7 +205,7 @@ trainers: [
   },
   {
     npc: beauty,
-    pokemon: [{ id: 16, level: 4 }],
+    pokemon: [{ id: 16, level: 6 }],
     facing: Direction.Down,
     pos: { x: 25, y: 8 },
     intro: [],
