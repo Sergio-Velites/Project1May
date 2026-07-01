@@ -9,6 +9,25 @@ const SUPABASE_ANON_KEY =
   (process.env.REACT_APP_SUPABASE_ANON_KEY as string | undefined) ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwbGZqcmppYmpwdGlndmZnZHZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1OTMxNjMsImV4cCI6MjA5MzE2OTE2M30.lOgErwiQHTp98A3a7Z3ZotvYKmdxbwScNFgN_9lOijM";
 
+// Modo mantenimiento global: el juego lo consulta al arrancar. Fail-open (si no
+// se puede comprobar, se deja jugar) y con timeout para no bloquear el arranque.
+export const fetchMaintenance = async (): Promise<{ maintenance: boolean; message: string }> => {
+  try {
+    if (!SUPABASE_URL) return { maintenance: false, message: "" };
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 4000);
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/maintenance`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      signal: ctrl.signal,
+    }).finally(() => clearTimeout(timer));
+    if (!res.ok) return { maintenance: false, message: "" };
+    const d = await res.json();
+    return { maintenance: !!d.maintenance, message: typeof d.message === "string" ? d.message : "" };
+  } catch {
+    return { maintenance: false, message: "" };
+  }
+};
+
 // In-memory current user ID (also persisted in localStorage)
 // Se inicializa con el valor de localStorage para que persista entre recargas.
 let currentUserId: string | null = localStorage.getItem("wedding_user_id");

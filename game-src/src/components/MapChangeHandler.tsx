@@ -4,12 +4,14 @@ import {
   exitMap,
   selectPos,
   selectMap,
+  selectMapId,
   setMap,
   setMapWithPos,
 } from "../state/gameSlice";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import emitter, { Event } from "../app/emitter";
 import { isExit } from "../app/map-helper";
+import mapData from "../maps/map-data";
 import { selectBlackScreen, setBlackScreen } from "../state/uiSlice";
 
 interface OverlayProps {
@@ -32,7 +34,14 @@ const MapChangeHandler = () => {
   const dispatch = useDispatch();
   const pos = useSelector(selectPos);
   const map = useSelector(selectMap);
+  const mapId = useSelector(selectMapId);
   const darkScreen = useSelector(selectBlackScreen);
+  // Casilla en la que ACABAMOS de aterrizar tras una transición. Mientras el
+  // jugador siga en ella no se vuelve a transportar (evita el bucle infinito
+  // cuando el destino de un portal es, a su vez, otro portal). Se limpia en
+  // cuanto el jugador se mueve a otra casilla; así, si vuelve a pisar el portal,
+  // sí transporta.
+  const arrivedAt = useRef<{ map: string; x: number; y: number } | null>(null);
 
   useEffect(() => {
     const nextMap = map.maps[pos.y] ? map.maps[pos.y][pos.x] : null;
@@ -42,8 +51,30 @@ const MapChangeHandler = () => {
         ? map.teleports[pos.y][pos.x]
         : null;
 
+    // Anti-bucle: si estamos justo en la casilla de llegada de la última
+    // transición, no transportar. Si el jugador ya se ha movido a otra casilla,
+    // limpiar el guardado (una nueva pisada del portal sí transportará).
+    const landed = arrivedAt.current;
+    const stillOnLanding =
+      !!landed && landed.map === mapId && landed.x === pos.x && landed.y === pos.y;
+    if (!stillOnLanding) arrivedAt.current = null;
+
     if (!nextMap && !exit && !teleport) return;
     if (darkScreen) return;
+    if (stillOnLanding) return;
+
+    // Destino de la transición (para marcar la llegada y no rebotar).
+    let dest: { map: string; x: number; y: number } | null = null;
+    if (nextMap) {
+      const s = mapData[nextMap]?.start;
+      dest = { map: nextMap, x: s?.x ?? 0, y: s?.y ?? 0 };
+    } else if (exit) {
+      const rm = map.exitReturnMap;
+      const rp = map.exitReturnPos;
+      if (rm && rp) dest = { map: rm, x: rp.x, y: rp.y };
+    } else if (teleport) {
+      dest = { map: teleport.map, x: teleport.pos.x, y: teleport.pos.y };
+    }
 
     const transition = (action: () => void) => {
       dispatch(setBlackScreen(true));
@@ -74,13 +105,13 @@ const MapChangeHandler = () => {
     };
 
     if (nextMap) {
-      transition(() => dispatch(setMap(nextMap)));
+      transition(() => { arrivedAt.current = dest; dispatch(setMap(nextMap)); });
     } else if (exit) {
-      transition(() => dispatch(exitMap()));
+      transition(() => { arrivedAt.current = dest; dispatch(exitMap()); });
     } else if (teleport) {
-      transition(() => dispatch(setMapWithPos(teleport)));
+      transition(() => { arrivedAt.current = dest; dispatch(setMapWithPos(teleport)); });
     }
-  }, [pos, map.maps, dispatch, map.exits, darkScreen, map.teleports]);
+  }, [pos, mapId, map, dispatch, darkScreen]);
 
   return <Overlay $show={darkScreen} />;
 };

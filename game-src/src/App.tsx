@@ -1,6 +1,9 @@
 import styled from "styled-components";
+import { useEffect, useState } from "react";
 import Gameboy from "./components/Gameboy";
 import Game from "./components/Game";
+import Maintenance from "./components/Maintenance";
+import { fetchMaintenance } from "./app/cloud-save";
 
 import "./App.css";
 import Paint from "./components/Paint";
@@ -19,11 +22,40 @@ const StyledApp = styled.div`
 `;
 
 const App = () => {
+  // Comprobación de mantenimiento al arrancar. Fail-open: si no se puede
+  // comprobar (red/Supabase caído), se deja jugar. Mientras se resuelve, la
+  // pantalla de la Game Boy queda en negro un instante.
+  const [phase, setPhase] = useState<"loading" | "ok" | "maintenance">("loading");
+  const [message, setMessage] = useState("");
+  useEffect(() => {
+    let alive = true;
+    fetchMaintenance()
+      .then((r) => {
+        if (!alive) return;
+        if (r.maintenance) {
+          setMessage(r.message);
+          setPhase("maintenance");
+        } else {
+          setPhase("ok");
+        }
+      })
+      .catch(() => alive && setPhase("ok"));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   return (
     <StyledApp>
       <Gameboy>
-        <Game />
-        {PAINT_MODE && <Paint />}
+        {phase === "maintenance" ? (
+          <Maintenance message={message} />
+        ) : phase === "ok" ? (
+          <>
+            <Game />
+            {PAINT_MODE && <Paint />}
+          </>
+        ) : null}
       </Gameboy>
     </StyledApp>
   );

@@ -687,21 +687,28 @@ function selToolBtnStyle(enabled: boolean, active = false): React.CSSProperties 
 
 // ── Portales: flatten/nest entre el shape de MapType y un array plano editable ──
 
-function flattenPortals(m: MapEntry): PortalEntry[] {
+// PORTALES UNIFICADOS: existe UN solo tipo = "salida a mapa+posición" (teleport).
+// Al cargar un mapa, las puertas (`maps`) y salidas (`exits`) antiguas se
+// convierten a este tipo (conservando el comportamiento: puerta→`start` del
+// destino, salida→`exitReturnMap`/`Pos`). Así el editor los muestra y edita
+// igual, y al guardar se escriben todos como `teleports`.
+function flattenPortals(m: MapEntry, allMaps: MapData): PortalEntry[] {
   const out: PortalEntry[] = [];
-  // maps: Record<row, Record<col, MapId>>
+  // maps (puertas/conexiones antiguas) → teleport al `start` del destino.
   if (m.maps) {
     for (const [r, cols] of Object.entries(m.maps)) {
       for (const [c, dest] of Object.entries(cols ?? {})) {
+        const d = String(dest);
         out.push({
-          kind: 'door',
+          kind: 'teleport',
           pos: { x: parseInt(c, 10), y: parseInt(r, 10) },
-          destMap: String(dest),
+          destMap: d,
+          destPos: allMaps[d]?.start ?? { x: 0, y: 0 },
         });
       }
     }
   }
-  // teleports: Record<row, Record<col, { map, pos }>>
+  // teleports: ya son del tipo unificado.
   if (m.teleports) {
     for (const [r, cols] of Object.entries(m.teleports)) {
       for (const [c, dest] of Object.entries(cols ?? {})) {
@@ -714,17 +721,24 @@ function flattenPortals(m: MapEntry): PortalEntry[] {
       }
     }
   }
-  // exits: Record<row, number[]>
-  if (m.exits) {
+  // exits antiguas → teleport a exitReturnMap/exitReturnPos (mismo destino).
+  if (m.exits && m.exitReturnMap && m.exitReturnPos) {
     for (const [r, cols] of Object.entries(m.exits)) {
       for (const c of cols) {
-        out.push({ kind: 'exit', pos: { x: c, y: parseInt(r, 10) } });
+        out.push({
+          kind: 'teleport',
+          pos: { x: c, y: parseInt(r, 10) },
+          destMap: m.exitReturnMap,
+          destPos: m.exitReturnPos,
+        });
       }
     }
   }
   return out;
 }
 
+// Serializa SIEMPRE como `teleports` (tipo unificado). `maps` y `exits` se
+// dejan vacíos: el mapa queda con un único mecanismo de transición.
 function nestPortals(portals: PortalEntry[]): {
   maps: Record<string, Record<string, string>>;
   teleports: Record<string, Record<string, { map: string; pos: { x: number; y: number } }>>;
@@ -734,17 +748,11 @@ function nestPortals(portals: PortalEntry[]): {
   const teleports: Record<string, Record<string, { map: string; pos: { x: number; y: number } }>> = {};
   const exits: Record<string, number[]> = {};
   for (const p of portals) {
+    if (!p.destMap || !p.destPos) continue; // portal incompleto → se ignora
     const r = String(p.pos.y);
     const c = String(p.pos.x);
-    if (p.kind === 'door' && p.destMap) {
-      (maps[r] ??= {})[c] = p.destMap;
-    } else if (p.kind === 'teleport' && p.destMap && p.destPos) {
-      (teleports[r] ??= {})[c] = { map: p.destMap, pos: p.destPos };
-    } else if (p.kind === 'exit') {
-      (exits[r] ??= []).push(p.pos.x);
-    }
+    (teleports[r] ??= {})[c] = { map: p.destMap, pos: p.destPos };
   }
-  for (const r of Object.keys(exits)) exits[r].sort((a, b) => a - b);
   return { maps, teleports, exits };
 }
 
@@ -1568,7 +1576,21 @@ function MapTilePickerModal({ state, mapData, onClose }: {
   const [q, setQ] = useState('');
   const [mapId, setMapId] = useState(state.current?.mapId ?? '');
   const [pos, setPos] = useState<{ x: number; y: number } | null>(state.current?.pos ?? null);
+  // Zoom del preview con la rueda (para clicar la casilla exacta sin errores).
+  const [zoom, setZoom] = useState(1);
   const searchRef = useAutofocus<HTMLInputElement>();
+  const previewScrollRef = useRef<HTMLDivElement>(null);
+  // Listener de rueda NO pasivo: hace zoom del mapa destino sin desplazar la página.
+  useEffect(() => {
+    const el = previewScrollRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      setZoom((z) => Math.max(0.5, Math.min(8, z * (e.deltaY < 0 ? 1.15 : 1 / 1.15))));
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
 
   const mapIds = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -1579,8 +1601,9 @@ function MapTilePickerModal({ state, mapData, onClose }: {
   }, [q, mapData]);
 
   const map = mapId ? mapData[mapId] : null;
-  // Tamaño del tile del preview para encajar en ~520×420.
-  const previewTile = map ? Math.max(6, Math.min(28, Math.floor(Math.min(520 / map.width, 420 / map.height)))) : 16;
+  // Tamaño base para encajar en ~520×420, escalado por el zoom de la rueda.
+  const baseTile = map ? Math.max(6, Math.min(28, Math.floor(Math.min(520 / map.width, 420 / map.height)))) : 16;
+  const previewTile = Math.max(2, Math.round(baseTile * zoom));
   const canConfirm = !!mapId && (!state.requirePos || !!pos);
 
   return (
@@ -1595,7 +1618,7 @@ function MapTilePickerModal({ state, mapData, onClose }: {
             {mapIds.map((id) => {
               const active = mapId === id;
               return (
-                <button key={id} onClick={() => { setMapId(id); setPos(null); }} style={{
+                <button key={id} onClick={() => { setMapId(id); setPos(null); setZoom(1); }} style={{
                   textAlign: 'left', padding: '6px 10px', borderRadius: 5, cursor: 'pointer',
                   background: active ? '#2a3a5a' : 'transparent',
                   border: `1px solid ${active ? '#6a8aff' : 'transparent'}`,
@@ -1612,14 +1635,15 @@ function MapTilePickerModal({ state, mapData, onClose }: {
 
         {/* Preview del mapa destino */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-          <div style={{ flex: 1, overflow: 'auto', padding: 16, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+          <div ref={previewScrollRef} style={{ flex: 1, overflow: 'auto', padding: 16, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
             {!map ? (
               <div style={{ color: '#666', fontSize: 13, margin: 'auto', textAlign: 'center' }}>← Elige un mapa destino</div>
             ) : (
               <div>
                 {state.requirePos && (
                   <div style={{ fontSize: 11, color: pos ? '#aaffaa' : '#ffcc88', marginBottom: 8 }}>
-                    {pos ? `Casilla destino: (${pos.x}, ${pos.y})` : '👆 Click en una casilla del mapa para fijar la posición de llegada'}
+                    {pos ? `Casilla destino: (${pos.x}, ${pos.y})` : '👆 Click en una casilla; usa la rueda para hacer zoom'}
+                    <span style={{ color: '#667', marginLeft: 8 }}>· zoom {zoom.toFixed(1)}×</span>
                   </div>
                 )}
                 <div
@@ -1929,7 +1953,6 @@ export default function MapEditor() {
   const [portals, setPortals] = useState<PortalEntry[]>([]);
   const [exitReturnMap, setExitReturnMap] = useState<string | null>(null);
   const [exitReturnPos, setExitReturnPos] = useState<{ x: number; y: number } | null>(null);
-  const [activePortalKind, setActivePortalKind] = useState<PortalKind>('door');
   const [selectedPortalIdx, setSelectedPortalIdx] = useState<number | null>(null);
   const [itemTypeKeys, setItemTypeKeys] = useState<string[]>([]);
   const [musicTracks, setMusicTracks] = useState<MusicTrack[]>([]);
@@ -1947,6 +1970,40 @@ export default function MapEditor() {
   const [saveFlash, setSaveFlash] = useState(false);
   const [commitMsg, setCommitMsg] = useState<{ text: string; tone: 'ok' | 'warn' | 'err' } | null>(null);
   const [building, setBuilding] = useState(false);
+  // Modo mantenimiento del juego (flag en Supabase; toggle instantáneo).
+  const [maintenance, setMaintenance] = useState<boolean | null>(null);
+  const [maintBusy, setMaintBusy] = useState(false);
+  useEffect(() => {
+    fetch('/api/admin/maintenance').then((r) => r.json()).then((d) => setMaintenance(!!d.maintenance)).catch(() => {});
+  }, []);
+  const toggleMaintenance = async () => {
+    if (maintBusy || maintenance === null) return;
+    const next = !maintenance;
+    if (!confirm(next
+      ? '¿Poner el JUEGO en modo mantenimiento? Cualquiera que entre verá el mensaje del Team Rocket (instantáneo).'
+      : '¿Quitar el mantenimiento y reabrir el juego?')) return;
+    setMaintBusy(true);
+    try {
+      const r = await fetch('/api/admin/maintenance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          maintenance: next,
+          message: 'Pokémon Wedding está bajo mantenimiento del Team Rocket. Disculpa las molestias.',
+        }),
+      });
+      if (r.ok) {
+        setMaintenance(next);
+        setCommitMsg({ text: next ? '🚧 Juego en modo mantenimiento.' : '✅ Juego reabierto.', tone: 'ok' });
+      } else {
+        setCommitMsg({ text: 'No se pudo cambiar el mantenimiento.', tone: 'err' });
+      }
+    } catch (e) {
+      setCommitMsg({ text: `Error de red al cambiar mantenimiento: ${String(e)}`, tone: 'err' });
+    } finally {
+      setMaintBusy(false);
+    }
+  };
   const [showGraph, setShowGraph] = useState(false);
   const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
   const [error, setError] = useState('');
@@ -2271,7 +2328,7 @@ export default function MapEditor() {
     setFlyable(!!m.flyable);
     setFlySpot(m.flySpot ?? null);
     setMusicField(m.music ?? null);
-    setPortals(flattenPortals(m));
+    setPortals(flattenPortals(m, mapData));
     setExitReturnMap(m.exitReturnMap ?? null);
     setExitReturnPos(m.exitReturnPos ?? null);
     setMinimapPos(m.minimapPos ?? null);
@@ -2706,7 +2763,9 @@ export default function MapEditor() {
         maps: parsed.maps,
         teleports: parsed.teleports,
         exits: parsed.exits,
-      } as MapEntry));
+        exitReturnMap: parsed.exitReturnMap,
+        exitReturnPos: parsed.exitReturnPos,
+      } as MapEntry, mapData));
       setExitReturnMap(parsed.exitReturnMap);
       setExitReturnPos(parsed.exitReturnPos);
       setMinimapPos(parsed.minimapPos);
@@ -3524,28 +3583,14 @@ export default function MapEditor() {
         setSelectedPortalIdx(idx);
         return;
       }
-      // Crear nuevo portal del tipo activo
-      if (activePortalKind === 'door') {
-        setPicker({
-          kind: 'maptile',
-          title: `🚪 Puerta en (${tile.x}, ${tile.y})`,
-          subtitle: 'Elige el mapa destino al que lleva esta puerta',
-          requirePos: false,
-          onPick: ({ mapId }) => { setPortals((p) => [...p, { kind: 'door', pos: { x: tile.x, y: tile.y }, destMap: mapId }]); setDirty(true); },
-        });
-      } else if (activePortalKind === 'teleport') {
-        setPicker({
-          kind: 'maptile',
-          title: `🌀 Teleport en (${tile.x}, ${tile.y})`,
-          subtitle: 'Elige el mapa y haz click en la casilla de llegada',
-          requirePos: true,
-          onPick: ({ mapId, pos }) => { setPortals((p) => [...p, { kind: 'teleport', pos: { x: tile.x, y: tile.y }, destMap: mapId, destPos: pos ?? { x: 0, y: 0 } }]); setDirty(true); },
-        });
-      } else {
-        // exit
-        setPortals((p) => [...p, { kind: 'exit', pos: { x: tile.x, y: tile.y } }]);
-        setDirty(true);
-      }
+      // Portal unificado: SIEMPRE una salida a un mapa + casilla de llegada.
+      setPicker({
+        kind: 'maptile',
+        title: `🚪 Salida en (${tile.x}, ${tile.y})`,
+        subtitle: 'Elige el mapa destino y haz click en la casilla de llegada (usa la rueda para hacer zoom)',
+        requirePos: true,
+        onPick: ({ mapId, pos }) => { setPortals((p) => [...p, { kind: 'teleport', pos: { x: tile.x, y: tile.y }, destMap: mapId, destPos: pos ?? { x: 0, y: 0 } }]); setDirty(true); },
+      });
       return;
     }
   }
@@ -4284,6 +4329,26 @@ export default function MapEditor() {
           style={{ padding: '4px 12px', background: '#1a2a2a', border: '1px solid #3a6a6a', borderRadius: 4, color: building ? '#666' : '#88dddd', cursor: building ? 'default' : 'pointer', fontSize: 12 }}
         >
           {building ? 'Lanzando…' : '🛠 Compilar juego'}
+        </button>
+
+        {/* Modo mantenimiento (flag Supabase, instantáneo) */}
+        <button
+          className="me-tb-secondary"
+          onClick={toggleMaintenance}
+          disabled={maintBusy || maintenance === null}
+          title="Pone el JUEGO en mantenimiento: cualquiera que entre verá el mensaje del Team Rocket. Cambia al instante (no recompila)."
+          style={{
+            padding: '4px 12px',
+            background: maintenance ? '#3a1a1a' : '#1a1a2a',
+            border: `1px solid ${maintenance ? '#c0392b' : '#5a3a3a'}`,
+            borderRadius: 4,
+            color: maintenance === null ? '#666' : maintenance ? '#ff9988' : '#cca0a0',
+            cursor: maintBusy || maintenance === null ? 'default' : 'pointer',
+            fontSize: 12,
+            fontWeight: maintenance ? 700 : 400,
+          }}
+        >
+          {maintenance === null ? '🚧 …' : maintBusy ? '🚧 …' : maintenance ? '🚧 Mantenimiento: ON' : '🚧 Mantenimiento'}
         </button>
 
         {/* Importar .ts (sustituye todo el mapa) */}
@@ -5738,8 +5803,6 @@ export default function MapEditor() {
                 portals={portals}
                 selectedIdx={selectedPortalIdx}
                 setSelectedIdx={setSelectedPortalIdx}
-                activePortalKind={activePortalKind}
-                setActivePortalKind={setActivePortalKind}
                 exitReturnMap={exitReturnMap}
                 setExitReturnMap={(v) => { setExitReturnMap(v); setDirty(true); }}
                 exitReturnPos={exitReturnPos}
@@ -7009,7 +7072,6 @@ function MapMetaInspector({
 
 function PortalsInspector({
   portals, selectedIdx, setSelectedIdx,
-  activePortalKind, setActivePortalKind,
   exitReturnMap, setExitReturnMap,
   exitReturnPos, setExitReturnPos,
   mapData, openPicker, onUpdate, onDelete, sourceFile,
@@ -7017,8 +7079,6 @@ function PortalsInspector({
   portals: PortalEntry[];
   selectedIdx: number | null;
   setSelectedIdx: (i: number | null) => void;
-  activePortalKind: PortalKind;
-  setActivePortalKind: (k: PortalKind) => void;
   exitReturnMap: string | null;
   setExitReturnMap: (v: string | null) => void;
   exitReturnPos: { x: number; y: number } | null;
@@ -7030,54 +7090,21 @@ function PortalsInspector({
   sourceFile?: string;
 }) {
   const sel = selectedIdx !== null ? portals[selectedIdx] : null;
-  const KIND_INFO: Record<PortalKind, { label: string; emoji: string; color: string; help: string }> = {
-    door: { label: 'Puerta (maps)', emoji: '🚪', color: '#88ff88', help: 'Pisar el tile cambia al MapId destino.' },
-    teleport: { label: 'Teleport', emoji: '🌀', color: '#cc88ff', help: 'Pisar lleva al mapa+pos exacta indicados.' },
-    exit: { label: 'Salida (exits)', emoji: '↪️', color: '#88ccff', help: 'Pisar vuelve al exitReturnMap+exitReturnPos.' },
-  };
+  const COLOR = '#cc88ff';
   return (
     <div style={{ color: '#ccc', fontSize: 13, lineHeight: 1.6 }}>
       <div style={{ fontSize: 32, marginBottom: 8, textAlign: 'center' }}>🚪</div>
-      <p style={{ color: '#ffaa88', fontWeight: 700, marginBottom: 8 }}>Modo Portales activo</p>
+      <p style={{ color: '#ffaa88', fontWeight: 700, marginBottom: 8 }}>Modo Portales</p>
       <p style={{ color: '#aaa', fontSize: 11, marginBottom: 12 }}>
-        Selecciona el tipo activo y haz click en un tile vacío para crear. Click en un portal para editarlo.
+        Un único tipo de portal: una <strong>salida</strong> que lleva a otro mapa y a una casilla concreta.
+        Click en una casilla vacía para crear (eliges mapa y casilla de llegada; usa la rueda para hacer zoom). Click en un portal para editarlo.
       </p>
-
-      {/* Selector tipo activo */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 14 }}>
-        {(['door', 'teleport', 'exit'] as PortalKind[]).map((k) => {
-          const info = KIND_INFO[k];
-          const active = activePortalKind === k;
-          return (
-            <button
-              key={k}
-              onClick={() => setActivePortalKind(k)}
-              style={{
-                flex: 1,
-                padding: '6px 4px',
-                background: active ? `${info.color}33` : '#0f0f1a',
-                border: `2px solid ${active ? info.color : '#2a2a4a'}`,
-                borderRadius: 4,
-                color: active ? info.color : '#888',
-                cursor: 'pointer',
-                fontSize: 11,
-                fontWeight: 700,
-              }}
-              title={info.help}
-            >
-              {info.emoji} {info.label.split(' ')[0]}
-            </button>
-          );
-        })}
-      </div>
 
       {/* Editor del seleccionado */}
       {sel && (
-        <div style={{ padding: 10, background: '#0f0f1a', border: `2px solid ${KIND_INFO[sel.kind].color}`, borderRadius: 4, marginBottom: 14 }}>
+        <div style={{ padding: 10, background: '#0f0f1a', border: `2px solid ${COLOR}`, borderRadius: 4, marginBottom: 14 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <strong style={{ color: KIND_INFO[sel.kind].color, fontSize: 12 }}>
-              {KIND_INFO[sel.kind].emoji} {KIND_INFO[sel.kind].label} ({sel.pos.x},{sel.pos.y})
-            </strong>
+            <strong style={{ color: COLOR, fontSize: 12 }}>🚪 Salida ({sel.pos.x},{sel.pos.y})</strong>
             <button
               onClick={() => onDelete(selectedIdx!)}
               style={{ background: 'transparent', border: '1px solid #7a3a3a', color: '#ff8888', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', fontSize: 11 }}
@@ -7085,25 +7112,23 @@ function PortalsInspector({
               Eliminar
             </button>
           </div>
-          {(sel.kind === 'door' || sel.kind === 'teleport') && (
-            <div style={{ marginBottom: 8 }}>
-              <label style={{ fontSize: 11, color: '#888' }}>Mapa destino:</label>
-              <button
-                onClick={() => openPicker({
-                  kind: 'maptile',
-                  title: sel.kind === 'teleport' ? '🌀 Destino del teleport' : '🚪 Mapa destino de la puerta',
-                  subtitle: sel.kind === 'teleport' ? 'Elige mapa y casilla de llegada' : 'Elige el mapa destino',
-                  requirePos: sel.kind === 'teleport',
-                  current: sel.destMap ? { mapId: sel.destMap, pos: sel.destPos } : undefined,
-                  onPick: ({ mapId, pos }) => onUpdate(selectedIdx!, sel.kind === 'teleport' ? { destMap: mapId, destPos: pos ?? { x: 0, y: 0 } } : { destMap: mapId }),
-                })}
-                style={{ ...inputStyle, width: '100%', marginTop: 4, textAlign: 'left', cursor: 'pointer' }}
-              >
-                {sel.destMap ? (mapData[sel.destMap]?.name ?? sel.destMap) : '👆 Elegir mapa…'}
-                {sel.kind === 'teleport' && sel.destPos && <span style={{ color: '#88aaff' }}> → ({sel.destPos.x},{sel.destPos.y})</span>}
-              </button>
-            </div>
-          )}
+          <div style={{ marginBottom: 8 }}>
+            <label style={{ fontSize: 11, color: '#888' }}>Mapa y casilla de llegada:</label>
+            <button
+              onClick={() => openPicker({
+                kind: 'maptile',
+                title: '🚪 Destino de la salida',
+                subtitle: 'Elige mapa y casilla de llegada (rueda = zoom)',
+                requirePos: true,
+                current: sel.destMap ? { mapId: sel.destMap, pos: sel.destPos } : undefined,
+                onPick: ({ mapId, pos }) => onUpdate(selectedIdx!, { destMap: mapId, destPos: pos ?? { x: 0, y: 0 } }),
+              })}
+              style={{ ...inputStyle, width: '100%', marginTop: 4, textAlign: 'left', cursor: 'pointer' }}
+            >
+              {sel.destMap ? (mapData[sel.destMap]?.name ?? sel.destMap) : '👆 Elegir mapa…'}
+              {sel.destPos && <span style={{ color: '#88aaff' }}> → ({sel.destPos.x},{sel.destPos.y})</span>}
+            </button>
+          </div>
         </div>
       )}
 
@@ -7113,7 +7138,6 @@ function PortalsInspector({
         <div style={{ maxHeight: 180, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
           {portals.length === 0 && <div style={{ color: '#555', fontSize: 11, textAlign: 'center', padding: 8 }}>Ninguno</div>}
           {portals.map((p, i) => {
-            const info = KIND_INFO[p.kind];
             const active = selectedIdx === i;
             return (
               <div
@@ -7121,8 +7145,8 @@ function PortalsInspector({
                 onClick={() => setSelectedIdx(i)}
                 style={{
                   padding: '4px 8px',
-                  background: active ? `${info.color}22` : '#0f0f1a',
-                  border: `1px solid ${active ? info.color : '#2a2a4a'}`,
+                  background: active ? `${COLOR}22` : '#0f0f1a',
+                  border: `1px solid ${active ? COLOR : '#2a2a4a'}`,
                   borderRadius: 3,
                   cursor: 'pointer',
                   fontSize: 11,
@@ -7131,8 +7155,8 @@ function PortalsInspector({
                   gap: 6,
                 }}
               >
-                <span>{info.emoji}</span>
-                <span style={{ color: info.color, fontWeight: 600 }}>({p.pos.x},{p.pos.y})</span>
+                <span>🚪</span>
+                <span style={{ color: COLOR, fontWeight: 600 }}>({p.pos.x},{p.pos.y})</span>
                 {p.destMap && <span style={{ color: '#aaa' }}>→ {p.destMap}{p.destPos ? ` (${p.destPos.x},${p.destPos.y})` : ''}</span>}
               </div>
             );
@@ -7140,17 +7164,20 @@ function PortalsInspector({
         </div>
       </div>
 
-      {/* exitReturnMap / exitReturnPos */}
+      {/* exitReturnMap / exitReturnPos — ya NO se usa para transiciones (todo es
+          portal unificado). Se conserva porque el juego lo usa como mapa padre
+          para la MÚSICA (interiores heredan la del exterior) y para resolver el
+          punto de RECUPERACIÓN tras un KO. */}
       <div style={{ padding: 10, background: '#0f0f1a', border: '1px solid #2a2a4a', borderRadius: 4, marginBottom: 12 }}>
         <div style={{ fontSize: 11, color: '#88ccff', fontWeight: 700, marginBottom: 6 }}>
-          ↪️ Destino de los <code>exits</code>
+          🎵 Mapa padre (música / recuperación)
         </div>
-        <label style={{ fontSize: 11, color: '#888' }}>Mapa + casilla de regreso:</label>
+        <label style={{ fontSize: 11, color: '#888' }}>Mapa exterior de referencia:</label>
         <button
           onClick={() => openPicker({
             kind: 'maptile',
-            title: '↪️ Regreso de las salidas (exits)',
-            subtitle: 'Elige el mapa y la casilla a la que vuelve el jugador',
+            title: '🎵 Mapa padre (música / recuperación)',
+            subtitle: 'Mapa exterior del que este hereda música y punto de recuperación',
             requirePos: true,
             current: exitReturnMap ? { mapId: exitReturnMap, pos: exitReturnPos ?? undefined } : undefined,
             onPick: ({ mapId, pos }) => { setExitReturnMap(mapId); setExitReturnPos(pos); },
