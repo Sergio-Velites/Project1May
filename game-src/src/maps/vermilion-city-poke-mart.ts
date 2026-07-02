@@ -26,7 +26,7 @@ const vermilionCityPokeMart: MapType = {
   exitReturnPos: { x: 23, y: 14 },
   music: "/game/music/maps-original/vermilion-city.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 123 },
+  minimapPos: { x: 147, y: 124 },
 };
 
 export default vermilionCityPokeMart;

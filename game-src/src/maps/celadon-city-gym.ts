@@ -35,7 +35,7 @@ const celadonCityGym: MapType = {
   exitReturnPos: { x: 12, y: 28 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
-  minimapPos: { x: 111, y: 76 },
+  minimapPos: { x: 112, y: 76 },
 };
 
 export default celadonCityGym;

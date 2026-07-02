@@ -48,7 +48,10 @@ text: {
     },
   },
   maps: {
-    7: { 7: MapId.PewterCityMuseum2f },
+
+  },
+  teleports: {
+    7: { 7: { map: MapId.PewterCityMuseum2f, pos: { x: 7, y: 7 } } },
   },
   exits: {
     7: [10, 11, 16, 17],

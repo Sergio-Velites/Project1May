@@ -29,16 +29,19 @@ const pokemonMansion3f: MapType = {
   },
   text: {},
   maps: {
-    1: { 6: MapId.PokemonMansion2f },
-    10: { 7: MapId.PokemonMansion2f },
-    14: { 25: MapId.PokemonMansion2f },
+
+  },
+  teleports: {
+    1: { 6: { map: MapId.PokemonMansion2f, pos: { x: 6, y: 1 } } },
+    10: { 7: { map: MapId.PokemonMansion2f, pos: { x: 7, y: 10 } } },
+    14: { 25: { map: MapId.PokemonMansion2f, pos: { x: 25, y: 14 } } },
   },
   exits: {
 
   },
   music: "/game/music/maps-original/pokemon-mansion.mp3",
   grass: {},
-  minimapPos: { x: 53, y: 194 },
+  minimapPos: { x: 47, y: 191 },
 };
 
 export default pokemonMansion3f;

@@ -43,7 +43,7 @@ const saffronCityGym: MapType = {
   exitReturnPos: { x: 34, y: 4 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 76 },
+  minimapPos: { x: 148, y: 76 },
 };
 
 export default saffronCityGym;

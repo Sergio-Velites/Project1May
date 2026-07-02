@@ -30,7 +30,7 @@ const eliteFour3: MapType = {
   },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
-  minimapPos: { x: 28, y: 41 },
+  minimapPos: { x: 29, y: 41 },
 };
 
 export default eliteFour3;

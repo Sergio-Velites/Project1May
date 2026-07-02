@@ -29,17 +29,20 @@ const ceruleanCave2f: MapType = {
   },
   text: {},
   maps: {
-    1: { 9: MapId.CeruleanCave1f, 29: MapId.CeruleanCave1f },
-    3: { 1: MapId.CeruleanCave1f },
-    6: { 22: MapId.CeruleanCave1f },
-    7: { 19: MapId.CeruleanCave1f },
-    11: { 3: MapId.CeruleanCave1f },
+
+  },
+  teleports: {
+    1: { 9: { map: MapId.CeruleanCave1f, pos: { x: 7, y: 1 } }, 29: { map: MapId.CeruleanCave1f, pos: { x: 27, y: 1 } } },
+    3: { 1: { map: MapId.CeruleanCave1f, pos: { x: 1, y: 3 } } },
+    6: { 22: { map: MapId.CeruleanCave1f, pos: { x: 23, y: 7 } } },
+    7: { 19: { map: MapId.CeruleanCave1f, pos: { x: 18, y: 9 } } },
+    11: { 3: { map: MapId.CeruleanCave1f, pos: { x: 3, y: 11 } } },
   },
   exits: {
 
   },
   grass: {},
-  minimapPos: { x: 147, y: 41 },
+  minimapPos: { x: 138, y: 33 },
 };
 
 export default ceruleanCave2f;

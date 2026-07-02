@@ -47,9 +47,7 @@ const rockTunnel1f: MapType = {
   },
   text: {},
   maps: {
-    3: { 5: MapId.RockTunnel2f, 37: MapId.RockTunnel2f },
-    11: { 17: MapId.RockTunnel2f },
-    17: { 37: MapId.RockTunnel2f },
+
   },
   exits: {
     // Boca norte → Ruta 10 (entrada superior)
@@ -59,12 +57,14 @@ const rockTunnel1f: MapType = {
   exitReturnMap: MapId.Route10,
   exitReturnPos: { x: 8, y: 18 },
   teleports: {
-    // Boca sur → Ruta 10 (entrada inferior, junto a Pueblo Lavanda)
+    3: { 5: { map: MapId.RockTunnel2f, pos: { x: 3, y: 3 } }, 37: { map: MapId.RockTunnel2f, pos: { x: 27, y: 3 } } },
+    11: { 17: { map: MapId.RockTunnel2f, pos: { x: 23, y: 11 } } },
+    17: { 37: { map: MapId.RockTunnel2f, pos: { x: 33, y: 25 } } },
     33: { 15: { map: MapId.Route10, pos: { x: 8, y: 54 } } },
     35: { 15: { map: MapId.Route10, pos: { x: 8, y: 54 } } },
   },
   grass: {},
-  minimapPos: { x: 194, y: 60 },
+  minimapPos: { x: 195, y: 53 },
 };
 
 export default rockTunnel1f;

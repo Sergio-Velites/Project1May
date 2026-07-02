@@ -35,7 +35,7 @@ const celadonCityGameCorner: MapType = {
   exitReturnPos: { x: 28, y: 20 },
   music: "/game/music/maps-original/rocket-game-corner.mp3",
   grass: {},
-  minimapPos: { x: 111, y: 76 },
+  minimapPos: { x: 112, y: 76 },
 };
 
 export default celadonCityGameCorner;

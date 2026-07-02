@@ -29,15 +29,18 @@ const seafoamIslands4f: MapType = {
   },
   text: {},
   maps: {
-    3: { 25: MapId.SeafoamIslands3f },
-    12: { 5: MapId.SeafoamIslands3f },
-    14: { 25: MapId.SeafoamIslands3f },
+
+  },
+  teleports: {
+    3: { 25: { map: MapId.SeafoamIslands3f, pos: { x: 25, y: 3 } } },
+    12: { 5: { map: MapId.SeafoamIslands3f, pos: { x: 5, y: 13 } } },
+    14: { 25: { map: MapId.SeafoamIslands3f, pos: { x: 25, y: 14 } } },
   },
   exits: {
 
   },
   grass: {},
-  minimapPos: { x: 89, y: 185 },
+  minimapPos: { x: 89, y: 190 },
 };
 
 export default seafoamIslands4f;

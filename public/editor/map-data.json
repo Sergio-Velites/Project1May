@@ -14,7 +14,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -103,12 +103,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "12": "celadon-city-dept-store-2f"
+        "12": {
+          "map": "celadon-city-dept-store-2f",
+          "pos": {
+            "x": 12,
+            "y": 1
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "7": [
         2,
@@ -139,7 +145,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -259,13 +265,25 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "12": "celadon-city-dept-store-1f",
-        "16": "celadon-city-dept-store-3f"
+        "12": {
+          "map": "celadon-city-dept-store-1f",
+          "pos": {
+            "x": 12,
+            "y": 1
+          }
+        },
+        "16": {
+          "map": "celadon-city-dept-store-3f",
+          "pos": {
+            "x": 16,
+            "y": 1
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -286,7 +304,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -397,13 +415,25 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "12": "celadon-city-dept-store-4f",
-        "16": "celadon-city-dept-store-2f"
+        "12": {
+          "map": "celadon-city-dept-store-4f",
+          "pos": {
+            "x": 12,
+            "y": 1
+          }
+        },
+        "16": {
+          "map": "celadon-city-dept-store-2f",
+          "pos": {
+            "x": 16,
+            "y": 1
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -424,7 +454,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -553,13 +583,25 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "12": "celadon-city-dept-store-3f",
-        "16": "celadon-city-dept-store-5f"
+        "12": {
+          "map": "celadon-city-dept-store-3f",
+          "pos": {
+            "x": 12,
+            "y": 1
+          }
+        },
+        "16": {
+          "map": "celadon-city-dept-store-5f",
+          "pos": {
+            "x": 16,
+            "y": 1
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -580,7 +622,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -700,13 +742,25 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "12": "celadon-city-dept-store-6f",
-        "16": "celadon-city-dept-store-4f"
+        "12": {
+          "map": "celadon-city-dept-store-6f",
+          "pos": {
+            "x": 15,
+            "y": 2
+          }
+        },
+        "16": {
+          "map": "celadon-city-dept-store-4f",
+          "pos": {
+            "x": 16,
+            "y": 1
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -727,7 +781,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -857,12 +911,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "2": {
-        "15": "celadon-city-dept-store-5f"
+        "15": {
+          "map": "celadon-city-dept-store-5f",
+          "pos": {
+            "x": 12,
+            "y": 1
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -883,7 +943,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -1159,7 +1219,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -1300,7 +1360,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -1399,7 +1459,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -1499,7 +1559,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -1553,7 +1613,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -1674,7 +1734,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -1792,7 +1852,7 @@
       "y": 10
     },
     "minimapPos": {
-      "x": 111,
+      "x": 112,
       "y": 76
     },
     "minimapParent": null,
@@ -2801,8 +2861,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 41
+      "x": 138,
+      "y": 33
     },
     "minimapParent": null,
     "music": null,
@@ -3164,28 +3224,70 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "7": "cerulean-cave-2f",
-        "27": "cerulean-cave-2f"
+        "7": {
+          "map": "cerulean-cave-2f",
+          "pos": {
+            "x": 9,
+            "y": 1
+          }
+        },
+        "27": {
+          "map": "cerulean-cave-2f",
+          "pos": {
+            "x": 29,
+            "y": 1
+          }
+        }
       },
       "3": {
-        "1": "cerulean-cave-2f"
+        "1": {
+          "map": "cerulean-cave-2f",
+          "pos": {
+            "x": 1,
+            "y": 3
+          }
+        }
       },
       "6": {
-        "0": "cerulean-cave-3f"
+        "0": {
+          "map": "cerulean-cave-3f",
+          "pos": {
+            "x": 3,
+            "y": 6
+          }
+        }
       },
       "7": {
-        "23": "cerulean-cave-2f"
+        "23": {
+          "map": "cerulean-cave-2f",
+          "pos": {
+            "x": 22,
+            "y": 6
+          }
+        }
       },
       "9": {
-        "18": "cerulean-cave-2f"
+        "18": {
+          "map": "cerulean-cave-2f",
+          "pos": {
+            "x": 19,
+            "y": 7
+          }
+        }
       },
       "11": {
-        "3": "cerulean-cave-2f"
+        "3": {
+          "map": "cerulean-cave-2f",
+          "pos": {
+            "x": 3,
+            "y": 11
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "17": [
         24,
@@ -3214,8 +3316,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 41
+      "x": 138,
+      "y": 33
     },
     "minimapParent": null,
     "music": null,
@@ -3542,25 +3644,61 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "9": "cerulean-cave-1f",
-        "29": "cerulean-cave-1f"
+        "9": {
+          "map": "cerulean-cave-1f",
+          "pos": {
+            "x": 7,
+            "y": 1
+          }
+        },
+        "29": {
+          "map": "cerulean-cave-1f",
+          "pos": {
+            "x": 27,
+            "y": 1
+          }
+        }
       },
       "3": {
-        "1": "cerulean-cave-1f"
+        "1": {
+          "map": "cerulean-cave-1f",
+          "pos": {
+            "x": 1,
+            "y": 3
+          }
+        }
       },
       "6": {
-        "22": "cerulean-cave-1f"
+        "22": {
+          "map": "cerulean-cave-1f",
+          "pos": {
+            "x": 23,
+            "y": 7
+          }
+        }
       },
       "7": {
-        "19": "cerulean-cave-1f"
+        "19": {
+          "map": "cerulean-cave-1f",
+          "pos": {
+            "x": 18,
+            "y": 9
+          }
+        }
       },
       "11": {
-        "3": "cerulean-cave-1f"
+        "3": {
+          "map": "cerulean-cave-1f",
+          "pos": {
+            "x": 3,
+            "y": 11
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -3581,8 +3719,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 41
+      "x": 138,
+      "y": 33
     },
     "minimapParent": null,
     "music": null,
@@ -3932,12 +4070,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "6": {
-        "3": "cerulean-cave-1f"
+        "3": {
+          "map": "cerulean-cave-1f",
+          "pos": {
+            "x": 0,
+            "y": 6
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -3958,7 +4102,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 41
     },
     "minimapParent": null,
@@ -4060,7 +4204,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 41
     },
     "minimapParent": null,
@@ -4204,7 +4348,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 41
     },
     "minimapParent": null,
@@ -4294,7 +4438,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 41
     },
     "minimapParent": null,
@@ -4385,7 +4529,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 41
     },
     "minimapParent": null,
@@ -4487,7 +4631,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 41
     },
     "minimapParent": null,
@@ -4611,8 +4755,8 @@
       "y": 18
     },
     "minimapPos": {
-      "x": 149,
-      "y": 29
+      "x": 148,
+      "y": 41
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/cerulean-city.mp3\"",
@@ -5566,7 +5710,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 28,
+      "x": 29,
       "y": 41
     },
     "minimapParent": null,
@@ -5667,7 +5811,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 53,
-      "y": 194
+      "y": 195
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-gym.mp3\"",
@@ -5877,7 +6021,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 53,
-      "y": 194
+      "y": 195
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-lab.mp3\"",
@@ -6023,7 +6167,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 53,
-      "y": 194
+      "y": 195
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/cinnabar-island.mp3\"",
@@ -6125,7 +6269,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 53,
-      "y": 194
+      "y": 195
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-center.mp3\"",
@@ -6249,7 +6393,7 @@
     },
     "minimapPos": {
       "x": 53,
-      "y": 194
+      "y": 195
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/cinnabar-island.mp3\"",
@@ -6621,8 +6765,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 170,
-      "y": 123
+      "x": 53,
+      "y": 60
     },
     "minimapParent": null,
     "music": null,
@@ -6733,7 +6877,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 28,
+      "x": 29,
       "y": 41
     },
     "minimapParent": null,
@@ -6897,7 +7041,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 28,
+      "x": 29,
       "y": 41
     },
     "minimapParent": null,
@@ -7030,7 +7174,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 28,
+      "x": 29,
       "y": 41
     },
     "minimapParent": null,
@@ -7171,7 +7315,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 28,
+      "x": 29,
       "y": 41
     },
     "minimapParent": null,
@@ -7699,7 +7843,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 124,
-      "y": 170
+      "y": 171
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-gym.mp3\"",
@@ -7836,7 +7980,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 124,
-      "y": 170
+      "y": 171
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
@@ -7926,7 +8070,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 124,
-      "y": 170
+      "y": 171
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
@@ -8008,7 +8152,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 124,
-      "y": 170
+      "y": 171
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
@@ -8110,7 +8254,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 124,
-      "y": 170
+      "y": 171
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-center.mp3\"",
@@ -8231,7 +8375,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 124,
-      "y": 170
+      "y": 171
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
@@ -8328,7 +8472,7 @@
     },
     "minimapPos": {
       "x": 124,
-      "y": 170
+      "y": 171
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/celadon-city.mp3\"",
@@ -9338,8 +9482,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 53,
-      "y": 82
+      "x": 30,
+      "y": 112
     },
     "minimapParent": null,
     "music": null,
@@ -9558,7 +9702,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 28,
+      "x": 29,
       "y": 41
     },
     "minimapParent": null,
@@ -9739,7 +9883,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 28,
+      "x": 29,
       "y": 41
     },
     "minimapParent": null,
@@ -10067,7 +10211,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
+      "x": 195,
       "y": 76
     },
     "minimapParent": null,
@@ -10157,7 +10301,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
+      "x": 195,
       "y": 76
     },
     "minimapParent": null,
@@ -10215,7 +10359,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
+      "x": 195,
       "y": 76
     },
     "minimapParent": null,
@@ -10317,7 +10461,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
+      "x": 195,
       "y": 76
     },
     "minimapParent": null,
@@ -10441,7 +10585,7 @@
       "y": 6
     },
     "minimapPos": {
-      "x": 194,
+      "x": 195,
       "y": 76
     },
     "minimapParent": null,
@@ -10872,8 +11016,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 30,
-      "y": 75
+      "x": 29,
+      "y": 78
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/indigo-plateau.mp3\"",
@@ -12850,8 +12994,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 108,
-      "y": 45
+      "x": 99,
+      "y": 41
     },
     "minimapParent": null,
     "music": "music",
@@ -13746,18 +13890,36 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "5": {
-        "5": "mt-moon-2f"
+        "5": {
+          "map": "mt-moon-2f",
+          "pos": {
+            "x": 5,
+            "y": 5
+          }
+        }
       },
       "11": {
-        "17": "mt-moon-2f"
+        "17": {
+          "map": "mt-moon-2f",
+          "pos": {
+            "x": 25,
+            "y": 9
+          }
+        }
       },
       "15": {
-        "25": "mt-moon-2f"
+        "25": {
+          "map": "mt-moon-2f",
+          "pos": {
+            "x": 25,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "35": [
         14,
@@ -13786,8 +13948,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 108,
-      "y": 45
+      "x": 99,
+      "y": 41
     },
     "minimapParent": null,
     "music": "music",
@@ -14956,30 +15118,72 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "3": {
-        "23": "mt-moon-3f"
+        "23": {
+          "map": "mt-moon-3f",
+          "pos": {
+            "x": 25,
+            "y": 9
+          }
+        }
       },
       "5": {
-        "5": "mt-moon-1f"
+        "5": {
+          "map": "mt-moon-1f",
+          "pos": {
+            "x": 5,
+            "y": 5
+          }
+        }
       },
       "9": {
-        "25": "mt-moon-1f"
+        "25": {
+          "map": "mt-moon-1f",
+          "pos": {
+            "x": 17,
+            "y": 11
+          }
+        }
       },
       "11": {
-        "17": "mt-moon-3f"
+        "17": {
+          "map": "mt-moon-3f",
+          "pos": {
+            "x": 5,
+            "y": 7
+          }
+        }
       },
       "15": {
-        "25": "mt-moon-1f"
+        "25": {
+          "map": "mt-moon-1f",
+          "pos": {
+            "x": 25,
+            "y": 15
+          }
+        }
       },
       "17": {
-        "21": "mt-moon-3f"
+        "21": {
+          "map": "mt-moon-3f",
+          "pos": {
+            "x": 21,
+            "y": 17
+          }
+        }
       },
       "27": {
-        "13": "mt-moon-3f"
+        "13": {
+          "map": "mt-moon-3f",
+          "pos": {
+            "x": 15,
+            "y": 27
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "3": [
         27
@@ -15007,8 +15211,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 108,
-      "y": 45
+      "x": 99,
+      "y": 41
     },
     "minimapParent": null,
     "music": "music",
@@ -16020,21 +16224,45 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "7": {
-        "5": "mt-moon-2f"
+        "5": {
+          "map": "mt-moon-2f",
+          "pos": {
+            "x": 17,
+            "y": 11
+          }
+        }
       },
       "9": {
-        "25": "mt-moon-2f"
+        "25": {
+          "map": "mt-moon-2f",
+          "pos": {
+            "x": 23,
+            "y": 3
+          }
+        }
       },
       "17": {
-        "21": "mt-moon-2f"
+        "21": {
+          "map": "mt-moon-2f",
+          "pos": {
+            "x": 21,
+            "y": 17
+          }
+        }
       },
       "27": {
-        "15": "mt-moon-2f"
+        "15": {
+          "map": "mt-moon-2f",
+          "pos": {
+            "x": 13,
+            "y": 27
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "0": [
         37,
@@ -16574,8 +16802,8 @@
       "y": 6
     },
     "minimapPos": {
-      "x": 55,
-      "y": 135
+      "x": 53,
+      "y": 147
     },
     "minimapParent": null,
     "music": "music",
@@ -17672,12 +17900,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "7": {
-        "7": "pewter-city-museum-2f"
+        "7": {
+          "map": "pewter-city-museum-2f",
+          "pos": {
+            "x": 7,
+            "y": 7
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "7": [
         10,
@@ -17802,12 +18036,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "7": {
-        "7": "pewter-city-museum-1f"
+        "7": {
+          "map": "pewter-city-museum-1f",
+          "pos": {
+            "x": 7,
+            "y": 7
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": "pewter-city-museum-1f",
     "exitReturnPos": {
@@ -19820,8 +20060,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 53,
-      "y": 194
+      "x": 47,
+      "y": 191
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-mansion.mp3\"",
@@ -20204,15 +20444,27 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "10": {
-        "5": "pokemon-mansion-2f"
+        "5": {
+          "map": "pokemon-mansion-2f",
+          "pos": {
+            "x": 5,
+            "y": 10
+          }
+        }
       },
       "23": {
-        "21": "pokemon-mansion-4f"
+        "21": {
+          "map": "pokemon-mansion-4f",
+          "pos": {
+            "x": 23,
+            "y": 22
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "27": [
         4,
@@ -20245,8 +20497,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 53,
-      "y": 194
+      "x": 47,
+      "y": 191
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-mansion.mp3\"",
@@ -20641,19 +20893,43 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "6": "pokemon-mansion-3f"
+        "6": {
+          "map": "pokemon-mansion-3f",
+          "pos": {
+            "x": 6,
+            "y": 1
+          }
+        }
       },
       "10": {
-        "5": "pokemon-mansion-1f",
-        "7": "pokemon-mansion-3f"
+        "5": {
+          "map": "pokemon-mansion-1f",
+          "pos": {
+            "x": 5,
+            "y": 10
+          }
+        },
+        "7": {
+          "map": "pokemon-mansion-3f",
+          "pos": {
+            "x": 7,
+            "y": 10
+          }
+        }
       },
       "14": {
-        "25": "pokemon-mansion-3f"
+        "25": {
+          "map": "pokemon-mansion-3f",
+          "pos": {
+            "x": 25,
+            "y": 14
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -20674,8 +20950,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 53,
-      "y": 194
+      "x": 47,
+      "y": 191
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-mansion.mp3\"",
@@ -20994,18 +21270,36 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "6": "pokemon-mansion-2f"
+        "6": {
+          "map": "pokemon-mansion-2f",
+          "pos": {
+            "x": 6,
+            "y": 1
+          }
+        }
       },
       "10": {
-        "7": "pokemon-mansion-2f"
+        "7": {
+          "map": "pokemon-mansion-2f",
+          "pos": {
+            "x": 7,
+            "y": 10
+          }
+        }
       },
       "14": {
-        "25": "pokemon-mansion-2f"
+        "25": {
+          "map": "pokemon-mansion-2f",
+          "pos": {
+            "x": 25,
+            "y": 14
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -21026,8 +21320,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 53,
-      "y": 194
+      "x": 47,
+      "y": 191
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-mansion.mp3\"",
@@ -21379,12 +21673,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "22": {
-        "23": "pokemon-mansion-1f"
+        "23": {
+          "map": "pokemon-mansion-1f",
+          "pos": {
+            "x": 21,
+            "y": 23
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -21405,8 +21705,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
-      "y": 76
+      "x": 197,
+      "y": 71
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-tower.mp3\"",
@@ -21648,12 +21948,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "9": {
-        "18": "pokemon-tower-2f"
+        "18": {
+          "map": "pokemon-tower-2f",
+          "pos": {
+            "x": 18,
+            "y": 9
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "17": [
         10,
@@ -21682,8 +21988,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
-      "y": 76
+      "x": 197,
+      "y": 71
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-tower.mp3\"",
@@ -21987,13 +22293,25 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "9": {
-        "3": "pokemon-tower-3f",
-        "18": "pokemon-tower-1f"
+        "3": {
+          "map": "pokemon-tower-3f",
+          "pos": {
+            "x": 3,
+            "y": 9
+          }
+        },
+        "18": {
+          "map": "pokemon-tower-1f",
+          "pos": {
+            "x": 18,
+            "y": 9
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -22014,8 +22332,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
-      "y": 76
+      "x": 197,
+      "y": 71
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-tower.mp3\"",
@@ -22303,13 +22621,25 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "9": {
-        "3": "pokemon-tower-2f",
-        "18": "pokemon-tower-4f"
+        "3": {
+          "map": "pokemon-tower-2f",
+          "pos": {
+            "x": 3,
+            "y": 9
+          }
+        },
+        "18": {
+          "map": "pokemon-tower-4f",
+          "pos": {
+            "x": 18,
+            "y": 9
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -22330,8 +22660,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
-      "y": 76
+      "x": 197,
+      "y": 71
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-tower.mp3\"",
@@ -22625,13 +22955,25 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "9": {
-        "3": "pokemon-tower-5f",
-        "18": "pokemon-tower-3f"
+        "3": {
+          "map": "pokemon-tower-5f",
+          "pos": {
+            "x": 3,
+            "y": 9
+          }
+        },
+        "18": {
+          "map": "pokemon-tower-3f",
+          "pos": {
+            "x": 18,
+            "y": 9
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -22652,8 +22994,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
-      "y": 76
+      "x": 197,
+      "y": 71
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-tower.mp3\"",
@@ -22947,13 +23289,25 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "9": {
-        "3": "pokemon-tower-4f",
-        "18": "pokemon-tower-6f"
+        "3": {
+          "map": "pokemon-tower-4f",
+          "pos": {
+            "x": 3,
+            "y": 9
+          }
+        },
+        "18": {
+          "map": "pokemon-tower-6f",
+          "pos": {
+            "x": 18,
+            "y": 9
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -22974,8 +23328,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
-      "y": 76
+      "x": 197,
+      "y": 71
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-tower.mp3\"",
@@ -23280,15 +23634,27 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "9": {
-        "18": "pokemon-tower-5f"
+        "18": {
+          "map": "pokemon-tower-5f",
+          "pos": {
+            "x": 18,
+            "y": 9
+          }
+        }
       },
       "16": {
-        "9": "pokemon-tower-7f"
+        "9": {
+          "map": "pokemon-tower-7f",
+          "pos": {
+            "x": 9,
+            "y": 16
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -23309,8 +23675,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
-      "y": 76
+      "x": 197,
+      "y": 71
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-tower.mp3\"",
@@ -23684,12 +24050,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "16": {
-        "9": "pokemon-tower-6f"
+        "9": {
+          "map": "pokemon-tower-6f",
+          "pos": {
+            "x": 9,
+            "y": 16
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -23710,8 +24082,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 190,
-      "y": 100
+      "x": 201,
+      "y": 70
     },
     "minimapParent": null,
     "music": null,
@@ -24638,8 +25010,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
-      "y": 60
+      "x": 195,
+      "y": 53
     },
     "minimapParent": null,
     "music": null,
@@ -25095,19 +25467,42 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "3": {
-        "5": "rock-tunnel-2f",
-        "37": "rock-tunnel-2f"
+        "5": {
+          "map": "rock-tunnel-2f",
+          "pos": {
+            "x": 3,
+            "y": 3
+          }
+        },
+        "37": {
+          "map": "rock-tunnel-2f",
+          "pos": {
+            "x": 27,
+            "y": 3
+          }
+        }
       },
       "11": {
-        "17": "rock-tunnel-2f"
+        "17": {
+          "map": "rock-tunnel-2f",
+          "pos": {
+            "x": 23,
+            "y": 11
+          }
+        }
       },
       "17": {
-        "37": "rock-tunnel-2f"
-      }
-    },
-    "teleports": {
+        "37": {
+          "map": "rock-tunnel-2f",
+          "pos": {
+            "x": 33,
+            "y": 25
+          }
+        }
+      },
       "33": {
         "15": {
           "map": "route-10",
@@ -25157,8 +25552,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
-      "y": 60
+      "x": 195,
+      "y": 53
     },
     "minimapParent": null,
     "music": null,
@@ -25616,19 +26011,43 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "3": {
-        "3": "rock-tunnel-1f",
-        "27": "rock-tunnel-1f"
+        "3": {
+          "map": "rock-tunnel-1f",
+          "pos": {
+            "x": 5,
+            "y": 3
+          }
+        },
+        "27": {
+          "map": "rock-tunnel-1f",
+          "pos": {
+            "x": 37,
+            "y": 3
+          }
+        }
       },
       "11": {
-        "23": "rock-tunnel-1f"
+        "23": {
+          "map": "rock-tunnel-1f",
+          "pos": {
+            "x": 17,
+            "y": 11
+          }
+        }
       },
       "25": {
-        "33": "rock-tunnel-1f"
+        "33": {
+          "map": "rock-tunnel-1f",
+          "pos": {
+            "x": 37,
+            "y": 17
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -26344,8 +26763,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 194,
-      "y": 57
+      "x": 196,
+      "y": 66
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-11.mp3\"",
@@ -27942,7 +28361,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 160,
+      "x": 178,
       "y": 123
     },
     "minimapParent": null,
@@ -28302,8 +28721,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 166,
-      "y": 119
+      "x": 196,
+      "y": 95
     },
     "minimapParent": null,
     "music": null,
@@ -28440,8 +28859,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 166,
-      "y": 119
+      "x": 196,
+      "y": 105
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-11.mp3\"",
@@ -30404,8 +30823,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 180,
-      "y": 150
+      "x": 175,
+      "y": 147
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-11.mp3\"",
@@ -31189,8 +31608,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 164,
-      "y": 160
+      "x": 158,
+      "y": 158
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-11.mp3\"",
@@ -31852,8 +32271,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 138,
-      "y": 151
+      "x": 135,
+      "y": 170
     },
     "minimapParent": null,
     "music": null,
@@ -31984,8 +32403,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 138,
-      "y": 151
+      "x": 145,
+      "y": 170
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-11.mp3\"",
@@ -32429,8 +32848,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 94,
-      "y": 98
+      "x": 100,
+      "y": 76
     },
     "minimapParent": null,
     "music": null,
@@ -32613,8 +33032,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 94,
-      "y": 98
+      "x": 90,
+      "y": 76
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/bicycle.mp3\"",
@@ -33118,8 +33537,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 81,
-      "y": 128
+      "x": 75,
+      "y": 120
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/bicycle.mp3\"",
@@ -34703,8 +35122,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 110,
-      "y": 151
+      "x": 95,
+      "y": 168
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/bicycle.mp3\"",
@@ -35347,8 +35766,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 95,
-      "y": 181
+      "x": 124,
+      "y": 186
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/surf.mp3\"",
@@ -36615,7 +37034,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 53,
-      "y": 82
+      "y": 66
     },
     "minimapParent": null,
     "music": null,
@@ -36937,7 +37356,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 53,
-      "y": 82
+      "y": 92
     },
     "minimapParent": null,
     "music": "music",
@@ -38358,8 +38777,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 80,
-      "y": 189
+      "x": 89,
+      "y": 195
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/surf.mp3\"",
@@ -40265,8 +40684,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 56,
-      "y": 169
+      "x": 53,
+      "y": 172
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/surf.mp3\"",
@@ -42170,8 +42589,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 30,
-      "y": 116
+      "x": 40,
+      "y": 112
     },
     "minimapParent": null,
     "music": null,
@@ -43113,8 +43532,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 30,
-      "y": 75
+      "x": 29,
+      "y": 95
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/victory-road.mp3\"",
@@ -45336,8 +45755,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 28
+      "x": 146,
+      "y": 22
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-24-welcome.mp3\"",
@@ -46056,8 +46475,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 165,
-      "y": 22
+      "x": 163,
+      "y": 14
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-24-welcome.mp3\"",
@@ -46934,7 +47353,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 91,
+      "x": 88,
       "y": 48
     },
     "minimapParent": null,
@@ -47093,8 +47512,8 @@
     "flyable": true,
     "flySpot": null,
     "minimapPos": {
-      "x": 89,
-      "y": 40
+      "x": 78,
+      "y": 52
     },
     "minimapParent": null,
     "music": "music",
@@ -47931,8 +48350,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 124,
-      "y": 44
+      "x": 53,
+      "y": 100
     },
     "minimapParent": null,
     "music": null,
@@ -48058,8 +48477,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 123,
-      "y": 29
+      "x": 120,
+      "y": 41
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-3.mp3\"",
@@ -49104,7 +49523,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 149,
       "y": 58
     },
     "minimapParent": null,
@@ -49568,7 +49987,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 100
     },
     "minimapParent": null,
@@ -51063,8 +51482,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 168,
-      "y": 45
+      "x": 172,
+      "y": 41
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-11.mp3\"",
@@ -52108,7 +52527,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 124,
-      "y": 150
+      "y": 162
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/safari-zone.mp3\"",
@@ -52498,7 +52917,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 124,
-      "y": 150
+      "y": 162
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/safari-zone.mp3\"",
@@ -52996,7 +53415,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 124,
-      "y": 150
+      "y": 162
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/safari-zone.mp3\"",
@@ -53340,7 +53759,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 124,
-      "y": 150
+      "y": 162
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/safari-zone.mp3\"",
@@ -53695,7 +54114,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 76
     },
     "minimapParent": null,
@@ -53777,7 +54196,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 76
     },
     "minimapParent": null,
@@ -53908,7 +54327,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 76
     },
     "minimapParent": null,
@@ -54138,7 +54557,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 76
     },
     "minimapParent": null,
@@ -54228,7 +54647,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 76
     },
     "minimapParent": null,
@@ -54318,7 +54737,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 76
     },
     "minimapParent": null,
@@ -54420,7 +54839,7 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 76
     },
     "minimapParent": null,
@@ -54544,7 +54963,7 @@
       "y": 30
     },
     "minimapPos": {
-      "x": 147,
+      "x": 148,
       "y": 76
     },
     "minimapParent": null,
@@ -55443,7 +55862,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 89,
-      "y": 185
+      "y": 190
     },
     "minimapParent": null,
     "music": null,
@@ -55729,18 +56148,35 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "3": {
-        "25": "seafoam-islands-2f"
+        "25": {
+          "map": "seafoam-islands-2f",
+          "pos": {
+            "x": 25,
+            "y": 3
+          }
+        }
       },
       "5": {
-        "7": "seafoam-islands-2f"
+        "7": {
+          "map": "seafoam-islands-2f",
+          "pos": {
+            "x": 7,
+            "y": 5
+          }
+        }
       },
       "15": {
-        "23": "seafoam-islands-2f"
-      }
-    },
-    "teleports": {
+        "23": {
+          "map": "seafoam-islands-2f",
+          "pos": {
+            "x": 23,
+            "y": 15
+          }
+        }
+      },
       "17": {
         "4": {
           "map": "route-20",
@@ -55793,7 +56229,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 89,
-      "y": 185
+      "y": 190
     },
     "minimapParent": null,
     "music": null,
@@ -56084,28 +56520,70 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "2": {
-        "4": "seafoam-islands-3f"
+        "4": {
+          "map": "seafoam-islands-3f",
+          "pos": {
+            "x": 5,
+            "y": 3
+          }
+        }
       },
       "3": {
-        "25": "seafoam-islands-1f"
+        "25": {
+          "map": "seafoam-islands-1f",
+          "pos": {
+            "x": 25,
+            "y": 3
+          }
+        }
       },
       "5": {
-        "7": "seafoam-islands-1f"
+        "7": {
+          "map": "seafoam-islands-1f",
+          "pos": {
+            "x": 7,
+            "y": 5
+          }
+        }
       },
       "7": {
-        "13": "seafoam-islands-3f"
+        "13": {
+          "map": "seafoam-islands-3f",
+          "pos": {
+            "x": 13,
+            "y": 7
+          }
+        }
       },
       "11": {
-        "25": "seafoam-islands-3f"
+        "25": {
+          "map": "seafoam-islands-3f",
+          "pos": {
+            "x": 25,
+            "y": 11
+          }
+        }
       },
       "15": {
-        "19": "seafoam-islands-3f",
-        "23": "seafoam-islands-1f"
+        "19": {
+          "map": "seafoam-islands-3f",
+          "pos": {
+            "x": 19,
+            "y": 15
+          }
+        },
+        "23": {
+          "map": "seafoam-islands-1f",
+          "pos": {
+            "x": 23,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -56127,7 +56605,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 89,
-      "y": 185
+      "y": 190
     },
     "minimapParent": null,
     "music": null,
@@ -56434,28 +56912,70 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "3": {
-        "5": "seafoam-islands-2f",
-        "25": "seafoam-islands-4f"
+        "5": {
+          "map": "seafoam-islands-2f",
+          "pos": {
+            "x": 4,
+            "y": 2
+          }
+        },
+        "25": {
+          "map": "seafoam-islands-4f",
+          "pos": {
+            "x": 25,
+            "y": 3
+          }
+        }
       },
       "7": {
-        "13": "seafoam-islands-2f"
+        "13": {
+          "map": "seafoam-islands-2f",
+          "pos": {
+            "x": 13,
+            "y": 7
+          }
+        }
       },
       "11": {
-        "25": "seafoam-islands-2f"
+        "25": {
+          "map": "seafoam-islands-2f",
+          "pos": {
+            "x": 25,
+            "y": 11
+          }
+        }
       },
       "13": {
-        "5": "seafoam-islands-4f"
+        "5": {
+          "map": "seafoam-islands-4f",
+          "pos": {
+            "x": 5,
+            "y": 12
+          }
+        }
       },
       "14": {
-        "25": "seafoam-islands-4f"
+        "25": {
+          "map": "seafoam-islands-4f",
+          "pos": {
+            "x": 25,
+            "y": 14
+          }
+        }
       },
       "15": {
-        "19": "seafoam-islands-2f"
+        "19": {
+          "map": "seafoam-islands-2f",
+          "pos": {
+            "x": 19,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -56477,7 +56997,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 89,
-      "y": 185
+      "y": 190
     },
     "minimapParent": null,
     "music": null,
@@ -56751,18 +57271,36 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "3": {
-        "25": "seafoam-islands-3f"
+        "25": {
+          "map": "seafoam-islands-3f",
+          "pos": {
+            "x": 25,
+            "y": 3
+          }
+        }
       },
       "12": {
-        "5": "seafoam-islands-3f"
+        "5": {
+          "map": "seafoam-islands-3f",
+          "pos": {
+            "x": 5,
+            "y": 13
+          }
+        }
       },
       "14": {
-        "25": "seafoam-islands-3f"
+        "25": {
+          "map": "seafoam-islands-3f",
+          "pos": {
+            "x": 25,
+            "y": 14
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -56783,8 +57321,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -56968,22 +57506,52 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "8": "silph-co-9f",
-        "10": "silph-co-11f"
+        "8": {
+          "map": "silph-co-9f",
+          "pos": {
+            "x": 14,
+            "y": 0
+          }
+        },
+        "10": {
+          "map": "silph-co-11f",
+          "pos": {
+            "x": 9,
+            "y": 0
+          }
+        }
       },
       "7": {
-        "13": "silph-co-4f"
+        "13": {
+          "map": "silph-co-4f",
+          "pos": {
+            "x": 11,
+            "y": 7
+          }
+        }
       },
       "11": {
-        "9": "silph-co-4f"
+        "9": {
+          "map": "silph-co-4f",
+          "pos": {
+            "x": 17,
+            "y": 11
+          }
+        }
       },
       "15": {
-        "13": "silph-co-4f"
+        "13": {
+          "map": "silph-co-4f",
+          "pos": {
+            "x": 3,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -57004,8 +57572,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -57213,15 +57781,27 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "9": "silph-co-10f"
+        "9": {
+          "map": "silph-co-10f",
+          "pos": {
+            "x": 10,
+            "y": 0
+          }
+        }
       },
       "2": {
-        "3": "silph-co-7f"
+        "3": {
+          "map": "silph-co-7f",
+          "pos": {
+            "x": 5,
+            "y": 7
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "5": [
         5
@@ -57246,8 +57826,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -57517,15 +58097,27 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "26": "silph-co-2f"
+        "26": {
+          "map": "silph-co-2f",
+          "pos": {
+            "x": 24,
+            "y": 0
+          }
+        }
       },
       "10": {
-        "16": "silph-co-3f"
+        "16": {
+          "map": "silph-co-3f",
+          "pos": {
+            "x": 20,
+            "y": 16
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "17": [
         10,
@@ -57554,8 +58146,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -57840,21 +58432,57 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "24": "silph-co-1f",
-        "26": "silph-co-3f"
+        "24": {
+          "map": "silph-co-1f",
+          "pos": {
+            "x": 26,
+            "y": 0
+          }
+        },
+        "26": {
+          "map": "silph-co-3f",
+          "pos": {
+            "x": 26,
+            "y": 0
+          }
+        }
       },
       "3": {
-        "3": "silph-co-3f",
-        "13": "silph-co-8f"
+        "3": {
+          "map": "silph-co-3f",
+          "pos": {
+            "x": 27,
+            "y": 3
+          }
+        },
+        "13": {
+          "map": "silph-co-8f",
+          "pos": {
+            "x": 11,
+            "y": 5
+          }
+        }
       },
       "15": {
-        "9": "silph-co-6f",
-        "27": "silph-co-8f"
+        "9": {
+          "map": "silph-co-6f",
+          "pos": {
+            "x": 23,
+            "y": 3
+          }
+        },
+        "27": {
+          "map": "silph-co-8f",
+          "pos": {
+            "x": 3,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -57875,8 +58503,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -58137,26 +58765,80 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "24": "silph-co-4f",
-        "26": "silph-co-2f"
+        "24": {
+          "map": "silph-co-4f",
+          "pos": {
+            "x": 24,
+            "y": 0
+          }
+        },
+        "26": {
+          "map": "silph-co-2f",
+          "pos": {
+            "x": 26,
+            "y": 0
+          }
+        }
       },
       "3": {
-        "3": "silph-co-5f",
-        "27": "silph-co-2f"
+        "3": {
+          "map": "silph-co-5f",
+          "pos": {
+            "x": 11,
+            "y": 5
+          }
+        },
+        "27": {
+          "map": "silph-co-2f",
+          "pos": {
+            "x": 3,
+            "y": 3
+          }
+        }
       },
       "11": {
-        "3": "silph-co-9f",
-        "11": "silph-co-7f",
-        "23": "silph-co-3f"
+        "3": {
+          "map": "silph-co-9f",
+          "pos": {
+            "x": 9,
+            "y": 3
+          }
+        },
+        "11": {
+          "map": "silph-co-7f",
+          "pos": {
+            "x": 5,
+            "y": 3
+          }
+        },
+        "23": {
+          "map": "silph-co-3f",
+          "pos": {
+            "x": 27,
+            "y": 15
+          }
+        }
       },
       "15": {
-        "3": "silph-co-5f",
-        "27": "silph-co-3f"
+        "3": {
+          "map": "silph-co-5f",
+          "pos": {
+            "x": 3,
+            "y": 15
+          }
+        },
+        "27": {
+          "map": "silph-co-3f",
+          "pos": {
+            "x": 23,
+            "y": 11
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -58177,8 +58859,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -58479,25 +59161,61 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "24": "silph-co-3f",
-        "26": "silph-co-5f"
+        "24": {
+          "map": "silph-co-3f",
+          "pos": {
+            "x": 24,
+            "y": 0
+          }
+        },
+        "26": {
+          "map": "silph-co-5f",
+          "pos": {
+            "x": 26,
+            "y": 0
+          }
+        }
       },
       "3": {
-        "17": "silph-co-6f"
+        "17": {
+          "map": "silph-co-6f",
+          "pos": {
+            "x": 3,
+            "y": 3
+          }
+        }
       },
       "7": {
-        "11": "silph-co-10f"
+        "11": {
+          "map": "silph-co-10f",
+          "pos": {
+            "x": 13,
+            "y": 7
+          }
+        }
       },
       "11": {
-        "17": "silph-co-10f"
+        "17": {
+          "map": "silph-co-10f",
+          "pos": {
+            "x": 9,
+            "y": 11
+          }
+        }
       },
       "15": {
-        "3": "silph-co-10f"
+        "3": {
+          "map": "silph-co-10f",
+          "pos": {
+            "x": 13,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -58518,8 +59236,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -58806,23 +59524,59 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "24": "silph-co-6f",
-        "26": "silph-co-4f"
+        "24": {
+          "map": "silph-co-6f",
+          "pos": {
+            "x": 14,
+            "y": 0
+          }
+        },
+        "26": {
+          "map": "silph-co-4f",
+          "pos": {
+            "x": 26,
+            "y": 0
+          }
+        }
       },
       "3": {
-        "27": "silph-co-7f"
+        "27": {
+          "map": "silph-co-7f",
+          "pos": {
+            "x": 21,
+            "y": 15
+          }
+        }
       },
       "5": {
-        "11": "silph-co-3f"
+        "11": {
+          "map": "silph-co-3f",
+          "pos": {
+            "x": 3,
+            "y": 3
+          }
+        }
       },
       "15": {
-        "3": "silph-co-3f",
-        "9": "silph-co-9f"
+        "3": {
+          "map": "silph-co-3f",
+          "pos": {
+            "x": 3,
+            "y": 15
+          }
+        },
+        "9": {
+          "map": "silph-co-9f",
+          "pos": {
+            "x": 17,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -58843,8 +59597,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -59126,17 +59880,41 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "14": "silph-co-5f",
-        "16": "silph-co-7f"
+        "14": {
+          "map": "silph-co-5f",
+          "pos": {
+            "x": 24,
+            "y": 0
+          }
+        },
+        "16": {
+          "map": "silph-co-7f",
+          "pos": {
+            "x": 22,
+            "y": 0
+          }
+        }
       },
       "3": {
-        "3": "silph-co-4f",
-        "23": "silph-co-2f"
+        "3": {
+          "map": "silph-co-4f",
+          "pos": {
+            "x": 17,
+            "y": 3
+          }
+        },
+        "23": {
+          "map": "silph-co-2f",
+          "pos": {
+            "x": 9,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -59157,8 +59935,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -59430,22 +60208,52 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "16": "silph-co-8f",
-        "22": "silph-co-6f"
+        "16": {
+          "map": "silph-co-8f",
+          "pos": {
+            "x": 14,
+            "y": 0
+          }
+        },
+        "22": {
+          "map": "silph-co-6f",
+          "pos": {
+            "x": 16,
+            "y": 0
+          }
+        }
       },
       "3": {
-        "5": "silph-co-3f"
+        "5": {
+          "map": "silph-co-3f",
+          "pos": {
+            "x": 11,
+            "y": 11
+          }
+        }
       },
       "7": {
-        "5": "silph-co-11f"
+        "5": {
+          "map": "silph-co-11f",
+          "pos": {
+            "x": 3,
+            "y": 2
+          }
+        }
       },
       "15": {
-        "21": "silph-co-5f"
+        "21": {
+          "map": "silph-co-5f",
+          "pos": {
+            "x": 27,
+            "y": 3
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -59466,8 +60274,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -59725,25 +60533,61 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "14": "silph-co-7f",
-        "16": "silph-co-9f"
+        "14": {
+          "map": "silph-co-7f",
+          "pos": {
+            "x": 16,
+            "y": 0
+          }
+        },
+        "16": {
+          "map": "silph-co-9f",
+          "pos": {
+            "x": 16,
+            "y": 0
+          }
+        }
       },
       "5": {
-        "11": "silph-co-2f"
+        "11": {
+          "map": "silph-co-2f",
+          "pos": {
+            "x": 13,
+            "y": 3
+          }
+        }
       },
       "9": {
-        "11": "silph-co-8f"
+        "11": {
+          "map": "silph-co-8f",
+          "pos": {
+            "x": 3,
+            "y": 11
+          }
+        }
       },
       "11": {
-        "3": "silph-co-8f"
+        "3": {
+          "map": "silph-co-8f",
+          "pos": {
+            "x": 11,
+            "y": 9
+          }
+        }
       },
       "15": {
-        "3": "silph-co-2f"
+        "3": {
+          "map": "silph-co-2f",
+          "pos": {
+            "x": 27,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -59764,8 +60608,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 76
+      "x": 150,
+      "y": 79
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/silph-co.mp3\"",
@@ -60028,19 +60872,43 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "14": "silph-co-10f",
-        "16": "silph-co-8f"
+        "14": {
+          "map": "silph-co-10f",
+          "pos": {
+            "x": 8,
+            "y": 0
+          }
+        },
+        "16": {
+          "map": "silph-co-8f",
+          "pos": {
+            "x": 16,
+            "y": 0
+          }
+        }
       },
       "3": {
-        "9": "silph-co-3f"
+        "9": {
+          "map": "silph-co-3f",
+          "pos": {
+            "x": 3,
+            "y": 11
+          }
+        }
       },
       "15": {
-        "17": "silph-co-5f"
+        "17": {
+          "map": "silph-co-5f",
+          "pos": {
+            "x": 9,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -60061,8 +60929,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 123
+      "x": 150,
+      "y": 133
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/ss-anne.mp3\"",
@@ -60723,14 +61591,7 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
-      "6": {
-        "2": "ss-anne-2f"
-      },
-      "15": {
-        "37": "ss-anne-bf1"
-      }
-    },
+    "maps": {},
     "teleports": {
       "0": {
         "26": {
@@ -60745,6 +61606,24 @@
           "pos": {
             "x": 19,
             "y": 30
+          }
+        }
+      },
+      "6": {
+        "2": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 2,
+            "y": 4
+          }
+        }
+      },
+      "15": {
+        "37": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 27,
+            "y": 5
           }
         }
       }
@@ -60769,8 +61648,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 123
+      "x": 150,
+      "y": 133
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/ss-anne.mp3\"",
@@ -61440,15 +62319,27 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "4": {
-        "2": "ss-anne-1f"
+        "2": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 2,
+            "y": 6
+          }
+        }
       },
       "12": {
-        "2": "ss-anne-3f"
+        "2": {
+          "map": "ss-anne-3f",
+          "pos": {
+            "x": 19,
+            "y": 3
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -61469,8 +62360,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 123
+      "x": 150,
+      "y": 133
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/ss-anne.mp3\"",
@@ -61592,12 +62483,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "3": {
-        "19": "ss-anne-2f"
+        "19": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 2,
+            "y": 12
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -61618,8 +62515,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 123
+      "x": 150,
+      "y": 133
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/ss-anne.mp3\"",
@@ -61846,12 +62743,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "5": {
-        "27": "ss-anne-1f"
+        "27": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 37,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -61872,8 +62775,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 129,
-      "y": 76
+      "x": 133,
+      "y": 82
     },
     "minimapParent": null,
     "music": null,
@@ -62128,8 +63031,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 147,
-      "y": 58
+      "x": 153,
+      "y": 64
     },
     "minimapParent": null,
     "music": null,
@@ -62523,7 +63426,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 147,
-      "y": 123
+      "y": 124
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/vermilion-city.mp3\"",
@@ -62610,7 +63513,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 147,
-      "y": 123
+      "y": 124
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-gym.mp3\"",
@@ -62750,7 +63653,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 147,
-      "y": 123
+      "y": 124
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/vermilion-city.mp3\"",
@@ -62840,7 +63743,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 147,
-      "y": 123
+      "y": 124
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/vermilion-city.mp3\"",
@@ -62930,7 +63833,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 147,
-      "y": 123
+      "y": 124
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/vermilion-city.mp3\"",
@@ -63032,7 +63935,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 147,
-      "y": 123
+      "y": 124
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-center.mp3\"",
@@ -63156,7 +64059,7 @@
     },
     "minimapPos": {
       "x": 147,
-      "y": 123
+      "y": 124
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/vermilion-city.mp3\"",
@@ -64299,8 +65202,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 30,
-      "y": 60
+      "x": 29,
+      "y": 65
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/victory-road.mp3\"",
@@ -64534,12 +65437,18 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "1": "victory-road-2f"
+        "1": {
+          "map": "victory-road-2f",
+          "pos": {
+            "x": 0,
+            "y": 8
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "17": [
         8,
@@ -64568,8 +65477,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 30,
-      "y": 75
+      "x": 29,
+      "y": 65
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/victory-road.mp3\"",
@@ -64761,22 +65670,52 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "1": {
-        "1": "victory-road-3f"
+        "1": {
+          "map": "victory-road-3f",
+          "pos": {
+            "x": 2,
+            "y": 0
+          }
+        }
       },
       "7": {
-        "23": "victory-road-3f",
-        "27": "victory-road-3f"
+        "23": {
+          "map": "victory-road-3f",
+          "pos": {
+            "x": 23,
+            "y": 7
+          }
+        },
+        "27": {
+          "map": "victory-road-3f",
+          "pos": {
+            "x": 26,
+            "y": 8
+          }
+        }
       },
       "8": {
-        "0": "victory-road-1f"
+        "0": {
+          "map": "victory-road-1f",
+          "pos": {
+            "x": 1,
+            "y": 1
+          }
+        }
       },
       "14": {
-        "25": "victory-road-3f"
+        "25": {
+          "map": "victory-road-3f",
+          "pos": {
+            "x": 27,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {
       "7": [
         29
@@ -64807,8 +65746,8 @@
     "flyable": false,
     "flySpot": null,
     "minimapPos": {
-      "x": 30,
-      "y": 75
+      "x": 29,
+      "y": 65
     },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/victory-road.mp3\"",
@@ -65036,21 +65975,45 @@
     "onlineBattleNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "2": "victory-road-2f"
+        "2": {
+          "map": "victory-road-2f",
+          "pos": {
+            "x": 1,
+            "y": 1
+          }
+        }
       },
       "7": {
-        "23": "victory-road-2f"
+        "23": {
+          "map": "victory-road-2f",
+          "pos": {
+            "x": 23,
+            "y": 7
+          }
+        }
       },
       "8": {
-        "26": "victory-road-2f"
+        "26": {
+          "map": "victory-road-2f",
+          "pos": {
+            "x": 27,
+            "y": 7
+          }
+        }
       },
       "15": {
-        "27": "victory-road-2f"
+        "27": {
+          "map": "victory-road-2f",
+          "pos": {
+            "x": 25,
+            "y": 14
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -67214,7 +68177,7 @@
     "flySpot": null,
     "minimapPos": {
       "x": 53,
-      "y": 82
+      "y": 74
     },
     "minimapParent": null,
     "music": null,

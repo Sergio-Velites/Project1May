@@ -26,7 +26,7 @@ const fuchsiaCityPokeMart: MapType = {
   exitReturnPos: { x: 5, y: 14 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
-  minimapPos: { x: 124, y: 170 },
+  minimapPos: { x: 124, y: 171 },
 };
 
 export default fuchsiaCityPokeMart;

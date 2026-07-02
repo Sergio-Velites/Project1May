@@ -29,17 +29,20 @@ const victoryRoad3f: MapType = {
   },
   text: {},
   maps: {
-    0: { 2: MapId.VictoryRoad2f },
-    7: { 23: MapId.VictoryRoad2f },
-    8: { 26: MapId.VictoryRoad2f },
-    15: { 27: MapId.VictoryRoad2f },
+
+  },
+  teleports: {
+    0: { 2: { map: MapId.VictoryRoad2f, pos: { x: 1, y: 1 } } },
+    7: { 23: { map: MapId.VictoryRoad2f, pos: { x: 23, y: 7 } } },
+    8: { 26: { map: MapId.VictoryRoad2f, pos: { x: 27, y: 7 } } },
+    15: { 27: { map: MapId.VictoryRoad2f, pos: { x: 25, y: 14 } } },
   },
   exits: {
 
   },
   music: "/game/music/maps-original/victory-road.mp3",
   grass: {},
-  minimapPos: { x: 30, y: 75 },
+  minimapPos: { x: 29, y: 65 },
 };
 
 export default victoryRoad3f;

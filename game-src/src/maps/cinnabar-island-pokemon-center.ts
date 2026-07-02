@@ -28,7 +28,7 @@ const cinnabarIslandPokemonCenter: MapType = {
   exitReturnPos: { x: 11, y: 12 },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
-  minimapPos: { x: 53, y: 194 },
+  minimapPos: { x: 53, y: 195 },
 };
 
 export default cinnabarIslandPokemonCenter;

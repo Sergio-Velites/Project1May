@@ -29,14 +29,17 @@ const pokemonTower4f: MapType = {
   },
   text: {},
   maps: {
-    9: { 3: MapId.PokemonTower5f, 18: MapId.PokemonTower3f },
+
+  },
+  teleports: {
+    9: { 3: { map: MapId.PokemonTower5f, pos: { x: 3, y: 9 } }, 18: { map: MapId.PokemonTower3f, pos: { x: 18, y: 9 } } },
   },
   exits: {
 
   },
   music: "/game/music/maps-original/pokemon-tower.mp3",
   grass: {},
-  minimapPos: { x: 194, y: 76 },
+  minimapPos: { x: 197, y: 71 },
 };
 
 export default pokemonTower4f;

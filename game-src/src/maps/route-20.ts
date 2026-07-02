@@ -65,7 +65,7 @@ const route20: MapType = {
   },
   music: "/game/music/maps-original/surf.mp3",
   grass: {},
-  minimapPos: { x: 80, y: 189 },
+  minimapPos: { x: 89, y: 195 },
 };
 
 export default route20;

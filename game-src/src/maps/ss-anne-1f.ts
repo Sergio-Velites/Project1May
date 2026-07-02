@@ -29,22 +29,19 @@ const ssAnne1f: MapType = {
   },
   text: {},
   maps: {
-    6: { 2: MapId.SsAnne2f },
-    15: { 37: MapId.SsAnneBf1 },
+
   },
   teleports: {
-    // Pasarela (cols 26-27, fila 0) → muelle del puerto de Ciudad Carmín
-    0: {
-      26: { map: MapId.VermilionCity, pos: { x: 18, y: 30 } },
-      27: { map: MapId.VermilionCity, pos: { x: 19, y: 30 } },
-    },
+    0: { 26: { map: MapId.VermilionCity, pos: { x: 18, y: 30 } }, 27: { map: MapId.VermilionCity, pos: { x: 19, y: 30 } } },
+    6: { 2: { map: MapId.SsAnne2f, pos: { x: 2, y: 4 } } },
+    15: { 37: { map: MapId.SsAnneBf1, pos: { x: 27, y: 5 } } },
   },
   exits: {
 
   },
   music: "/game/music/maps-original/ss-anne.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 123 },
+  minimapPos: { x: 150, y: 133 },
 };
 
 export default ssAnne1f;

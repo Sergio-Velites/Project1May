@@ -49,16 +49,16 @@ const mtMoon2f: MapType = {
     27: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
   },
   maps: {
-    3: { 23: MapId.MtMoon3f },
-    5: { 5: MapId.MtMoon1f },
-    9: { 25: MapId.MtMoon1f },
-    11: { 17: MapId.MtMoon3f },
-    15: { 25: MapId.MtMoon1f },
-    17: { 21: MapId.MtMoon3f },
-    27: { 13: MapId.MtMoon3f },
+
   },
   teleports: {
-
+    3: { 23: { map: MapId.MtMoon3f, pos: { x: 25, y: 9 } } },
+    5: { 5: { map: MapId.MtMoon1f, pos: { x: 5, y: 5 } } },
+    9: { 25: { map: MapId.MtMoon1f, pos: { x: 17, y: 11 } } },
+    11: { 17: { map: MapId.MtMoon3f, pos: { x: 5, y: 7 } } },
+    15: { 25: { map: MapId.MtMoon1f, pos: { x: 25, y: 15 } } },
+    17: { 21: { map: MapId.MtMoon3f, pos: { x: 21, y: 17 } } },
+    27: { 13: { map: MapId.MtMoon3f, pos: { x: 15, y: 27 } } },
   },
   exits: {
     3: [27],
@@ -209,7 +209,7 @@ const mtMoon2f: MapType = {
       intro: ["..."],
     },
   ],
-  minimapPos: { x: 108, y: 45 },
+  minimapPos: { x: 99, y: 41 },
 };
 
 export default mtMoon2f;

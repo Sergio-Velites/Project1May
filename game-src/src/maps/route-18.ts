@@ -44,7 +44,7 @@ const route18: MapType = {
   },
   music: "/game/music/maps-original/bicycle.mp3",
   grass: {},
-  minimapPos: { x: 110, y: 151 },
+  minimapPos: { x: 95, y: 168 },
 };
 
 export default route18;

@@ -38,7 +38,7 @@ const cinnabarIslandGym: MapType = {
   exitReturnPos: { x: 18, y: 4 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
-  minimapPos: { x: 53, y: 194 },
+  minimapPos: { x: 53, y: 195 },
 };
 
 export default cinnabarIslandGym;

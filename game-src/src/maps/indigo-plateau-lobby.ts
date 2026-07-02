@@ -31,7 +31,7 @@ const indigoPlateauLobby: MapType = {
   exitReturnMap: MapId.IndigoPlateau,
   exitReturnPos: { x: 9, y: 6 },
   grass: {},
-  minimapPos: { x: 28, y: 41 },
+  minimapPos: { x: 29, y: 41 },
 };
 
 export default indigoPlateauLobby;

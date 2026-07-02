@@ -28,7 +28,7 @@ const saffronCityPokemonCenter: MapType = {
   exitReturnPos: { x: 9, y: 30 },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 76 },
+  minimapPos: { x: 148, y: 76 },
 };
 
 export default saffronCityPokemonCenter;

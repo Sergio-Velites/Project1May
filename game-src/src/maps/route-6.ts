@@ -56,7 +56,7 @@ const route6: MapType = {
   },
   music: "/game/music/maps-original/route-3.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 100 },
+  minimapPos: { x: 148, y: 100 },
 };
 
 export default route6;

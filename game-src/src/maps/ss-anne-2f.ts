@@ -29,15 +29,18 @@ const ssAnne2f: MapType = {
   },
   text: {},
   maps: {
-    4: { 2: MapId.SsAnne1f },
-    12: { 2: MapId.SsAnne3f },
+
+  },
+  teleports: {
+    4: { 2: { map: MapId.SsAnne1f, pos: { x: 2, y: 6 } } },
+    12: { 2: { map: MapId.SsAnne3f, pos: { x: 19, y: 3 } } },
   },
   exits: {
 
   },
   music: "/game/music/maps-original/ss-anne.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 123 },
+  minimapPos: { x: 150, y: 133 },
 };
 
 export default ssAnne2f;

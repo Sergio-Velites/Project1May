@@ -116,7 +116,7 @@ const route21: MapType = {
   },
   music: "/game/music/maps-original/surf.mp3",
   grass: {},
-  minimapPos: { x: 56, y: 169 },
+  minimapPos: { x: 53, y: 172 },
 };
 
 export default route21;

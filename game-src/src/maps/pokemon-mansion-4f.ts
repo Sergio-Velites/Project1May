@@ -39,14 +39,17 @@ const pokemonMansion4f: MapType = {
   },
   text: {},
   maps: {
-    22: { 23: MapId.PokemonMansion1f },
+
+  },
+  teleports: {
+    22: { 23: { map: MapId.PokemonMansion1f, pos: { x: 21, y: 23 } } },
   },
   exits: {
 
   },
   music: "/game/music/maps-original/pokemon-mansion.mp3",
   grass: {},
-  minimapPos: { x: 53, y: 194 },
+  minimapPos: { x: 47, y: 191 },
 };
 
 export default pokemonMansion4f;

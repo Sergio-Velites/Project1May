@@ -27,7 +27,7 @@ const celadonCityHouseB: MapType = {
   exitReturnPos: { x: 31, y: 28 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
-  minimapPos: { x: 111, y: 76 },
+  minimapPos: { x: 112, y: 76 },
 };
 
 export default celadonCityHouseB;

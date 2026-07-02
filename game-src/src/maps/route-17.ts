@@ -169,7 +169,7 @@ const route17: MapType = {
   },
   music: "/game/music/maps-original/bicycle.mp3",
   grass: {},
-  minimapPos: { x: 81, y: 128 },
+  minimapPos: { x: 75, y: 120 },
 };
 
 export default route17;

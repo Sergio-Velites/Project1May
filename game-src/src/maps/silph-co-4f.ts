@@ -29,18 +29,21 @@ const silphCo4f: MapType = {
   },
   text: {},
   maps: {
-    0: { 24: MapId.SilphCo3f, 26: MapId.SilphCo5f },
-    3: { 17: MapId.SilphCo6f },
-    7: { 11: MapId.SilphCo10f },
-    11: { 17: MapId.SilphCo10f },
-    15: { 3: MapId.SilphCo10f },
+
+  },
+  teleports: {
+    0: { 24: { map: MapId.SilphCo3f, pos: { x: 24, y: 0 } }, 26: { map: MapId.SilphCo5f, pos: { x: 26, y: 0 } } },
+    3: { 17: { map: MapId.SilphCo6f, pos: { x: 3, y: 3 } } },
+    7: { 11: { map: MapId.SilphCo10f, pos: { x: 13, y: 7 } } },
+    11: { 17: { map: MapId.SilphCo10f, pos: { x: 9, y: 11 } } },
+    15: { 3: { map: MapId.SilphCo10f, pos: { x: 13, y: 15 } } },
   },
   exits: {
 
   },
   music: "/game/music/maps-original/silph-co.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 76 },
+  minimapPos: { x: 150, y: 79 },
 };
 
 export default silphCo4f;

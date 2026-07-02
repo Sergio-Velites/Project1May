@@ -15,12 +15,12 @@ const mtMoon1f: MapType = {
   height: 36,
   width: 40,
   maps: {
-    5: { 5: MapId.MtMoon2f },
-    11: { 17: MapId.MtMoon2f },
-    15: { 25: MapId.MtMoon2f },
+
   },
   teleports: {
-
+    5: { 5: { map: MapId.MtMoon2f, pos: { x: 5, y: 5 } } },
+    11: { 17: { map: MapId.MtMoon2f, pos: { x: 25, y: 9 } } },
+    15: { 25: { map: MapId.MtMoon2f, pos: { x: 25, y: 15 } } },
   },
   exits: {
     35: [14, 15],
@@ -259,7 +259,7 @@ const mtMoon1f: MapType = {
       },
     },
   ],
-  minimapPos: { x: 108, y: 45 },
+  minimapPos: { x: 99, y: 41 },
 };
 
 export default mtMoon1f;

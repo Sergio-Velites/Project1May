@@ -28,7 +28,7 @@ const celadonCityPokemonCenter: MapType = {
   exitReturnPos: { x: 41, y: 10 },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
-  minimapPos: { x: 111, y: 76 },
+  minimapPos: { x: 112, y: 76 },
 };
 
 export default celadonCityPokemonCenter;

@@ -29,13 +29,16 @@ const ceruleanCave3f: MapType = {
   },
   text: {},
   maps: {
-    6: { 3: MapId.CeruleanCave1f },
+
+  },
+  teleports: {
+    6: { 3: { map: MapId.CeruleanCave1f, pos: { x: 0, y: 6 } } },
   },
   exits: {
 
   },
   grass: {},
-  minimapPos: { x: 147, y: 41 },
+  minimapPos: { x: 138, y: 33 },
 };
 
 export default ceruleanCave3f;

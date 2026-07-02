@@ -27,7 +27,7 @@ const ceruleanCityHouseB: MapType = {
   exitReturnPos: { x: 27, y: 12 },
   music: "/game/music/maps-original/cerulean-city.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 41 },
+  minimapPos: { x: 148, y: 41 },
 };
 
 export default ceruleanCityHouseB;

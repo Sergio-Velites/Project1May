@@ -19,14 +19,17 @@ const ssAnneBf1: MapType = {
   },
   text: {},
   maps: {
-    5: { 27: MapId.SsAnne1f },
+
+  },
+  teleports: {
+    5: { 27: { map: MapId.SsAnne1f, pos: { x: 37, y: 15 } } },
   },
   exits: {
 
   },
   music: "/game/music/maps-original/ss-anne.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 123 },
+  minimapPos: { x: 150, y: 133 },
 };
 
 export default ssAnneBf1;

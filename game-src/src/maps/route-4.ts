@@ -134,7 +134,7 @@ const route4: MapType = {
       item: ItemType.MiracleBerry,
     },
   ],
-  minimapPos: { x: 123, y: 29 },
+  minimapPos: { x: 120, y: 41 },
   trainers: [
   {
     npc: youngster,

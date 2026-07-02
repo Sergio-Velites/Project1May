@@ -17,14 +17,17 @@ const celadonCityDeptStore4f: MapType = {
   },
   text: {},
   maps: {
-    1: { 12: MapId.CeladonCityDeptStore3f, 16: MapId.CeladonCityDeptStore5f },
+
+  },
+  teleports: {
+    1: { 12: { map: MapId.CeladonCityDeptStore3f, pos: { x: 12, y: 1 } }, 16: { map: MapId.CeladonCityDeptStore5f, pos: { x: 16, y: 1 } } },
   },
   exits: {
 
   },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
-  minimapPos: { x: 111, y: 76 },
+  minimapPos: { x: 112, y: 76 },
 };
 
 export default celadonCityDeptStore4f;

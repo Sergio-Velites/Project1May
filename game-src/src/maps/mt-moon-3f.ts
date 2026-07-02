@@ -51,13 +51,13 @@ const mtMoon3f: MapType = {
     33: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
   },
   maps: {
-    7: { 5: MapId.MtMoon2f },
-    9: { 25: MapId.MtMoon2f },
-    17: { 21: MapId.MtMoon2f },
-    27: { 15: MapId.MtMoon2f },
+
   },
   teleports: {
-
+    7: { 5: { map: MapId.MtMoon2f, pos: { x: 17, y: 11 } } },
+    9: { 25: { map: MapId.MtMoon2f, pos: { x: 23, y: 3 } } },
+    17: { 21: { map: MapId.MtMoon2f, pos: { x: 21, y: 17 } } },
+    27: { 15: { map: MapId.MtMoon2f, pos: { x: 13, y: 27 } } },
   },
   exits: {
     // Cámara noreste → salida este de Monte Luna (Ruta 4)
@@ -123,7 +123,7 @@ const mtMoon3f: MapType = {
   ],
 
   exitReturnMap: MapId.Route4,
-  minimapPos: { x: 108, y: 45 },
+  minimapPos: { x: 99, y: 41 },
 };
 
 export default mtMoon3f;

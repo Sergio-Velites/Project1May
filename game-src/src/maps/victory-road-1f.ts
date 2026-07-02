@@ -29,7 +29,10 @@ const victoryRoad1f: MapType = {
   },
   text: {},
   maps: {
-    1: { 1: MapId.VictoryRoad2f },
+
+  },
+  teleports: {
+    1: { 1: { map: MapId.VictoryRoad2f, pos: { x: 0, y: 8 } } },
   },
   exits: {
     17: [8, 9],
@@ -38,7 +41,7 @@ const victoryRoad1f: MapType = {
   exitReturnPos: { x: 4, y: 32 },
   music: "/game/music/maps-original/victory-road.mp3",
   grass: {},
-  minimapPos: { x: 30, y: 60 },
+  minimapPos: { x: 29, y: 65 },
 };
 
 export default victoryRoad1f;

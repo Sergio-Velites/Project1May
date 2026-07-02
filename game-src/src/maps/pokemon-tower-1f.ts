@@ -29,7 +29,10 @@ const pokemonTower1f: MapType = {
   },
   text: {},
   maps: {
-    9: { 18: MapId.PokemonTower2f },
+
+  },
+  teleports: {
+    9: { 18: { map: MapId.PokemonTower2f, pos: { x: 18, y: 9 } } },
   },
   exits: {
     17: [10, 11],
@@ -38,7 +41,7 @@ const pokemonTower1f: MapType = {
   exitReturnPos: { x: 14, y: 6 },
   music: "/game/music/maps-original/pokemon-tower.mp3",
   grass: {},
-  minimapPos: { x: 194, y: 76 },
+  minimapPos: { x: 197, y: 71 },
 };
 
 export default pokemonTower1f;

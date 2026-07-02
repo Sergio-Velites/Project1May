@@ -68,7 +68,7 @@ const route3PokemonCenter: MapType = {
       isOnline: true,
     },
   ],
-  minimapPos: { x: 91, y: 48 },
+  minimapPos: { x: 88, y: 48 },
 };
 
 

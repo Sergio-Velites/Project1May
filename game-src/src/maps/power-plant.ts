@@ -56,7 +56,7 @@ const powerPlant: MapType = {
   exitReturnMap: MapId.Route10,
   exitReturnPos: { x: 6, y: 40 },
   grass: {},
-  minimapPos: { x: 190, y: 100 },
+  minimapPos: { x: 201, y: 70 },
 };
 
 export default powerPlant;

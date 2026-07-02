@@ -27,7 +27,7 @@ const route4Gate: MapType = {
     7: { 4: { map: MapId.Route2, pos: { x: 15, y: 40 } }, 5: { map: MapId.Route2, pos: { x: 15, y: 40 } } },
   },
   grass: {},
-  minimapPos: { x: 124, y: 44 },
+  minimapPos: { x: 53, y: 100 },
 };
 
 export default route4Gate;
