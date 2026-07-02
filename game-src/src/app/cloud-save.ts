@@ -11,20 +11,41 @@ const SUPABASE_ANON_KEY =
 
 // Modo mantenimiento global: el juego lo consulta al arrancar. Fail-open (si no
 // se puede comprobar, se deja jugar) y con timeout para no bloquear el arranque.
-export const fetchMaintenance = async (): Promise<{ maintenance: boolean; message: string }> => {
+// El dispositivo se identifica con su player_id + write_token (mismas claves de
+// localStorage que usa el guardado, definidas más abajo): si el admin ha puesto
+// a este jugador en la lista de acceso, el servidor responde bypass=true y el
+// juego arranca con normalidad aunque el mantenimiento esté activo.
+export const fetchMaintenance = async (): Promise<{
+  maintenance: boolean;
+  message: string;
+  bypass: boolean;
+}> => {
+  const OPEN = { maintenance: false, message: "", bypass: false };
   try {
-    if (!SUPABASE_URL) return { maintenance: false, message: "" };
+    if (!SUPABASE_URL) return OPEN;
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 4000);
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/maintenance`, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+    const playerId = localStorage.getItem("wedding_user_id");
+    const writeToken = localStorage.getItem("wedding_write_token");
+    const qs = playerId ? `?player=${encodeURIComponent(playerId)}` : "";
+    const headers: Record<string, string> = {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    };
+    if (playerId && writeToken) headers["x-write-token"] = writeToken;
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/maintenance${qs}`, {
+      headers,
       signal: ctrl.signal,
     }).finally(() => clearTimeout(timer));
-    if (!res.ok) return { maintenance: false, message: "" };
+    if (!res.ok) return OPEN;
     const d = await res.json();
-    return { maintenance: !!d.maintenance, message: typeof d.message === "string" ? d.message : "" };
+    return {
+      maintenance: !!d.maintenance,
+      message: typeof d.message === "string" ? d.message : "",
+      bypass: !!d.bypass,
+    };
   } catch {
-    return { maintenance: false, message: "" };
+    return OPEN;
   }
 };
 

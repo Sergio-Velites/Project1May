@@ -32,7 +32,9 @@ const App = () => {
     fetchMaintenance()
       .then((r) => {
         if (!alive) return;
-        if (r.maintenance) {
+        // `bypass`: el servidor ha verificado que este jugador está en la lista
+        // de acceso del mantenimiento (player_id + write_token) → juega normal.
+        if (r.maintenance && !r.bypass) {
           setMessage(r.message);
           setPhase("maintenance");
         } else {

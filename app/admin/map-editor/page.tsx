@@ -1979,9 +1979,49 @@ export default function MapEditor() {
   // Modo mantenimiento del juego (flag en Supabase; toggle instantáneo).
   const [maintenance, setMaintenance] = useState<boolean | null>(null);
   const [maintBusy, setMaintBusy] = useState(false);
+  // Jugadores con acceso durante el mantenimiento (allowlist en app_config,
+  // verificada en servidor con player_id + write_token).
+  const [maintAllowed, setMaintAllowed] = useState<string[]>([]);
+  const [maintPlayers, setMaintPlayers] = useState<{ playerId: string; name: string; pokemonCount: number }[]>([]);
+  const [maintPanelOpen, setMaintPanelOpen] = useState(false);
+  const [maintSearch, setMaintSearch] = useState('');
   useEffect(() => {
-    fetch('/api/admin/maintenance').then((r) => r.json()).then((d) => setMaintenance(!!d.maintenance)).catch(() => {});
+    fetch('/api/admin/maintenance').then((r) => r.json()).then((d) => {
+      setMaintenance(!!d.maintenance);
+      if (Array.isArray(d.allowedPlayers)) setMaintAllowed(d.allowedPlayers);
+    }).catch(() => {});
   }, []);
+  const openMaintPanel = async () => {
+    setMaintPanelOpen(true);
+    try {
+      const d = await fetch('/api/admin/maintenance?players=1').then((r) => r.json());
+      if (Array.isArray(d.allowedPlayers)) setMaintAllowed(d.allowedPlayers);
+      if (Array.isArray(d.players)) setMaintPlayers(d.players);
+    } catch {
+      setCommitMsg({ text: 'No se pudo cargar la lista de jugadores.', tone: 'err' });
+    }
+  };
+  const toggleAllowedPlayer = async (playerId: string) => {
+    const id = playerId.toLowerCase();
+    const next = maintAllowed.some((p) => p.toLowerCase() === id)
+      ? maintAllowed.filter((p) => p.toLowerCase() !== id)
+      : [...maintAllowed, id];
+    const prev = maintAllowed;
+    setMaintAllowed(next); // optimista; se revierte si el POST falla
+    try {
+      const r = await fetch('/api/admin/maintenance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ allowedPlayers: next }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || r.statusText);
+      if (Array.isArray(d.allowedPlayers)) setMaintAllowed(d.allowedPlayers);
+    } catch (e) {
+      setMaintAllowed(prev);
+      setCommitMsg({ text: `No se pudo actualizar el acceso: ${String(e)}`, tone: 'err' });
+    }
+  };
   const toggleMaintenance = async () => {
     if (maintBusy || maintenance === null) return;
     const next = !maintenance;
@@ -4358,6 +4398,82 @@ export default function MapEditor() {
         >
           {maintenance === null ? '🚧 …' : maintBusy ? '🚧 …' : maintenance ? '🚧 Mantenimiento: ON' : '🚧 Mantenimiento'}
         </button>
+
+        {/* Acceso durante mantenimiento (allowlist de jugadores) */}
+        <button
+          className="me-tb-secondary"
+          onClick={openMaintPanel}
+          title="Elige qué invitados pueden seguir jugando mientras el juego está en mantenimiento (verificado en servidor con su dispositivo)."
+          style={{
+            padding: '4px 12px',
+            background: maintAllowed.length ? '#1a2a1a' : '#1a1a2a',
+            border: `1px solid ${maintAllowed.length ? '#3a7a3a' : '#5a3a3a'}`,
+            borderRadius: 4,
+            color: maintAllowed.length ? '#99e099' : '#cca0a0',
+            cursor: 'pointer',
+            fontSize: 12,
+          }}
+        >
+          🎟 Acceso{maintAllowed.length ? `: ${maintAllowed.length}` : ''}
+        </button>
+        {maintPanelOpen && (
+          <div
+            style={{
+              position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(0,0,0,0.55)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+            onClick={() => setMaintPanelOpen(false)}
+          >
+            <div
+              style={{
+                width: 'min(440px, 92vw)', maxHeight: '80vh', overflow: 'auto',
+                background: '#161622', border: '1px solid #4a4a6a', borderRadius: 8,
+                padding: 16, color: '#ddd', fontSize: 13,
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <strong>🎟 Acceso durante mantenimiento</strong>
+                <button onClick={() => setMaintPanelOpen(false)} style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontSize: 16 }}>✕</button>
+              </div>
+              <p style={{ margin: '0 0 10px', color: '#9a9ab0', fontSize: 12 }}>
+                Los invitados marcados pueden seguir jugando con el mantenimiento activo
+                {maintenance ? ' (AHORA MISMO está activo).' : ' (ahora está desactivado).'}
+                {' '}La verificación es en servidor: solo funciona desde el dispositivo del propio invitado.
+              </p>
+              <input
+                placeholder="Buscar invitado…"
+                value={maintSearch}
+                onChange={(e) => setMaintSearch(e.target.value)}
+                style={{ width: '100%', padding: '6px 8px', marginBottom: 8, background: '#0e0e18', border: '1px solid #3a3a5a', borderRadius: 4, color: '#eee' }}
+              />
+              {maintPlayers.length === 0 && <div style={{ color: '#888' }}>Cargando jugadores…</div>}
+              {maintPlayers
+                .filter((p) => !maintSearch || p.name.toLowerCase().includes(maintSearch.toLowerCase()))
+                .map((p) => {
+                  const on = maintAllowed.some((id) => id.toLowerCase() === p.playerId.toLowerCase());
+                  return (
+                    <label
+                      key={p.playerId}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px',
+                        borderRadius: 4, cursor: 'pointer',
+                        background: on ? '#1a2a1a' : 'transparent',
+                        border: `1px solid ${on ? '#3a7a3a' : 'transparent'}`,
+                        marginBottom: 2,
+                      }}
+                    >
+                      <input type="checkbox" checked={on} onChange={() => toggleAllowedPlayer(p.playerId)} />
+                      <span style={{ flex: 1 }}>
+                        {p.name} <span style={{ color: '#777', fontSize: 11 }}>· {p.pokemonCount} PKMN</span>
+                      </span>
+                      <code style={{ color: '#666', fontSize: 10 }}>{p.playerId.slice(0, 8)}…</code>
+                    </label>
+                  );
+                })}
+            </div>
+          </div>
+        )}
 
         {/* Importar .ts (sustituye todo el mapa) */}
         <button
