@@ -65,7 +65,10 @@ walls: {
       ],
     },
   },
-  maps: {},
+  maps: {
+    // Borde sur (playa) → Ruta 21 (ruta de agua hacia Isla Cinabria; requiere Surf)
+    17: { 9: MapId.Route21, 10: MapId.Route21 },
+  },
   exits: {},
   music: music,
   grass: {},

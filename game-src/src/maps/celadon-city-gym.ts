@@ -1,5 +1,5 @@
 import image from "../assets/map/celadon-city-gym.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const celadonCityGym: MapType = {
   name: "Gimnasio Ciudad Celedon",
@@ -31,6 +31,8 @@ const celadonCityGym: MapType = {
   exits: {
     17: [4, 5],
   },
+  exitReturnMap: MapId.CeladonCity,
+  exitReturnPos: { x: 12, y: 28 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
   minimapPos: { x: 111, y: 76 },

@@ -1,5 +1,5 @@
 import image from "../assets/map/cinnabar-island-gym.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const cinnabarIslandGym: MapType = {
   name: "Gimnasio Isla Cinabria",
@@ -34,6 +34,8 @@ const cinnabarIslandGym: MapType = {
   exits: {
     17: [16, 17],
   },
+  exitReturnMap: MapId.CinnabarIsland,
+  exitReturnPos: { x: 18, y: 4 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
   minimapPos: { x: 53, y: 194 },

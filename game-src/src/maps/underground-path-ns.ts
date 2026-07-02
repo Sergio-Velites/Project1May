@@ -1,5 +1,5 @@
 import image from "../assets/map/underground-path-ns.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const undergroundPathNS: MapType = {
   name: "Camino Subterráneo N-S",
@@ -60,6 +60,12 @@ const undergroundPathNS: MapType = {
   text: {},
   maps: {
 
+  },
+  teleports: {
+    // Escalera norte (5,3) → caseta de Ruta 5
+    3: { 5: { map: MapId.Route5, pos: { x: 17, y: 28 } } },
+    // Escalera sur (2,41) → caseta de Ruta 6
+    41: { 2: { map: MapId.Route6, pos: { x: 17, y: 14 } } },
   },
   exits: {
 

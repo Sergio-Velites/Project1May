@@ -33,8 +33,15 @@ const seafoamIslands1f: MapType = {
     5: { 7: MapId.SeafoamIslands2f },
     15: { 23: MapId.SeafoamIslands2f },
   },
-  exits: {
-    17: [4, 5, 26, 27],
+  exits: {},
+  teleports: {
+    // Boca oeste (cols 4-5) y boca este (cols 26-27) → Ruta 20
+    17: {
+      4: { map: MapId.Route20, pos: { x: 48, y: 6 } },
+      5: { map: MapId.Route20, pos: { x: 48, y: 6 } },
+      26: { map: MapId.Route20, pos: { x: 58, y: 10 } },
+      27: { map: MapId.Route20, pos: { x: 58, y: 10 } },
+    },
   },
   grass: {},
   minimapPos: { x: 89, y: 185 },

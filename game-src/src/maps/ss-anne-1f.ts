@@ -32,6 +32,13 @@ const ssAnne1f: MapType = {
     6: { 2: MapId.SsAnne2f },
     15: { 37: MapId.SsAnneBf1 },
   },
+  teleports: {
+    // Pasarela (cols 26-27, fila 0) → muelle del puerto de Ciudad Carmín
+    0: {
+      26: { map: MapId.VermilionCity, pos: { x: 18, y: 30 } },
+      27: { map: MapId.VermilionCity, pos: { x: 19, y: 30 } },
+    },
+  },
   exits: {
 
   },

@@ -29,11 +29,16 @@ const route16: MapType = {
   },
   text: {},
   maps: {
-    4: { 17: MapId.Route16Gate, 24: MapId.Route16Gate },
-    5: { 17: MapId.Route16Gate, 24: MapId.Route16Gate },
-    10: { 17: MapId.Route16Gate, 24: MapId.Route16Gate, 39: MapId.CeladonCity },
-    11: { 17: MapId.Route16Gate, 24: MapId.Route16Gate },
+    10: { 39: MapId.CeladonCity },
     17: { 1: MapId.Route17, 2: MapId.Route17, 3: MapId.Route17, 4: MapId.Route17, 6: MapId.Route17, 7: MapId.Route17, 8: MapId.Route17, 9: MapId.Route17, 10: MapId.Route17, 11: MapId.Route17, 13: MapId.Route17 },
+  },
+  teleports: {
+    // Caseta Ruta 16 (pasa de la mitad oeste a la este). Puerta oeste col 17,
+    // puerta este col 24. Se entra en el extremo correspondiente del pasaje.
+    4: { 17: { map: MapId.Route16Gate, pos: { x: 1, y: 2 } }, 24: { map: MapId.Route16Gate, pos: { x: 6, y: 2 } } },
+    5: { 17: { map: MapId.Route16Gate, pos: { x: 1, y: 3 } }, 24: { map: MapId.Route16Gate, pos: { x: 6, y: 3 } } },
+    10: { 17: { map: MapId.Route16Gate, pos: { x: 1, y: 8 } }, 24: { map: MapId.Route16Gate, pos: { x: 6, y: 8 } } },
+    11: { 17: { map: MapId.Route16Gate, pos: { x: 1, y: 9 } }, 24: { map: MapId.Route16Gate, pos: { x: 6, y: 9 } } },
   },
   exits: {
 

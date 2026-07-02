@@ -15,7 +15,7 @@ const mtMoon2f: MapType = {
   height: 28,
   width: 28,
   start: {
-    x: 3,
+    x: 4,
     y: 6,
   },
   walls: {

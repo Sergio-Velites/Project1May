@@ -1,5 +1,5 @@
 import image from "../assets/map/saffron-city-copycat-house.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const saffronCityCopycatHouse: MapType = {
   name: "Casa Mimica",
@@ -20,6 +20,8 @@ const saffronCityCopycatHouse: MapType = {
   exits: {
     7: [2, 3],
   },
+  exitReturnMap: MapId.SaffronCity,
+  exitReturnPos: { x: 7, y: 6 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
   minimapPos: { x: 147, y: 76 },

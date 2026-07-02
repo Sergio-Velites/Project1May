@@ -1,5 +1,5 @@
 import image from "../assets/map/saffron-city-fighting-dojo.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const saffronCityFightingDojo: MapType = {
   name: "Dojo de Lucha",
@@ -28,6 +28,8 @@ const saffronCityFightingDojo: MapType = {
   exits: {
     11: [4, 5],
   },
+  exitReturnMap: MapId.SaffronCity,
+  exitReturnPos: { x: 26, y: 4 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
   minimapPos: { x: 147, y: 76 },

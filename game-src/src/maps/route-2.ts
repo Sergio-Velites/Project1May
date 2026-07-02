@@ -138,14 +138,15 @@ const route2: MapType = {
       },
     },
   maps: {
-    0: { 8: MapId.PewterCity, 9: MapId.PewterCity },
     9: { 12: MapId.DiglettsCave },
-    35: { 16: MapId.Route4Gate },
-    39: { 15: MapId.Route4Gate },
     71: { 7: MapId.ViridianCity, 8: MapId.ViridianCity, 9: MapId.ViridianCity },
   },
   teleports: {
-
+    // Extremo norte de Ruta 2 → Control Ruta 2 (acceso a EL BOSQUECILLO).
+    0: { 8: { map: MapId.Route2Gate, pos: { x: 5, y: 6 } }, 9: { map: MapId.Route2Gate, pos: { x: 4, y: 6 } } },
+    // Caseta interior de Ruta 2 (paso N-S). Puerta norte (16,35), puerta sur (15,39).
+    35: { 16: { map: MapId.Route4Gate, pos: { x: 5, y: 1 } } },
+    39: { 15: { map: MapId.Route4Gate, pos: { x: 5, y: 6 } } },
   },
   exits: {
 

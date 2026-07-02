@@ -1,5 +1,5 @@
 import image from "../assets/map/cinnabar-island-poke-mart.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const cinnabarIslandPokeMart: MapType = {
   name: "Tienda Pokemon",
@@ -22,6 +22,8 @@ const cinnabarIslandPokeMart: MapType = {
   exits: {
     7: [3, 4],
   },
+  exitReturnMap: MapId.CinnabarIsland,
+  exitReturnPos: { x: 15, y: 12 },
   music: "/game/music/maps-original/cinnabar-island.mp3",
   grass: {},
   minimapPos: { x: 53, y: 194 },

@@ -1,5 +1,5 @@
 import image from "../assets/map/underground-path-ew.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const undergroundPathEW: MapType = {
   name: "Camino Subterráneo E-O",
@@ -20,6 +20,12 @@ const undergroundPathEW: MapType = {
   text: {},
   maps: {
 
+  },
+  teleports: {
+    // Escalera este (47,2) → caseta de Ruta 8
+    2: { 47: { map: MapId.Route8, pos: { x: 13, y: 4 } } },
+    // Escalera oeste (2,5) → caseta de Ruta 7
+    5: { 2: { map: MapId.Route7, pos: { x: 5, y: 14 } } },
   },
   exits: {
 

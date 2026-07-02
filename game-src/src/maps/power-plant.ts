@@ -1,5 +1,5 @@
 import image from "../assets/map/power-plant.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const powerPlant: MapType = {
   name: "Central Electrica",
@@ -53,6 +53,8 @@ const powerPlant: MapType = {
     11: [0],
     35: [4, 5],
   },
+  exitReturnMap: MapId.Route10,
+  exitReturnPos: { x: 6, y: 40 },
   grass: {},
   minimapPos: { x: 190, y: 100 },
 };

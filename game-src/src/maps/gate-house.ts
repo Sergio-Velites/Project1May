@@ -25,12 +25,12 @@ const gateHouse: MapType = {
 
   },
   teleports: {
-
+    // Norte → Camino a la liga Pokémon (extremo sur)
+    0: { 4: { map: MapId.LeagueRoute, pos: { x: 9, y: 156 } }, 5: { map: MapId.LeagueRoute, pos: { x: 9, y: 156 } } },
+    // Sur → Ruta 22 (delante de la caseta)
+    7: { 4: { map: MapId.Route22, pos: { x: 8, y: 6 } }, 5: { map: MapId.Route22, pos: { x: 8, y: 6 } } },
   },
-  exits: {
-    0: [4, 5],
-    7: [4, 5],
-  },
+  exits: {},
   exitReturnMap: MapId.Route22,
   exitReturnPos: { x: 8, y: 6 },
   gifts: [

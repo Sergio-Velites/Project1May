@@ -1,5 +1,5 @@
 import image from "../assets/map/celadon-city-game-corner.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const celadonCityGameCorner: MapType = {
   name: "Salon Recreativo",
@@ -31,6 +31,8 @@ const celadonCityGameCorner: MapType = {
   exits: {
     17: [15, 16],
   },
+  exitReturnMap: MapId.CeladonCity,
+  exitReturnPos: { x: 28, y: 20 },
   music: "/game/music/maps-original/rocket-game-corner.mp3",
   grass: {},
   minimapPos: { x: 111, y: 76 },

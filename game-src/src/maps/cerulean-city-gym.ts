@@ -1,5 +1,5 @@
 import image from "../assets/map/cerulean-city-gym.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const ceruleanCityGym: MapType = {
   name: "Gimnasio Ciudad Celeste",
@@ -28,6 +28,8 @@ const ceruleanCityGym: MapType = {
   exits: {
     13: [4, 5],
   },
+  exitReturnMap: MapId.CeruleanCity,
+  exitReturnPos: { x: 30, y: 20 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
   minimapPos: { x: 147, y: 41 },

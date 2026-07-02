@@ -1,5 +1,5 @@
 import image from "../assets/map/fuchsia-city-warden-house.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const fuchsiaCityWardenHouse: MapType = {
   name: "Casa del Guarda",
@@ -21,6 +21,8 @@ const fuchsiaCityWardenHouse: MapType = {
   exits: {
     7: [4, 5],
   },
+  exitReturnMap: MapId.FuchsiaCity,
+  exitReturnPos: { x: 27, y: 28 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
   minimapPos: { x: 124, y: 170 },

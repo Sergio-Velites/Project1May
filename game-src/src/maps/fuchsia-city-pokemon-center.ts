@@ -1,5 +1,5 @@
 import image from "../assets/map/fuchsia-city-pokemon-center.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const fuchsiaCityPokemonCenter: MapType = {
   name: "Centro Pokemon",
@@ -24,6 +24,8 @@ const fuchsiaCityPokemonCenter: MapType = {
   exits: {
     7: [3, 4],
   },
+  exitReturnMap: MapId.FuchsiaCity,
+  exitReturnPos: { x: 19, y: 28 },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
   minimapPos: { x: 124, y: 170 },

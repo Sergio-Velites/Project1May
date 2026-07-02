@@ -1,5 +1,5 @@
 import image from "../assets/map/celadon-city-house-a.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const celadonCityHouseA: MapType = {
   name: "Casa Ciudad Celedon",
@@ -22,6 +22,8 @@ const celadonCityHouseA: MapType = {
   exits: {
     7: [2, 3],
   },
+  exitReturnMap: MapId.CeladonCity,
+  exitReturnPos: { x: 35, y: 28 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
   minimapPos: { x: 111, y: 76 },

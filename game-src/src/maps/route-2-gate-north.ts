@@ -31,12 +31,12 @@ maps: {
 
   },
 teleports: {
-
+    // Norte → VILLAMAYOR DE MONJARDÍN (Pewter)
+    0: { 4: { map: MapId.PewterCity, pos: { x: 8, y: 34 } }, 5: { map: MapId.PewterCity, pos: { x: 8, y: 34 } } },
+    // Sur → EL BOSQUECILLO (salida norte del bosque)
+    7: { 4: { map: MapId.ViridianForrest, pos: { x: 1, y: 1 } }, 5: { map: MapId.ViridianForrest, pos: { x: 1, y: 1 } } },
   },
-exits: {
-    0: [4, 5],
-    7: [4, 5],
-  },
+exits: {},
 exitReturnMap: MapId.ViridianForrest,
 exitReturnPos: { x: 1, y: 1 },
 items: [

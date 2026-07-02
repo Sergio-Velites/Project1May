@@ -1,5 +1,5 @@
 import image from "../assets/map/route-12-gate.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const route12Gate: MapType = {
   name: "Caseta Ruta 12",
@@ -21,9 +21,11 @@ const route12Gate: MapType = {
   maps: {
 
   },
-  exits: {
-    0: [4, 5],
-    7: [4, 5],
+  exits: {},
+  teleports: {
+    // Pasaje N-S: norte (row 0) ↔ sur (row 7) de Ruta 12
+    0: { 4: { map: MapId.Route12, pos: { x: 10, y: 14 } }, 5: { map: MapId.Route12, pos: { x: 11, y: 14 } } },
+    7: { 4: { map: MapId.Route12, pos: { x: 10, y: 22 } }, 5: { map: MapId.Route12, pos: { x: 11, y: 22 } } },
   },
   grass: {},
   minimapPos: { x: 166, y: 119 },

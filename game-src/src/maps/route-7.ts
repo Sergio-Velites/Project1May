@@ -61,6 +61,10 @@ const route7: MapType = {
     14: { 19: MapId.SaffronCity },
     15: { 19: MapId.SaffronCity },
   },
+  teleports: {
+    // Caseta suroeste → Camino Subterráneo E-O (escalera oeste)
+    13: { 5: { map: MapId.UndergroundPathEW, pos: { x: 3, y: 5 } } },
+  },
   exits: {
 
   },

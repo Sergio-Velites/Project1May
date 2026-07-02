@@ -58,7 +58,7 @@ const celadonCity: MapType = {
     11: { 49: MapId.Route7 },
     13: { 8: MapId.CeladonCityPokeMart, 10: MapId.CeladonCityPokeMart },
     18: { 0: MapId.Route16 },
-    19: { 28: MapId.CeladonCityGameCorner, 33: MapId.CeladonCityPrizeRoom, 39: MapId.CeladonCityDeptStore5f },
+    19: { 28: MapId.CeladonCityGameCorner, 33: MapId.CeladonCityPrizeRoom, 39: MapId.CeladonCityDeptStore1f },
     27: { 12: MapId.CeladonCityGym, 31: MapId.CeladonCityHouseB, 35: MapId.CeladonCityHouseA },
   },
   exits: {

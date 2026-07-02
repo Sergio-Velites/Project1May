@@ -155,6 +155,17 @@ text: {
   maps: {
 
   },
+  teleports: {
+    // Salida norte (row 0, cols 1-2) → Control Ruta 2 Norte → VILLAMAYOR (Pewter)
+    0: { 1: { map: MapId.Route2GateNorth, pos: { x: 5, y: 6 } }, 2: { map: MapId.Route2GateNorth, pos: { x: 5, y: 6 } } },
+    // Salida sur (row 47, cols 15-18) → Control Ruta 2 → Ruta 2
+    47: {
+      15: { map: MapId.Route2Gate, pos: { x: 5, y: 1 } },
+      16: { map: MapId.Route2Gate, pos: { x: 5, y: 1 } },
+      17: { map: MapId.Route2Gate, pos: { x: 5, y: 1 } },
+      18: { map: MapId.Route2Gate, pos: { x: 5, y: 1 } },
+    },
+  },
   exits: {
 
   },

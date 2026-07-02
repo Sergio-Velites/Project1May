@@ -1,5 +1,5 @@
 import image from "../assets/map/vermilion-city-fan-club.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const vermilionCityFanClub: MapType = {
   name: "Club de Aficionados Pokemon",
@@ -20,6 +20,8 @@ const vermilionCityFanClub: MapType = {
   exits: {
     7: [2, 3],
   },
+  exitReturnMap: MapId.VermilionCity,
+  exitReturnPos: { x: 9, y: 14 },
   music: "/game/music/maps-original/vermilion-city.mp3",
   grass: {},
   minimapPos: { x: 147, y: 123 },

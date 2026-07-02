@@ -86,6 +86,10 @@ walls: {
     8: { 39: MapId.ViridianCity },
     9: { 39: MapId.ViridianCity },
   },
+  teleports: {
+    // Puerta de la Caseta de Control (edificio noroeste) → camino a la liga
+    5: { 8: { map: MapId.GateHouse, pos: { x: 4, y: 6 } } },
+  },
   exits: {
 
   },

@@ -45,6 +45,8 @@ const pokemonMansion1f: MapType = {
   exits: {
     27: [4, 5, 6, 7, 26, 27],
   },
+  exitReturnMap: MapId.CinnabarIsland,
+  exitReturnPos: { x: 6, y: 4 },
   music: "/game/music/maps-original/pokemon-mansion.mp3",
   grass: {},
   minimapPos: { x: 53, y: 194 },

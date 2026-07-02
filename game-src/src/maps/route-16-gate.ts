@@ -1,5 +1,5 @@
 import image from "../assets/map/route-16-gate.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const route16Gate: MapType = {
   name: "Caseta Ruta 16",
@@ -21,11 +21,14 @@ const route16Gate: MapType = {
   maps: {
 
   },
-  exits: {
-    2: [0, 7],
-    3: [0, 7],
-    8: [0, 7],
-    9: [0, 7],
+  exits: {},
+  teleports: {
+    // Pasaje superior (rows 2-3): oeste (col 0) ↔ este (col 7) de Ruta 16
+    2: { 0: { map: MapId.Route16, pos: { x: 16, y: 4 } }, 7: { map: MapId.Route16, pos: { x: 25, y: 4 } } },
+    3: { 0: { map: MapId.Route16, pos: { x: 16, y: 5 } }, 7: { map: MapId.Route16, pos: { x: 25, y: 5 } } },
+    // Pasaje inferior (rows 8-9): oeste (col 0) ↔ este (col 7) de Ruta 16
+    8: { 0: { map: MapId.Route16, pos: { x: 16, y: 10 } }, 7: { map: MapId.Route16, pos: { x: 25, y: 10 } } },
+    9: { 0: { map: MapId.Route16, pos: { x: 16, y: 11 } }, 7: { map: MapId.Route16, pos: { x: 25, y: 10 } } },
   },
   grass: {},
   minimapPos: { x: 94, y: 98 },

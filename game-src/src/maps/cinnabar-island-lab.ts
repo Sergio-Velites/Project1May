@@ -1,5 +1,5 @@
 import image from "../assets/map/cinnabar-island-lab.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const cinnabarIslandLab: MapType = {
   name: "Laboratorio de Cinabria",
@@ -21,6 +21,8 @@ const cinnabarIslandLab: MapType = {
   exits: {
     7: [2, 3],
   },
+  exitReturnMap: MapId.CinnabarIsland,
+  exitReturnPos: { x: 6, y: 10 },
   music: "/game/music/maps-original/pokemon-lab.mp3",
   grass: {},
   minimapPos: { x: 53, y: 194 },

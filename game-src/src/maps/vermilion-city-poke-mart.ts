@@ -1,5 +1,5 @@
 import image from "../assets/map/vermilion-city-poke-mart.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const vermilionCityPokeMart: MapType = {
   name: "Tienda Pokemon",
@@ -22,6 +22,8 @@ const vermilionCityPokeMart: MapType = {
   exits: {
     7: [3, 4],
   },
+  exitReturnMap: MapId.VermilionCity,
+  exitReturnPos: { x: 23, y: 14 },
   music: "/game/music/maps-original/vermilion-city.mp3",
   grass: {},
   minimapPos: { x: 147, y: 123 },

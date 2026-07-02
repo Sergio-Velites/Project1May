@@ -1,5 +1,5 @@
 import image from "../assets/map/celadon-city-prize-room.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const celadonCityPrizeRoom: MapType = {
   name: "Sala de Premios",
@@ -21,6 +21,8 @@ const celadonCityPrizeRoom: MapType = {
   exits: {
     7: [4, 5],
   },
+  exitReturnMap: MapId.CeladonCity,
+  exitReturnPos: { x: 33, y: 20 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
   minimapPos: { x: 111, y: 76 },

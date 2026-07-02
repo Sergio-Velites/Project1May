@@ -1,5 +1,5 @@
 import image from "../assets/map/vermilion-city-house-b.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const vermilionCityHouseB: MapType = {
   name: "Casa Ciudad Carmin",
@@ -22,6 +22,8 @@ const vermilionCityHouseB: MapType = {
   exits: {
     7: [2, 3],
   },
+  exitReturnMap: MapId.VermilionCity,
+  exitReturnPos: { x: 23, y: 20 },
   music: "/game/music/maps-original/vermilion-city.mp3",
   grass: {},
   minimapPos: { x: 147, y: 123 },

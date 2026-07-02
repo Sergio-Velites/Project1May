@@ -25,15 +25,13 @@ const route2Gate: MapType = {
   maps: {
 
   },
-  exits: {
-    0: [4, 5],
-    7: [4, 5],
+  exits: {},
+  teleports: {
+    // Norte → EL BOSQUECILLO (entrada sur del bosque)
+    0: { 4: { map: MapId.ViridianForrest, pos: { x: 17, y: 46 } }, 5: { map: MapId.ViridianForrest, pos: { x: 16, y: 46 } } },
+    // Sur → Ruta 2 (extremo norte)
+    7: { 4: { map: MapId.Route2, pos: { x: 8, y: 1 } }, 5: { map: MapId.Route2, pos: { x: 9, y: 1 } } },
   },
-  exitReturnPos: {
-    x: 3,
-    y: 44,
-  },
-  exitReturnMap: MapId.Route2,
   minimapPos: { x: 53, y: 82 },
 };
 

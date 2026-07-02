@@ -35,6 +35,8 @@ const silphCo1f: MapType = {
   exits: {
     17: [10, 11],
   },
+  exitReturnMap: MapId.SaffronCity,
+  exitReturnPos: { x: 18, y: 22 },
   music: "/game/music/maps-original/silph-co.mp3",
   grass: {},
   minimapPos: { x: 147, y: 76 },

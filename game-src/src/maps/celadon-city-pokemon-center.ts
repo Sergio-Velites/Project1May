@@ -1,5 +1,5 @@
 import image from "../assets/map/celadon-city-pokemon-center.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const celadonCityPokemonCenter: MapType = {
   name: "Centro Pokemon",
@@ -24,6 +24,8 @@ const celadonCityPokemonCenter: MapType = {
   exits: {
     7: [3, 4],
   },
+  exitReturnMap: MapId.CeladonCity,
+  exitReturnPos: { x: 41, y: 10 },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
   minimapPos: { x: 111, y: 76 },

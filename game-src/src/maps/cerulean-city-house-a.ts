@@ -1,5 +1,5 @@
 import image from "../assets/map/cerulean-city-house-a.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const ceruleanCityHouseA: MapType = {
   name: "Casa Ciudad Celeste",
@@ -22,6 +22,8 @@ const ceruleanCityHouseA: MapType = {
   exits: {
     7: [2, 3],
   },
+  exitReturnMap: MapId.CeruleanCity,
+  exitReturnPos: { x: 13, y: 16 },
   music: "/game/music/maps-original/cerulean-city.mp3",
   grass: {},
   minimapPos: { x: 147, y: 41 },

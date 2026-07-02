@@ -65,6 +65,13 @@ const vermilionCity: MapType = {
     15: { 39: MapId.Route11 },
     19: { 12: MapId.VermilionCityGym, 23: MapId.VermilionCityHouseB },
   },
+  teleports: {
+    // Muelle del puerto (extremo sur) → pasarela del S.S. Aguamarina
+    31: {
+      18: { map: MapId.SsAnne1f, pos: { x: 26, y: 5 } },
+      19: { map: MapId.SsAnne1f, pos: { x: 27, y: 5 } },
+    },
+  },
   exits: {
 
   },

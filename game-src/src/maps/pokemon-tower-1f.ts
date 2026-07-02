@@ -34,6 +34,8 @@ const pokemonTower1f: MapType = {
   exits: {
     17: [10, 11],
   },
+  exitReturnMap: MapId.LavenderTown,
+  exitReturnPos: { x: 14, y: 6 },
   music: "/game/music/maps-original/pokemon-tower.mp3",
   grass: {},
   minimapPos: { x: 194, y: 76 },

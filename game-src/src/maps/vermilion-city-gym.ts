@@ -1,5 +1,5 @@
 import image from "../assets/map/vermilion-city-gym.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const vermilionCityGym: MapType = {
   name: "Gimnasio Ciudad Carmin",
@@ -27,6 +27,8 @@ const vermilionCityGym: MapType = {
   exits: {
     17: [4, 5],
   },
+  exitReturnMap: MapId.VermilionCity,
+  exitReturnPos: { x: 12, y: 20 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
   minimapPos: { x: 147, y: 123 },

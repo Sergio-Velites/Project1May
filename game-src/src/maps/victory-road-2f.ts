@@ -38,6 +38,8 @@ const victoryRoad2f: MapType = {
     7: [29],
     8: [29],
   },
+  exitReturnMap: MapId.Route23,
+  exitReturnPos: { x: 14, y: 32 },
   music: "/game/music/maps-original/victory-road.mp3",
   grass: {},
   minimapPos: { x: 30, y: 75 },

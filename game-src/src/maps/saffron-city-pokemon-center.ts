@@ -1,5 +1,5 @@
 import image from "../assets/map/saffron-city-pokemon-center.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const saffronCityPokemonCenter: MapType = {
   name: "Centro Pokemon",
@@ -24,6 +24,8 @@ const saffronCityPokemonCenter: MapType = {
   exits: {
     7: [3, 4],
   },
+  exitReturnMap: MapId.SaffronCity,
+  exitReturnPos: { x: 9, y: 30 },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
   minimapPos: { x: 147, y: 76 },

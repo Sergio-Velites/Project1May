@@ -1,5 +1,5 @@
 import image from "../assets/map/fuchsia-city-gym.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const fuchsiaCityGym: MapType = {
   name: "Gimnasio Ciudad Fucsia",
@@ -30,6 +30,8 @@ const fuchsiaCityGym: MapType = {
   exits: {
     17: [4, 5],
   },
+  exitReturnMap: MapId.FuchsiaCity,
+  exitReturnPos: { x: 5, y: 28 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
   minimapPos: { x: 124, y: 170 },

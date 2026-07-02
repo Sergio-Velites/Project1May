@@ -1,5 +1,5 @@
 import image from "../assets/map/saffron-city-house-a.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const saffronCityHouseA: MapType = {
   name: "Casa Ciudad Azafran",
@@ -22,6 +22,8 @@ const saffronCityHouseA: MapType = {
   exits: {
     7: [2, 3],
   },
+  exitReturnMap: MapId.SaffronCity,
+  exitReturnPos: { x: 29, y: 30 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
   minimapPos: { x: 147, y: 76 },

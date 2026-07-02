@@ -48,6 +48,18 @@ const route20: MapType = {
     5: { 48: MapId.SeafoamIslands1f },
     9: { 58: MapId.SeafoamIslands1f },
   },
+  teleports: {
+    // Borde oeste (col 46) → Isla Cinabria
+    3: { 46: { map: MapId.CinnabarIsland, pos: { x: 18, y: 9 } } },
+    5: { 46: { map: MapId.CinnabarIsland, pos: { x: 18, y: 9 } } },
+    6: { 46: { map: MapId.CinnabarIsland, pos: { x: 18, y: 9 } } },
+    7: { 46: { map: MapId.CinnabarIsland, pos: { x: 18, y: 9 } } },
+    8: { 46: { map: MapId.CinnabarIsland, pos: { x: 18, y: 9 } } },
+    9: { 46: { map: MapId.CinnabarIsland, pos: { x: 18, y: 9 } } },
+    // Borde este (col 61) → Ruta 19 (bajada a Ciudad Fucsia)
+    2: { 61: { map: MapId.Route19, pos: { x: 1, y: 5 } } },
+    4: { 61: { map: MapId.Route19, pos: { x: 1, y: 5 } } },
+  },
   exits: {
 
   },

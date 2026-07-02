@@ -134,8 +134,6 @@ const route12: MapType = {
   text: {},
   maps: {
     0: { 8: MapId.LavenderTown, 9: MapId.LavenderTown, 10: MapId.LavenderTown },
-    15: { 10: MapId.Route12Gate, 11: MapId.Route12Gate },
-    21: { 10: MapId.Route12Gate },
     37: { 0: MapId.Route11 },
     61: { 0: MapId.Route11 },
     62: { 0: MapId.Route11 },
@@ -175,6 +173,11 @@ const route12: MapType = {
     105: { 0: MapId.Route11 },
     106: { 0: MapId.Route11 },
     107: { 0: MapId.Route11, 1: MapId.Route13, 2: MapId.Route13, 4: MapId.Route13, 5: MapId.Route13, 6: MapId.Route13, 7: MapId.Route13, 8: MapId.Route13, 10: MapId.Route13, 11: MapId.Route13 },
+  },
+  teleports: {
+    // Caseta Ruta 12 (mitad norte ↔ sur). Puerta norte row 15, sur row 21.
+    15: { 10: { map: MapId.Route12Gate, pos: { x: 4, y: 1 } }, 11: { map: MapId.Route12Gate, pos: { x: 5, y: 1 } } },
+    21: { 10: { map: MapId.Route12Gate, pos: { x: 4, y: 6 } } },
   },
   exits: {
 

@@ -1,5 +1,5 @@
 import image from "../assets/map/lavender-town-house-a.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const lavenderTownHouseA: MapType = {
   name: "Casa Pueblo Lavanda",
@@ -22,6 +22,8 @@ const lavenderTownHouseA: MapType = {
   exits: {
     7: [2, 3],
   },
+  exitReturnMap: MapId.LavenderTown,
+  exitReturnPos: { x: 7, y: 10 },
   music: "/game/music/maps-original/lavender-town.mp3",
   grass: {},
   minimapPos: { x: 194, y: 76 },

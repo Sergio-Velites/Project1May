@@ -63,7 +63,7 @@ const saffronCity: MapType = {
     21: { 0: MapId.Route7, 18: MapId.SilphCo1f },
     22: { 0: MapId.Route7 },
     23: { 0: MapId.Route7 },
-    29: { 9: MapId.SaffronCityPokemonCenter },
+    29: { 9: MapId.SaffronCityPokemonCenter, 29: MapId.SaffronCityHouseA },
     35: { 20: MapId.Route6, 21: MapId.Route6 },
   },
   exits: {

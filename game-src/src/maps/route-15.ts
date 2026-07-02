@@ -39,8 +39,8 @@ const route15: MapType = {
     5: { 59: MapId.Route14 },
     6: { 59: MapId.Route14 },
     7: { 59: MapId.Route14 },
-    8: { 0: MapId.FuchsiaCity, 7: MapId.Route15Gate, 14: MapId.Route15Gate, 59: MapId.Route14 },
-    9: { 0: MapId.FuchsiaCity, 7: MapId.Route15Gate, 14: MapId.Route15Gate, 59: MapId.Route14 },
+    8: { 0: MapId.FuchsiaCity, 59: MapId.Route14 },
+    9: { 0: MapId.FuchsiaCity, 59: MapId.Route14 },
     10: { 59: MapId.Route14 },
     11: { 59: MapId.Route14 },
     12: { 59: MapId.Route14 },
@@ -48,6 +48,11 @@ const route15: MapType = {
     15: { 0: MapId.FuchsiaCity, 59: MapId.Route14 },
     16: { 0: MapId.FuchsiaCity, 59: MapId.Route14 },
     17: { 0: MapId.FuchsiaCity, 59: MapId.Route14 },
+  },
+  teleports: {
+    // Caseta Ruta 15 (mitad oeste ↔ este). Puerta oeste col 7, este col 14.
+    8: { 7: { map: MapId.Route15Gate, pos: { x: 1, y: 4 } }, 14: { map: MapId.Route15Gate, pos: { x: 6, y: 4 } } },
+    9: { 7: { map: MapId.Route15Gate, pos: { x: 1, y: 5 } }, 14: { map: MapId.Route15Gate, pos: { x: 6, y: 5 } } },
   },
   exits: {
 

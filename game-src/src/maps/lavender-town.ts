@@ -76,7 +76,7 @@ const lavenderTown: MapType = {
     6: { 0: MapId.Route8 },
     7: { 0: MapId.Route8 },
     8: { 0: MapId.Route8 },
-    9: { 0: MapId.Route8 },
+    9: { 0: MapId.Route8, 7: MapId.LavenderTownHouseA },
     10: { 0: MapId.Route8 },
     11: { 0: MapId.Route8 },
     12: { 0: MapId.Route8 },

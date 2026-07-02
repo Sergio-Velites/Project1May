@@ -103,6 +103,14 @@ const route21: MapType = {
   maps: {
     89: { 10: MapId.CinnabarIsland, 11: MapId.CinnabarIsland },
   },
+  teleports: {
+    // Extremo norte → PUEBLO PALETA (playa sur)
+    1: {
+      9: { map: MapId.PalletTown, pos: { x: 9, y: 16 } },
+      10: { map: MapId.PalletTown, pos: { x: 10, y: 16 } },
+      11: { map: MapId.PalletTown, pos: { x: 10, y: 16 } },
+    },
+  },
   exits: {
 
   },

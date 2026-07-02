@@ -52,10 +52,16 @@ const rockTunnel1f: MapType = {
     17: { 37: MapId.RockTunnel2f },
   },
   exits: {
+    // Boca norte → Ruta 10 (entrada superior)
     0: [15],
     3: [15],
-    33: [15],
-    35: [15],
+  },
+  exitReturnMap: MapId.Route10,
+  exitReturnPos: { x: 8, y: 18 },
+  teleports: {
+    // Boca sur → Ruta 10 (entrada inferior, junto a Pueblo Lavanda)
+    33: { 15: { map: MapId.Route10, pos: { x: 8, y: 54 } } },
+    35: { 15: { map: MapId.Route10, pos: { x: 8, y: 54 } } },
   },
   grass: {},
   minimapPos: { x: 194, y: 60 },

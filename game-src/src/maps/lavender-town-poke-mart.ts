@@ -1,5 +1,5 @@
 import image from "../assets/map/lavender-town-poke-mart.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const lavenderTownPokeMart: MapType = {
   name: "Tienda Pokemon",
@@ -22,6 +22,8 @@ const lavenderTownPokeMart: MapType = {
   exits: {
     7: [3, 4],
   },
+  exitReturnMap: MapId.LavenderTown,
+  exitReturnPos: { x: 15, y: 14 },
   music: "/game/music/maps-original/lavender-town.mp3",
   grass: {},
   minimapPos: { x: 194, y: 76 },

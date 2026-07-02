@@ -39,6 +39,8 @@ const ceruleanCave1f: MapType = {
   exits: {
     17: [24, 25],
   },
+  exitReturnMap: MapId.CeruleanCity,
+  exitReturnPos: { x: 4, y: 12 },
   grass: {},
   minimapPos: { x: 147, y: 41 },
 };

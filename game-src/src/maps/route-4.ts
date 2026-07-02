@@ -109,7 +109,7 @@ const route4: MapType = {
     },
   },
   exitReturnMap: MapId.MtMoon3f,
-  exitReturnPos: { x: 27, y: 2 },
+  exitReturnPos: { x: 37, y: 1 },
   items: [
     {
       item: ItemType.LoveBall,

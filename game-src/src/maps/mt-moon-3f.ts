@@ -60,9 +60,10 @@ const mtMoon3f: MapType = {
 
   },
   exits: {
-
+    // Cámara noreste → salida este de Monte Luna (Ruta 4)
+    0: [37, 38],
   },
-  exitReturnPos: { x: 3, y: 6 },
+  exitReturnPos: { x: 24, y: 6 },
   fences: {},
   grass: {},
   text: {},

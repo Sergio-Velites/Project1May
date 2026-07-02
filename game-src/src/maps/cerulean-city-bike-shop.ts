@@ -1,5 +1,5 @@
 import image from "../assets/map/cerulean-city-bike-shop.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const ceruleanCityBikeShop: MapType = {
   name: "Ciclo Club",
@@ -24,6 +24,8 @@ const ceruleanCityBikeShop: MapType = {
   exits: {
     7: [2, 3],
   },
+  exitReturnMap: MapId.CeruleanCity,
+  exitReturnPos: { x: 13, y: 26 },
   music: "/game/music/maps-original/cerulean-city.mp3",
   grass: {},
   minimapPos: { x: 147, y: 41 },

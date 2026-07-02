@@ -1,5 +1,5 @@
 import image from "../assets/map/fuchsia-city-poke-mart.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const fuchsiaCityPokeMart: MapType = {
   name: "Tienda Pokemon",
@@ -22,6 +22,8 @@ const fuchsiaCityPokeMart: MapType = {
   exits: {
     7: [3, 4],
   },
+  exitReturnMap: MapId.FuchsiaCity,
+  exitReturnPos: { x: 5, y: 14 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
   minimapPos: { x: 124, y: 170 },

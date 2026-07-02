@@ -83,6 +83,10 @@ const fuchsiaCity: MapType = {
     34: { 0: MapId.Route18 },
     35: { 0: MapId.Route18, 1: MapId.Route19, 2: MapId.Route19, 3: MapId.Route19, 4: MapId.Route19, 5: MapId.Route19, 6: MapId.Route19, 7: MapId.Route19, 8: MapId.Route19, 9: MapId.Route19, 10: MapId.Route19, 16: MapId.Route19, 17: MapId.Route19, 18: MapId.Route19, 19: MapId.Route19, 20: MapId.Route19, 21: MapId.Route19, 22: MapId.Route19, 23: MapId.Route19, 24: MapId.Route19 },
   },
+  teleports: {
+    // Puerta del edificio norte → ZONA SAFARI (entrada sur del área central)
+    3: { 18: { map: MapId.SafariZoneCenter, pos: { x: 14, y: 24 } } },
+  },
   exits: {
 
   },

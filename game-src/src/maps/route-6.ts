@@ -47,6 +47,10 @@ const route6: MapType = {
     0: { 0: MapId.SaffronCity, 1: MapId.SaffronCity, 2: MapId.SaffronCity, 3: MapId.SaffronCity, 4: MapId.SaffronCity, 5: MapId.SaffronCity, 6: MapId.SaffronCity, 7: MapId.SaffronCity, 8: MapId.SaffronCity, 10: MapId.SaffronCity, 12: MapId.SaffronCity, 13: MapId.SaffronCity, 14: MapId.SaffronCity, 15: MapId.SaffronCity, 16: MapId.SaffronCity, 17: MapId.SaffronCity, 18: MapId.SaffronCity, 19: MapId.SaffronCity },
     35: { 8: MapId.VermilionCity, 9: MapId.VermilionCity, 11: MapId.VermilionCity, 12: MapId.VermilionCity, 13: MapId.VermilionCity, 14: MapId.VermilionCity, 15: MapId.VermilionCity, 16: MapId.VermilionCity, 17: MapId.VermilionCity, 18: MapId.VermilionCity, 19: MapId.VermilionCity },
   },
+  teleports: {
+    // Caseta este → Camino Subterráneo N-S (escalera sur)
+    13: { 17: { map: MapId.UndergroundPathNS, pos: { x: 3, y: 41 } } },
+  },
   exits: {
 
   },

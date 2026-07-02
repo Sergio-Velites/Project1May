@@ -1,5 +1,5 @@
 import image from "../assets/map/diglets-cave.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const digletsCave: MapType = {
   name: "Cueva Diglett",
@@ -24,6 +24,8 @@ const digletsCave: MapType = {
   exits: {
     7: [2, 3],
   },
+  exitReturnMap: MapId.Route2,
+  exitReturnPos: { x: 12, y: 10 },
   grass: {},
   minimapPos: { x: 170, y: 123 },
 };

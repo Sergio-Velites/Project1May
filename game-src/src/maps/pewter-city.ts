@@ -144,10 +144,26 @@ const pewterCity: MapType = {
     32: { 39: MapId.Route3 },
     33: { 39: MapId.Route3 },
     34: { 39: MapId.Route3 },
-    35: { 0: MapId.Route2, 1: MapId.Route2, 2: MapId.Route2, 3: MapId.Route2, 4: MapId.Route2, 5: MapId.Route2, 6: MapId.Route2, 7: MapId.Route2, 8: MapId.Route2, 9: MapId.Route2, 10: MapId.Route2, 11: MapId.Route2, 18: MapId.Route2, 19: MapId.Route2, 26: MapId.Route2, 27: MapId.Route2, 28: MapId.Route2, 29: MapId.Route2, 30: MapId.Route2, 31: MapId.Route2, 32: MapId.Route2, 33: MapId.Route2, 34: MapId.Route2, 35: MapId.Route2, 36: MapId.Route2, 37: MapId.Route2, 38: MapId.Route2, 39: MapId.Route3 },
+    35: { 39: MapId.Route3 },
   },
   teleports: {
-
+    // Borde sur de VILLAMAYOR → Control Ruta 2 Norte → EL BOSQUECILLO.
+    35: {
+      0: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 1: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      2: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 3: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      4: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 5: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      6: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 7: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      8: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 9: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      10: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 11: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      18: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 19: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      26: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 27: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      28: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 29: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      30: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 31: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      32: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 33: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      34: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 35: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      36: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } }, 37: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+      38: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
+    },
   },
   exits: {
 

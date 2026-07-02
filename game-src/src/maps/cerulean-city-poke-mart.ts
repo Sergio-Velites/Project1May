@@ -1,5 +1,5 @@
 import image from "../assets/map/cerulean-city-poke-mart.png";
-import { MapType } from "./map-types";
+import { MapId, MapType } from "./map-types";
 
 const ceruleanCityPokeMart: MapType = {
   name: "Tienda Pokemon",
@@ -22,6 +22,8 @@ const ceruleanCityPokeMart: MapType = {
   exits: {
     7: [3, 4],
   },
+  exitReturnMap: MapId.CeruleanCity,
+  exitReturnPos: { x: 25, y: 26 },
   music: "/game/music/maps-original/cerulean-city.mp3",
   grass: {},
   minimapPos: { x: 147, y: 41 },
