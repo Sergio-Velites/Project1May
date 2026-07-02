@@ -25,14 +25,28 @@ export const fetchMaintenance = async (): Promise<{
     if (!SUPABASE_URL) return OPEN;
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 4000);
-    const playerId = localStorage.getItem("wedding_user_id");
-    const writeToken = localStorage.getItem("wedding_write_token");
-    const qs = playerId ? `?player=${encodeURIComponent(playerId)}` : "";
     const headers: Record<string, string> = {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
     };
-    if (playerId && writeToken) headers["x-write-token"] = writeToken;
+    // Identidad para el bypass, por prioridad:
+    //  1. Link firmado del admin (?play_as/?recover + &rt=): prueba de admin —
+    //     entra aunque el mantenimiento esté activo, sin tocar la allowlist.
+    //  2. Identidad del dispositivo (localStorage id + write_token): entra si
+    //     el admin ha puesto a ESTE jugador en la lista de acceso.
+    const sp = new URLSearchParams(window.location.search);
+    const urlPlayer = (sp.get("recover") || sp.get("play_as") || "").trim();
+    const rt = (sp.get("rt") || "").trim();
+    let qs = "";
+    if (urlPlayer && rt) {
+      qs = `?player=${encodeURIComponent(urlPlayer)}`;
+      headers["x-recover-token"] = rt;
+    } else {
+      const playerId = localStorage.getItem("wedding_user_id");
+      const writeToken = localStorage.getItem("wedding_write_token");
+      if (playerId) qs = `?player=${encodeURIComponent(playerId)}`;
+      if (playerId && writeToken) headers["x-write-token"] = writeToken;
+    }
     const res = await fetch(`${SUPABASE_URL}/functions/v1/maintenance${qs}`, {
       headers,
       signal: ctrl.signal,

@@ -27,9 +27,12 @@ export default function ImpersonateButtons({ userId, playerName, recoverToken }:
   const [copied, setCopied] = useState<string | null>(null);
 
   const rtParam = recoverToken ? `&rt=${encodeURIComponent(recoverToken)}` : "";
+  // El rt firmado también viaja en el link de "jugar puntualmente": además de
+  // habilitar la recuperación, sirve como prueba de admin para entrar al juego
+  // aunque esté en modo mantenimiento (la edge function `maintenance` lo valida).
   const playAsUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/?play_as=${encodeURIComponent(userId)}`
-    : `/?play_as=${userId}`;
+    ? `${window.location.origin}/?play_as=${encodeURIComponent(userId)}${rtParam}`
+    : `/?play_as=${userId}${rtParam}`;
   const recoverUrl = typeof window !== "undefined"
     ? `${window.location.origin}/?recover=${encodeURIComponent(userId)}${rtParam}`
     : `/?recover=${userId}${rtParam}`;

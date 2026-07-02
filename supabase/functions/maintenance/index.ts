@@ -16,6 +16,32 @@ import { db, json } from "../_shared/db.ts";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// ── Prueba alternativa: token de recuperación firmado por el admin ──────────
+// Mismo esquema que webauthn-register-start: HMAC-SHA256(ADMIN_SECRET,
+// "recover:<uuid>") en base64url sin padding. Un link ?play_as/?recover con
+// &rt= válido demuestra que lo generó el panel de admin → bypass directo
+// (sin necesidad de estar en la allowlist).
+function b64url(bytes: Uint8Array): string {
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+async function recoverTokenFor(userId: string): Promise<string> {
+  const secret = Deno.env.get("ADMIN_SECRET") ?? "";
+  const key = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`recover:${userId}`));
+  return b64url(new Uint8Array(sig));
+}
+function safeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let r = 0;
+  for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return r === 0;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -41,18 +67,25 @@ Deno.serve(async (req) => {
       const url = new URL(req.url);
       const player = url.searchParams.get("player");
       const writeToken = req.headers.get("x-write-token");
-      if (
-        maintenance &&
-        player && UUID_RE.test(player) &&
-        writeToken &&
-        allowed.some((id) => id.toLowerCase() === player.toLowerCase())
-      ) {
-        const { data: save } = await db
-          .from("saves")
-          .select("write_token")
-          .eq("user_id", player)
-          .maybeSingle();
-        bypass = !!save?.write_token && save.write_token === writeToken;
+      const recoverToken = req.headers.get("x-recover-token");
+      if (maintenance && player && UUID_RE.test(player)) {
+        // 1) Link firmado por el admin (?play_as/?recover + &rt=): entra siempre.
+        if (recoverToken && Deno.env.get("ADMIN_SECRET")) {
+          bypass = safeEqual(recoverToken, await recoverTokenFor(player));
+        }
+        // 2) Jugador en la allowlist con el write_token de su partida.
+        if (
+          !bypass &&
+          writeToken &&
+          allowed.some((id) => id.toLowerCase() === player.toLowerCase())
+        ) {
+          const { data: save } = await db
+            .from("saves")
+            .select("write_token")
+            .eq("user_id", player)
+            .maybeSingle();
+          bypass = !!save?.write_token && save.write_token === writeToken;
+        }
       }
 
       const body: Record<string, unknown> = { maintenance, message, bypass };
