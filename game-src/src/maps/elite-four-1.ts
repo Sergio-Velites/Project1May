@@ -22,16 +22,23 @@ const eliteFour1: MapType = {
     11: [0, 1, 2, 3, 6, 7, 8, 9],
   },
   text: {},
-  maps: {
-    0: { 4: MapId.EliteFour2, 5: MapId.EliteFour2 },
-    11: { 4: MapId.IndigoPlateauLobby, 5: MapId.IndigoPlateauLobby },
-  },
-  exits: {
-
-  },
+  maps: {},
+  exits: {},
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
   minimapPos: { x: 29, y: 41 },
+  fences: {},
+  teleports: {
+    0: {
+      4: { map: MapId.EliteFour2, pos: { x: 4, y: 10 } },
+      5: { map: MapId.EliteFour2, pos: { x: 5, y: 10 } },
+    },
+    11: {
+      4: { map: MapId.IndigoPlateauLobby, pos: { x: 8, y: 1 } },
+      5: { map: MapId.IndigoPlateauLobby, pos: { x: 8, y: 1 } },
+    },
+  },
+  trainers: [],
 };
 
 export default eliteFour1;
