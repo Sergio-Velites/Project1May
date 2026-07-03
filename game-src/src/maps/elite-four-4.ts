@@ -36,16 +36,22 @@ const eliteFour4: MapType = {
     25: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
   },
   text: {},
-  maps: {
-    0: { 5: MapId.ChampionRoom, 6: MapId.ChampionRoom },
-    16: { 24: MapId.EliteFour3 },
-  },
-  exits: {
-
-  },
+  maps: {},
+  exits: {},
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
   minimapPos: { x: 29, y: 41 },
+  fences: {},
+  teleports: {
+    0: {
+      5: { map: MapId.ChampionRoom, pos: { x: 3, y: 6 } },
+      6: { map: MapId.ChampionRoom, pos: { x: 4, y: 6 } },
+    },
+    16: {
+      24: { map: MapId.EliteFour3, pos: { x: 5, y: 1 } },
+    },
+  },
+  trainers: [],
 };
 
 export default eliteFour4;
