@@ -19,7 +19,7 @@ import {
 import { selectMenuOpen, showTextThenAction } from "../state/uiSlice";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
-import { directionModifier, isWater } from "../app/map-helper";
+import { directionModifier, isFence, isWall, isWater } from "../app/map-helper";
 import pokemonMetadata from "../app/pokemon-metadata";
 import { Direction } from "../state/state-types";
 
@@ -41,6 +41,11 @@ const SurfHandler = () => {
       const adjX = pos.x + mod.x;
       const adjY = pos.y + mod.y;
       if (!isWater(map.water, adjX, adjY)) return;
+      // La casilla de agua debe ser realmente transitable surfeando: si además
+      // es muro o saliente, el movimiento se bloquearía y el jugador quedaría
+      // "surfeando en tierra" (sprite de surf sin entrar al agua). En ese caso
+      // no se inicia el surf, igual que en el juego original no habría agua ahí.
+      if (isWall(map.walls, adjX, adjY) || isFence(map.fences, adjX, adjY)) return;
 
       const surfer = pokemon.find((p) => p.moves?.some((m) => m.id === "surf"));
       if (!surfer) return;

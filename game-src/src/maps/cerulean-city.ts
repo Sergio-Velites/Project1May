@@ -81,7 +81,7 @@ const ceruleanCity: MapType = {
     7: { 39: MapId.Route9 },
     8: { 39: MapId.Route9 },
     9: { 27: MapId.CeruleanCityHouseB, 39: MapId.Route9 },
-    11: { 0: MapId.Route4, 4: MapId.CeruleanCave1f, 27: MapId.CeruleanCityHouseB },
+    11: { 4: MapId.CeruleanCave1f, 27: MapId.CeruleanCityHouseB },
     12: { 0: MapId.Route4, 39: MapId.Route9 },
     13: { 0: MapId.Route4, 39: MapId.Route9 },
     14: { 39: MapId.Route9 },

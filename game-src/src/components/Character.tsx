@@ -189,6 +189,12 @@ const Character = () => {
       wasOnWaterRef.current = false;
       return () => clearTimeout(t);
     }
+    // Red de seguridad: surfeando en tierra sin haber pisado agua (p.ej. un
+    // save corrupto o un surf que no llegó a entrar al agua) → desmontar en
+    // cuanto se dé un paso. Evita "nadar por la tierra" indefinidamente.
+    if (onSurfingRef.current && !onWaterNow && !wasOnWaterRef.current) {
+      dispatch(setOnSurfing(false));
+    }
     wasOnWaterRef.current = onWaterNow;
     // Solo pos+map como deps: el cambio de onSurfing NO debe re-triggear
     // este efecto (evita la race condition donde el cleanup cancela el dispatch).

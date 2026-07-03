@@ -35,7 +35,7 @@ const route8: MapType = {
     4: { 56: Direction.Left },
     5: { 56: Direction.Left },
     6: { 56: Direction.Left },
-    7: { 18: Direction.Down, 19: Direction.Down, 20: Direction.Down, 21: Direction.Down, 56: Direction.Down, 57: Direction.Down, 58: Direction.Down, 59: Direction.Down },
+    7: { 18: Direction.Down, 19: Direction.Down, 20: Direction.Down, 21: Direction.Down, 56: Direction.Down, 57: Direction.Down, 58: Direction.Down },
     11: { 56: Direction.Left },
     12: { 56: Direction.Left },
     13: { 56: Direction.Left },
@@ -51,7 +51,7 @@ const route8: MapType = {
     4: [56],
     5: [56],
     6: [56],
-    7: [18, 19, 20, 21, 56, 57, 58, 59],
+    7: [18, 19, 20, 21, 56, 57, 58],
     11: [56],
     12: [56],
     13: [56],
@@ -67,7 +67,6 @@ const route8: MapType = {
     10: { 0: MapId.SaffronCity },
   },
   teleports: {
-    // Caseta noroeste → Camino Subterráneo E-O (escalera este)
     3: { 13: { map: MapId.UndergroundPathEW, pos: { x: 46, y: 2 } } },
   },
   exits: {

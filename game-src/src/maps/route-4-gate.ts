@@ -22,8 +22,7 @@ const route4Gate: MapType = {
   },
   exits: {},
   teleports: {
-    // Paso N-S en Ruta 2 (edificio entre la puerta norte y sur de la ruta).
-    0: { 4: { map: MapId.Route2, pos: { x: 16, y: 34 } }, 5: { map: MapId.Route2, pos: { x: 16, y: 34 } } },
+    0: { 5: { map: MapId.Route2, pos: { x: 16, y: 34 } } },
     7: { 4: { map: MapId.Route2, pos: { x: 15, y: 40 } }, 5: { map: MapId.Route2, pos: { x: 15, y: 40 } } },
   },
   grass: {},

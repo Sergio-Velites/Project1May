@@ -11,11 +11,11 @@ const route4: MapType = {
   width: 90,
   start: { x: 64, y: 23 },
   walls: {
-    1: [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80],
+    1: [35, 80],
     2: [35, 80],
     3: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 35, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91],
     4: [3, 10, 11, 13, 16, 18, 35],
-    5: [3, 10, 12, 13, 16, 17, 19, 23, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89],
+    5: [3, 10, 12, 13, 16, 17, 19, 23, 35, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89],
     6: [3, 23, 80],
     7: [3, 17, 23, 27, 80],
     8: [3, 23, 80],
@@ -41,10 +41,7 @@ const route4: MapType = {
     },
   },
   maps: {
-    5: {
-      11: MapId.Route3PokemonCenter,
-      18: MapId.MtMoon1f,
-    },
+    5: { 11: MapId.Route3PokemonCenter, 18: MapId.MtMoon1f },
   },
   exits: {
     5: [24],
@@ -74,39 +71,20 @@ const route4: MapType = {
     17: [12, 13],
   },
   water: {
+    1: [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79],
+    5: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34],
     6: [81, 82, 83, 84, 85, 86, 87, 88, 90, 91],
     7: [81, 82, 83, 84, 85, 86, 87, 88, 90, 91],
     8: [81, 82, 83, 84, 85, 86, 87, 88, 90, 91],
   },
   teleports: {
-    4: {
-      89: { map: MapId.CeruleanCity, pos: { x: 1, y: 12 } },
-    },
-    6: {
-      89: { map: MapId.CeruleanCity, pos: { x: 1, y: 14 } },
-    },
-    7: {
-      89: { map: MapId.CeruleanCity, pos: { x: 1, y: 15 } },
-    },
-    8: {
-      89: { map: MapId.CeruleanCity, pos: { x: 1, y: 16 } },
-    },
-    10: {
-      89: { map: MapId.CeruleanCity, pos: { x: 1, y: 18 } },
-    },
-    11: {
-      89: { map: MapId.CeruleanCity, pos: { x: 1, y: 19 } },
-    },
-    17: {
-      6: { map: MapId.Route3, pos: { x: 57, y: 1 } },
-      7: { map: MapId.Route3, pos: { x: 58, y: 1 } },
-      8: { map: MapId.Route3, pos: { x: 59, y: 1 } },
-      9: { map: MapId.Route3, pos: { x: 60, y: 1 } },
-      10: { map: MapId.Route3, pos: { x: 60, y: 1 } },
-      11: { map: MapId.Route3, pos: { x: 61, y: 1 } },
-      12: { map: MapId.Route3, pos: { x: 62, y: 1 } },
-      13: { map: MapId.Route3, pos: { x: 63, y: 1 } },
-    },
+    4: { 89: { map: MapId.CeruleanCity, pos: { x: 1, y: 12 } } },
+    6: { 89: { map: MapId.CeruleanCity, pos: { x: 1, y: 14 } } },
+    7: { 89: { map: MapId.CeruleanCity, pos: { x: 1, y: 15 } } },
+    8: { 89: { map: MapId.CeruleanCity, pos: { x: 1, y: 16 } } },
+    10: { 89: { map: MapId.CeruleanCity, pos: { x: 1, y: 18 } } },
+    11: { 89: { map: MapId.CeruleanCity, pos: { x: 1, y: 19 } } },
+    17: { 6: { map: MapId.Route3, pos: { x: 57, y: 1 } }, 7: { map: MapId.Route3, pos: { x: 58, y: 1 } }, 8: { map: MapId.Route3, pos: { x: 59, y: 1 } }, 9: { map: MapId.Route3, pos: { x: 60, y: 1 } }, 10: { map: MapId.Route3, pos: { x: 60, y: 1 } }, 11: { map: MapId.Route3, pos: { x: 61, y: 1 } } },
   },
   exitReturnMap: MapId.MtMoon3f,
   exitReturnPos: { x: 37, y: 1 },

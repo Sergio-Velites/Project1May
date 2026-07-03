@@ -82,7 +82,7 @@ const route10: MapType = {
     71: [0, 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 17, 18, 19],
   },
   fenceDirections: {
-    1: { 0: Direction.Down, 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down, 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down, 14: Direction.Down, 15: Direction.Down, 16: Direction.Down, 17: Direction.Down },
+    1: { 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down, 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down, 14: Direction.Down, 15: Direction.Down, 16: Direction.Down, 17: Direction.Down },
     2: { 18: Direction.Left },
     3: { 18: Direction.Left },
     4: { 18: Direction.Left },
@@ -148,10 +148,9 @@ const route10: MapType = {
     67: { 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 18: Direction.Left },
     68: { 18: Direction.Left },
     69: { 18: Direction.Left },
-    71: { 10: Direction.Left },
   },
   fences: {
-    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+    1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
     2: [18],
     3: [18],
     4: [18],
@@ -217,7 +216,6 @@ const route10: MapType = {
     67: [6, 7, 8, 9, 10, 18],
     68: [18],
     69: [18],
-    71: [10],
   },
   text: {},
   maps: {

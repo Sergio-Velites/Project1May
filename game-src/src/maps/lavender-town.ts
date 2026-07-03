@@ -28,8 +28,7 @@ const lavenderTown: MapType = {
     17: [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15, 16, 17, 18, 19],
   },
   fenceDirections: {
-    0: { 10: Direction.Left },
-    1: { 0: Direction.Down, 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down, 10: Direction.Left },
+    1: { 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down, 10: Direction.Left },
     2: { 10: Direction.Left },
     3: { 10: Direction.Left },
     4: { 10: Direction.Left },
@@ -44,11 +43,9 @@ const lavenderTown: MapType = {
     13: { 18: Direction.Left },
     14: { 18: Direction.Left },
     15: { 18: Direction.Left },
-    17: { 10: Direction.Left },
   },
   fences: {
-    0: [10],
-    1: [0, 1, 2, 3, 4, 5, 10],
+    1: [1, 2, 3, 4, 5, 10],
     2: [10],
     3: [10],
     4: [10],
@@ -63,7 +60,6 @@ const lavenderTown: MapType = {
     13: [18],
     14: [18],
     15: [18],
-    17: [10],
   },
   text: {},
   maps: {

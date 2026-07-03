@@ -61,7 +61,6 @@ const rockTunnel1f: MapType = {
     11: { 17: { map: MapId.RockTunnel2f, pos: { x: 23, y: 11 } } },
     17: { 37: { map: MapId.RockTunnel2f, pos: { x: 33, y: 25 } } },
     33: { 15: { map: MapId.Route10, pos: { x: 8, y: 54 } } },
-    35: { 15: { map: MapId.Route10, pos: { x: 8, y: 54 } } },
   },
   grass: {},
   minimapPos: { x: 195, y: 53 },

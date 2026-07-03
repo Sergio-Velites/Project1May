@@ -25,10 +25,10 @@ const route15: MapType = {
     14: [0, 1, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
   },
   fenceDirections: {
-    7: { 16: Direction.Down, 17: Direction.Down, 18: Direction.Down, 19: Direction.Down, 20: Direction.Down, 21: Direction.Down, 22: Direction.Down, 23: Direction.Down, 24: Direction.Down, 25: Direction.Down, 26: Direction.Down, 27: Direction.Down, 28: Direction.Down, 29: Direction.Down, 30: Direction.Down, 31: Direction.Down, 32: Direction.Down, 33: Direction.Down, 34: Direction.Down, 35: Direction.Down, 36: Direction.Down, 37: Direction.Down, 38: Direction.Down, 39: Direction.Down, 40: Direction.Down, 41: Direction.Down, 42: Direction.Down, 43: Direction.Down, 44: Direction.Down, 45: Direction.Down, 46: Direction.Down, 47: Direction.Down, 48: Direction.Down, 49: Direction.Down, 50: Direction.Down, 51: Direction.Down, 52: Direction.Down, 53: Direction.Down, 54: Direction.Down, 55: Direction.Down, 56: Direction.Down, 57: Direction.Down, 58: Direction.Down, 59: Direction.Down },
+    7: { 16: Direction.Down, 17: Direction.Down, 18: Direction.Down, 19: Direction.Down, 20: Direction.Down, 21: Direction.Down, 22: Direction.Down, 23: Direction.Down, 24: Direction.Down, 25: Direction.Down, 26: Direction.Down, 27: Direction.Down, 28: Direction.Down, 29: Direction.Down, 30: Direction.Down, 31: Direction.Down, 32: Direction.Down, 33: Direction.Down, 34: Direction.Down, 35: Direction.Down, 36: Direction.Down, 37: Direction.Down, 38: Direction.Down, 39: Direction.Down, 40: Direction.Down, 41: Direction.Down, 42: Direction.Down, 43: Direction.Down, 44: Direction.Down, 45: Direction.Down, 46: Direction.Down, 47: Direction.Down, 48: Direction.Down, 49: Direction.Down, 50: Direction.Down, 51: Direction.Down, 52: Direction.Down, 53: Direction.Down, 54: Direction.Down, 55: Direction.Down, 56: Direction.Down, 57: Direction.Down, 58: Direction.Down },
   },
   fences: {
-    7: [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
+    7: [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58],
   },
   text: {},
   maps: {
@@ -50,7 +50,6 @@ const route15: MapType = {
     17: { 0: MapId.FuchsiaCity, 59: MapId.Route14 },
   },
   teleports: {
-    // Caseta Ruta 15 (mitad oeste ↔ este). Puerta oeste col 7, este col 14.
     8: { 7: { map: MapId.Route15Gate, pos: { x: 1, y: 4 } }, 14: { map: MapId.Route15Gate, pos: { x: 6, y: 4 } } },
     9: { 7: { map: MapId.Route15Gate, pos: { x: 1, y: 5 } }, 14: { map: MapId.Route15Gate, pos: { x: 6, y: 5 } } },
   },

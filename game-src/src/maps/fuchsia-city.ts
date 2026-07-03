@@ -57,7 +57,6 @@ const fuchsiaCity: MapType = {
     31: { 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down, 6: Direction.Down, 7: Direction.Down, 9: Direction.Down, 17: Direction.Down, 18: Direction.Down, 19: Direction.Down, 20: Direction.Down, 21: Direction.Down, 22: Direction.Down, 23: Direction.Down },
     33: { 10: Direction.Left },
     34: { 10: Direction.Left },
-    35: { 10: Direction.Left, 24: Direction.Left },
   },
   fences: {
     23: [2],
@@ -71,7 +70,6 @@ const fuchsiaCity: MapType = {
     31: [2, 3, 4, 5, 6, 7, 9, 17, 18, 19, 20, 21, 22, 23],
     33: [10],
     34: [10],
-    35: [10, 24],
   },
   text: {},
   maps: {
@@ -84,7 +82,6 @@ const fuchsiaCity: MapType = {
     35: { 0: MapId.Route18, 1: MapId.Route19, 2: MapId.Route19, 3: MapId.Route19, 4: MapId.Route19, 5: MapId.Route19, 6: MapId.Route19, 7: MapId.Route19, 8: MapId.Route19, 9: MapId.Route19, 10: MapId.Route19, 16: MapId.Route19, 17: MapId.Route19, 18: MapId.Route19, 19: MapId.Route19, 20: MapId.Route19, 21: MapId.Route19, 22: MapId.Route19, 23: MapId.Route19, 24: MapId.Route19 },
   },
   teleports: {
-    // Puerta del edificio norte → ZONA SAFARI (entrada sur del área central)
     3: { 18: { map: MapId.SafariZoneCenter, pos: { x: 14, y: 24 } } },
   },
   exits: {

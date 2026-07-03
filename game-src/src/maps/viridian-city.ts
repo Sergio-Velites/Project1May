@@ -40,10 +40,10 @@ const viridianCity: MapType = {
     21: [0, 1, 2, 3, 4, 5, 6, 7, 36, 37, 38, 39],
     22: [0, 1, 2, 3, 8, 22, 23, 24, 25, 36, 37, 38, 39],
     23: [0, 1, 2, 3, 8, 9, 22, 23, 24, 25, 36, 37, 38, 39],
-    24: [0, 1, 2, 3, 8, 9, 10, 11, 12, 13, 22, 23, 24, 25, 36, 37, 38, 39],
-    25: [0, 1, 2, 3, 8, 9, 10, 11, 12, 13, 22, 24, 25, 36, 37, 38, 39],
-    26: [0, 1, 2, 3, 8, 9, 10, 11, 12, 13, 36, 37, 38, 39],
-    27: [8, 9, 10, 11, 12, 13, 36, 37, 38, 39],
+    24: [0, 1, 2, 3, 22, 23, 24, 25, 36, 37, 38, 39],
+    25: [0, 1, 2, 3, 22, 24, 25, 36, 37, 38, 39],
+    26: [0, 1, 2, 3, 36, 37, 38, 39],
+    27: [36, 37, 38, 39],
     28: [3, 36, 37, 38, 39],
     29: [3, 21, 36, 37, 38, 39],
     30: [3, 36, 37, 38, 39],
@@ -55,8 +55,8 @@ const viridianCity: MapType = {
   },
   fenceDirections: {
     9: { 24: Direction.Down, 25: Direction.Down, 26: Direction.Down, 27: Direction.Down, 28: Direction.Down, 29: Direction.Down, 30: Direction.Down, 31: Direction.Down, 32: Direction.Down, 33: Direction.Down, 34: Direction.Down, 35: Direction.Down },
-    13: { 0: Direction.Down, 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down },
-    27: { 0: Direction.Down, 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down, 6: Direction.Down, 7: Direction.Down, 14: Direction.Down, 16: Direction.Down, 17: Direction.Down, 18: Direction.Down, 20: Direction.Down, 21: Direction.Down, 22: Direction.Down, 23: Direction.Down, 24: Direction.Down, 25: Direction.Down, 26: Direction.Down, 27: Direction.Down, 28: Direction.Down, 29: Direction.Down, 30: Direction.Down, 31: Direction.Down, 32: Direction.Down, 33: Direction.Down, 34: Direction.Down, 35: Direction.Down },
+    13: { 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down },
+    27: { 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down, 6: Direction.Down, 7: Direction.Down, 14: Direction.Down, 16: Direction.Down, 17: Direction.Down, 18: Direction.Down, 20: Direction.Down, 21: Direction.Down, 22: Direction.Down, 23: Direction.Down, 24: Direction.Down, 25: Direction.Down, 26: Direction.Down, 27: Direction.Down, 28: Direction.Down, 29: Direction.Down, 30: Direction.Down, 31: Direction.Down, 32: Direction.Down, 33: Direction.Down, 34: Direction.Down, 35: Direction.Down },
   },
     boulders: [
     {
@@ -86,8 +86,8 @@ const viridianCity: MapType = {
   ],
   fences: {
     9: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
-    13: [0, 1, 2, 3, 4, 5],
-    27: [0, 1, 2, 3, 4, 5, 6, 7, 14, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
+    13: [1, 2, 3, 4, 5],
+    27: [1, 2, 3, 4, 5, 6, 7, 14, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
   },
   grass: {},
   water: {
