@@ -6,10 +6,7 @@ const route2Gate: MapType = {
   image,
   height: 8,
   width: 10,
-  start: {
-    x: 4,
-    y: 6,
-  },
+  start: { x: 4, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 6, 7, 8, 9],
     2: [0, 6, 8, 9],
@@ -22,15 +19,19 @@ const route2Gate: MapType = {
   fences: {},
   grass: {},
   text: {},
-  maps: {
-
-  },
+  maps: {},
   exits: {},
   teleports: {
-    0: { 5: { map: MapId.ViridianForrest, pos: { x: 16, y: 46 } } },
-    7: { 4: { map: MapId.Route2, pos: { x: 8, y: 1 } }, 5: { map: MapId.Route2, pos: { x: 9, y: 1 } } },
+    0: {
+      5: { map: MapId.ViridianForrest, pos: { x: 16, y: 46 } },
+    },
+    7: {
+      4: { map: MapId.Route2, pos: { x: 3, y: 45 } },
+      5: { map: MapId.Route2, pos: { x: 3, y: 45 } },
+    },
   },
   minimapPos: { x: 53, y: 82 },
+  trainers: [],
 };
 
 export default route2Gate;
