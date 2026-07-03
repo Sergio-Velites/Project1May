@@ -1574,10 +1574,12 @@ function TextEntryModal({ state, onClose }: { state: Extract<NonNullable<PickerS
 }
 
 // ── Modal: elegir mapa destino + (opcional) casilla por click sobre preview ─
-function MapTilePickerModal({ state, mapData, onClose }: {
+function MapTilePickerModal({ state, mapData, onClose, onNavigate }: {
   state: Extract<NonNullable<PickerState>, { kind: 'maptile' }>;
   mapData: MapData;
   onClose: () => void;
+  /** Navegar el editor al mapa elegido (sin fijar nada). Cierra el modal. */
+  onNavigate?: (mapId: string, pos: { x: number; y: number } | null) => void;
 }) {
   const [q, setQ] = useState('');
   const [mapId, setMapId] = useState(state.current?.mapId ?? '');
@@ -1679,8 +1681,25 @@ function MapTilePickerModal({ state, mapData, onClose }: {
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', padding: '10px 16px', borderTop: '1px solid #2a2a4a' }}>
-            <button onClick={onClose} style={modalBtnStyle}>Cancelar</button>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '10px 16px', borderTop: '1px solid #2a2a4a' }}>
+            {onNavigate && (
+              <button
+                disabled={!mapId}
+                onClick={() => { onNavigate(mapId, pos); onClose(); }}
+                title="Abrir este mapa en el editor para navegarlo (no fija el destino)"
+                style={{
+                  ...modalBtnStyle,
+                  marginRight: 'auto',
+                  border: '1px solid #3a6a4a',
+                  color: mapId ? '#8fe0a8' : '#556',
+                  opacity: mapId ? 1 : 0.5,
+                  cursor: mapId ? 'pointer' : 'not-allowed',
+                }}
+              >
+                🧭 Ir al mapa
+              </button>
+            )}
+            <button onClick={onClose} style={{ ...modalBtnStyle, marginLeft: onNavigate ? undefined : 'auto' }}>Cancelar</button>
             <button disabled={!canConfirm} onClick={() => { state.onPick({ mapId, pos }); onClose(); }} style={{ ...modalPrimaryBtnStyle, opacity: canConfirm ? 1 : 0.4, cursor: canConfirm ? 'pointer' : 'not-allowed' }}>
               {state.requirePos ? 'Fijar destino' : 'Elegir mapa'}
             </button>
@@ -1692,7 +1711,12 @@ function MapTilePickerModal({ state, mapData, onClose }: {
 }
 
 /** Despacha el modal correcto según el estado del picker. */
-function PickerHost({ picker, mapData, onClose }: { picker: PickerState; mapData: MapData; onClose: () => void }) {
+function PickerHost({ picker, mapData, onClose, onNavigate }: {
+  picker: PickerState;
+  mapData: MapData;
+  onClose: () => void;
+  onNavigate?: (mapId: string, pos: { x: number; y: number } | null) => void;
+}) {
   if (!picker) return null;
   switch (picker.kind) {
     case 'item': return <ItemPickerModal state={picker} onClose={onClose} />;
@@ -1700,7 +1724,7 @@ function PickerHost({ picker, mapData, onClose }: { picker: PickerState; mapData
     case 'gift': return <GiftFormModal state={picker} onClose={onClose} />;
     case 'static': return <StaticPokemonFormModal state={picker} onClose={onClose} />;
     case 'text': return <TextEntryModal state={picker} onClose={onClose} />;
-    case 'maptile': return <MapTilePickerModal state={picker} mapData={mapData} onClose={onClose} />;
+    case 'maptile': return <MapTilePickerModal state={picker} mapData={mapData} onClose={onClose} onNavigate={onNavigate} />;
   }
 }
 
@@ -2108,6 +2132,9 @@ export default function MapEditor() {
   const [shiftStep, setShiftStep] = useState(1);
   // Selección rectangular (modo 'select'): cortar/copiar/pegar bloques.
   const [selRect, setSelRect] = useState<SelRect | null>(null);
+  // Casilla de llegada tras navegar por una puerta (🧭); pulso temporal.
+  const [arrivalMark, setArrivalMark] = useState<{ x: number; y: number } | null>(null);
+  const arrivalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const selDrag = useRef<{ startX: number; startY: number } | null>(null);
   // El portapapeles vive fuera del mapa → sobrevive al cambiar de mapa (pegar en otro).
   const [clipboard, setClipboard] = useState<MapClipboard | null>(null);
@@ -2383,10 +2410,10 @@ export default function MapEditor() {
   }
 
   // ── Cambiar mapa ──────────────────────────────────────────────────────
-  function selectMap(id: string) {
+  function selectMap(id: string): boolean {
     if (dirty && id !== selectedMapId) {
       const ok = window.confirm('Hay cambios sin guardar en el mapa actual. ¿Cambiar de mapa y descartarlos en pantalla?');
-      if (!ok) return;
+      if (!ok) return false;
     }
     setSelectedMapId(id);
     if (mapData[id]) loadFromEntry(mapData[id]);
@@ -2394,8 +2421,33 @@ export default function MapEditor() {
     // Limpiar la selección al cambiar de mapa; el portapapeles SÍ se conserva
     // (para poder cortar en un mapa y pegar en otro).
     setSelRect(null);
+    setArrivalMark(null);
     setPastePending(false);
     setDirty(false);
+    return true;
+  }
+
+  /**
+   * Navegación por puertas: ir a un mapa y (opcional) centrar y marcar la
+   * casilla de llegada con un pulso verde (se apaga solo a los 5 s).
+   * Respeta el aviso de cambios sin guardar de selectMap.
+   */
+  function goToMap(id: string, pos?: { x: number; y: number } | null) {
+    if (!mapData[id]) return;
+    if (!selectMap(id)) return;
+    if (arrivalTimerRef.current) clearTimeout(arrivalTimerRef.current);
+    if (pos) {
+      setArrivalMark(pos);
+      arrivalTimerRef.current = setTimeout(() => setArrivalMark(null), 5000);
+      requestAnimationFrame(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        el.scrollLeft = Math.max(0, pos.x * zoom - el.clientWidth / 2 + zoom / 2);
+        el.scrollTop = Math.max(0, pos.y * zoom - el.clientHeight / 2 + zoom / 2);
+      });
+    } else {
+      setArrivalMark(null);
+    }
   }
 
   // Estado de escritura para el commit del .ts. Solo campos gestionados.
@@ -4996,6 +5048,27 @@ export default function MapEditor() {
                 }} />
               )}
 
+              {/* Casilla de llegada tras navegar por una puerta (🧭): pulso verde */}
+              {arrivalMark && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: arrivalMark.x * zoom,
+                    top: arrivalMark.y * zoom,
+                    width: zoom,
+                    height: zoom,
+                    border: '3px solid #6effa0',
+                    boxShadow: '0 0 0 3px rgba(30,200,90,0.45), 0 0 18px 6px rgba(60,255,140,0.55)',
+                    pointerEvents: 'none',
+                    boxSizing: 'border-box',
+                    zIndex: 60,
+                    animation: 'me-arrival-pulse 0.9s ease-in-out infinite alternate',
+                  }}
+                >
+                  <style>{`@keyframes me-arrival-pulse { from { opacity: 1; } to { opacity: 0.35; } }`}</style>
+                </div>
+              )}
+
               {/* Selección rectangular (modo select): rectángulo azul con asa */}
               {editMode === 'select' && selRect && (
                 <div
@@ -5955,6 +6028,7 @@ export default function MapEditor() {
                 setExitReturnPos={(v) => { setExitReturnPos(v); setDirty(true); }}
                 mapData={mapData}
                 openPicker={setPicker}
+                onGoTo={goToMap}
                 onUpdate={(idx, patch) => {
                   setPortals((ps) => ps.map((p, i) => i === idx ? { ...p, ...patch } : p));
                   setDirty(true);
@@ -5997,7 +6071,7 @@ export default function MapEditor() {
       )}
 
       {/* Modales de selección visual */}
-      <PickerHost picker={picker} mapData={mapData} onClose={() => setPicker(null)} />
+      <PickerHost picker={picker} mapData={mapData} onClose={() => setPicker(null)} onNavigate={goToMap} />
 
       {/* Grafo de conexiones entre mapas */}
       {showGraph && (
@@ -7220,7 +7294,7 @@ function PortalsInspector({
   portals, selectedIdx, setSelectedIdx,
   exitReturnMap, setExitReturnMap,
   exitReturnPos, setExitReturnPos,
-  mapData, openPicker, onUpdate, onDelete, sourceFile,
+  mapData, openPicker, onUpdate, onDelete, sourceFile, onGoTo,
 }: {
   portals: PortalEntry[];
   selectedIdx: number | null;
@@ -7234,6 +7308,8 @@ function PortalsInspector({
   onUpdate: (idx: number, patch: Partial<PortalEntry>) => void;
   onDelete: (idx: number) => void;
   sourceFile?: string;
+  /** Navegar el editor al mapa destino de una puerta (centra la casilla de llegada). */
+  onGoTo?: (mapId: string, pos?: { x: number; y: number } | null) => void;
 }) {
   const sel = selectedIdx !== null ? portals[selectedIdx] : null;
   const COLOR = '#cc88ff';
@@ -7249,14 +7325,25 @@ function PortalsInspector({
       {/* Editor del seleccionado */}
       {sel && (
         <div style={{ padding: 10, background: '#0f0f1a', border: `2px solid ${COLOR}`, borderRadius: 4, marginBottom: 14 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, gap: 6 }}>
             <strong style={{ color: COLOR, fontSize: 12 }}>🚪 Salida ({sel.pos.x},{sel.pos.y})</strong>
-            <button
-              onClick={() => onDelete(selectedIdx!)}
-              style={{ background: 'transparent', border: '1px solid #7a3a3a', color: '#ff8888', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', fontSize: 11 }}
-            >
-              Eliminar
-            </button>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {onGoTo && sel.destMap && (
+                <button
+                  onClick={() => onGoTo(sel.destMap!, sel.destPos)}
+                  title={`Abrir ${mapData[sel.destMap]?.name ?? sel.destMap} centrado en la casilla de llegada`}
+                  style={{ background: 'transparent', border: '1px solid #3a6a4a', color: '#8fe0a8', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', fontSize: 11 }}
+                >
+                  🧭 Ir al destino
+                </button>
+              )}
+              <button
+                onClick={() => onDelete(selectedIdx!)}
+                style={{ background: 'transparent', border: '1px solid #7a3a3a', color: '#ff8888', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', fontSize: 11 }}
+              >
+                Eliminar
+              </button>
+            </div>
           </div>
           <div style={{ marginBottom: 8 }}>
             <label style={{ fontSize: 11, color: '#888' }}>Mapa y casilla de llegada:</label>
@@ -7303,7 +7390,20 @@ function PortalsInspector({
               >
                 <span>🚪</span>
                 <span style={{ color: COLOR, fontWeight: 600 }}>({p.pos.x},{p.pos.y})</span>
-                {p.destMap && <span style={{ color: '#aaa' }}>→ {p.destMap}{p.destPos ? ` (${p.destPos.x},${p.destPos.y})` : ''}</span>}
+                {p.destMap && (
+                  <span style={{ color: '#aaa', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    → {mapData[p.destMap]?.name ?? p.destMap}{p.destPos ? ` (${p.destPos.x},${p.destPos.y})` : ''}
+                  </span>
+                )}
+                {onGoTo && p.destMap && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onGoTo(p.destMap!, p.destPos); }}
+                    title={`Ir a ${mapData[p.destMap]?.name ?? p.destMap} (casilla de llegada centrada)`}
+                    style={{ marginLeft: 'auto', flexShrink: 0, background: 'transparent', border: '1px solid #3a6a4a', color: '#8fe0a8', borderRadius: 3, padding: '1px 7px', cursor: 'pointer', fontSize: 11 }}
+                  >
+                    🧭
+                  </button>
+                )}
               </div>
             );
           })}
