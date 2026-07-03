@@ -9,10 +9,7 @@ const route2GateNorth: MapType = {
   image,
   height: 8,
   width: 10,
-  start: {
-    x: 4,
-    y: 6,
-  },
+  start: { x: 4, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 6, 7, 8, 9],
     2: [0, 6, 8, 9],
@@ -27,12 +24,15 @@ const route2GateNorth: MapType = {
   text: {},
   
 
-maps: {
-
-  },
+maps: {},
 teleports: {
-    0: { 5: { map: MapId.PewterCity, pos: { x: 8, y: 34 } } },
-    7: { 4: { map: MapId.ViridianForrest, pos: { x: 1, y: 1 } }, 5: { map: MapId.ViridianForrest, pos: { x: 1, y: 1 } } },
+    0: {
+      5: { map: MapId.Route2, pos: { x: 3, y: 10 } },
+    },
+    7: {
+      4: { map: MapId.ViridianForrest, pos: { x: 1, y: 1 } },
+      5: { map: MapId.ViridianForrest, pos: { x: 1, y: 1 } },
+    },
   },
 exits: {},
 exitReturnMap: MapId.ViridianForrest,
@@ -47,40 +47,38 @@ items: [
 // Trainers para "route-2-gate-north"
 trainers: [
   {
-  npc: beauty,
-  pokemon: [{ id: 19, level: 2 }],
-  facing: Direction.Left,
-  pos: { x: 6, y: 4 },
-  intro: [
-
-  ],
-  outtro: [
-    "Ese capullo del hermano del novio... ",
-    "Me intentó echar la caña...",
-    "Como si fuera un magikarp...",
-    "Y luego salió corriendo hacia VILLAMAYOR DE MONJARDÍN"
-  ],
-  money: 0,
-  persistent: true,
-},
+    npc: beauty,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Left,
+    pos: { x: 6, y: 4 },
+    intro: [],
+    outtro: [
+      "Ese capullo del hermano del novio... ",
+      "Me intentó echar la caña...",
+      "Como si fuera un magikarp...",
+      "Y luego salió corriendo hacia VILLAMAYOR DE MONJARDÍN"
+    ],
+    money: 0,
+    persistent: true,
+  },
   {
-  npc: blackBelt,
-  pokemon: [{ id: 68, level: 20 }],
-  facing: Direction.Left,
-  pos: { x: 7, y: 1 },
-  intro: [
-    "Antes me hacía llamar Berrito...",
-    "Pero gracias a gym Unav,",
-    "Hoy vengo de incógnito!",
-    "Ssshhhh no se lo digas a nadie"
+    npc: blackBelt,
+    pokemon: [{ id: 68, level: 20 }],
+    facing: Direction.Left,
+    pos: { x: 7, y: 1 },
+    intro: [
+      "Antes me hacía llamar Berrito...",
+      "Pero gracias a gym Unav,",
+      "Hoy vengo de incógnito!",
+      "Ssshhhh no se lo digas a nadie"
+    ],
+    outtro: [
+      "Como me jode que la boda no sea en Zentral..."
+    ],
+    money: 99995,
+    persistent: true,
+  }
   ],
-  outtro: [
-    "Como me jode que la boda no sea en Zentral..."
-  ],
-  money: 99995,
-  persistent: true,
-}
-],
   minimapPos: { x: 53, y: 66 },
 };
 
