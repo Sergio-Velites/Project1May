@@ -22,16 +22,23 @@ const indigoPlateauLobby: MapType = {
     11: [12, 13, 14, 15],
   },
   text: {},
-  maps: {
-    0: { 8: MapId.EliteFour1 },
-  },
-  exits: {
-    11: [7, 8],
-  },
+  maps: {},
+  exits: {},
   exitReturnMap: MapId.IndigoPlateau,
   exitReturnPos: { x: 9, y: 6 },
   grass: {},
   minimapPos: { x: 29, y: 41 },
+  fences: {},
+  teleports: {
+    0: {
+      8: { map: MapId.EliteFour1, pos: { x: 5, y: 10 } },
+    },
+    11: {
+      7: { map: MapId.LeagueRoute, pos: { x: 10, y: 6 } },
+      8: { map: MapId.LeagueRoute, pos: { x: 11, y: 6 } },
+    },
+  },
+  trainers: [],
 };
 
 export default indigoPlateauLobby;
