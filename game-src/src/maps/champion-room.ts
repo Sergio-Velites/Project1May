@@ -18,15 +18,19 @@ const championRoom: MapType = {
     7: [0, 1, 2, 5, 6, 7],
   },
   text: {},
-  maps: {
-    7: { 3: MapId.EliteFour4, 4: MapId.EliteFour4 },
-  },
-  exits: {
-
-  },
+  maps: {},
+  exits: {},
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
   minimapPos: { x: 29, y: 41 },
+  fences: {},
+  teleports: {
+    7: {
+      3: { map: MapId.EliteFour4, pos: { x: 5, y: 1 } },
+      4: { map: MapId.EliteFour4, pos: { x: 6, y: 1 } },
+    },
+  },
+  trainers: [],
 };
 
 export default championRoom;
