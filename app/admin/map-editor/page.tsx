@@ -2000,6 +2000,10 @@ export default function MapEditor() {
   const [saveFlash, setSaveFlash] = useState(false);
   const [commitMsg, setCommitMsg] = useState<{ text: string; tone: 'ok' | 'warn' | 'err' } | null>(null);
   const [building, setBuilding] = useState(false);
+  // Subida de PNG de mapa: contador de cache-bust (se añade como ?v= a la URL
+  // de la imagen para que el canvas refresque tras reemplazarla).
+  const [imgVersion, setImgVersion] = useState(0);
+  const [uploadingImg, setUploadingImg] = useState(false);
   // Modo mantenimiento del juego (flag en Supabase; toggle instantáneo).
   const [maintenance, setMaintenance] = useState<boolean | null>(null);
   const [maintBusy, setMaintBusy] = useState(false);
@@ -2455,6 +2459,8 @@ export default function MapEditor() {
   function buildMapWriteState() {
     const { maps, teleports, exits } = nestPortals(portals);
     return {
+      width: currentMap?.width,
+      height: currentMap?.height,
       start: startPos,
       cave, dark, allowBicycle,
       // flyable/flySpot SÍ se escriben al .ts: los consume la MO Vuelo.
@@ -2471,6 +2477,80 @@ export default function MapEditor() {
       maps, teleports, exits, exitReturnMap, exitReturnPos,
       minimapPos, minimapParent,
     };
+  }
+
+  // ── Dimensiones del mapa (tiles) ─────────────────────────────────────────
+  // Se editan DIRECTAMENTE sobre mapData (el canvas y todos los overlays leen
+  // currentMap.width/height). Persisten con 💾 Guardar (override Supabase +
+  // width/height en el .ts vía commit-map).
+  function updateMapDims(patch: { width?: number; height?: number }) {
+    setMapData((d) => {
+      const cur = d[selectedMapId];
+      if (!cur) return d;
+      const width = patch.width !== undefined && Number.isInteger(patch.width) && patch.width > 0 ? patch.width : cur.width;
+      const height = patch.height !== undefined && Number.isInteger(patch.height) && patch.height > 0 ? patch.height : cur.height;
+      if (width === cur.width && height === cur.height) return d;
+      return { ...d, [selectedMapId]: { ...cur, width, height } };
+    });
+    setDirty(true);
+  }
+
+  // ── Subir PNG para reemplazar la imagen del mapa ─────────────────────────
+  // Los bytes se suben BAJO EL NOMBRE ACTUAL (currentMap.imageFile): así el
+  // import del .ts sigue siendo válido sin tocar código. El servidor valida el
+  // PNG, lo commitea a GitHub y guarda copia en Supabase (preview instantáneo).
+  async function uploadMapImage(f: File) {
+    if (!currentMap) return;
+    setUploadingImg(true);
+    try {
+      const arr = new Uint8Array(await f.arrayBuffer());
+      let bin = '';
+      const CHUNK = 0x8000;
+      for (let i = 0; i < arr.length; i += CHUNK) {
+        bin += String.fromCharCode(...arr.subarray(i, i + CHUNK));
+      }
+      const contentBase64 = btoa(bin);
+
+      const res = await fetch('/api/admin/upload-map-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ file: currentMap.imageFile, contentBase64 }),
+      });
+      const json = (await res.json().catch(() => ({}))) as {
+        ok?: boolean; configured?: boolean; previewSaved?: boolean;
+        pixelWidth?: number; pixelHeight?: number;
+        branch?: string; commitSha?: string; error?: string; warnings?: string[];
+      };
+      if (!res.ok || !json.ok) {
+        setCommitMsg({ text: `Imagen NO subida: ${json.error ?? `HTTP ${res.status}`}`, tone: 'err' });
+        return;
+      }
+      setImgVersion((v) => v + 1);
+
+      const parts: string[] = [];
+      if (json.commitSha) parts.push(`✓ Imagen ${currentMap.imageFile} → commit ${json.commitSha.slice(0, 7)} (${json.branch})`);
+      else if (json.configured === false) parts.push(`Imagen solo en preview (falta GH_TOKEN, sin commit)`);
+      if (json.warnings?.length) parts.push(json.warnings.join(' · '));
+      setCommitMsg({ text: parts.join(' · '), tone: json.warnings?.length ? 'warn' : 'ok' });
+
+      // Proponer ajustar las dimensiones en tiles a las del PNG nuevo.
+      if (json.pixelWidth && json.pixelHeight) {
+        const tw = Math.round(json.pixelWidth / 16);
+        const th = Math.round(json.pixelHeight / 16);
+        if ((tw !== currentMap.width || th !== currentMap.height) && tw > 0 && th > 0) {
+          const ok = window.confirm(
+            `El PNG mide ${json.pixelWidth}×${json.pixelHeight}px → ${tw}×${th} tiles.\n` +
+            `El mapa está configurado como ${currentMap.width}×${currentMap.height} tiles.\n\n` +
+            `¿Ajustar width/height a ${tw}×${th}? (recuerda 💾 Guardar después)`
+          );
+          if (ok) updateMapDims({ width: tw, height: th });
+        }
+      }
+    } catch (e) {
+      setCommitMsg({ text: `Error subiendo imagen: ${String(e)}`, tone: 'err' });
+    } finally {
+      setUploadingImg(false);
+    }
   }
 
   // ── Compilar el juego (dispara el GitHub Action) ────────────────────────
@@ -2507,6 +2587,8 @@ export default function MapEditor() {
           trainers,
           walls,
           overrides: {
+            width: currentMap?.width,
+            height: currentMap?.height,
             start: startPos,
             cave,
             dark,
@@ -5030,7 +5112,7 @@ export default function MapEditor() {
                   position: 'relative',
                   width: currentMap.width * zoom,
                   height: currentMap.height * zoom,
-                  backgroundImage: `url(/api/admin/map-image/${currentMap.imageFile})`,
+                  backgroundImage: `url(/api/admin/map-image/${currentMap.imageFile}?v=${imgVersion})`,
                   backgroundSize: '100% 100%',
                   backgroundRepeat: 'no-repeat',
                   imageRendering: 'pixelated',
@@ -5998,6 +6080,10 @@ export default function MapEditor() {
             ) : editMode === 'map' ? (
               <MapMetaInspector
                 currentMap={currentMap}
+                imgVersion={imgVersion}
+                uploadingImg={uploadingImg}
+                onUploadImage={uploadMapImage}
+                onChangeDims={updateMapDims}
                 cave={cave}
                 setCave={(v) => { setCave(v); setDirty(true); }}
                 dark={dark}
@@ -7131,6 +7217,10 @@ function MechanicsInspector({
 
 function MapMetaInspector({
   currentMap,
+  imgVersion,
+  uploadingImg,
+  onUploadImage,
+  onChangeDims,
   cave,
   setCave,
   dark,
@@ -7151,6 +7241,10 @@ function MapMetaInspector({
   storeItemsCount,
 }: {
   currentMap?: MapEntry;
+  imgVersion: number;
+  uploadingImg: boolean;
+  onUploadImage: (f: File) => void;
+  onChangeDims: (patch: { width?: number; height?: number }) => void;
   cave: boolean;
   setCave: (v: boolean) => void;
   dark: boolean;
@@ -7177,6 +7271,79 @@ function MapMetaInspector({
       <div style={{ color: '#888', fontSize: 11, marginBottom: 12 }}>
         {currentMap ? `${currentMap.sourceFile} · ${currentMap.width}×${currentMap.height}` : 'Sin mapa'}
       </div>
+
+      {/* ── Imagen del mapa: preview + reemplazo por subida ── */}
+      {currentMap && (
+        <div style={{ ...sectionStyle, background: '#101a12', border: '1px solid #2d6a3a', borderRadius: 4, padding: 10, marginBottom: 12 }}>
+          <label style={labelStyle}>Imagen del mapa</label>
+          <div style={{ color: '#789', fontSize: 11, marginBottom: 6 }}>{currentMap.imageFile}</div>
+          <img
+            src={`/api/admin/map-image/${currentMap.imageFile}?v=${imgVersion}`}
+            alt={currentMap.imageFile}
+            style={{ width: '100%', imageRendering: 'pixelated', border: '1px solid #333', borderRadius: 3, background: '#000' }}
+          />
+          <label
+            style={{
+              display: 'block', textAlign: 'center', marginTop: 8, padding: '6px 8px',
+              background: uploadingImg ? '#1a2a1e' : '#12321c', border: '1px solid #2d8a4a',
+              color: uploadingImg ? '#6a8a72' : '#8fe8a8', borderRadius: 4,
+              cursor: uploadingImg ? 'wait' : 'pointer', fontSize: 12, fontWeight: 700,
+            }}
+          >
+            {uploadingImg ? 'Subiendo…' : '🖼 Reemplazar PNG…'}
+            <input
+              type="file"
+              accept="image/png"
+              disabled={uploadingImg}
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = ''; // permitir re-subir el mismo fichero
+                if (!f) return;
+                if (!window.confirm(`Esto REEMPLAZA ${currentMap.imageFile} en el repo (commit inmediato) y en el editor. ¿Continuar?`)) return;
+                onUploadImage(f);
+              }}
+            />
+          </label>
+          <div style={{ color: '#789', fontSize: 10, marginTop: 6, lineHeight: 1.5 }}>
+            Se sube con el nombre actual (el .ts no cambia). El juego jugable la
+            mostrará tras 🛠 Compilar juego. 16 px = 1 tile.
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
+            <label style={{ color: '#888', fontSize: 10 }}>
+              Width (tiles)
+              <input
+                type="number"
+                min={1}
+                value={currentMap.width}
+                onChange={(e) => {
+                  const w = parseInt(e.target.value, 10);
+                  if (!Number.isNaN(w)) onChangeDims({ width: w });
+                }}
+                style={{ ...inputStyle, fontSize: 11, padding: '2px 6px' }}
+              />
+            </label>
+            <label style={{ color: '#888', fontSize: 10 }}>
+              Height (tiles)
+              <input
+                type="number"
+                min={1}
+                value={currentMap.height}
+                onChange={(e) => {
+                  const h = parseInt(e.target.value, 10);
+                  if (!Number.isNaN(h)) onChangeDims({ height: h });
+                }}
+                style={{ ...inputStyle, fontSize: 11, padding: '2px 6px' }}
+              />
+            </label>
+          </div>
+          <div style={{ color: '#789', fontSize: 10, marginTop: 6 }}>
+            width/height se escriben al .ts con 💾 Guardar. Cuidado: encoger el
+            mapa deja fuera contenido con coordenadas mayores.
+          </div>
+        </div>
+      )}
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13 }}>
           <input type="checkbox" checked={allowBicycle} onChange={(e) => setAllowBicycle(e.target.checked)} style={{ accentColor: '#88ff88' }} />

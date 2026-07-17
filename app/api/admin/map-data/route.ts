@@ -27,6 +27,8 @@ function readBundledData(): Record<string, unknown> {
 }
 
 type OverrideKey =
+  | 'width'
+  | 'height'
   | 'start'
   | 'cave'
   | 'dark'
@@ -64,6 +66,8 @@ type OverrideKey =
   | 'minimapParent';
 
 const OVERRIDE_KEYS: OverrideKey[] = [
+  'width',
+  'height',
   'start',
   'cave',
   'dark',

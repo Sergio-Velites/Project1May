@@ -57,6 +57,9 @@ export interface Pos { x: number; y: number }
  */
 export interface MapWriteState {
   name?: string;
+  /** Dimensiones en tiles (px/16). Solo se reescriben si vienen definidas y > 0. */
+  width?: number;
+  height?: number;
   start?: Pos | null;
   cave?: boolean;
   dark?: boolean;
@@ -391,6 +394,10 @@ function buildFieldOps(state: MapWriteState, resolve: (t: string) => string): Fi
   const push = (field: string, text: string | null) => ops.push({ field, text });
 
   if (state.name !== undefined) push('name', `name: "${escapeTSString(state.name)}"`);
+  // width/height: obligatorios en MapType → nunca se eliminan, solo se
+  // reemplazan con enteros válidos (> 0). Valores raros se ignoran (no tocar).
+  if (state.width !== undefined && Number.isInteger(state.width) && state.width > 0) push('width', `width: ${state.width}`);
+  if (state.height !== undefined && Number.isInteger(state.height) && state.height > 0) push('height', `height: ${state.height}`);
   if (state.allowBicycle !== undefined) push('allowBicycle', state.allowBicycle ? 'allowBicycle: true' : null);
   if (state.cave !== undefined) push('cave', state.cave ? 'cave: true' : null);
   if (state.dark !== undefined) push('dark', state.dark ? 'dark: true' : null);
