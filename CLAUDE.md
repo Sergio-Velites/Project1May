@@ -90,9 +90,14 @@ node_modules/.bin/react-scripts build
 npx react-scripts build
 ```
 
-### ⚠️ Regla 3: NUNCA commits directos a master
+### ⚠️ Regla 3: NUNCA commits directos a master (con matiz)
 
-Toda modificación del juego va a la rama de desarrollo activa (`claude/pokemon-gen2-database-tScT0`). El merge a master es decisión del usuario.
+Toda modificación **de código** va a la rama de desarrollo activa (`integrate-gb-maps`).
+El merge a `master` lo decide el usuario. Excepción operativa: el map-editor SÍ
+commitea `.ts` de mapas y el bundle directamente a `master` por diseño (es su
+flujo, ver sección Map Editor). Si el usuario pide explícitamente ver un cambio
+en producción, llevar los commits a `master` es lo correcto (fast-forward cuando
+la rama solo va por delante) — pero confirmar/avisar, nunca por defecto.
 
 ### Flujo completo
 
@@ -112,21 +117,40 @@ cp -r game-src/build/* public/game/
 rm -f public/game/static/js/main.OLDHASH.js \
       public/game/static/js/main.OLDHASH.js.LICENSE.txt
 
-# 5. Commit y push (a la rama activa, NUNCA a master)
+# 5. Commit y push (a la rama activa; el merge a master lo decide el usuario)
 git add public/game/ game-src/src/
 git commit -m "feat: descripción"
-git push origin claude/pokemon-gen2-database-tScT0
+git push origin integrate-gb-maps
 ```
 
-### Cambios solo en Next.js (admin, RSVP, map-editor)
+### Cambios solo en Next.js (admin, RSVP, **map-editor**)
 
-No requieren compilar el juego:
+Los cambios en `app/` y `supabase/` **NO requieren compilar el juego** (el editor,
+el admin y las API routes son parte del shell Next, no del bundle CRA):
 
 ```bash
 git add app/ supabase/
 git commit -m "feat: descripción"
-git push origin claude/pokemon-gen2-database-tScT0
+git push origin integrate-gb-maps
 ```
+
+### ⚠️ Cómo se ve un cambio del editor EN PRODUCCIÓN (regla clave)
+
+Producción (`game.bodasym26.es`) corre **`master`**. Un cambio de `app/`
+(p. ej. una función nueva del map-editor) NO aparece en el editor desplegado
+hasta que ese commit está en `master`. El proyecto de Vercel es **git-connected**:
+un push a `master` dispara solo un deploy del shell Next (~1 min) y el editor
+queda actualizado — **sin** recompilar el juego.
+
+- **Solo el JUEGO jugable** (mapas, mecánicas, sprites del bundle) necesita
+  además 🛠 **Compilar juego** (recompila el CRA y commitea `public/game/`).
+- Síntoma típico de "no veo mi feature del editor": estás mirando producción
+  (que corre `master`) pero el commit sigue en una rama de desarrollo. Solución:
+  llevar los commits a `master` (fast-forward si la rama solo va por delante:
+  `git push origin <rama>:master`) y esperar el deploy de Vercel.
+- Verificar el deploy: MCP `claude.ai Vercel` → `list_deployments` (buscar el de
+  `githubCommitRef: master` con tu SHA en estado `READY`) o
+  `npx vercel inspect <deploy-id> --scope apps-7362s-projects`.
 
 ---
 
