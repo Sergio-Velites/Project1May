@@ -32,3 +32,9 @@ Thumbs.db
 # Supabase CLI temp files
 supabase/.temp/
 __pycache__/
+
+# Vercel CLI (link local + envs descargadas — contienen secretos)
+# OJO: no usar ".env*" global: game-src/.env.production (valores públicos
+# del anon key) SÍ va commiteado y lo necesita build-game.yml.
+.vercel
+.env.vercel

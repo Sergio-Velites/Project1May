@@ -20,7 +20,8 @@
 16. [Estado actual de la narrativa](#estado-actual-de-la-narrativa)
 17. [Archivos clave](#archivos-clave)
 18. [Problemas conocidos y soluciones definitivas](#problemas-conocidos-y-soluciones-definitivas)
-19. [Variables de entorno](#variables-de-entorno)
+19. [Acceso a infraestructura (Supabase · Vercel · GitHub)](#acceso-a-infraestructura-supabase--vercel--github)
+20. [Variables de entorno](#variables-de-entorno)
 
 ---
 
@@ -36,7 +37,7 @@ Invitación de boda interactiva con estética Game Boy (Pokémon Rojo/Azul). El 
 - Sistema de medallas únicas por invitado
 - Map Editor integrado en `/admin/map-editor`
 
-**Repositorio**: `Sergio-Velites/Project1May` · **Rama activa de desarrollo**: `claude/pokemon-gen2-database-tScT0` · **Producción**: `master` → Vercel
+**Repositorio**: `Sergio-Velites/Project1May` · **Rama activa de desarrollo**: `integrate-gb-maps` (jul 2026) · **Producción**: `master` → Vercel (proyecto git-connected: cada push a `master` redespliega el shell Next automáticamente; el juego jugable solo cambia tras recompilar el bundle — botón 🛠 del editor o build manual)
 
 ---
 
@@ -851,6 +852,33 @@ Las imágenes de mapa **ya NO se copian** a `public/editor/maps/`. El editor las
 `game-src/src/assets/map/` vía `/api/admin/map-image/<file>` (misma fuente que compila el juego).
 `next.config.ts` incluye `game-src/src/assets/map/**` en el trace de ese lambda.
 
+### Reemplazar el PNG del mapa y editar width/height (desde el editor)
+
+En el inspector 🗺 (modo `map`) hay una sección **"Imagen del mapa"** con preview,
+botón **🖼 Reemplazar PNG…** e inputs **Width/Height (tiles)**:
+
+- **Subida**: `POST /api/admin/upload-map-image` valida el PNG (magic bytes + IHDR,
+  máx. 4 MB), lo **commitea a GitHub** bajo `game-src/src/assets/map/<imageFile>`
+  (mismo nombre → el `import` del `.ts` no cambia) y guarda copia base64 en la
+  tabla Supabase `map_editor_images` (migración `011`) para **preview instantáneo**:
+  el filesystem del lambda de Vercel no refleja el commit hasta el siguiente deploy.
+- **`map-image/[file]` con auto-limpieza**: sirve el override de Supabase solo
+  mientras difiera del filesystem; cuando un deploy ya incluye los mismos bytes,
+  **borra la fila** y vuelve al filesystem → el override nunca puede tapar una
+  edición manual posterior del PNG en el repo (la trampa clásica de los overrides).
+- **Dimensiones**: al subir, el servidor devuelve los px y el editor propone
+  `width/height = px/16` (confirm). También se pueden editar a mano; el canvas se
+  redimensiona al instante (se muta `mapData`, no hay estado aparte). Persisten
+  con 💾 Guardar: override Supabase (`width`/`height` en `OVERRIDE_KEYS`) + campos
+  `width:`/`height:` del `.ts` vía `ts-codegen` (reescritura quirúrgica; valores
+  no enteros o ≤ 0 se ignoran y el campo nunca se elimina).
+- **Cache-bust**: el canvas añade `?v=<imgVersion>` a la URL de la imagen; el
+  contador se incrementa tras cada subida.
+- ⚠️ Encoger un mapa NO recorta el contenido (walls/NPCs con coords mayores
+  quedan fuera del canvas pero siguen en los datos).
+- El juego jugable muestra la imagen nueva tras **🛠 Compilar juego** (CRA la
+  importa del repo en build).
+
 ### Guardar → commit del `.ts` (escritura quirúrgica + auto-imports)
 
 `💾 Guardar` hace DOS cosas (aditivo, nunca rompe):
@@ -1054,7 +1082,7 @@ una rama de staging con revisión por PR, basta con poner `MAP_EDIT_BRANCH=<rama
 | `game-src/src/components/OnlineBattleNpc.tsx` | Detecta A frente al scientist |
 | `game-src/src/components/OnlineBattleMenu.tsx` | Flujo batalla online |
 | `game-src/src/maps/map-types.ts` | Interfaces MapType, TrainerType |
-| `game-src/src/maps/map-data.ts` | Registro de los 33 mapas |
+| `game-src/src/maps/map-data.ts` | Registro de los 163 mapas |
 | `app/admin/page.tsx` | Server Component: fetch RSVPs (usa process.env) |
 | `app/admin/AdminDashboard.tsx` | Client Component: sorting + render + medallas |
 | `app/admin/admin-medals.ts` | Lógica medallas únicas (empate = nadie) |
@@ -1182,6 +1210,16 @@ Ejemplos: Diglett/Natu 50px · Pikachu 54px · Charizard 62px · Snorlax 64px ·
 
 > **Estado de despliegue (revisión de seguridad)**: mergeado a `master` y desplegado. Edge Functions activas en Supabase (`kplfjrjibjptigvfgdvy`): `load-game` v4, `webauthn-auth-finish` v14, `save-game` v8, `admin-player` v2. `verify_jwt` preservado en cada una (`admin-player` = true; resto = false). Bundle del juego: `main.c45b5a0b.js`. La cabecera `x-write-token` está en la allowlist CORS de `_shared/cors.ts`.
 
+### 25. GH_TOKEN caducado → "Guardado en nube. Commit falló: … HTTP 401" (2026-07-17)
+**Síntoma**: al 💾 Guardar en el map-editor, el preview de Supabase se guarda pero el commit del `.ts` falla con `No se pudo comprobar la rama master: HTTP 401` (500 en `/api/admin/commit-map`). También rompe 🛠 Compilar juego y la subida de imágenes.
+**Causa**: el PAT guardado como `GH_TOKEN` en Vercel caducó o fue revocado.
+**Arreglo (5 min, sin tocar código)**:
+1. Conseguir token nuevo: `gh auth token` (la CLI local está logueada como Sergio-Velites, scopes `repo`+`workflow`) o crear un PAT fine-grained en GitHub (Contents + Actions: read/write sobre este repo — preferible, con caducidad posterior al evento).
+2. `npx vercel env rm GH_TOKEN --yes && gh auth token | npx vercel env add GH_TOKEN production && gh auth token | npx vercel env add GH_TOKEN preview`
+3. Redesplegar (las funciones no cogen el valor hasta el siguiente deploy): `npx vercel redeploy <url-del-último-deploy-prod>`.
+**Importante**: los guardados hechos con el token roto viven SOLO en el override de Supabase — reabrir cada mapa afectado y volver a 💾 Guardar para que llegue al `.ts` (consultar `map_editor_data.updated_at` para saber cuáles).
+**NO diagnosticar con `vercel env pull`**: devuelve el literal `[SENSITIVE]` (11 chars) para variables sensibles, no el valor real.
+
 ---
 
 ## Ideas futuras (no implementadas)
@@ -1216,6 +1254,62 @@ Actualmente `cerulean-cave-1f` no tiene acceso desde el mapa. Conectar con `ceru
 ### Editor de mapas — mejoras pendientes
 - Selector de `MapId` en portales (doors/teleports) con autocompletado en vez de campo de texto libre.
 - Vista de conexiones: mostrar qué mapas están conectados entre sí (grafo).
+
+---
+
+## Acceso a infraestructura (Supabase · Vercel · GitHub)
+
+Cómo operar CUALQUIER pieza del despliegue de forma autónoma, sin pedir nada al
+usuario. Ningún secreto vive en este archivo: todo el acceso es vía CLIs ya
+autenticadas en esta máquina o herramientas MCP conectadas.
+
+### Supabase — proyecto `kplfjrjibjptigvfgdvy`
+
+- **Vía MCP** (`claude.ai Supabase`): `execute_sql` (consultas), `apply_migration`
+  (DDL — además crear SIEMPRE el archivo espejo en `supabase/migrations/`),
+  `deploy_edge_function`, `get_logs`, `list_tables`, `get_advisors`.
+- **Tablas**: `saves` (partidas + `write_token` + RSVP), `rsvp`,
+  `webauthn_credentials`, `webauthn_challenges`, `link_sessions` (Club Cable),
+  `map_editor_data` (overrides del editor: `map_id, trainers, walls, overrides,
+  updated_at`), `map_editor_images` (PNGs subidos, preview), `app_config`
+  (mantenimiento + allowlist).
+- **Edge Functions**: listadas en la sección de guardado. `verify_jwt=false` en
+  todas salvo `admin-player`. Al redesplegar una función, preservar ese flag.
+- **Diagnóstico "¿qué mapas tienen cambios sin commitear?"**:
+  `select map_id, updated_at from map_editor_data order by updated_at desc` y
+  comparar con los commits `editor:` de `master`.
+
+### Vercel — team `apps-7362s-projects` · proyecto `project1-may`
+
+- **CLI logueada** como `apps-7362` (`npx vercel@latest whoami`). IDs:
+  team `team_seM7WhowVA1RMQtTZD6Hua2c`, proyecto `prj_lGeU69gtyehTBf2FMvl2L8dYRVXa`.
+  Si el directorio no está linkado: `npx vercel link --yes --project project1-may
+  --scope apps-7362s-projects` (crea `.vercel/`, gitignorado).
+- **Dominios**: `game.bodasym26.es` (producción), `project1-may.vercel.app`.
+- **Git-connected**: push a `master` → deploy automático del shell Next.
+  Deploy manual/redeploy: `npx vercel redeploy <url-deploy-prod>` (usar tras
+  cambiar env vars) o `npx vercel --prod`.
+- **Env vars**: `npx vercel env ls|add|rm`. ⚠️ `env pull` escribe el literal
+  `[SENSITIVE]` para variables sensibles — NUNCA diagnosticar valores así;
+  verificar por comportamiento. Cambios de env requieren redeploy.
+- **Logs de producción**: MCP `claude.ai Vercel` → `get_runtime_logs` /
+  `get_runtime_errors` (filtrar con `query`, p.ej. `commit-map`).
+- **Borrar SIEMPRE** cualquier `.env*` descargado tras usarlo.
+
+### GitHub — repo `Sergio-Velites/Project1May`
+
+- **CLI `gh` logueada** como `Sergio-Velites` (dueño), scopes `repo`+`workflow`:
+  vale para API, PRs, workflows (`gh workflow run build-game.yml -f ref=master`)
+  y como fuente de emergencia de token (`gh auth token`) — ver problema #25.
+- **`GH_TOKEN` en Vercel** (lo usan `commit-map`, `upload-map-image` y
+  `build-game`): desde 2026-07-17 es el token OAuth de la CLI `gh` (amplio: todos
+  los repos del usuario). Sustituir cuando se pueda por un PAT fine-grained
+  (Contents + Actions: read/write, solo este repo, caducidad > fecha de la boda).
+- **Ramas**: el editor commitea a `MAP_EDIT_BRANCH` (sin definir en Vercel →
+  default `master`). El botón 🛠 compila el ref `MAP_EDIT_BRANCH` con el workflow
+  de `GH_WORKFLOW_REF` (default `master` ambos). Desarrollo de código en ramas
+  (`integrate-gb-maps` actual) SIEMPRE rebasadas sobre `master` antes de merge,
+  porque `master` avanza solo con los commits `editor:`.
 
 ---
 

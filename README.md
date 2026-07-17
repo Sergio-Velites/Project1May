@@ -134,6 +134,23 @@ Accesible en `/admin` (protegido con cookie `ADMIN_PASSWORD` vía middleware).
 
 El botón de descarga exporta todos los datos RSVP a CSV para uso externo (catering, transporte, etc.).
 
+### Map Editor (`/admin/map-editor`)
+
+Editor visual de los 163 mapas del juego, sin tocar código a mano:
+
+- **Edición completa**: muros, hierba, agua, salientes direccionales, portales,
+  NPCs/entrenadores (con auto-equipos), encuentros (con auto-relleno por
+  terreno/hora), objetos, textos, rocas, árboles de bayas, música, minimapa…
+- **Imagen del mapa**: botón 🖼 para **subir un PNG que reemplaza el del mapa**
+  (commit automático al repo + preview instantáneo) e inputs de **width/height
+  en tiles** (16 px = 1 tile) con propuesta automática según el PNG subido.
+- **💾 Guardar** hace doble persistencia: preview inmediato en Supabase y
+  **commit quirúrgico del `.ts`** del mapa a `master` vía GitHub API (conserva
+  todo lo que el editor no gestiona y reconcilia imports).
+- **🛠 Compilar juego**: dispara un GitHub Action que recompila el bundle CRA y
+  lo commitea — los cambios llegan al juego jugable en unos minutos.
+- Usable en móvil/tablet (gestos de dos dedos para desplazar y pinch-zoom).
+
 ---
 
 ## Stack técnico
