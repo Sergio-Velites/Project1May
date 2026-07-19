@@ -2,7 +2,6 @@ import image from "../assets/map/viridian-city-pokemon-center.png";
 import { MapId, MapType } from "./map-types";
 import { Direction } from "../state/state-types";
 import { scientist } from "../app/npcs";
-
 import music from "../assets/music/maps/pokemon-center.mp3";
 
 const viridianCityPokemonCenter: MapType = {
@@ -10,67 +9,53 @@ const viridianCityPokemonCenter: MapType = {
   image,
   height: 8,
   width: 14,
-  start: {
-    x: 4,
-    y: 6,
-  },
+  start: { x: 11, y: 3 },
   walls: {
-    0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13],
-    1: [0, 1, 2, 5, 6, 7],
-    2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13],
+    2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
     3: [13],
     4: [0],
     5: [0],
-    6: [0, 1, 6, 7, 12, 13],
-    7: [0, 1, 6, 7, 12, 13],
+    6: [1, 6, 7, 12, 13],
+    7: [1, 6, 7, 12, 13],
   },
   text: {
     4: {
       0: [
         "¡Bienvenidos, invitados de la boda!",
         "¡Aquí curamos a todos los PKMN gratis!",
-        "¡Que disfruten la celebración!",
+        "¡Que disfruten la celebración!"
       ],
     },
   },
-  maps: {
-
-  },
-  exits: {
-    7: [3, 4],
-  },
-  music,
+  maps: {},
+  exits: {},
+  music: music,
   grass: {},
   exitReturnMap: MapId.ViridianCity,
-  exitReturnPos: {
-    x: 23,
-    y: 26,
-  },
-  pokemonCenter: {
-    x: 3,
-    y: 2,
-  },
-  pc: {
-    x: 13,
-    y: 3,
-  },
-  onlineBattleNpc: {
-    x: 8,
-    y: 2,
-  },
+  exitReturnPos: { x: 23, y: 26 },
+  pokemonCenter: { x: 3, y: 2 },
+  pc: { x: 13, y: 3 },
+  onlineBattleNpc: { x: 11, y: 2 },
   trainers: [
-    {
-      npc: scientist,
-      pokemon: [{ id: 1, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 8, y: 1 },
-      intro: [],
-      outtro: [],
-      money: 0,
-      isOnline: true,
-    },
+  {
+    npc: scientist,
+    pokemon: [{ id: 1, level: 1 }],
+    facing: Direction.Down,
+    pos: { x: 11, y: 2 },
+    intro: [],
+    outtro: [],
+    money: 0,
+    isOnline: true,
+  }
   ],
   minimapPos: { x: 53, y: 112 },
+  fences: {},
+  teleports: {
+    8: {
+      3: { map: MapId.ViridianCity, pos: { x: 23, y: 26 } },
+      4: { map: MapId.ViridianCity, pos: { x: 23, y: 26 } },
+    },
+  },
 };
 
 export default viridianCityPokemonCenter;
