@@ -1,7 +1,7 @@
 import palletTownImage from "../assets/map/pallet-town.png";
 import { MapId, MapType } from "./map-types";
 import { Direction } from "../state/state-types";
-import { lass, teamRocketGrunt, youngster } from "../app/npcs";
+import { gambler, lass, rocker, teamRocketGrunt, youngster } from "../app/npcs";
 import music from "../assets/music/maps/pallet-town.mp3";
 import getEncounterData from "./get-location-data";
 
@@ -21,17 +21,16 @@ walls: {
     5: [0, 3, 4, 6, 7, 11, 12, 14, 15, 19],
     6: [0, 19],
     7: [0, 19],
-    8: [0, 4, 10, 11, 12, 13, 14, 15, 19],
+    8: [0, 10, 11, 12, 13, 14, 15, 19],
     9: [0, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 19],
     10: [0, 10, 11, 12, 13, 14, 15, 19],
     11: [0, 10, 11, 13, 14, 15, 19],
     12: [0, 19],
     13: [0, 10, 11, 12, 13, 14, 15, 19],
     14: [0, 19],
-    15: [0, 10, 19],
+    15: [0, 19],
     16: [0, 19],
     17: [0, 1, 2, 3, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-    18: [4, 5, 6, 7],
   },
   text: {
     5: {
@@ -40,11 +39,6 @@ walls: {
       ],
       11: [
         "Casa de Chun Su. Hoy no hay nadie."
-      ],
-    },
-    8: {
-      4: [
-        "Pensé que me invitarían..."
       ],
     },
     9: {
@@ -57,19 +51,10 @@ walls: {
         "DESTILERÍA DEL PROF. OAK"
       ],
     },
-    15: {
-      10: [
-        "Dicen que hay un tal JUANRE que no perdona a los rezajados",
-        "Habrá que que ponerse en marcha...",
-        "Dicen que la preboda es en EL BOSQUECILLO"
-      ],
-    },
   },
-  maps: {
-    17: {  },
-  },
+  maps: {},
   exits: {},
-  music: music,
+  music: "/game/music/maps-original/pallet-town.mp3",
   grass: {},
   recoverLocation: { x: 5, y: 6 },
   // NPCs del pueblo con los que se puede hablar (no combaten):
@@ -136,6 +121,32 @@ trainers: [
     money: 0,
     persistent: true,
     hideCondition: "has-pokemon",
+  },
+  {
+    npc: rocker,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Down,
+    pos: { x: 4, y: 8 },
+    intro: [],
+    outtro: [
+      "Pensé que me invitarían..."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: gambler,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Down,
+    pos: { x: 10, y: 15 },
+    intro: [],
+    outtro: [
+      "Dicen que hay un tal JUANRE que no perdona a los rezajados",
+      "Habrá que que ponerse en marcha...",
+      "Dicen que la preboda es en EL BOSQUECILLO"
+    ],
+    money: 0,
+    persistent: true,
   }
   ],
 water: {
@@ -198,12 +209,25 @@ encounters: {
   fences: {},
   minimapPos: { x: 53, y: 147 },
   flyable: true,
-  flySpot: { x: 5, y: 6 },
+  flySpot: { x: 12, y: 12 },
   teleports: {
-    0: { 10: { map: MapId.Route1, pos: { x: 11, y: 34 } }, 11: { map: MapId.Route1, pos: { x: 11, y: 34 } } },
-    5: { 5: { map: MapId.PalletTownHouseA1F, pos: { x: 2, y: 7 } }, 13: { map: MapId.PalletTownHouseB, pos: { x: 2, y: 7 } } },
-    11: { 12: { map: MapId.PalletTownLab, pos: { x: 5, y: 11 } } },
-    17: { 4: { map: MapId.Route21, pos: { x: 4, y: 1 } }, 5: { map: MapId.Route21, pos: { x: 5, y: 1 } }, 6: { map: MapId.Route21, pos: { x: 6, y: 1 } }, 7: { map: MapId.Route21, pos: { x: 7, y: 1 } } },
+    0: {
+      10: { map: MapId.Route1, pos: { x: 11, y: 34 } },
+      11: { map: MapId.Route1, pos: { x: 11, y: 34 } },
+    },
+    5: {
+      5: { map: MapId.PalletTownHouseA1F, pos: { x: 2, y: 7 } },
+      13: { map: MapId.PalletTownHouseB, pos: { x: 2, y: 7 } },
+    },
+    11: {
+      12: { map: MapId.PalletTownLab, pos: { x: 5, y: 11 } },
+    },
+    18: {
+      4: { map: MapId.Route21, pos: { x: 4, y: 1 } },
+      5: { map: MapId.Route21, pos: { x: 5, y: 1 } },
+      6: { map: MapId.Route21, pos: { x: 6, y: 1 } },
+      7: { map: MapId.Route21, pos: { x: 7, y: 1 } },
+    },
   },
 };
 
