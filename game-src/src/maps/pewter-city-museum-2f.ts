@@ -7,10 +7,7 @@ const pewterMuseum2f: MapType = {
   image,
   height: 8,
   width: 14,
-  start: {
-    x: 7,
-    y: 6,
-  },
+  start: { x: 7, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
     1: [10, 11, 12],
@@ -44,21 +41,17 @@ text: {
       },
     },
   },
-  maps: {
-
-  },
+  maps: {},
   teleports: {
-    7: { 7: { map: MapId.PewterCityMuseum1f, pos: { x: 7, y: 7 } } },
+    7: {
+      7: { map: MapId.PewterCityMuseum1f, pos: { x: 6, y: 7 } },
+    },
   },
-  exits: {
-
-  },
-  exitReturnPos: {
-    x: 7,
-    y: 6,
-  },
+  exits: {},
+  exitReturnPos: { x: 7, y: 6 },
   exitReturnMap: MapId.PewterCityMuseum1f,
   minimapPos: { x: 53, y: 52 },
+  trainers: [],
 };
 
 export default pewterMuseum2f;
