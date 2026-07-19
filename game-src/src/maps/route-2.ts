@@ -138,6 +138,10 @@ const route2: MapType = {
       16: { map: MapId.Route4Gate, pos: { x: 5, y: 1 } },
       17: { map: MapId.Route4Gate, pos: { x: 5, y: 1 } },
     },
+    36: {
+      16: { map: MapId.Route4Gate, pos: { x: 5, y: 1 } },
+      17: { map: MapId.Route4Gate, pos: { x: 5, y: 1 } },
+    },
     39: {
       15: { map: MapId.Route4Gate, pos: { x: 5, y: 7 } },
     },
