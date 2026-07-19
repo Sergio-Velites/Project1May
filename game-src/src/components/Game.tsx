@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ReactNode } from "react";
+import { ReactNode, useRef } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { selectPos, selectMap, selectDefeatedTrainers, selectMapId, selectPokemon } from "../state/gameSlice";
@@ -108,10 +108,24 @@ const ColorOverlay = styled.div`
  */
 const MapViewport = ({ children }: { children: ReactNode }) => {
   const pos = useSelector(selectPos);
+  const mapId = useSelector(selectMapId);
+  // La transición del translate (0.2s) es SOLO para el paso a paso de andar
+  // (todo movimiento legítimo — caminar, empujar roca, saltar saliente — mueve
+  // exactamente 1 tile dentro del mismo mapa). Cualquier otro cambio de pos
+  // (puerta/teleport, conexión entre mapas, KO → centro Pokémon, cargar
+  // partida, quest que recoloca) es un salto: sin transición, el mapa aparece
+  // ya colocado — nada de "barrido" deslizante hasta el punto de aparición.
+  const prev = useRef({ x: pos.x, y: pos.y, mapId });
+  const isStep =
+    prev.current.mapId === mapId &&
+    Math.abs(pos.x - prev.current.x) <= 1 &&
+    Math.abs(pos.y - prev.current.y) <= 1;
+  prev.current = { x: pos.x, y: pos.y, mapId };
   return (
     <BackgroundContainer
       style={{
         transform: `translate(${xToPx(-pos.x)}, ${yToPx(-pos.y)})`,
+        ...(isStep ? {} : { transition: "none" }),
       }}
     >
       {children}

@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/game/static/css/main.84e6e57a.css",
-    "main.js": "/game/static/js/main.d0942cb9.js",
+    "main.js": "/game/static/js/main.779f6a74.js",
     "static/media/pewter-city.mp3": "/game/static/media/pewter-city.dbfe2794208a91f807e7.mp3",
     "static/media/mt-moon.mp3": "/game/static/media/mt-moon.d3c96e8c603b742504e6.mp3",
     "static/media/intro.mp4": "/game/static/media/intro.635c67d841e2fe0b7a4e.mp4",
@@ -65,6 +65,7 @@
     "static/media/route-24.png": "/game/static/media/route-24.b51b66f856c1a7351058.png",
     "static/media/Pokemon-GB.ttf": "/game/static/media/Pokemon-GB.6211ee48ea626f34681e.ttf",
     "static/media/pokemon-mansion-1f.png": "/game/static/media/pokemon-mansion-1f.98653e1e46c4ade03665.png",
+    "static/media/pallet-town.png": "/game/static/media/pallet-town.6798145f28589e6c8fc4.png",
     "static/media/victory-road-2f.png": "/game/static/media/victory-road-2f.380bec7e0076c4b2d482.png",
     "static/media/seafoam-islands-3f.png": "/game/static/media/seafoam-islands-3f.b2666ff745e73228460a.png",
     "static/media/pewter-city-gym.png": "/game/static/media/pewter-city-gym.6692cc749ba781d6f0f6.png",
@@ -77,6 +78,6 @@
   },
   "entrypoints": [
     "static/css/main.84e6e57a.css",
-    "static/js/main.d0942cb9.js"
+    "static/js/main.779f6a74.js"
   ]
 }
