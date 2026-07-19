@@ -18,16 +18,20 @@ const digletsCave: MapType = {
     7: [0, 1, 4, 5, 6, 7],
   },
   text: {},
-  maps: {
-
-  },
-  exits: {
-    7: [2, 3],
-  },
+  maps: {},
+  exits: {},
   exitReturnMap: MapId.Route2,
   exitReturnPos: { x: 12, y: 10 },
   grass: {},
   minimapPos: { x: 53, y: 60 },
+  fences: {},
+  teleports: {
+    8: {
+      2: { map: MapId.Route2, pos: { x: 12, y: 10 } },
+      3: { map: MapId.Route2, pos: { x: 12, y: 10 } },
+    },
+  },
+  trainers: [],
 };
 
 export default digletsCave;
