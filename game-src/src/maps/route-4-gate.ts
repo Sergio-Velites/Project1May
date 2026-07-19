@@ -17,16 +17,21 @@ const route4Gate: MapType = {
     7: [0, 9],
   },
   text: {},
-  maps: {
-
-  },
+  maps: {},
   exits: {},
   teleports: {
-    0: { 5: { map: MapId.Route2, pos: { x: 16, y: 34 } } },
-    7: { 4: { map: MapId.Route2, pos: { x: 15, y: 40 } }, 5: { map: MapId.Route2, pos: { x: 15, y: 40 } } },
+    0: {
+      5: { map: MapId.Route2, pos: { x: 16, y: 35 } },
+    },
+    8: {
+      4: { map: MapId.Route2, pos: { x: 15, y: 40 } },
+      5: { map: MapId.Route2, pos: { x: 15, y: 40 } },
+    },
   },
   grass: {},
   minimapPos: { x: 53, y: 100 },
+  fences: {},
+  trainers: [],
 };
 
 export default route4Gate;
