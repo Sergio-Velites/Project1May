@@ -125,8 +125,8 @@ const route2: MapType = {
   maps: {},
   teleports: {
     "-1": {
-      8: { map: MapId.PewterCity, pos: { x: 18, y: 34 } },
-      9: { map: MapId.PewterCity, pos: { x: 19, y: 34 } },
+      8: { map: MapId.PewterCity, pos: { x: 18, y: 35 } },
+      9: { map: MapId.PewterCity, pos: { x: 19, y: 35 } },
     },
     9: {
       12: { map: MapId.DiglettsCave, pos: { x: 3, y: 7 } },
