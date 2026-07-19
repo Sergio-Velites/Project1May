@@ -8,10 +8,7 @@ const peweterCityNpcB: MapType = {
   image,
   height: 8,
   width: 8,
-  start: {
-    x: 3,
-    y: 6,
-  },
+  start: { x: 3, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7],
     1: [0, 1, 7],
@@ -21,82 +18,74 @@ const peweterCityNpcB: MapType = {
     7: [0, 7],
   },
   text: {},
-  maps: {
-
-  },
-  exits: {
-    7: [2, 3],
-  },
-  exitReturnPos: {
-    x: 29,
-    y: 14,
-  },
+  maps: {},
+  exits: {},
+  exitReturnPos: { x: 29, y: 14 },
   exitReturnMap: MapId.PewterCity,
   grass: {},
   // Trainers para "pewter-city-npc-b"
 trainers: [
   {
-  npc: gentleman,
-  pokemon: [{ id: 19, level: 2 }],
-  facing: Direction.Down,
-  pos: { x: 4, y: 1 },
-  intro: [
-
-  ],
-  outtro: [
-    "Me pregunto si Diego irá con sombrero a la boda..."
-  ],
-  money: 0,
-  persistent: true,
-},
+    npc: gentleman,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Down,
+    pos: { x: 4, y: 1 },
+    intro: [],
+    outtro: [
+      "Me pregunto si Diego irá con sombrero a la boda..."
+    ],
+    money: 0,
+    persistent: true,
+  },
   {
-  npc: jrTrainerMale,
-  pokemon: [{ id: 19, level: 2 }],
-  facing: Direction.Up,
-  pos: { x: 7, y: 2 },
-  intro: [
-
-  ],
-  outtro: [
-    "Mike llevará su boina??",
-    "Fijo que a Eva le hace mucha ilusión"
-  ],
-  money: 0,
-  persistent: true,
-},
+    npc: jrTrainerMale,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Up,
+    pos: { x: 7, y: 2 },
+    intro: [],
+    outtro: [
+      "Mike llevará su boina??",
+      "Fijo que a Eva le hace mucha ilusión"
+    ],
+    money: 0,
+    persistent: true,
+  },
   {
-  npc: youngster,
-  pokemon: [{ id: 19, level: 2 }],
-  facing: Direction.Right,
-  pos: { x: 0, y: 3 },
-  intro: [
-
-  ],
-  outtro: [
-    "En si solo he venido para ver la actuación del cuchillos..."
-  ],
-  money: 0,
-  persistent: true,
-},
+    npc: youngster,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Right,
+    pos: { x: 0, y: 3 },
+    intro: [],
+    outtro: [
+      "En si solo he venido para ver la actuación del cuchillos..."
+    ],
+    money: 0,
+    persistent: true,
+  },
   {
-  npc: beauty,
-  pokemon: [{ id: 19, level: 2 }],
-  facing: Direction.Right,
-  pos: { x: 7, y: 5 },
-  intro: [
-
+    npc: beauty,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Right,
+    pos: { x: 7, y: 5 },
+    intro: [],
+    outtro: [
+      "Aaaah!",
+      "Ufff, menos mal",
+      "Pensaba que eras Fer con otro de sus chistes",
+      "Por favor no le digas que estoy aquí"
+    ],
+    money: 0,
+    persistent: true,
+  }
   ],
-  outtro: [
-    "Aaaah!",
-    "Ufff, menos mal",
-    "Pensaba que eras Fer con otro de sus chistes",
-    "Por favor no le digas que estoy aquí"
-  ],
-  money: 0,
-  persistent: true,
-}
-],
   minimapPos: { x: 53, y: 52 },
+  fences: {},
+  teleports: {
+    8: {
+      2: { map: MapId.PewterCity, pos: { x: 29, y: 14 } },
+      3: { map: MapId.PewterCity, pos: { x: 29, y: 14 } },
+    },
+  },
 };
 
 export default peweterCityNpcB;
