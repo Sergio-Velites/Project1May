@@ -1232,7 +1232,7 @@ Ejemplos: Diglett/Natu 50px · Pikachu 54px · Charizard 62px · Snorlax 64px ·
 ### 24. `admin-player`: validación de formato UUID (defensa en profundidad)
 **Solución** (`supabase/functions/admin-player/index.ts`): GET/PUT/DELETE validan que `userId` tiene formato UUID antes de tocar la BD. El admin ya está protegido por `x-admin-key` (`ADMIN_SECRET`); esto solo rechaza IDs malformados que habrían dado error igualmente.
 
-> **Estado de despliegue (revisión de seguridad)**: mergeado a `master` y desplegado. Edge Functions activas en Supabase (`kplfjrjibjptigvfgdvy`): `load-game` v4, `webauthn-auth-finish` v14, `save-game` v8, `admin-player` v2. `verify_jwt` preservado en cada una (`admin-player` = true; resto = false). Bundle del juego: `main.c45b5a0b.js`. La cabecera `x-write-token` está en la allowlist CORS de `_shared/cors.ts`.
+> **Estado de despliegue (revisión de seguridad)**: mergeado a `master` y desplegado. Edge Functions activas en Supabase (`kplfjrjibjptigvfgdvy`): `load-game` v4, `webauthn-auth-finish` v14, `save-game` v8, `admin-player` v2, `webauthn-register-start` v7 (CORS con `x-recover-token`, ver #26), `maintenance` v3. `verify_jwt` preservado en cada una (`admin-player` y `maintenance` = true; resto = false). Las cabeceras `x-write-token` y `x-recover-token` están en la allowlist CORS de `_shared/cors.ts`.
 
 ### 25. GH_TOKEN caducado → "Guardado en nube. Commit falló: … HTTP 401" (2026-07-17)
 **Síntoma**: al 💾 Guardar en el map-editor, el preview de Supabase se guarda pero el commit del `.ts` falla con `No se pudo comprobar la rama master: HTTP 401` (500 en `/api/admin/commit-map`). También rompe 🛠 Compilar juego y la subida de imágenes.
@@ -1243,6 +1243,12 @@ Ejemplos: Diglett/Natu 50px · Pikachu 54px · Charizard 62px · Snorlax 64px ·
 3. Redesplegar (las funciones no cogen el valor hasta el siguiente deploy): `npx vercel redeploy <url-del-último-deploy-prod>`.
 **Importante**: los guardados hechos con el token roto viven SOLO en el override de Supabase — reabrir cada mapa afectado y volver a 💾 Guardar para que llegue al `.ts` (consultar `map_editor_data.updated_at` para saber cuáles).
 **NO diagnosticar con `vercel env pull`**: devuelve el literal `[SENSITIVE]` (11 chars) para variables sensibles, no el valor real.
+
+### 26. Enlaces de recuperación (?recover=&rt=) no vinculaban la passkey (2026-07-19)
+**Síntoma**: al abrir el link `?recover=<uuid>&rt=<token>` del admin, "Vincular Face ID/Huella" fallaba con "No se pudo vincular…" y la sesión degradaba a modo "jugar puntualmente" (sin quedar el dispositivo enlazado).
+**Causa raíz (de despliegue, no de código)**: las Edge Functions **empaquetan `_shared/*.ts` en el momento del deploy**. `x-recover-token` se añadió a la allowlist CORS de `_shared/cors.ts`, y `maintenance` se desplegó después (bundle nuevo), pero **`webauthn-register-start` quedó en v6 con el `cors.ts` viejo**. El preflight del navegador no autorizaba `x-recover-token` → el POST nunca se enviaba → el cliente lo trataba como fallo de vinculación. El token en sí siempre fue válido.
+**Arreglo**: redesplegar `webauthn-register-start` (v7) con el `_shared/cors.ts` actual, **preservando `verify_jwt=false`**. Verificado con un link real: preflight OK + POST 200 con challenge.
+**Regla general**: al tocar CUALQUIER archivo de `supabase/functions/_shared/`, redesplegar TODAS las funciones que dependan del cambio (cada una lleva su copia congelada). Comprobar qué bundle tiene cada función desplegada: MCP Supabase → `get_edge_function` (devuelve los ficheros empaquetados).
 
 ---
 
