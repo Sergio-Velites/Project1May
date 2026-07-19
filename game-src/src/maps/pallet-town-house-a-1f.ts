@@ -47,7 +47,7 @@ const houseA1f: MapType = {
     1: {
       7: { map: MapId.PalletTownHouseA2F, pos: { x: 7, y: 2 } },
     },
-    7: {
+    8: {
       2: { map: MapId.PalletTown, pos: { x: 5, y: 6 } },
       3: { map: MapId.PalletTown, pos: { x: 5, y: 6 } },
     },
