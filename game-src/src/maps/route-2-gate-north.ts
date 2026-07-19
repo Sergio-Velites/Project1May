@@ -27,11 +27,11 @@ const route2GateNorth: MapType = {
 maps: {},
 teleports: {
     0: {
-      5: { map: MapId.Route2, pos: { x: 3, y: 10 } },
+      5: { map: MapId.Route2, pos: { x: 3, y: 11 } },
     },
-    7: {
-      4: { map: MapId.ViridianForrest, pos: { x: 1, y: 1 } },
-      5: { map: MapId.ViridianForrest, pos: { x: 1, y: 1 } },
+    8: {
+      4: { map: MapId.ViridianForrest, pos: { x: 1, y: 0 } },
+      5: { map: MapId.ViridianForrest, pos: { x: 2, y: 0 } },
     },
   },
 exits: {},
