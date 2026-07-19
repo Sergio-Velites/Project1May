@@ -331,36 +331,36 @@ const viridianCity: MapType = {
   flySpot: { x: 23, y: 26 },
   teleports: {
     0: {
-      17: { map: MapId.Route2, pos: { x: 7, y: 70 } },
-      18: { map: MapId.Route2, pos: { x: 8, y: 70 } },
-      19: { map: MapId.Route2, pos: { x: 9, y: 70 } },
+      17: { map: MapId.Route2, pos: { x: 7, y: 71 } },
+      18: { map: MapId.Route2, pos: { x: 8, y: 71 } },
+      19: { map: MapId.Route2, pos: { x: 9, y: 71 } },
     },
     7: {
-      32: { map: MapId.ViridianCityGym, pos: { x: 16, y: 16 } },
+      32: { map: MapId.ViridianCityGym, pos: { x: 16, y: 17 } },
     },
     9: {
-      21: { map: MapId.ViridianCityNpcHouse, pos: { x: 2, y: 6 } },
+      21: { map: MapId.ViridianCityNpcHouse, pos: { x: 2, y: 7 } },
     },
     14: {
-      0: { map: MapId.Route22, pos: { x: 38, y: 6 } },
+      0: { map: MapId.Route22, pos: { x: 39, y: 6 } },
     },
     15: {
-      0: { map: MapId.Route22, pos: { x: 38, y: 7 } },
-      21: { map: MapId.ViridianCityPokemonAcadamy, pos: { x: 2, y: 6 } },
+      0: { map: MapId.Route22, pos: { x: 39, y: 7 } },
+      21: { map: MapId.ViridianCityPokemonAcadamy, pos: { x: 2, y: 7 } },
     },
     16: {
-      0: { map: MapId.Route22, pos: { x: 38, y: 8 } },
+      0: { map: MapId.Route22, pos: { x: 39, y: 8 } },
     },
     17: {
-      0: { map: MapId.Route22, pos: { x: 38, y: 9 } },
+      0: { map: MapId.Route22, pos: { x: 39, y: 9 } },
     },
     19: {
-      29: { map: MapId.ViridianCityPokeMart, pos: { x: 4, y: 6 } },
+      29: { map: MapId.ViridianCityPokeMart, pos: { x: 4, y: 7 } },
     },
     25: {
-      23: { map: MapId.ViridianCityPokemonCenter, pos: { x: 4, y: 6 } },
+      23: { map: MapId.ViridianCityPokemonCenter, pos: { x: 4, y: 7 } },
     },
-    35: {
+    36: {
       20: { map: MapId.Route1, pos: { x: 11, y: 34 } },
       21: { map: MapId.Route1, pos: { x: 11, y: 34 } },
     },
