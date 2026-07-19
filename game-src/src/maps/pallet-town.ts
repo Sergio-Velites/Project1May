@@ -212,8 +212,8 @@ encounters: {
   flySpot: { x: 12, y: 12 },
   teleports: {
     0: {
-      10: { map: MapId.Route1, pos: { x: 11, y: 34 } },
-      11: { map: MapId.Route1, pos: { x: 11, y: 34 } },
+      10: { map: MapId.Route1, pos: { x: 10, y: 35 } },
+      11: { map: MapId.Route1, pos: { x: 11, y: 35 } },
     },
     5: {
       5: { map: MapId.PalletTownHouseA1F, pos: { x: 2, y: 7 } },
@@ -223,10 +223,10 @@ encounters: {
       12: { map: MapId.PalletTownLab, pos: { x: 5, y: 11 } },
     },
     18: {
-      4: { map: MapId.Route21, pos: { x: 4, y: 1 } },
-      5: { map: MapId.Route21, pos: { x: 5, y: 1 } },
-      6: { map: MapId.Route21, pos: { x: 6, y: 1 } },
-      7: { map: MapId.Route21, pos: { x: 7, y: 1 } },
+      4: { map: MapId.Route21, pos: { x: 4, y: 0 } },
+      5: { map: MapId.Route21, pos: { x: 5, y: 0 } },
+      6: { map: MapId.Route21, pos: { x: 6, y: 0 } },
+      7: { map: MapId.Route21, pos: { x: 7, y: 0 } },
     },
   },
 };
