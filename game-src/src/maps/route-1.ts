@@ -221,13 +221,13 @@ const route1: MapType = {
   ],
   minimapPos: { x: 53, y: 130 },
   teleports: {
-    0: {
-      10: { map: MapId.ViridianCity, pos: { x: 20, y: 34 } },
-      11: { map: MapId.ViridianCity, pos: { x: 21, y: 34 } },
+    "-1": {
+      10: { map: MapId.ViridianCity, pos: { x: 20, y: 35 } },
+      11: { map: MapId.ViridianCity, pos: { x: 21, y: 35 } },
     },
-    35: {
-      10: { map: MapId.PalletTown, pos: { x: 10, y: 1 } },
-      11: { map: MapId.PalletTown, pos: { x: 11, y: 1 } },
+    36: {
+      10: { map: MapId.PalletTown, pos: { x: 10, y: 0 } },
+      11: { map: MapId.PalletTown, pos: { x: 11, y: 0 } },
     },
   },
 }
