@@ -23,11 +23,11 @@ const route2Gate: MapType = {
   exits: {},
   teleports: {
     0: {
-      5: { map: MapId.ViridianForrest, pos: { x: 16, y: 46 } },
+      5: { map: MapId.ViridianForrest, pos: { x: 16, y: 47 } },
     },
-    7: {
-      4: { map: MapId.Route2, pos: { x: 3, y: 45 } },
-      5: { map: MapId.Route2, pos: { x: 3, y: 45 } },
+    8: {
+      4: { map: MapId.Route2, pos: { x: 3, y: 44 } },
+      5: { map: MapId.Route2, pos: { x: 3, y: 44 } },
     },
   },
   minimapPos: { x: 53, y: 82 },
