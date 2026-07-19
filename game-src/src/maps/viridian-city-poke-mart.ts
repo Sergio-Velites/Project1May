@@ -9,10 +9,7 @@ const viridianCityPokeMart: MapType = {
   image,
   height: 8,
   width: 8,
-  start: {
-    x: 4,
-    y: 6,
-  },
+  start: { x: 4, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7],
     1: [0, 1, 2, 3, 4, 5, 6, 7],
@@ -22,33 +19,31 @@ const viridianCityPokeMart: MapType = {
     6: [0, 1],
   },
   text: {},
-  maps: {
-
-  },
-  exits: {
-    7: [3, 4],
-  },
-  music,
+  maps: {},
+  exits: {},
+  music: music,
   grass: {},
   exitReturnMap: MapId.ViridianCity,
-  exitReturnPos: {
-    x: 29,
-    y: 20,
-  },
-  store: {
-    x: 1,
-    y: 5,
-  },
+  exitReturnPos: { x: 29, y: 20 },
+  store: { x: 1, y: 5 },
   storeItems: [
     ItemType.PokeBall,
     ItemType.GreatBall,
     ItemType.UltraBall,
     ItemType.VinoMonjardin,
-    // ItemType.Antidote, TODO Add this
-    // ItemType.ParalyzeHeal, TODO Add this
-    // ItemType.BurnHeal, TODO Add this
+    ItemType.Antidote,
+    ItemType.ParalyzeHeal,
+    ItemType.BurnHeal,
   ],
   minimapPos: { x: 53, y: 112 },
+  fences: {},
+  teleports: {
+    8: {
+      3: { map: MapId.ViridianCity, pos: { x: 29, y: 20 } },
+      4: { map: MapId.ViridianCity, pos: { x: 29, y: 20 } },
+    },
+  },
+  trainers: [],
 };
 
 export default viridianCityPokeMart;
