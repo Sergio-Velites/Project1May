@@ -6,10 +6,7 @@ const viridianCityAcadamy: MapType = {
   image,
   height: 8,
   width: 8,
-  start: {
-    x: 2,
-    y: 6,
-  },
+  start: { x: 2, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7],
     1: [7],
@@ -23,7 +20,7 @@ const viridianCityAcadamy: MapType = {
       3: [
         "TITULO: EL AMOR Y LOS POKEMON.",
         "Cap. 1: El primer encuentro.",
-        "Cap. 2: La batalla del corazon.",
+        "Cap. 2: La batalla del corazon."
       ],
     },
     4: {
@@ -31,23 +28,24 @@ const viridianCityAcadamy: MapType = {
         "Encontrado este curioso pokemon.",
         "No sabemos su procedencia",
         "Juraría que le he oído susurrar algo....",
-        "'Soy Jonny, Soy Jonny...'",
+        "'Soy Jonny, Soy Jonny...'"
       ],
     },
   },
-  maps: {
-
-  },
-  exits: {
-    7: [2, 3],
-  },
+  maps: {},
+  exits: {},
   grass: {},
   exitReturnMap: MapId.ViridianCity,
-  exitReturnPos: {
-    x: 21,
-    y: 16,
-  },
+  exitReturnPos: { x: 21, y: 16 },
   minimapPos: { x: 53, y: 112 },
+  fences: {},
+  teleports: {
+    8: {
+      2: { map: MapId.ViridianCity, pos: { x: 21, y: 16 } },
+      3: { map: MapId.ViridianCity, pos: { x: 21, y: 16 } },
+    },
+  },
+  trainers: [],
 };
 
 export default viridianCityAcadamy;
