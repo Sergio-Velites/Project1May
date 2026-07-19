@@ -146,8 +146,8 @@ text: {
   maps: {},
   teleports: {
     "-1": {
-      1: { map: MapId.Route2GateNorth, pos: { x: 5, y: 6 } },
-      2: { map: MapId.Route2GateNorth, pos: { x: 5, y: 6 } },
+      1: { map: MapId.Route2GateNorth, pos: { x: 4, y: 7 } },
+      2: { map: MapId.Route2GateNorth, pos: { x: 5, y: 7 } },
     },
     48: {
       15: { map: MapId.Route2Gate, pos: { x: 5, y: 1 } },
