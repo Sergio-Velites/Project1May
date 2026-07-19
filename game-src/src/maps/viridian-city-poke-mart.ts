@@ -32,7 +32,7 @@ const viridianCityPokeMart: MapType = {
     ItemType.UltraBall,
     ItemType.VinoMonjardin,
     ItemType.Antidote,
-    ItemType.ParalyzeHeal,
+    ItemType.ParlyzHeal,
     ItemType.BurnHeal,
   ],
   minimapPos: { x: 53, y: 112 },
