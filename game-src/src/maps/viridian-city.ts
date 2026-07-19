@@ -330,7 +330,7 @@ const viridianCity: MapType = {
   flyable: true,
   flySpot: { x: 23, y: 26 },
   teleports: {
-    0: {
+    "-1": {
       17: { map: MapId.Route2, pos: { x: 7, y: 71 } },
       18: { map: MapId.Route2, pos: { x: 8, y: 71 } },
       19: { map: MapId.Route2, pos: { x: 9, y: 71 } },
@@ -342,17 +342,17 @@ const viridianCity: MapType = {
       21: { map: MapId.ViridianCityNpcHouse, pos: { x: 2, y: 7 } },
     },
     14: {
-      0: { map: MapId.Route22, pos: { x: 39, y: 6 } },
+      "-1": { map: MapId.Route22, pos: { x: 39, y: 6 } },
     },
     15: {
-      0: { map: MapId.Route22, pos: { x: 39, y: 7 } },
+      "-1": { map: MapId.Route22, pos: { x: 39, y: 7 } },
       21: { map: MapId.ViridianCityPokemonAcadamy, pos: { x: 2, y: 7 } },
     },
     16: {
-      0: { map: MapId.Route22, pos: { x: 39, y: 8 } },
+      "-1": { map: MapId.Route22, pos: { x: 39, y: 8 } },
     },
     17: {
-      0: { map: MapId.Route22, pos: { x: 39, y: 9 } },
+      "-1": { map: MapId.Route22, pos: { x: 39, y: 9 } },
     },
     19: {
       29: { map: MapId.ViridianCityPokeMart, pos: { x: 4, y: 7 } },
