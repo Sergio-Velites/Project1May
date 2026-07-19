@@ -3,17 +3,13 @@ import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
 import music from "../assets/music/maps/pokemon-gym.mp3";
 import { tamer } from "../app/npcs";
-
 const viridianCityGym: MapType = {
   name: "Gimnasio de Soto Lezkairu",
   image,
-  music,
+  music: music,
   height: 18,
   width: 20,
-  start: {
-    x: 16,
-    y: 16,
-  },
+  start: { x: 16, y: 16 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
     1: [0, 5],
@@ -37,27 +33,20 @@ const viridianCityGym: MapType = {
       15: [
         "GIMNASIO AÑIL",
         "Solo los campeones",
-        "pueden entrar aquí.",
+        "pueden entrar aquí."
       ],
       18: [
         "AVISO AL LUCHADOR:",
         "El líder no está.",
-        "¡Vuelve cuando seas digno!",
+        "¡Vuelve cuando seas digno!"
       ],
     },
   },
-  maps: {
-
-  },
-  exits: {
-    17: [16, 17],
-  },
+  maps: {},
+  exits: {},
   grass: {},
   exitReturnMap: MapId.ViridianCity,
-  exitReturnPos: {
-    x: 32,
-    y: 8,
-  },
+  exitReturnPos: { x: 32, y: 8 },
   spinners: {
     1: {
       19: Direction.Left,
@@ -107,23 +96,21 @@ const viridianCityGym: MapType = {
   // Trainers para "viridian-city-gym"
 trainers: [
   {
-  npc: tamer,
-  pokemon: [{ id: 19, level: 2 }],
-  facing: Direction.Down,
-  pos: { x: 3, y: 2 },
-  intro: [
-
+    npc: tamer,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Down,
+    pos: { x: 3, y: 2 },
+    intro: [],
+    outtro: [
+      "No tienes regalo para los novios?",
+      "Puedes llevarte este pokemon.",
+      "Tan feo como inútil"
+    ],
+    money: 0,
+    persistent: true,
+    sightRange: 0,
+  }
   ],
-  outtro: [
-    "No tienes regalo para los novios?",
-    "Puedes llevarte este pokemon.",
-    "Tan feo como inútil"
-  ],
-  money: 0,
-  persistent: true,
-  sightRange: 0,
-}
-],
   gifts: [
     {
       pokemonId: 129,
@@ -133,6 +120,13 @@ trainers: [
     },
   ],
   minimapPos: { x: 53, y: 112 },
+  fences: {},
+  teleports: {
+    18: {
+      16: { map: MapId.ViridianCity, pos: { x: 32, y: 8 } },
+      17: { map: MapId.ViridianCity, pos: { x: 32, y: 8 } },
+    },
+  },
 };
 
 export default viridianCityGym;
