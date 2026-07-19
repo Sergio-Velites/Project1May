@@ -15,6 +15,18 @@ const route3: MapType = {
   width: 70,
   start: { x: 1, y: 9 },
   walls: {
+    "-13": [70],
+    "-12": [70],
+    "-11": [70],
+    "-10": [70],
+    "-9": [70],
+    "-8": [70],
+    "-7": [70],
+    "-6": [70],
+    "-5": [70],
+    "-4": [70],
+    "-3": [70],
+    "-2": [70],
     0: [55, 56, 64],
     1: [55, 56, 64],
     2: [55, 64],
@@ -55,12 +67,7 @@ const route3: MapType = {
     },
   },
   maps: {},
-  exits: {
-    8: [0],
-    9: [0],
-    10: [0],
-    11: [0],
-  },
+  exits: {},
   exitReturnMap: MapId.PewterCity,
   exitReturnPos: { x: 38, y: 17 },
   encounters: {
@@ -260,14 +267,26 @@ const route3: MapType = {
   flyable: true,
   flySpot: { x: 61, y: -12 },
   teleports: {
-    0: {
-      57: { map: MapId.Route4, pos: { x: 6, y: 16 } },
-      58: { map: MapId.Route4, pos: { x: 7, y: 16 } },
-      59: { map: MapId.Route4, pos: { x: 8, y: 16 } },
-      60: { map: MapId.Route4, pos: { x: 9, y: 16 } },
-      61: { map: MapId.Route4, pos: { x: 11, y: 16 } },
-      62: { map: MapId.Route4, pos: { x: 12, y: 16 } },
-      63: { map: MapId.Route4, pos: { x: 13, y: 16 } },
+    "-1": {
+      57: { map: MapId.Route4, pos: { x: 6, y: 17 } },
+      58: { map: MapId.Route4, pos: { x: 7, y: 17 } },
+      59: { map: MapId.Route4, pos: { x: 8, y: 17 } },
+      60: { map: MapId.Route4, pos: { x: 9, y: 17 } },
+      61: { map: MapId.Route4, pos: { x: 10, y: 17 } },
+      62: { map: MapId.Route4, pos: { x: 11, y: 17 } },
+      63: { map: MapId.Route4, pos: { x: 11, y: 17 } },
+    },
+    8: {
+      "-1": { map: MapId.PewterCity, pos: { x: 39, y: 16 } },
+    },
+    9: {
+      "-1": { map: MapId.PewterCity, pos: { x: 39, y: 17 } },
+    },
+    10: {
+      "-1": { map: MapId.PewterCity, pos: { x: 39, y: 18 } },
+    },
+    11: {
+      "-1": { map: MapId.PewterCity, pos: { x: 39, y: 19 } },
     },
   },
 }
