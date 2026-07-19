@@ -10,7 +10,7 @@ const mtMoon2f: MapType = {
   name: "Monte Luna de Miel 2F",
   allowBicycle: true,
   image,
-  music: music,
+  music: "/game/music/maps-original/mt-moon.mp3",
   cave: true,
   height: 28,
   width: 28,
