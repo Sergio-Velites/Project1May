@@ -129,7 +129,7 @@ const route2: MapType = {
       9: { map: MapId.PewterCity, pos: { x: 19, y: 34 } },
     },
     9: {
-      12: { map: MapId.DiglettsCave, pos: { x: 3, y: 6 } },
+      12: { map: MapId.DiglettsCave, pos: { x: 3, y: 7 } },
     },
     12: {
       3: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
