@@ -361,8 +361,8 @@ const viridianCity: MapType = {
       23: { map: MapId.ViridianCityPokemonCenter, pos: { x: 4, y: 7 } },
     },
     36: {
-      20: { map: MapId.Route1, pos: { x: 11, y: 34 } },
-      21: { map: MapId.Route1, pos: { x: 11, y: 34 } },
+      20: { map: MapId.Route1, pos: { x: 10, y: 0 } },
+      21: { map: MapId.Route1, pos: { x: 11, y: 0 } },
     },
   },
 }
