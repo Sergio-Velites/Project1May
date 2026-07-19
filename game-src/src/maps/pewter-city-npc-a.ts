@@ -9,10 +9,7 @@ const peweterCityNpcA: MapType = {
   image,
   height: 8,
   width: 8,
-  start: {
-    x: 3,
-    y: 6,
-  },
+  start: { x: 3, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7],
     1: [0, 1, 7],
@@ -22,39 +19,30 @@ const peweterCityNpcA: MapType = {
     7: [0, 7],
   },
   text: {},
-  maps: {
-
-  },
-  exits: {
-    7: [2, 3],
-  },
-  exitReturnPos: {
-    x: 7,
-    y: 30,
-  },
+  maps: {},
+  exits: {},
+  exitReturnPos: { x: 7, y: 30 },
   exitReturnMap: MapId.PewterCity,
   grass: {},
   // Trainers para "pewter-city-npc-a"
 trainers: [
   {
-  npc: biker,
-  pokemon: [{ id: 19, level: 2 }],
-  facing: Direction.Left,
-  pos: { x: 5, y: 5 },
-  intro: [
-
+    npc: biker,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Left,
+    pos: { x: 5, y: 5 },
+    intro: [],
+    outtro: [
+      "Tadej Pogačar:",
+      "Pensaba que me invitarían a través de Gudari,",
+      "Pero me equivoqué.",
+      "Me sobra una bici.",
+      "Si la quieres es tuya."
+    ],
+    money: 0,
+    persistent: true,
+  }
   ],
-  outtro: [
-    "Tadej Pogačar:",
-    "Pensaba que me invitarían a través de Gudari,",
-    "Pero me equivoqué.",
-    "Me sobra una bici.",
-    "Si la quieres es tuya."
-  ],
-  money: 0,
-  persistent: true,
-}
-],
   items: [
     {
       item: ItemType.Bicycle,
@@ -62,6 +50,13 @@ trainers: [
     },
   ],
   minimapPos: { x: 53, y: 52 },
+  fences: {},
+  teleports: {
+    8: {
+      2: { map: MapId.PewterCity, pos: { x: 7, y: 30 } },
+      3: { map: MapId.PewterCity, pos: { x: 7, y: 30 } },
+    },
+  },
 };
 
 export default peweterCityNpcA;
