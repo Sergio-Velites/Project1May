@@ -101,37 +101,37 @@ const pewterCity: MapType = {
   maps: {},
   teleports: {
     5: {
-      19: { map: MapId.PewterCityMuseum1f, pos: { x: 17, y: 6 } },
+      19: { map: MapId.PewterCityMuseum1f, pos: { x: 17, y: 7 } },
     },
     7: {
-      14: { map: MapId.PewterCityMuseum1f, pos: { x: 10, y: 6 } },
+      14: { map: MapId.PewterCityMuseum1f, pos: { x: 10, y: 7 } },
     },
     13: {
-      29: { map: MapId.PewterCityNpcB, pos: { x: 3, y: 6 } },
+      29: { map: MapId.PewterCityNpcB, pos: { x: 3, y: 7 } },
     },
     16: {
-      39: { map: MapId.Route3, pos: { x: 1, y: 8 } },
+      40: { map: MapId.Route3, pos: { x: 0, y: 8 } },
     },
     17: {
-      16: { map: MapId.PewterCityGym, pos: { x: 4, y: 12 } },
-      23: { map: MapId.PewterCityPokeMart, pos: { x: 4, y: 6 } },
-      39: { map: MapId.Route3, pos: { x: 1, y: 9 } },
+      16: { map: MapId.PewterCityGym, pos: { x: 4, y: 13 } },
+      23: { map: MapId.PewterCityPokeMart, pos: { x: 4, y: 7 } },
+      40: { map: MapId.Route3, pos: { x: 0, y: 9 } },
     },
     18: {
-      39: { map: MapId.Route3, pos: { x: 1, y: 10 } },
+      40: { map: MapId.Route3, pos: { x: 0, y: 10 } },
     },
     19: {
-      39: { map: MapId.Route3, pos: { x: 1, y: 11 } },
+      40: { map: MapId.Route3, pos: { x: 0, y: 11 } },
     },
     25: {
-      13: { map: MapId.PewterCityPokemonCenter, pos: { x: 4, y: 6 } },
+      13: { map: MapId.PewterCityPokemonCenter, pos: { x: 4, y: 7 } },
     },
     29: {
-      7: { map: MapId.PewterCityNpcA, pos: { x: 3, y: 6 } },
+      7: { map: MapId.PewterCityNpcA, pos: { x: 3, y: 7 } },
     },
-    35: {
-      18: { map: MapId.Route2, pos: { x: 8, y: 1 } },
-      19: { map: MapId.Route2, pos: { x: 9, y: 1 } },
+    36: {
+      18: { map: MapId.Route2, pos: { x: 8, y: 0 } },
+      19: { map: MapId.Route2, pos: { x: 9, y: 0 } },
     },
   },
   exits: {},
