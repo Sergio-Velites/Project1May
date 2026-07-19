@@ -3,6 +3,8 @@ import { MapId, MapType } from "./map-types";
 
 import arodactyl from "../assets/map/pewter-museum-photo-1.png";
 import kabutops from "../assets/map/pewter-museum-photo-2.png";
+import { superNerd } from "../app/npcs";
+import { Direction } from "../state/state-types";
 
 const pewterMuseum1f: MapType = {
   name: "Museo de Villamayor 1F",
@@ -74,7 +76,20 @@ text: {
     },
   ],
   minimapPos: { x: 53, y: 52 },
-  trainers: [],
+  trainers: [
+  {
+    npc: superNerd,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Left,
+    pos: { x: 12, y: 4 },
+    intro: [],
+    outtro: [
+      "..."
+    ],
+    money: 0,
+    persistent: true,
+  }
+  ],
 };
 
 export default pewterMuseum1f;
