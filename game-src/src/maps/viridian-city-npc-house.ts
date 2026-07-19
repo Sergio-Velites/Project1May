@@ -6,10 +6,7 @@ const viridianCityNpcHouse: MapType = {
   image,
   height: 8,
   width: 8,
-  start: {
-    x: 2,
-    y: 6,
-  },
+  start: { x: 2, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7],
     1: [0, 1, 7],
@@ -21,8 +18,7 @@ const viridianCityNpcHouse: MapType = {
 text: {
     0: {
       3: [
-        "No se como acabar con esa plaga... ",
-        "se esconden en las macetas..."
+        "No se como acabar con esa plaga... se esconden en las macetas..."
       ],
     },
     1: {
@@ -42,18 +38,11 @@ text: {
       ],
     },
   },
-  maps: {
-
-  },
-  exits: {
-    7: [2, 3],
-  },
+  maps: {},
+  exits: {},
   grass: {},
   exitReturnMap: MapId.ViridianCity,
-  exitReturnPos: {
-    x: 21,
-    y: 10,
-  },
+  exitReturnPos: { x: 21, y: 10 },
   staticPokemon: [
     {
       pokemonId: 147,
@@ -64,6 +53,14 @@ text: {
     },
   ],
   minimapPos: { x: 53, y: 112 },
+  fences: {},
+  teleports: {
+    8: {
+      2: { map: MapId.ViridianCity, pos: { x: 21, y: 10 } },
+      3: { map: MapId.ViridianCity, pos: { x: 21, y: 10 } },
+    },
+  },
+  trainers: [],
 };
 
 export default viridianCityNpcHouse;
