@@ -124,30 +124,30 @@ const route2: MapType = {
   },
   maps: {},
   teleports: {
-    0: {
+    "-1": {
       8: { map: MapId.PewterCity, pos: { x: 18, y: 34 } },
       9: { map: MapId.PewterCity, pos: { x: 19, y: 34 } },
     },
     9: {
       12: { map: MapId.DiglettsCave, pos: { x: 3, y: 6 } },
     },
-    11: {
-      3: { map: MapId.Route2GateNorth, pos: { x: 5, y: 2 } },
+    12: {
+      3: { map: MapId.Route2GateNorth, pos: { x: 5, y: 1 } },
     },
     35: {
       16: { map: MapId.Route4Gate, pos: { x: 5, y: 1 } },
       17: { map: MapId.Route4Gate, pos: { x: 5, y: 1 } },
     },
     39: {
-      15: { map: MapId.Route4Gate, pos: { x: 5, y: 6 } },
+      15: { map: MapId.Route4Gate, pos: { x: 5, y: 7 } },
     },
     43: {
-      3: { map: MapId.Route2Gate, pos: { x: 5, y: 6 } },
+      3: { map: MapId.Route2Gate, pos: { x: 5, y: 7 } },
     },
-    71: {
-      7: { map: MapId.ViridianCity, pos: { x: 17, y: 1 } },
-      8: { map: MapId.ViridianCity, pos: { x: 18, y: 1 } },
-      9: { map: MapId.ViridianCity, pos: { x: 19, y: 2 } },
+    72: {
+      7: { map: MapId.ViridianCity, pos: { x: 17, y: 0 } },
+      8: { map: MapId.ViridianCity, pos: { x: 18, y: 0 } },
+      9: { map: MapId.ViridianCity, pos: { x: 19, y: 0 } },
     },
   },
   exits: {},
