@@ -84,7 +84,7 @@ text: {
     pos: { x: 12, y: 4 },
     intro: [],
     outtro: [
-      "..."
+      "¡Tómate tu tiempo para mirar!"
     ],
     money: 0,
     persistent: true,
