@@ -13,7 +13,7 @@ const leagueRoute: MapType = {
   start: { x: 9, y: 156 },
   walls: {
     4: [9, 10, 11, 12],
-    5: [9, 10, 11, 12],
+    5: [9, 12],
     6: [9, 12],
     7: [9, 12],
     8: [9, 12],
@@ -57,7 +57,7 @@ const leagueRoute: MapType = {
     46: [0, 18, 21],
     47: [0, 18, 21],
     48: [0, 4, 5, 6, 14, 15, 16, 18, 21],
-    49: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 16, 17, 18, 21],
+    49: [0, 1, 2, 3, 4, 6, 7, 8, 9, 14, 16, 17, 18, 21],
     50: [0, 9, 14, 21],
     51: [0, 4, 9, 14, 21],
     52: [0, 9, 14, 21],
@@ -166,8 +166,8 @@ const leagueRoute: MapType = {
     155: [0, 6, 11, 21],
     156: [0, 6, 11, 21],
     157: [0, 1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
-    158: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-    159: [2, 13],
+    158: [2, 3, 4, 5, 6, 11, 12, 13],
+    159: [2, 7, 8, 9, 10, 13],
     160: [2, 13],
     161: [2, 13],
   },
@@ -280,14 +280,14 @@ const leagueRoute: MapType = {
   maps: {},
   teleports: {
     5: {
-      10: { map: MapId.IndigoPlateauLobby, pos: { x: 7, y: 10 } },
-      11: { map: MapId.IndigoPlateauLobby, pos: { x: 8, y: 10 } },
+      10: { map: MapId.IndigoPlateauLobby, pos: { x: 7, y: 11 } },
+      11: { map: MapId.IndigoPlateauLobby, pos: { x: 8, y: 11 } },
     },
     49: {
-      5: { map: MapId.VictoryRoad1f, pos: { x: 9, y: 16 } },
-      15: { map: MapId.VictoryRoad2f, pos: { x: 28, y: 8 } },
+      5: { map: MapId.VictoryRoad1f, pos: { x: 9, y: 17 } },
+      15: { map: MapId.VictoryRoad2f, pos: { x: 27, y: 8 } },
     },
-    157: {
+    158: {
       7: { map: MapId.GateHouse, pos: { x: 4, y: 1 } },
       8: { map: MapId.GateHouse, pos: { x: 4, y: 1 } },
       9: { map: MapId.GateHouse, pos: { x: 5, y: 1 } },
