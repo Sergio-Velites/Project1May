@@ -148,6 +148,14 @@ const victoryRoad1f: MapType = {
       pos: { x: 3, y: 8 },
       id: "boulder-victory-road-1f-3-8",
     },
+    {
+      pos: { x: 11, y: 6 },
+      id: "boulder-victory-road-1f-11-6",
+    },
+    {
+      pos: { x: 12, y: 6 },
+      id: "boulder-victory-road-1f-12-6",
+    },
   ],
 };
 
