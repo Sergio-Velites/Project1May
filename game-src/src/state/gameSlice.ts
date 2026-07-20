@@ -7,7 +7,7 @@ import { getPokemonStats } from "../app/use-pokemon-stats";
 import mapData from "../maps/map-data";
 import { getMoveMetadata } from "../app/use-move-metadata";
 import { ItemType } from "../app/use-item-data";
-import { boulderIdAt, canWalk, getFenceDirection, isBerryTree, isCuttableTree, isGift, isItem, isPortalTile, isStaticPokemon, isTrainer, isWall, isWater } from "../app/map-helper";
+import { boulderIdAt, canChangeElevation, canWalk, getFenceDirection, isBerryTree, isCuttableTree, isGift, isItem, isPortalTile, isStaticPokemon, isTrainer, isWall, isWater } from "../app/map-helper";
 import { BASE_FRIENDSHIP, STEPS_PER_FRIENDSHIP, friendshipOnWalk, getFriendship } from "../app/evolution-helper";
 import { rollGender } from "../app/gender-helper";
 import {
@@ -147,6 +147,10 @@ const tryBoulderInteraction = (
   // roca bloquea como un muro.
   if (!state.strengthActive || !teamKnowsStrength(state)) return "blocked";
 
+  // Planos de altura: no se puede alcanzar (ni empujar) una roca que está en
+  // otro nivel de elevación, salvo mediando una rampa.
+  if (!canChangeElevation(map, state.pos.x, state.pos.y, tx, ty)) return "blocked";
+
   // Tile al otro lado de la roca en la misma dirección.
   const bx = tx + dx;
   const by = ty + dy;
@@ -162,7 +166,8 @@ const tryBoulderInteraction = (
     [...state.completedQuests, ...(state.sessionCutTrees ?? [])],
     state.pokemon.length > 0,
     !!state.onSurfing,
-    positions
+    positions,
+    { x: tx, y: ty } // la roca no cruza bordes de elevación (salvo rampa)
   );
   // No se puede empujar la roca al agua, sobre otra roca, muro, etc.
   if (!destinationWalkable) return "blocked";
@@ -197,7 +202,7 @@ export const gameSlice = createSlice({
         return;
       }
       if (
-        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {})
+        !canWalk(state.pos.x - 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {}, { x: state.pos.x, y: state.pos.y })
       )
         return;
       state.pos.x -= 1;
@@ -224,7 +229,7 @@ export const gameSlice = createSlice({
         return;
       }
       if (
-        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {})
+        !canWalk(state.pos.x + 1, state.pos.y, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {}, { x: state.pos.x, y: state.pos.y })
       )
         return;
       state.pos.x += 1;
@@ -250,7 +255,7 @@ export const gameSlice = createSlice({
         return;
       }
       if (
-        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {})
+        !canWalk(state.pos.x, state.pos.y - 1, state.map, state.collectedItems, state.defeatedTrainers, [...state.completedQuests, ...(state.sessionCutTrees ?? [])], state.pokemon.length > 0, !!state.onSurfing, state.boulderPositions ?? {}, { x: state.pos.x, y: state.pos.y })
       )
         return;
       state.pos.y -= 1;
@@ -278,6 +283,9 @@ export const gameSlice = createSlice({
         // Saliente orientado a otro lado: por este flanco se comporta como muro.
         return;
       }
+      // Planos de altura: sin rampa no se cruza entre niveles distintos. El
+      // salto del saliente (fenceDirDown === Down) es transición legítima.
+      if (fenceDirDown === null && !canChangeElevation(map, state.pos.x, state.pos.y, state.pos.x, state.pos.y + 1)) return;
       if (isWall(map.walls, state.pos.x, state.pos.y + 1)) return;
       // Surf: el agua es transitable; la tierra también (al pisarla se
       // activa el desmonte fuera de este reducer). A pie: el agua bloquea.

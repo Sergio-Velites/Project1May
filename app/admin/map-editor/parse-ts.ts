@@ -59,6 +59,10 @@ export interface ParsedMap {
   walls: Record<string, number[]>;
   fences: Record<string, number[]>;
   fenceDirections: Record<string, Record<string, 'down' | 'up' | 'left' | 'right'>>;
+  /** Planos de altura por tile (sparse; ausente = nivel 0). */
+  elevations: Record<string, Record<string, number>>;
+  /** Rampas/escaleras que conectan planos. */
+  ramps: Record<string, number[]>;
   grass: Record<string, number[]>;
   water: Record<string, number[]>;
   texts: Record<string, Record<string, string[]>>;
@@ -165,6 +169,38 @@ function parseItemTypeArrayField(tsText: string, key: string): string[] {
   let itemM: RegExpExecArray | null;
   while ((itemM = re.exec(blk.text)) !== null) {
     result.push(itemM[1]);
+  }
+  return result;
+}
+
+/** Planos de altura: `elevations: { fila: { col: nivel } }` (valores numéricos). */
+function parseNumberRowColMap(tsText: string, key: string): Record<string, Record<string, number>> {
+  const m = tsText.match(new RegExp(`(?<![\\w])${key}\\s*:\\s*\\{`));
+  if (!m || m.index === undefined) return {};
+  const blockStart = tsText.indexOf('{', m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, blockStart);
+  if (!blk) return {};
+
+  const result: Record<string, Record<string, number>> = {};
+  const inner = blk.text.slice(1, -1);
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    const rowMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
+    if (!rowMatch) { i++; continue; }
+    const rowKey = rowMatch[1];
+    i += rowMatch[0].length - 1;
+    const rowBlk = findBalancedBlock(inner, i);
+    if (!rowBlk) break;
+    const row: Record<string, number> = {};
+    const colRe = /"?(-?\d+)"?\s*:\s*(-?\d+)/g;
+    let colM: RegExpExecArray | null;
+    while ((colM = colRe.exec(rowBlk.text)) !== null) {
+      row[colM[1]] = parseInt(colM[2], 10);
+    }
+    if (Object.keys(row).length > 0) result[rowKey] = row;
+    i = rowBlk.end + 1;
   }
   return result;
 }
@@ -601,6 +637,8 @@ export function parseMapTS(tsText: string): ParsedMap {
     walls: parseRowColMap(tsText, 'walls'),
     fences: parseRowColMap(tsText, 'fences'),
     fenceDirections: parseDirectionRowColMap(tsText, 'fenceDirections'),
+    elevations: parseNumberRowColMap(tsText, 'elevations'),
+    ramps: parseRowColMap(tsText, 'ramps'),
     grass: parseRowColMap(tsText, 'grass'),
     water: parseRowColMap(tsText, 'water'),
     texts: parseTextField(tsText),

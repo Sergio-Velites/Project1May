@@ -172,6 +172,37 @@ function parseDirectionRowColMap(tsText, key) {
   return result;
 }
 
+// Planos de altura: `elevations: { fila: { col: nivel } }` con valores numéricos.
+function parseNumberRowColMap(tsText, key) {
+  const m = tsText.match(new RegExp(`(?<![\\w])${key}\\s*:\\s*\\{`));
+  if (!m || m.index === undefined) return {};
+  const blockStart = tsText.indexOf("{", m.index + m[0].length - 1);
+  const blk = findBalancedBlock(tsText, blockStart);
+  if (!blk) return {};
+  const result = {};
+  const inner = blk.text.slice(1, -1);
+  let i = 0;
+  while (i < inner.length) {
+    while (i < inner.length && /\s|,/.test(inner[i])) i++;
+    if (i >= inner.length) break;
+    const rowMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
+    if (!rowMatch) { i++; continue; }
+    const rowKey = rowMatch[1];
+    i += rowMatch[0].length - 1;
+    const rowBlk = findBalancedBlock(inner, i);
+    if (!rowBlk) break;
+    const row = {};
+    const colRe = /"?(-?\d+)"?\s*:\s*(-?\d+)/g;
+    let colM;
+    while ((colM = colRe.exec(rowBlk.text)) !== null) {
+      row[colM[1]] = parseInt(colM[2], 10);
+    }
+    if (Object.keys(row).length > 0) result[rowKey] = row;
+    i = rowBlk.end + 1;
+  }
+  return result;
+}
+
 // ── Parsers de portales ────────────────────────────────────────────────
 function mapIdEnumToKebab(name) {
   // Fuente de verdad: el valor real del enum. Solo si el nombre no existe en el
@@ -883,6 +914,8 @@ for (const file of MAP_FILES) {
   // Campos extra (todos opcionales en MapType)
   const fences = parseRowColMap(tsText, "fences");
   const fenceDirections = parseDirectionRowColMap(tsText, "fenceDirections");
+  const elevations = parseNumberRowColMap(tsText, "elevations");
+  const ramps = parseRowColMap(tsText, "ramps");
   const grass = parseRowColMap(tsText, "grass");
   const water = parseRowColMap(tsText, "water");
 
@@ -980,6 +1013,8 @@ for (const file of MAP_FILES) {
     walls,
     fences,
     fenceDirections,
+    elevations,
+    ramps,
     grass,
     water,
     encounters,

@@ -434,6 +434,22 @@ export interface MapType {
    */
   fenceDirections?: Record<number, Record<number, Direction>>;
   /**
+   * Elevación por tile (planos de altura estilo Pokémon: meseta marrón vs
+   * suelo verde). Formato sparse `{ fila: { col: nivel } }`; los tiles
+   * ausentes están a nivel 0. Solo se puede caminar entre tiles del MISMO
+   * nivel; el cambio de plano se hace por `ramps` (escaleras/rampas) o
+   * saltando un saliente. El "plano actual" del jugador es la elevación del
+   * tile que pisa — al teletransportarse o cambiar de mapa el plano es el del
+   * tile de llegada, sin ningún estado adicional que resetear.
+   */
+  elevations?: Record<number, Record<number, number>>;
+  /**
+   * Rampas/escaleras: tiles transitables desde y hacia CUALQUIER nivel
+   * (conectan los planos de `elevations`). Mismo formato `{ fila: [cols] }`
+   * que `walls`.
+   */
+  ramps?: Record<number, number[]>;
+  /**
    * Tiles de agua. Mismo formato Record<row, col[]> que walls/grass.
    * Bloquean el paso (como muros) pero permiten pescar desde tile adyacente
    * con cualquiera de las 3 cañas (`OldRod`, `GoodRod`, `SuperRod`).

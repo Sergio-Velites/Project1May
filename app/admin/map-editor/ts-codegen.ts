@@ -71,6 +71,10 @@ export interface MapWriteState {
   walls?: Record<string, number[]>;
   fences?: Record<string, number[]>;
   fenceDirections?: Record<string, Record<string, DirectionName>>;
+  /** Planos de altura por tile (sparse; ausente = nivel 0). */
+  elevations?: Record<string, Record<string, number>>;
+  /** Rampas/escaleras que conectan planos. Mismo formato que walls. */
+  ramps?: Record<string, number[]>;
   grass?: Record<string, number[]>;
   water?: Record<string, number[]>;
   texts?: Record<string, Record<string, string[]>>;
@@ -325,6 +329,18 @@ function serSpinners(spinners: Record<string, Record<string, DirectionName>>): s
   return serDirectionRowColMap(spinners, 'spinners');
 }
 
+/** Planos de altura: `{ fila: { col: nivel } }` con valores numéricos. */
+function serNumberRowColMap(data: Record<string, Record<string, number>>, field: string): string {
+  const rows = sortedNumKeys(data);
+  if (rows.length === 0) return `${field}: {}`;
+  const rowLines = rows.map((r) => {
+    const cols = sortedNumKeys(data[String(r)] ?? {});
+    const colLines = cols.map((c) => `      ${objKey(c)}: ${data[String(r)][String(c)]},`);
+    return `    ${objKey(r)}: {\n${colLines.join('\n')}\n    },`;
+  });
+  return `${field}: {\n${rowLines.join('\n')}\n  }`;
+}
+
 function serMaps(maps: Record<string, Record<string, string>>, resolve: (t: string) => string): string {
   const rows = sortedNumKeys(maps);
   if (rows.length === 0) return 'maps: {}';
@@ -410,6 +426,8 @@ function buildFieldOps(state: MapWriteState, resolve: (t: string) => string): Fi
   if (state.walls !== undefined) push('walls', serRowColMap(state.walls, 'walls'));
   if (state.fences !== undefined) push('fences', serRowColMap(state.fences, 'fences'));
   if (state.fenceDirections !== undefined) push('fenceDirections', Object.keys(state.fenceDirections).length ? serDirectionRowColMap(state.fenceDirections, 'fenceDirections') : null);
+  if (state.elevations !== undefined) push('elevations', Object.keys(state.elevations).length ? serNumberRowColMap(state.elevations, 'elevations') : null);
+  if (state.ramps !== undefined) push('ramps', Object.keys(state.ramps).length ? serRowColMap(state.ramps, 'ramps') : null);
   if (state.grass !== undefined) push('grass', serRowColMap(state.grass, 'grass'));
   if (state.water !== undefined) push('water', Object.keys(state.water).length ? serRowColMap(state.water, 'water') : null);
   if (state.texts !== undefined) push('text', serTexts(state.texts));

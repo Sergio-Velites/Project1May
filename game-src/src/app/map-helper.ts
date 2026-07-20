@@ -49,6 +49,42 @@ export const isGrass = (
   return !!grass && grass[y] && grass[y].includes(x);
 };
 
+/** Elevación del tile (x, y). Los tiles no pintados están a nivel 0. */
+export const getElevation = (
+  map: { elevations?: Record<number, Record<number, number>> },
+  x: number,
+  y: number
+): number => map.elevations?.[y]?.[x] ?? 0;
+
+/** ¿El tile (x, y) es una rampa/escalera (conecta planos de elevación)? */
+export const isRamp = (
+  map: { ramps?: Record<number, number[]> },
+  x: number,
+  y: number
+): boolean => !!map.ramps?.[y]?.includes(x);
+
+/**
+ * Regla de planos de altura: se puede pasar de (fromX, fromY) a (toX, toY)
+ * solo si ambos tiles están al MISMO nivel, o si alguno de los dos es una
+ * rampa (las rampas conectan cualquier par de niveles). Los saltos de
+ * saliente NO pasan por aquí: un ledge es en sí mismo una transición de
+ * plano legítima (saltar de la cornisa alta a la hierba baja).
+ */
+export const canChangeElevation = (
+  map: {
+    elevations?: Record<number, Record<number, number>>;
+    ramps?: Record<number, number[]>;
+  },
+  fromX: number,
+  fromY: number,
+  toX: number,
+  toY: number
+): boolean => {
+  if (!map.elevations) return true;
+  if (isRamp(map, fromX, fromY) || isRamp(map, toX, toY)) return true;
+  return getElevation(map, fromX, fromY) === getElevation(map, toX, toY);
+};
+
 export const isWater = (
   water: Record<number, number[]> | undefined,
   x: number,
@@ -212,9 +248,14 @@ export const canWalk = (
   completedQuests: string[] = [],
   hasPokemon: boolean = false,
   onSurfing: boolean = false,
-  boulderPositions: Record<string, PosType> = {}
+  boulderPositions: Record<string, PosType> = {},
+  // Tile de ORIGEN del paso. Si se pasa, se aplica la regla de planos de
+  // altura (elevations/ramps). Opcional para no romper llamadas existentes
+  // que solo comprueban si un tile es transitable en abstracto.
+  from?: PosType
 ) => {
   const map = mapData[mapId];
+  if (from && !canChangeElevation(map, from.x, from.y, x, y)) return false;
   if (isItem(map.items, x, y, collectedItems, mapId)) return false;
   if (isGift(map.gifts, x, y, completedQuests)) return false;
   if (isCuttableTree(map.cuttableTrees, x, y, completedQuests)) return false;

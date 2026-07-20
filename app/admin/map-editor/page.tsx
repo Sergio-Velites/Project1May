@@ -63,6 +63,10 @@ interface MapEntry {
   fences?: Record<string, number[]>;
   /** Dirección de salto por tile de saliente. Default Down si falta el tile. */
   fenceDirections?: Record<string, Record<string, DirectionName>>;
+  /** Planos de altura por tile (sparse; ausente = nivel 0). */
+  elevations?: Record<string, Record<string, number>>;
+  /** Rampas/escaleras que conectan planos de altura. */
+  ramps?: Record<string, number[]>;
   grass?: Record<string, number[]>;
   water?: Record<string, number[]>;
   encounters?: EncountersOverride | null;
@@ -134,7 +138,10 @@ type EncountersOverride = Partial<Record<EncounterTableKey, EncounterTable>>;
 
 const EMPTY_TABLE = (): EncounterTable => ({ rate: 0, pokemon: [] });
 
-type EditMode = 'select' | 'npc' | 'walls' | 'fences' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'berry-trees' | 'boulders' | 'spots' | 'mechanics' | 'portals' | 'map';
+type EditMode = 'select' | 'npc' | 'walls' | 'fences' | 'elevations' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'berry-trees' | 'boulders' | 'spots' | 'mechanics' | 'portals' | 'map';
+
+/** Brocha del modo elevaciones: nivel 1-3 o rampa (escalera entre planos). */
+type ElevationBrush = 1 | 2 | 3 | 'ramp';
 
 // Nº de tiles clicables ALREDEDOR del mapa. Permite colocar portales/muros fuera
 // del borde visible (p.ej. un portal justo fuera → el jugador cambia de mapa al
@@ -592,6 +599,8 @@ interface MapClipboard {
   walls: Record<string, number[]>;
   fences: Record<string, number[]>;
   fenceDirections: Record<string, Record<string, DirectionName>>;
+  elevations: Record<string, Record<string, number>>;
+  ramps: Record<string, number[]>;
   grass: Record<string, number[]>;
   water: Record<string, number[]>;
   stoppers: Record<string, number[]>;
@@ -1944,6 +1953,9 @@ export default function MapEditor() {
   const [trainers, setTrainers] = useState<Trainer[]>([]);
   const [walls, setWalls] = useState<Record<string, number[]>>({});
   const [fences, setFences] = useState<Record<string, number[]>>({});
+  const [elevations, setElevations] = useState<Record<string, Record<string, number>>>({});
+  const [ramps, setRamps] = useState<Record<string, number[]>>({});
+  const [activeElevation, setActiveElevation] = useState<ElevationBrush>(1);
   // Dirección de salto por tile de saliente ({fila:{col:dir}}). Default Down.
   const [fenceDirections, setFenceDirections] = useState<Record<string, Record<string, DirectionName>>>({});
   // Dirección activa al pintar salientes en el modo "fences".
@@ -2364,6 +2376,8 @@ export default function MapEditor() {
     setTrainers(m.trainers ?? []);
     setWalls(m.walls ?? {});
     setFences(m.fences ?? {});
+    setElevations(m.elevations ?? {});
+    setRamps(m.ramps ?? {});
     setFenceDirections(m.fenceDirections ?? {});
     setGrass(m.grass ?? {});
     setWater((m as MapEntry & { water?: Record<string, number[]> }).water ?? {});
@@ -2467,7 +2481,7 @@ export default function MapEditor() {
       flyable, flySpot,
       music: musicField,
       trainers,
-      walls, fences, fenceDirections, grass, water,
+      walls, fences, fenceDirections, elevations, ramps, grass, water,
       texts, textRewards,
       items: items.map((it) => ({ itemKey: it.itemKey, pos: it.pos, ...(it.hidden ? { hidden: true } : {}) })),
       gifts, staticPokemon, cuttableTrees, berryTrees, boulders,
@@ -2598,6 +2612,8 @@ export default function MapEditor() {
             music: musicField,
             fences,
             fenceDirections,
+            elevations,
+            ramps,
             grass,
             water,
             encounters,
@@ -2701,6 +2717,8 @@ export default function MapEditor() {
             walls,
             fences,
             fenceDirections,
+            elevations,
+            ramps,
             grass,
             water,
             encounters,
@@ -2915,6 +2933,8 @@ export default function MapEditor() {
       setTrainers(parsed.trainers);
       setWalls(parsed.walls);
       setFences(parsed.fences);
+      setElevations(parsed.elevations ?? {});
+      setRamps(parsed.ramps ?? {});
       setFenceDirections((parsed as typeof parsed & { fenceDirections?: Record<string, Record<string, DirectionName>> }).fenceDirections ?? {});
       setGrass(parsed.grass);
       setWater(parsed.water);
@@ -3129,6 +3149,36 @@ export default function MapEditor() {
     return hasMask(src, x, y);
   }
 
+  /** Fija (o borra con null) la elevación de un tile. Nivel 0 = borrar (sparse). */
+  function setNumberAt(
+    src: Record<string, Record<string, number>>,
+    x: number,
+    y: number,
+    value: number | null,
+  ): Record<string, Record<string, number>> {
+    const rowKey = String(y);
+    const colKey = String(x);
+    const next = { ...src };
+    const row = { ...(next[rowKey] ?? {}) };
+    if (value === null || value === 0) {
+      delete row[colKey];
+    } else {
+      row[colKey] = value;
+    }
+    if (Object.keys(row).length === 0) delete next[rowKey];
+    else next[rowKey] = row;
+    return next;
+  }
+
+  /** Pinta un tile con la brocha de elevaciones activa (nivel o rampa). */
+  function paintElevationAt(x: number, y: number, mode: 'add' | 'remove') {
+    if (activeElevation === 'ramp') {
+      setRamps((prev) => setMaskAt(prev, x, y, mode === 'add'));
+    } else {
+      setElevations((prev) => setNumberAt(prev, x, y, mode === 'add' ? activeElevation : null));
+    }
+  }
+
   function setSpinnerAt(
     src: Record<string, Record<string, DirectionName>>,
     x: number,
@@ -3175,8 +3225,8 @@ export default function MapEditor() {
       for (const e of a) { if (e.pos.x < minX) minX = e.pos.x; if (e.pos.y < minY) minY = e.pos.y; }
     };
     const pt = (p: { x: number; y: number } | null) => { if (p) { if (p.x < minX) minX = p.x; if (p.y < minY) minY = p.y; } };
-    rc(walls); rc(fences); rc(grass); rc(water); rc(stoppers);
-    rcm(fenceDirections); rcm(spinners); rcm(texts); rcm(textRewards);
+    rc(walls); rc(fences); rc(ramps); rc(grass); rc(water); rc(stoppers);
+    rcm(fenceDirections); rcm(elevations); rcm(spinners); rcm(texts); rcm(textRewards);
     arr(trainers); arr(items); arr(gifts); arr(staticPokemon); arr(cuttableTrees); arr(boulders); arr(berryTrees); arr(portals);
     pt(startPos); pt(pokemonCenter); pt(pcPos); pt(storePos); pt(recoverLocation); pt(onlineBattleNpc); pt(flySpot);
     return { x: minX === Infinity ? 0 : minX, y: minY === Infinity ? 0 : minY };
@@ -3190,10 +3240,12 @@ export default function MapEditor() {
     if (dx === 0 && dy === 0) return;
     setWalls((m) => shiftRowCols(m, dx, dy));
     setFences((m) => shiftRowCols(m, dx, dy));
+    setRamps((m) => shiftRowCols(m, dx, dy));
     setGrass((m) => shiftRowCols(m, dx, dy));
     setWater((m) => shiftRowCols(m, dx, dy));
     setStoppers((m) => shiftRowCols(m, dx, dy));
     setFenceDirections((m) => shiftRowColMap(m, dx, dy));
+    setElevations((m) => shiftRowColMap(m, dx, dy));
     setTexts((m) => shiftRowColMap(m, dx, dy));
     setTextRewards((m) => shiftRowColMap(m, dx, dy));
     setSpinners((m) => shiftRowColMap(m, dx, dy));
@@ -3226,6 +3278,8 @@ export default function MapEditor() {
       walls: extractRowCols(walls, r),
       fences: extractRowCols(fences, r),
       fenceDirections: extractRowColMap(fenceDirections, r),
+      elevations: extractRowColMap(elevations, r),
+      ramps: extractRowCols(ramps, r),
       grass: extractRowCols(grass, r),
       water: extractRowCols(water, r),
       stoppers: extractRowCols(stoppers, r),
@@ -3248,6 +3302,8 @@ export default function MapEditor() {
     setWalls((m) => removeRowCols(m, r));
     setFences((m) => removeRowCols(m, r));
     setFenceDirections((m) => removeRowColMap(m, r));
+    setElevations((m) => removeRowColMap(m, r));
+    setRamps((m) => removeRowCols(m, r));
     setGrass((m) => removeRowCols(m, r));
     setWater((m) => removeRowCols(m, r));
     setStoppers((m) => removeRowCols(m, r));
@@ -3270,6 +3326,8 @@ export default function MapEditor() {
     setWalls((m) => mergeRowCols(m, shiftRowCols(c.walls, ax, ay)));
     setFences((m) => mergeRowCols(m, shiftRowCols(c.fences, ax, ay)));
     setFenceDirections((m) => mergeRowColMap(m, shiftRowColMap(c.fenceDirections, ax, ay)));
+    setElevations((m) => mergeRowColMap(m, shiftRowColMap(c.elevations ?? {}, ax, ay)));
+    setRamps((m) => mergeRowCols(m, shiftRowCols(c.ramps ?? {}, ax, ay)));
     setGrass((m) => mergeRowCols(m, shiftRowCols(c.grass, ax, ay)));
     setWater((m) => mergeRowCols(m, shiftRowCols(c.water, ax, ay)));
     setStoppers((m) => mergeRowCols(m, shiftRowCols(c.stoppers, ax, ay)));
@@ -3383,6 +3441,18 @@ export default function MapEditor() {
         return;
       }
 
+      // Pintado de elevaciones en arrastre (nivel activo o rampa)
+      if (editMode === 'elevations' && wallPaint.current?.active) {
+        const paint = wallPaint.current;
+        const k = `${tileX},${tileY}`;
+        if (!paint.visited.has(k)) {
+          paint.visited.add(k);
+          paintElevationAt(tileX, tileY, paint.mode);
+          setDirty(true);
+        }
+        return;
+      }
+
       // Mask paint en arrastre (walls, fences, grass, water)
       if (
         (editMode === 'walls' || editMode === 'fences' || editMode === 'grass' || editMode === 'water') &&
@@ -3414,7 +3484,7 @@ export default function MapEditor() {
       );
       setDirty(true);
     },
-    [tileFromClientPoint, editMode, activeFenceDir, panMode, currentMap]
+    [tileFromClientPoint, editMode, activeFenceDir, activeElevation, panMode, currentMap]
   );
 
   const onPointerUp = useCallback(() => {
@@ -3524,7 +3594,7 @@ export default function MapEditor() {
       (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
       return;
     }
-    if (editMode !== 'walls' && editMode !== 'fences' && editMode !== 'grass' && editMode !== 'water') return;
+    if (editMode !== 'walls' && editMode !== 'fences' && editMode !== 'grass' && editMode !== 'water' && editMode !== 'elevations') return;
     const tile = tileFromEvent(e);
     if (!tile) return;
     // Rango EXTENDIDO (mapa + margen): permite pintar muros/hierba/etc. fuera del borde.
@@ -3533,6 +3603,18 @@ export default function MapEditor() {
       tile.x >= (currentMap?.width ?? 0) + CANVAS_MARGIN ||
       tile.y >= (currentMap?.height ?? 0) + CANVAS_MARGIN
     ) return;
+    if (editMode === 'elevations') {
+      // Repintar con la MISMA brocha borra (nivel → 0 / quitar rampa).
+      const currentlyOn = activeElevation === 'ramp'
+        ? hasMask(ramps, tile.x, tile.y)
+        : (elevations[String(tile.y)]?.[String(tile.x)] ?? 0) === activeElevation;
+      const mode: 'add' | 'remove' = currentlyOn ? 'remove' : 'add';
+      wallPaint.current = { active: true, mode, visited: new Set([`${tile.x},${tile.y}`]) };
+      paintElevationAt(tile.x, tile.y, mode);
+      setDirty(true);
+      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      return;
+    }
     const src =
       editMode === 'walls' ? walls
       : editMode === 'fences' ? fences
@@ -4408,12 +4490,13 @@ export default function MapEditor() {
         {/* Modo edición — flexWrap: el grupo de 16 botones era un bloque
             indivisible de ~1100px que desbordaba en cualquier portátil. */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
-          {(['select', 'npc', 'walls', 'fences', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'berry-trees', 'boulders', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
+          {(['select', 'npc', 'walls', 'fences', 'elevations', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'berry-trees', 'boulders', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
               select: '#2a6a8a',
               npc: '#5050b0',
               walls: '#7a3030',
               fences: '#7a5a30',
+              elevations: '#8a5a2a',
               grass: '#3a7a3a',
               water: '#3a5aa0',
               texts: '#3a5a7a',
@@ -4444,7 +4527,7 @@ export default function MapEditor() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {m === 'npc' ? 'NPCs' : m === 'select' ? '⬚ Sel.' : m}
+                {m === 'npc' ? 'NPCs' : m === 'select' ? '⬚ Sel.' : m === 'elevations' ? '⛰ Alturas' : m}
               </button>
             );
           })}
@@ -5235,6 +5318,82 @@ export default function MapEditor() {
                 });
               })}
 
+              {/* Elevations overlay (tinte por nivel + número). Visible con
+                  intensidad completa en el modo ⛰; tenue en el resto para no
+                  tapar la edición de otros elementos. */}
+              {(editMode === 'elevations' || Object.keys(elevations).length > 0) && Object.entries(elevations).flatMap(([rowKey, colsMap]) => {
+                const y = parseInt(rowKey, 10);
+                if (Number.isNaN(y)) return [];
+                const LEVEL_COLORS: Record<number, string> = {
+                  1: '210, 140, 60',   // naranja tierra (nivel 1)
+                  2: '150, 90, 200',   // púrpura (nivel 2)
+                  3: '220, 70, 70',    // rojo (nivel 3)
+                };
+                return Object.entries(colsMap).map(([colKey, level]) => {
+                  const x = parseInt(colKey, 10);
+                  if (Number.isNaN(x)) return null;
+                  const rgb = LEVEL_COLORS[level] ?? '200, 200, 200';
+                  const strong = editMode === 'elevations';
+                  return (
+                    <div
+                      key={`el-${y}-${x}`}
+                      style={{
+                        position: 'absolute',
+                        left: x * zoom,
+                        top: y * zoom,
+                        width: zoom,
+                        height: zoom,
+                        background: `rgba(${rgb}, ${strong ? 0.45 : 0.14})`,
+                        border: strong ? `1px solid rgba(${rgb}, 0.9)` : 'none',
+                        pointerEvents: 'none',
+                        boxSizing: 'border-box',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#fff',
+                        fontSize: Math.max(8, zoom * 0.45),
+                        fontWeight: 700,
+                        lineHeight: 1,
+                        textShadow: '0 0 2px rgba(0,0,0,0.9)',
+                        opacity: strong ? 1 : 0.7,
+                      }}
+                    >
+                      {strong ? level : ''}
+                    </div>
+                  );
+                });
+              })}
+
+              {/* Ramps overlay (escaleras entre planos) */}
+              {(editMode === 'elevations' || Object.keys(ramps).length > 0) && Object.entries(ramps).flatMap(([rowKey, cols]) => {
+                const y = parseInt(rowKey, 10);
+                if (Number.isNaN(y)) return [];
+                const strong = editMode === 'elevations';
+                return cols.map((x) => (
+                  <div
+                    key={`rp-${y}-${x}`}
+                    style={{
+                      position: 'absolute',
+                      left: x * zoom,
+                      top: y * zoom,
+                      width: zoom,
+                      height: zoom,
+                      background: strong ? 'rgba(80, 220, 160, 0.5)' : 'rgba(80, 220, 160, 0.18)',
+                      border: strong ? '1px solid rgba(80, 220, 160, 0.95)' : '1px dashed rgba(80, 220, 160, 0.45)',
+                      pointerEvents: 'none',
+                      boxSizing: 'border-box',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: Math.max(8, zoom * 0.55),
+                      lineHeight: 1,
+                    }}
+                  >
+                    🪜
+                  </div>
+                ));
+              })}
+
               {/* Grass overlay */}
               {Object.entries(grass).flatMap(([rowKey, cols]) => {
                 const y = parseInt(rowKey, 10);
@@ -5796,6 +5955,59 @@ export default function MapEditor() {
                 countLabel="walls"
                 sourceFile={currentMap?.sourceFile}
               />
+            ) : editMode === 'elevations' ? (
+              <>
+                {/* Brocha de planos de altura */}
+                <div style={{ padding: '10px 12px', background: '#1a1208', border: '1px solid #8a5a2a', borderRadius: 6, marginBottom: 10 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#ffbb77', marginBottom: 6 }}>
+                    Brocha de altura
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
+                    {([1, 2, 3, 'ramp'] as ElevationBrush[]).map((b) => {
+                      const active = activeElevation === b;
+                      const label = b === 'ramp' ? '🪜 Rampa' : `⛰ Nivel ${b}`;
+                      const color = b === 'ramp' ? '#50dca0' : b === 1 ? '#d28c3c' : b === 2 ? '#965ac8' : '#dc4646';
+                      return (
+                        <button
+                          key={String(b)}
+                          onClick={() => setActiveElevation(b)}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                            padding: '8px 6px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                            background: active ? color : '#241a10',
+                            border: active ? '1px solid #ffe0bb' : '1px solid #4a3a20',
+                            borderRadius: 4, color: active ? '#141008' : '#bba',
+                          }}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#a89878', marginTop: 8, lineHeight: 1.5 }}>
+                    Pinta zonas elevadas (meseta marrón = nivel 1+). Los tiles sin
+                    pintar están a nivel 0. En el juego SOLO se puede caminar entre
+                    tiles del mismo nivel; para cambiar de plano hay que pisar una
+                    🪜 rampa (escalera) o saltar un saliente. Repintar con la misma
+                    brocha borra. Al cambiar de mapa o teletransportarte, tu plano
+                    es el del tile donde caes.
+                  </div>
+                </div>
+                <ModeHelpBlock
+                  emoji="⛰"
+                  color="#ffbb77"
+                  title="Planos de altura"
+                  lines={[
+                    'Pinta con el nivel activo; arrastra para rellenar',
+                    'Repintar la misma casilla la borra (vuelve a nivel 0)',
+                    '🪜 Rampa: conecta cualquier par de niveles',
+                    'Los NPC y objetos no se ven afectados al colocarse',
+                  ]}
+                  count={Object.values(elevations).reduce((a, m) => a + Object.keys(m).length, 0) + Object.values(ramps).reduce((a, b) => a + b.length, 0)}
+                  countLabel="tiles con altura/rampa"
+                  sourceFile={currentMap?.sourceFile}
+                />
+              </>
             ) : editMode === 'fences' ? (
               <>
                 {/* Selector de dirección de salto del saliente */}
