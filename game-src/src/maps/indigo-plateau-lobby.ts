@@ -31,9 +31,9 @@ const indigoPlateauLobby: MapType = {
   fences: {},
   teleports: {
     0: {
-      8: { map: MapId.EliteFour1, pos: { x: 5, y: 10 } },
+      8: { map: MapId.EliteFour1, pos: { x: 5, y: 11 } },
     },
-    11: {
+    12: {
       7: { map: MapId.LeagueRoute, pos: { x: 10, y: 6 } },
       8: { map: MapId.LeagueRoute, pos: { x: 11, y: 6 } },
     },
