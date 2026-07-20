@@ -48,19 +48,19 @@ walls: {
   maps: {},
   teleports: {
     5: {
-      8: { map: MapId.GateHouse, pos: { x: 4, y: 6 } },
+      8: { map: MapId.GateHouse, pos: { x: 4, y: 7 } },
     },
     6: {
-      39: { map: MapId.ViridianCity, pos: { x: 1, y: 14 } },
+      40: { map: MapId.ViridianCity, pos: { x: 0, y: 14 } },
     },
     7: {
-      39: { map: MapId.ViridianCity, pos: { x: 1, y: 15 } },
+      40: { map: MapId.ViridianCity, pos: { x: 0, y: 15 } },
     },
     8: {
-      39: { map: MapId.ViridianCity, pos: { x: 1, y: 16 } },
+      40: { map: MapId.ViridianCity, pos: { x: 0, y: 16 } },
     },
     9: {
-      39: { map: MapId.ViridianCity, pos: { x: 1, y: 17 } },
+      40: { map: MapId.ViridianCity, pos: { x: 0, y: 17 } },
     },
   },
   exits: {},
