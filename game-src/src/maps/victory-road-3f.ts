@@ -130,6 +130,12 @@ const victoryRoad3f: MapType = {
     5: [17],
     9: [1],
   },
+  boulders: [
+    {
+      pos: { x: 13, y: 11 },
+      id: "boulder-victory-road-3f-13-11",
+    },
+  ],
 };
 
 export default victoryRoad3f;
