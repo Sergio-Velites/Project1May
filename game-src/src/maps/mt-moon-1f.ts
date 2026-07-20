@@ -26,8 +26,8 @@ const mtMoon1f: MapType = {
       25: { map: MapId.MtMoon2f, pos: { x: 25, y: 16 } },
     },
     36: {
-      14: { map: MapId.Route3, pos: { x: 68, y: 6 } },
-      15: { map: MapId.Route3, pos: { x: 68, y: 6 } },
+      14: { map: MapId.Route4, pos: { x: 18, y: 6 } },
+      15: { map: MapId.Route4, pos: { x: 18, y: 6 } },
     },
   },
   exits: {},
