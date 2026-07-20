@@ -36,11 +36,11 @@ const victoryRoad2f: MapType = {
     7: {
       23: { map: MapId.VictoryRoad3f, pos: { x: 23, y: 8 } },
       27: { map: MapId.VictoryRoad3f, pos: { x: 26, y: 9 } },
-      30: { map: MapId.Route23, pos: { x: 14, y: 32 } },
+      30: { map: MapId.LeagueRoute, pos: { x: 15, y: 50 } },
     },
     8: {
       0: { map: MapId.VictoryRoad1f, pos: { x: 2, y: 1 } },
-      30: { map: MapId.Route23, pos: { x: 14, y: 32 } },
+      30: { map: MapId.LeagueRoute, pos: { x: 15, y: 50 } },
     },
     14: {
       25: { map: MapId.VictoryRoad3f, pos: { x: 27, y: 16 } },
