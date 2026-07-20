@@ -17,15 +17,15 @@ const mtMoon1f: MapType = {
   maps: {},
   teleports: {
     5: {
-      5: { map: MapId.MtMoon3f, pos: { x: 5, y: 6 } },
+      5: { map: MapId.MtMoon2f, pos: { x: 5, y: 6 } },
     },
     11: {
-      17: { map: MapId.MtMoon3f, pos: { x: 25, y: 10 } },
+      17: { map: MapId.MtMoon2f, pos: { x: 25, y: 10 } },
     },
     15: {
-      25: { map: MapId.MtMoon3f, pos: { x: 25, y: 16 } },
+      25: { map: MapId.MtMoon2f, pos: { x: 25, y: 16 } },
     },
-    35: {
+    36: {
       14: { map: MapId.Route3, pos: { x: 68, y: 6 } },
       15: { map: MapId.Route3, pos: { x: 68, y: 6 } },
     },
