@@ -137,6 +137,20 @@ const victoryRoad2f: MapType = {
     10: [5],
     15: [15, 21],
   },
+  boulders: [
+    {
+      pos: { x: 7, y: 8 },
+      id: "boulder-victory-road-2f-7-8",
+    },
+    {
+      pos: { x: 7, y: 9 },
+      id: "boulder-victory-road-2f-7-9",
+    },
+    {
+      pos: { x: 23, y: 14 },
+      id: "boulder-victory-road-2f-23-14",
+    },
+  ],
 };
 
 export default victoryRoad2f;
