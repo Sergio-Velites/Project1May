@@ -1,5 +1,6 @@
 import image from "../assets/map/victory-road-1f.png";
 import { MapId, MapType } from "./map-types";
+import { ItemType } from "../app/use-item-data";
 
 const victoryRoad1f: MapType = {
   name: "Camino Victoria 1F",
@@ -132,6 +133,22 @@ const victoryRoad1f: MapType = {
     7: [7, 15],
     13: [5],
   },
+  items: [
+    {
+      item: ItemType.MasterBall,
+      pos: { x: 11, y: 0 },
+    },
+    {
+      item: ItemType.FocusBand,
+      pos: { x: 9, y: 9 },
+    },
+  ],
+  boulders: [
+    {
+      pos: { x: 3, y: 8 },
+      id: "boulder-victory-road-1f-3-8",
+    },
+  ],
 };
 
 export default victoryRoad1f;
