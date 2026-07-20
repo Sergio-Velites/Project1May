@@ -120,16 +120,16 @@ const route4: MapType = {
   ],
   berryTrees: [
     {
-      pos: { x: 20, y: 3 },
-      item: ItemType.Berry,
-    },
-    {
-      pos: { x: 36, y: 3 },
-      item: ItemType.BitterBerry,
-    },
-    {
       pos: { x: 41, y: 3 },
       item: ItemType.MiracleBerry,
+    },
+    {
+      pos: { x: 57, y: 3 },
+      item: ItemType.MiracleBerry,
+    },
+    {
+      pos: { x: 63, y: 3 },
+      item: ItemType.MysteryBerry,
     },
   ],
   minimapPos: { x: 120, y: 41 },
