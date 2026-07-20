@@ -10,44 +10,43 @@ const gateHouse: MapType = {
   width: 10,
   start: { x: 4, y: 6 },
   walls: {
-    0: [0, 1, 2, 3, 4, 6, 7, 8, 9],
-    2: [0, 6, 8, 9],
-    3: [0, 6, 8, 9],
-    4: [0, 9],
-    5: [0, 6, 8, 9],
-    6: [0, 6, 8, 9],
-    7: [0, 9],
+    0: [0, 1, 2, 3, 6, 7, 8, 9],
+    1: [3, 6],
+    6: [3, 6],
+    7: [3, 6],
   },
   fences: {},
   grass: {},
   text: {},
-  maps: {
-
-  },
+  maps: {},
   teleports: {
-    0: { 5: { map: MapId.LeagueRoute, pos: { x: 9, y: 156 } } },
-    7: { 4: { map: MapId.Route22, pos: { x: 8, y: 6 } }, 5: { map: MapId.Route22, pos: { x: 8, y: 6 } } },
+    0: {
+      4: { map: MapId.LeagueRoute, pos: { x: 8, y: 157 } },
+      5: { map: MapId.LeagueRoute, pos: { x: 9, y: 157 } },
+    },
+    8: {
+      4: { map: MapId.Route22, pos: { x: 8, y: 6 } },
+      5: { map: MapId.Route22, pos: { x: 8, y: 6 } },
+    },
   },
   exits: {},
   exitReturnMap: MapId.Route22,
   exitReturnPos: { x: 8, y: 6 },
   gifts: [
-      {
-        pokemonId: 133,
-        level: 15,
-        pos: { x: 9, y: 2 },
-        questId: "gate-house-gift-9-2",
-      },
-    ],
-  trainers: [
     {
+      pokemonId: 133,
+      level: 15,
+      pos: { x: 9, y: 2 },
+      questId: "gate-house-gift-9-2",
+    },
+  ],
+  trainers: [
+  {
     npc: pokeManiac,
     pokemon: [{ id: 19, level: 2 }],
     facing: Direction.Up,
     pos: { x: 8, y: 2 },
-    intro: [
-
-    ],
+    intro: [],
     outtro: [
       "🎵 Llegaré a ser el mejor",
       "el mejor que habra jamás🎵..."
@@ -55,14 +54,12 @@ const gateHouse: MapType = {
     money: 0,
     persistent: true,
   },
-    {
+  {
     npc: superNerd,
     pokemon: [{ id: 19, level: 2 }],
     facing: Direction.Down,
     pos: { x: 5, y: 1 },
-    intro: [
-
-    ],
+    intro: [],
     outtro: [
       "...",
       "Estás lejos de ser un buen entrenador ",
@@ -73,14 +70,12 @@ const gateHouse: MapType = {
     persistent: true,
     hideCondition: "trainer-defeated:pewter-city-gym-4-1",
   },
-    {
+  {
     npc: scientist,
     pokemon: [{ id: 19, level: 2 }],
     facing: Direction.Down,
     pos: { x: 4, y: 1 },
-    intro: [
-
-    ],
+    intro: [],
     outtro: [
       "...",
       "Estás lejos de ser un buen entrenador ",
