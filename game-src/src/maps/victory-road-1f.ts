@@ -15,8 +15,8 @@ const victoryRoad1f: MapType = {
       1: { map: MapId.VictoryRoad2f, pos: { x: 0, y: 9 } },
     },
     18: {
-      8: { map: MapId.Route23, pos: { x: 4, y: 32 } },
-      9: { map: MapId.Route23, pos: { x: 4, y: 32 } },
+      8: { map: MapId.LeagueRoute, pos: { x: 5, y: 50 } },
+      9: { map: MapId.LeagueRoute, pos: { x: 5, y: 50 } },
     },
   },
   exits: {},
