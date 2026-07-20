@@ -1,8 +1,6 @@
 import image from "../assets/map/route-3-pokemon-center.png";
 import { MapId, MapType } from "./map-types";
 import { Direction } from "../state/state-types";
-import { scientist } from "../app/npcs";
-
 import music from "../assets/music/maps/pokemon-center.mp3";
 
 const route3PokemonCenter: MapType = {
@@ -10,65 +8,40 @@ const route3PokemonCenter: MapType = {
   image,
   height: 8,
   width: 14,
-  start: {
-    x: 4,
-    y: 6,
-  },
+  start: { x: 4, y: 6 },
   walls: {
-    0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13],
-    1: [0, 1, 2, 5, 6, 7],
-    2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13],
+    2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
     3: [13],
     4: [0],
     5: [0],
-    6: [0, 1, 6, 7, 12, 13],
-    7: [0, 1, 6, 7, 12, 13],
+    6: [1, 6, 7, 12, 13],
+    7: [1, 6, 7, 12, 13],
   },
  text: {
     4: {
       0: [
-        "Volata di peluka!..."
+        "Volata di peluka!"
       ],
     },
   },
-  maps: {
-
-  },
-  exits: {
-    7: [3, 4],
-  },
-  music,
+  maps: {},
+  exits: {},
+  music: music,
   grass: {},
   exitReturnMap: MapId.Route3,
-  exitReturnPos: {
-    x: 61,
-    y: 6,
-  },
-  pokemonCenter: {
-    x: 3,
-    y: 2,
-  },
-  pc: {
-    x: 13,
-    y: 3,
-  },
-    onlineBattleNpc: {
-    x: 8,
-    y: 2,
-  },
-  trainers: [
-    {
-      npc: scientist,
-      pokemon: [{ id: 1, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 8, y: 1 },
-      intro: [],
-      outtro: [],
-      money: 0,
-      isOnline: true,
-    },
-  ],
+  exitReturnPos: { x: 61, y: 6 },
+  pokemonCenter: { x: 3, y: 2 },
+  pc: { x: 13, y: 3 },
+    onlineBattleNpc: { x: 11, y: 2 },
+  trainers: [],
   minimapPos: { x: 88, y: 48 },
+  fences: {},
+  teleports: {
+    8: {
+      3: { map: MapId.Route4, pos: { x: 11, y: 6 } },
+      4: { map: MapId.Route4, pos: { x: 11, y: 6 } },
+    },
+  },
 };
 
 
