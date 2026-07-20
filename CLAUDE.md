@@ -357,6 +357,28 @@ ss-anne-1f · ss-anne-2f · ss-anne-3f · ss-anne-bf1
   Hielo + Baya Menta) · Fuchsia Baya Tostada. Colocarlos visualmente con el
   editor (las posiciones no están hardcodeadas).
 
+### Planos de altura (elevations) y rampas
+
+- **Datos**: `MapType.elevations?: Record<fila, Record<col, nivel>>` (sparse,
+  tile ausente = nivel 0) y `MapType.ramps?: Record<fila, [cols]>` (formato
+  walls). Serializados/parseados en ts-codegen, setup-editor.mjs y parse-ts.ts.
+- **Regla de movimiento** (`canWalk` con param opcional `from` + helpers
+  `getElevation`/`isRamp`/`canChangeElevation` en `map-helper.ts`): solo se
+  camina entre tiles del MISMO nivel; una rampa (en origen o destino) conecta
+  cualquier par de niveles. El **salto de saliente NO se bloquea** (un ledge es
+  transición legítima de plano, como en Gen I). La roca de Fuerza no cruza
+  bordes de elevación ni se puede alcanzar desde otro plano (salvo rampa).
+- **Sin estado nuevo**: el "plano actual" del jugador es la elevación del tile
+  que pisa. Teleports, KO→centro y cambios de mapa quedan al nivel del tile de
+  llegada automáticamente; no hay nada que resetear ni migrar en los saves.
+- **Editor**: modo `⛰ Alturas` — brocha de nivel 1/2/3 + 🪜 rampa, pintado con
+  arrastre (repintar con la misma brocha borra; nivel 0 = no pintado), overlay
+  con tinte/número por nivel (tenue fuera del modo). Integrado en desplazar
+  todo, selección rectangular y guardado (override keys `elevations`/`ramps`).
+- **Cómo montar la escena de la imagen de ejemplo**: pintar la meseta marrón
+  como nivel 1, dejar el suelo verde a nivel 0, y pintar los tiles de las
+  escaleras del PNG como 🪜 rampa.
+
 ### Salientes (ledges) direccionales
 
 - **Colisión**: `MapType.fences?: Record<number, number[]>` (`{fila:[cols]}`) sigue
