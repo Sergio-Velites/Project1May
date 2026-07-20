@@ -46,17 +46,27 @@ const mtMoon2f: MapType = {
   },
   maps: {},
   teleports: {
-    7: {
-      5: { map: MapId.MtMoon3f, pos: { x: 17, y: 11 } },
+    3: {
+      23: { map: MapId.MtMoon3f, pos: { x: 5, y: 8 } },
+      27: { map: MapId.Route4, pos: { x: 24, y: 6 } },
+    },
+    5: {
+      5: { map: MapId.MtMoon1f, pos: { x: 5, y: 6 } },
     },
     9: {
-      25: { map: MapId.MtMoon3f, pos: { x: 23, y: 3 } },
+      25: { map: MapId.MtMoon1f, pos: { x: 17, y: 12 } },
+    },
+    11: {
+      17: { map: MapId.MtMoon3f, pos: { x: 25, y: 10 } },
+    },
+    15: {
+      25: { map: MapId.MtMoon1f, pos: { x: 25, y: 16 } },
     },
     17: {
       21: { map: MapId.MtMoon3f, pos: { x: 21, y: 17 } },
     },
     27: {
-      15: { map: MapId.MtMoon3f, pos: { x: 13, y: 27 } },
+      13: { map: MapId.MtMoon3f, pos: { x: 15, y: 26 } },
     },
   },
   exits: {},
