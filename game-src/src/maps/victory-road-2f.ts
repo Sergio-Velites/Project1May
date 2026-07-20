@@ -28,24 +28,32 @@ const victoryRoad2f: MapType = {
     17: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
   },
   text: {},
-  maps: {
-
-  },
+  maps: {},
   teleports: {
-    1: { 1: { map: MapId.VictoryRoad3f, pos: { x: 2, y: 0 } } },
-    7: { 23: { map: MapId.VictoryRoad3f, pos: { x: 23, y: 7 } }, 27: { map: MapId.VictoryRoad3f, pos: { x: 26, y: 8 } } },
-    8: { 0: { map: MapId.VictoryRoad1f, pos: { x: 1, y: 1 } } },
-    14: { 25: { map: MapId.VictoryRoad3f, pos: { x: 27, y: 15 } } },
+    1: {
+      1: { map: MapId.VictoryRoad3f, pos: { x: 2, y: 1 } },
+    },
+    7: {
+      23: { map: MapId.VictoryRoad3f, pos: { x: 23, y: 8 } },
+      27: { map: MapId.VictoryRoad3f, pos: { x: 26, y: 9 } },
+      30: { map: MapId.Route23, pos: { x: 14, y: 32 } },
+    },
+    8: {
+      0: { map: MapId.VictoryRoad1f, pos: { x: 2, y: 1 } },
+      30: { map: MapId.Route23, pos: { x: 14, y: 32 } },
+    },
+    14: {
+      25: { map: MapId.VictoryRoad3f, pos: { x: 27, y: 16 } },
+    },
   },
-  exits: {
-    7: [29],
-    8: [29],
-  },
+  exits: {},
   exitReturnMap: MapId.Route23,
   exitReturnPos: { x: 14, y: 32 },
   music: "/game/music/maps-original/victory-road.mp3",
   grass: {},
   minimapPos: { x: 29, y: 65 },
+  fences: {},
+  trainers: [],
 };
 
 export default victoryRoad2f;
