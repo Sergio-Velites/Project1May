@@ -18,6 +18,7 @@ import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
 import PixelImage from "../styles/PixelImage";
 import { getMoveMetadata } from "../app/use-move-metadata";
+import { xpForNextLevel, MAX_LEVEL } from "../app/level-helper";
 import useItemData from "../app/use-item-data";
 import { selectName } from "../state/gameSlice";
 
@@ -250,10 +251,12 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
   const idStr  = String(meta.id).padStart(5, "0");
   const noStr  = `Nº${String(meta.id).padStart(3, "0")}`;
 
-  // XP to next level — Gen I Medium Fast: nextLevel³
-  const nextLvl = pokemon.level + 1;
-  const xpForNext = Math.pow(nextLvl, 3) - Math.pow(pokemon.level, 3);
-  const xpPct = Math.min(100, (pokemon.xp / xpForNext) * 100);
+  // XP hacia el siguiente nivel — según el growth rate REAL del Pokémon
+  // (antes usaba la fórmula Medium-Fast hardcodeada para todos).
+  const growthRate = meta.growthRate ?? "medium-fast";
+  const atMaxLevel = pokemon.level >= MAX_LEVEL;
+  const xpForNext = xpForNextLevel(pokemon.level, growthRate); // Infinity al máximo
+  const xpPct = atMaxLevel ? 100 : Math.min(100, (pokemon.xp / xpForNext) * 100);
 
   // ── Página 1 — ESTADO ──────────────────────────────────────────────────────
   if (page === 0) {
@@ -393,7 +396,7 @@ const PokemonSummary = ({ pokemon, onClose }: Props) => {
         </Row>
         <Row $justify="space-between">
           <Txt $size={0.75}>actual {pokemon.xp}</Txt>
-          <Txt $size={0.75}>siguiente {xpForNext}</Txt>
+          <Txt $size={0.75}>siguiente {atMaxLevel ? "—" : xpForNext}</Txt>
         </Row>
       </HpSection>
 
