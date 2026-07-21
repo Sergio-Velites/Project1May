@@ -29,7 +29,7 @@ import {
 } from "../state/uiSlice";
 import { directionModifier, isFence, isTrainer, isWall, isWater } from "./map-helper";
 import { getMoveMetadata } from "./use-move-metadata";
-import { getHpDeltaOnLevelUp, getLearnedMove } from "./level-helper";
+import { getHpDeltaOnLevelUp, getLearnedMove, MAX_LEVEL } from "./level-helper";
 import { getPokemonMetadata } from "./use-pokemon-metadata";
 import { resolveEvolution, friendshipOnLevelUp, getFriendship } from "./evolution-helper";
 import { StatusType } from "../state/state-types";
@@ -789,7 +789,7 @@ const useItemData = () => {
           showActionOnPokemon((index: number) => {
             const p = pokemon[index];
             const pokemonName = getPokemonMetadata(p.id).name.toUpperCase();
-            if (p.level >= 100) {
+            if (p.level >= MAX_LEVEL) {
               dispatch(showText([`¡${pokemonName} ya está en el nivel máximo!`]));
               return;
             }

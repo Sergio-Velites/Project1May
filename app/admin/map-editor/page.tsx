@@ -1410,7 +1410,7 @@ function GiftFormModal({ state, onClose }: { state: Extract<NonNullable<PickerSt
   const [pokemonId, setPokemonId] = useState(state.initial.pokemonId);
   const [level, setLevel] = useState(state.initial.level);
   const [questId, setQuestId] = useState(state.initial.questId);
-  const valid = pokemonId >= 1 && pokemonId <= MAX_POKEMON_ID && level >= 1 && level <= 100 && questId.trim().length > 0;
+  const valid = pokemonId >= 1 && pokemonId <= MAX_POKEMON_ID && level >= 1 && level <= MAX_LEVEL && questId.trim().length > 0;
   return (
     <PickerOverlay title={state.title} subtitle="Pokémon que se obtiene al recoger la pokéball" onClose={onClose} width={560}>
       <div style={{ height: '46vh', display: 'flex' }}>
@@ -1424,7 +1424,7 @@ function GiftFormModal({ state, onClose }: { state: Extract<NonNullable<PickerSt
         </div>
         <div>
           <label style={labelStyle}>Nivel</label>
-          <input type="number" min={1} max={100} value={level} onChange={(e) => setLevel(parseInt(e.target.value, 10) || 1)} style={{ ...inputStyle, width: 70 }} />
+          <input type="number" min={1} max={MAX_LEVEL} value={level} onChange={(e) => setLevel(parseInt(e.target.value, 10) || 1)} style={{ ...inputStyle, width: 70 }} />
         </div>
         <div style={{ flex: 1, minWidth: 160 }}>
           <label style={labelStyle}>questId (único)</label>
@@ -1447,7 +1447,7 @@ function StaticPokemonFormModal({ state, onClose }: { state: Extract<NonNullable
   const [sprite, setSprite] = useState(state.initial.sprite);
   const [questId, setQuestId] = useState(state.initial.questId);
   const [intro, setIntro] = useState(state.initial.intro);
-  const valid = pokemonId >= 1 && pokemonId <= MAX_POKEMON_ID && level >= 1 && level <= 100 && questId.trim().length > 0 && STATIC_POKEMON_SPRITES.includes(sprite);
+  const valid = pokemonId >= 1 && pokemonId <= MAX_POKEMON_ID && level >= 1 && level <= MAX_LEVEL && questId.trim().length > 0 && STATIC_POKEMON_SPRITES.includes(sprite);
   return (
     <PickerOverlay title={state.title} subtitle="Pokémon estático tipo Articuno (combate único)" onClose={onClose} width={580}>
       <div style={{ height: '40vh', display: 'flex' }}>
@@ -1456,7 +1456,7 @@ function StaticPokemonFormModal({ state, onClose }: { state: Extract<NonNullable
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, padding: '12px 16px', borderTop: '1px solid #2a2a4a' }}>
         <div>
           <label style={labelStyle}>Nivel</label>
-          <input type="number" min={1} max={100} value={level} onChange={(e) => setLevel(parseInt(e.target.value, 10) || 1)} style={inputStyle} />
+          <input type="number" min={1} max={MAX_LEVEL} value={level} onChange={(e) => setLevel(parseInt(e.target.value, 10) || 1)} style={inputStyle} />
         </div>
         <div>
           <label style={labelStyle}>Sprite overworld</label>
@@ -1550,7 +1550,7 @@ function TextEntryModal({ state, onClose }: { state: Extract<NonNullable<PickerS
             </button>
             <div>
               <label style={labelStyle}>Nivel</label>
-              <input type="number" min={1} max={100} value={level} onChange={(e) => setLevel(parseInt(e.target.value, 10) || 1)} style={{ ...inputStyle, width: 70 }} />
+              <input type="number" min={1} max={MAX_LEVEL} value={level} onChange={(e) => setLevel(parseInt(e.target.value, 10) || 1)} style={{ ...inputStyle, width: 70 }} />
             </div>
           </div>
         )}
@@ -6458,16 +6458,16 @@ function GenPicker({ value, onChange }: { value: GenChoice; onChange: (g: GenCho
 }
 
 function AfLevelRange({ min, max, setMin, setMax }: { min: number; max: number; setMin: (n: number) => void; setMax: (n: number) => void }) {
-  const clamp = (n: number) => Math.max(2, Math.min(100, n || 2));
+  const clamp = (n: number) => Math.max(2, Math.min(MAX_LEVEL, n || 2));
   return (
     <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
       <div style={{ flex: 1 }}>
         <span style={{ color: '#888', fontSize: 10 }}>Nivel mín.</span>
-        <input type="number" min={2} max={100} value={min} onChange={(e) => setMin(clamp(parseInt(e.target.value, 10)))} style={{ ...inputStyle, fontSize: 12, padding: '3px 6px' }} />
+        <input type="number" min={2} max={MAX_LEVEL} value={min} onChange={(e) => setMin(clamp(parseInt(e.target.value, 10)))} style={{ ...inputStyle, fontSize: 12, padding: '3px 6px' }} />
       </div>
       <div style={{ flex: 1 }}>
         <span style={{ color: '#888', fontSize: 10 }}>Nivel máx.</span>
-        <input type="number" min={2} max={100} value={max} onChange={(e) => setMax(clamp(parseInt(e.target.value, 10)))} style={{ ...inputStyle, fontSize: 12, padding: '3px 6px' }} />
+        <input type="number" min={2} max={MAX_LEVEL} value={max} onChange={(e) => setMax(clamp(parseInt(e.target.value, 10)))} style={{ ...inputStyle, fontSize: 12, padding: '3px 6px' }} />
       </div>
     </div>
   );
@@ -6906,6 +6906,8 @@ function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, onAutofi
 
 // Total de Pokémon admitidos en el editor (Gen I + Gen II = 251).
 const MAX_POKEMON_ID = 251;
+// Nivel máximo del juego (ver game-src/src/app/level-helper.ts → MAX_LEVEL).
+const MAX_LEVEL = 200;
 
 // Nombres Pokémon (índice 0 = vacío, 1 = Bulbasaur … 251 = Celebi).
 const POKEMON_NAMES_EDITOR = [
@@ -7124,10 +7126,10 @@ function EncountersTableEditor({
                   <input
                     type="number"
                     min={1}
-                    max={100}
+                    max={MAX_LEVEL}
                     value={p.minLevel}
                     onChange={(e) => {
-                      const v = Math.max(1, Math.min(100, parseInt(e.target.value, 10) || 1));
+                      const v = Math.max(1, Math.min(MAX_LEVEL, parseInt(e.target.value, 10) || 1));
                       update(i, { minLevel: v, maxLevel: Math.max(v, p.maxLevel) });
                     }}
                     title="Nivel mínimo"
@@ -7137,9 +7139,9 @@ function EncountersTableEditor({
                   <input
                     type="number"
                     min={p.minLevel}
-                    max={100}
+                    max={MAX_LEVEL}
                     value={p.maxLevel}
-                    onChange={(e) => update(i, { maxLevel: Math.max(p.minLevel, Math.min(100, parseInt(e.target.value, 10) || p.minLevel)) })}
+                    onChange={(e) => update(i, { maxLevel: Math.max(p.minLevel, Math.min(MAX_LEVEL, parseInt(e.target.value, 10) || p.minLevel)) })}
                     title="Nivel máximo"
                     style={{ ...inputBase, width: 44, flexShrink: 0 }}
                   />

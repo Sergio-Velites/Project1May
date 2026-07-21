@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { itemLabel } from "./item-names";
 
+// Nivel máximo del juego (ver game-src/src/app/level-helper.ts → MAX_LEVEL).
+const MAX_LEVEL = 200;
+
 interface PokemonInst {
   id: number;
   level: number;
@@ -98,7 +101,7 @@ export default function PlayerEditModal({ userId, playerName, onClose, onSaved }
   };
 
   const updateLevel = (idx: number, raw: string) => {
-    const level = Math.min(100, Math.max(1, parseInt(raw, 10) || 1));
+    const level = Math.min(MAX_LEVEL, Math.max(1, parseInt(raw, 10) || 1));
     setTeam((prev) => prev.map((p, i) => (i === idx ? { ...p, level } : p)));
   };
 
@@ -308,7 +311,7 @@ export default function PlayerEditModal({ userId, playerName, onClose, onSaved }
                               <button
                                 className="edit-step-btn"
                                 onClick={() => updateLevel(idx, String(p.level + 1))}
-                                disabled={p.level >= 100}
+                                disabled={p.level >= MAX_LEVEL}
                                 aria-label="Subir nivel"
                               >▲</button>
                             </div>

@@ -9,6 +9,9 @@ export interface PoolEntry {
   bst: number;
 }
 
+// Nivel máximo del juego (ver game-src/src/app/level-helper.ts → MAX_LEVEL).
+export const MAX_LEVEL = 200;
+
 export const POKEMON_POOL: Record<number, PoolEntry> = {
   1: { types: ["grass", "poison"], bst: 253 },
   2: { types: ["grass", "poison"], bst: 325 },
@@ -401,7 +404,7 @@ export function buildEncounterTable(opts: {
   rate?: number;
 }): BuiltEncounterTable {
   const lo = Math.max(2, Math.min(opts.minLevel, opts.maxLevel));
-  const hi = Math.min(100, Math.max(opts.minLevel, opts.maxLevel));
+  const hi = Math.min(MAX_LEVEL, Math.max(opts.minLevel, opts.maxLevel));
   const pool = candidateSpecies({ gen: opts.gen, terrain: opts.terrain, includeLegendary: opts.includeLegendary });
   const n = Math.max(1, Math.min(opts.count, pool.length));
   // Ordena el pool por BST: los más débiles serán los más comunes.
@@ -444,7 +447,7 @@ export function buildTrainerTeam(opts: {
 }): { id: number; level: number }[] {
   const diff = Math.max(1, Math.min(10, Math.round(opts.difficulty)));
   const lo = Math.max(2, Math.min(opts.minLevel, opts.maxLevel));
-  const hi = Math.min(100, Math.max(opts.minLevel, opts.maxLevel));
+  const hi = Math.min(MAX_LEVEL, Math.max(opts.minLevel, opts.maxLevel));
   const size = Math.max(1, Math.min(6, opts.size ?? Math.max(1, Math.round(1 + (diff - 1) * 5 / 9))));
   const allowLegendary = diff >= 9;
   // BST objetivo: dif 1 ≈ 250, dif 10 ≈ 600.

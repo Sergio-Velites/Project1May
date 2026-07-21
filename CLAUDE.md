@@ -566,6 +566,23 @@ Archivos principales: `game-src/src/app/move-helper.ts`, `game-src/src/component
 representable en el enrutamiento de stages del motor (riesgo de combate
 colgado). No implementar sin rediseñar el flujo de KO.
 
+### Nivel máximo 200 (`MAX_LEVEL`)
+
+- El tope de nivel se elevó de 100 a **200**. Fuente única: `MAX_LEVEL` en
+  `game-src/src/app/level-helper.ts` (usado por `getSingleLevelUp` y
+  `xpForNextLevel`) y por el Rare Candy en `use-item-data.ts`.
+- **Stats**: `getPokemonStats` es lineal en el nivel y NO tiene tope → los stats
+  siguen creciendo con la MISMA rampa por encima de 100 (exactamente como si la
+  curva continuara). Sin IVs/EVs, sin overflow.
+- **Movimientos**: NO se aprenden nuevos por encima de 100 (ningún Pokémon los
+  tiene en su tabla `moves`); `getLearnedMove` devuelve `null` de forma natural.
+- **XP**: la curva Gen I (`totalXpForLevel`) se extiende sin cambios (Lv200 slow
+  ≈ 10M XP). Subir 100→200 es ~8× más grindeo — decisión de diseño aceptada.
+- **Espejo del cap fuera del juego** (constantes locales `MAX_LEVEL = 200`,
+  sincronizar si cambia): admin `PlayerEditModal.tsx` (editor de equipo) y
+  map-editor (`page.tsx`: inputs de nivel de encuentros/regalos/estáticos/
+  entrenadores + `AfLevelRange`; `pokemon-pool.ts`: clamps de auto-relleno).
+
 ### Pokédex Gen I+II
 
 `pokemon-metadata.ts` contiene los 251 Pokémon con stats, evoluciones y growth rates correctos.

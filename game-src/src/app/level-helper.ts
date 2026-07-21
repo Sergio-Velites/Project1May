@@ -6,6 +6,14 @@ import { getPokemonStats } from "./use-pokemon-stats";
 export type GrowthRate = "fast" | "medium-fast" | "medium-slow" | "slow";
 
 /**
+ * Nivel máximo alcanzable. Elevado de 100 a 200: no se aprenden nuevos
+ * movimientos por encima de 100 (ningún Pokémon los tiene en su tabla),
+ * pero los stats siguen creciendo con la MISMA rampa lineal (getPokemonStats
+ * no tiene tope) y la curva de XP Gen I se extiende sin cambios.
+ */
+export const MAX_LEVEL = 200;
+
+/**
  * Total XP required to BE at level n (Gen I formulas).
  * Medium-Slow formula can be negative for level < 5 — clamped to 0.
  */
@@ -60,7 +68,7 @@ export const getSingleLevelUp = (
   currentExp: number,
   growthRate: GrowthRate = "medium-fast"
 ): { level: number; leveledUp: boolean; remainingXp: number } => {
-  if (currentLevel >= 100) {
+  if (currentLevel >= MAX_LEVEL) {
     return { level: currentLevel, leveledUp: false, remainingXp: currentExp };
   }
   const nextLevelXp =
@@ -84,7 +92,7 @@ export const xpForNextLevel = (
   currentLevel: number,
   growthRate: GrowthRate = "medium-fast"
 ): number => {
-  if (currentLevel >= 100) return Infinity;
+  if (currentLevel >= MAX_LEVEL) return Infinity;
   return (
     totalXpForLevel(currentLevel + 1, growthRate) -
     totalXpForLevel(currentLevel, growthRate)
