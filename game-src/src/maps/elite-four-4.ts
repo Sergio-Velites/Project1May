@@ -43,7 +43,7 @@ const eliteFour4: MapType = {
   minimapPos: { x: 29, y: 41 },
   fences: {},
   teleports: {
-    0: {
+    "-1": {
       5: { map: MapId.ChampionRoom, pos: { x: 3, y: 6 } },
       6: { map: MapId.ChampionRoom, pos: { x: 4, y: 6 } },
     },
