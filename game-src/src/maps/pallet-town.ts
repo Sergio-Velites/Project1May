@@ -208,7 +208,7 @@ encounters: {
 },
   fences: {},
   teleports: {
-    0: {
+    "-1": {
       10: { map: MapId.Route1, pos: { x: 10, y: 35 } },
       11: { map: MapId.Route1, pos: { x: 11, y: 35 } },
     },
