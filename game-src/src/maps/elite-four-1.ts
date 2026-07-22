@@ -33,7 +33,7 @@ const eliteFour1: MapType = {
       4: { map: MapId.EliteFour2, pos: { x: 4, y: 10 } },
       5: { map: MapId.EliteFour2, pos: { x: 5, y: 10 } },
     },
-    11: {
+    12: {
       4: { map: MapId.IndigoPlateauLobby, pos: { x: 8, y: 1 } },
       5: { map: MapId.IndigoPlateauLobby, pos: { x: 8, y: 1 } },
     },
