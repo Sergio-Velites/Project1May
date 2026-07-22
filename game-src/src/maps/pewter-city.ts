@@ -308,6 +308,10 @@ const pewterCity: MapType = {
     persistent: true,
   }
   ],
+  flyable: true,
+  flySpot: { x: 13, y: 26 },
+  flyAlwaysAvailable: true,
+  minimapPos: { x: 53, y: 50 },
 }
 
 export default pewterCity;
