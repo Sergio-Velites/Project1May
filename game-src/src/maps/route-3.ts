@@ -286,6 +286,7 @@ const route3: MapType = {
       "-1": { map: MapId.PewterCity, pos: { x: 39, y: 19 } },
     },
   },
+  minimapPos: { x: 69, y: 50 },
 }
 
 export default route3;
