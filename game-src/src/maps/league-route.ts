@@ -394,6 +394,7 @@ const leagueRoute: MapType = {
   flyUnlockTiles: {
     6: [10, 11],
   },
+  minimapPos: { x: 29, y: 40 },
 }
 
 export default leagueRoute;
