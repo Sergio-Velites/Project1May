@@ -271,6 +271,12 @@ const route4: MapType = {
       50: Direction.Left,
     },
   },
+  flyable: true,
+  flySpot: { x: 11, y: 6 },
+  flyUnlockTiles: {
+    6: [11],
+  },
+  minimapPos: { x: 88, y: 39 },
 };
 
 export default route4;
