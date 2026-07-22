@@ -3056,13 +3056,17 @@ export default function MapEditor() {
   // ── Auto-relleno de equipos de entrenador ─────────────────────────────
   function applyTrainerAutofill(cfg: TrainerAutofillConfig) {
     if (!autofillTr) return;
+    // "Conservar tamaño" SOLO aplica en scope 'all' (donde existe el checkbox).
+    // Para un entrenador individual el slider de tamaño siempre manda, si no
+    // poner "6" en un entrenador con 2 Pokémon no haría nada.
+    const useKeepSize = autofillTr.scope === 'all' && cfg.keepSize;
     const makeTeam = (currentSize: number) => buildTrainerTeam({
       gen: cfg.gen,
       types: cfg.types,
       difficulty: cfg.difficulty,
       minLevel: cfg.minLevel,
       maxLevel: cfg.maxLevel,
-      size: cfg.keepSize && currentSize > 0 ? currentSize : cfg.size,
+      size: useKeepSize && currentSize > 0 ? currentSize : cfg.size,
     });
     if (autofillTr.scope === 'one' && autofillTr.index !== null) {
       const idx = autofillTr.index;
@@ -6728,20 +6732,28 @@ function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, onAutofi
               <span style={{ fontSize: 11, color: '#cdf', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{POKEMON_NAMES_EDITOR[p.id] ?? `#${p.id}`}</span>
             </button>
             <span style={{ color: '#666', fontSize: 12 }}>Lv</span>
-            <input type="number" value={p.level} onChange={(e) => {
-              const next = trainer.pokemon.map((pk, j) => j === i ? { ...pk, level: parseInt(e.target.value) || 1 } : pk);
+            <input type="number" min={1} max={MAX_LEVEL} value={p.level} onChange={(e) => {
+              const level = Math.max(1, Math.min(MAX_LEVEL, parseInt(e.target.value, 10) || 1));
+              const next = trainer.pokemon.map((pk, j) => j === i ? { ...pk, level } : pk);
               onChange({ pokemon: next });
             }} style={{ ...inputStyle, width: 50 }} />
             <button onClick={() => onChange({ pokemon: trainer.pokemon.filter((_, j) => j !== i) })} style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: 16, padding: 0, lineHeight: 1 }}>×</button>
           </div>
         ))}
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          <button onClick={() => openPicker({
-            kind: 'pokemon',
-            title: 'Añadir Pokémon al entrenador',
-            onPick: (id) => onChange({ pokemon: [...trainer.pokemon, { id, level: 5 }] }),
-          })} style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', padding: '3px 10px' }}>
-            + Pokémon
+          <button
+            disabled={trainer.pokemon.length >= 6}
+            onClick={() => {
+              if (trainer.pokemon.length >= 6) return; // un equipo nunca supera 6
+              openPicker({
+                kind: 'pokemon',
+                title: 'Añadir Pokémon al entrenador',
+                onPick: (id) => onChange({ pokemon: [...trainer.pokemon, { id, level: 5 }].slice(0, 6) }),
+              });
+            }}
+            title={trainer.pokemon.length >= 6 ? 'Máximo 6 Pokémon por equipo' : 'Añadir Pokémon'}
+            style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: trainer.pokemon.length >= 6 ? '#4a5a4a' : '#88ff88', cursor: trainer.pokemon.length >= 6 ? 'not-allowed' : 'pointer', padding: '3px 10px', opacity: trainer.pokemon.length >= 6 ? 0.5 : 1 }}>
+            + Pokémon {trainer.pokemon.length >= 6 ? '(máx. 6)' : ''}
           </button>
           <button onClick={onAutofill} title="Auto-generar el equipo (tipo, dificultad, niveles…)" style={{ fontSize: 12, background: '#1f1a2e', border: '1px solid #6a5a9a', borderRadius: 4, color: '#c8b0ff', cursor: 'pointer', padding: '3px 10px' }}>
             ✨ Auto-equipo

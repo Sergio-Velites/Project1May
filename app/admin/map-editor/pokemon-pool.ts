@@ -481,10 +481,12 @@ export function buildTrainerTeam(opts: {
   const window = ranked.slice(0, windowSize).map((r) => r.id);
   const chosen = shuffle(window).slice(0, size);
 
-  // Niveles crecientes; el "ace" (último) al máximo del rango.
+  // Niveles crecientes cubriendo TODO el rango [lo, hi]: el más débil al mínimo
+  // y el "ace" (último) al máximo. (Antes solo usaba la mitad alta del rango,
+  // por lo que el nivel mínimo elegido parecía ignorarse.)
   const team = chosen.map((id, i) => {
     const frac = size === 1 ? 1 : i / (size - 1);
-    const level = Math.round(lo + (hi - lo) * (0.5 + 0.5 * frac));
+    const level = Math.round(lo + (hi - lo) * frac);
     return { id, level: Math.max(lo, Math.min(hi, level)) };
   });
   team.sort((a, b) => a.level - b.level);
