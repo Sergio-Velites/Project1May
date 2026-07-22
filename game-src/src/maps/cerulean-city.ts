@@ -283,11 +283,11 @@ const ceruleanCity: MapType = {
       39: { map: MapId.Route9, pos: { x: 24, y: 15 } },
     },
     10: {
-      27: { map: MapId.CeruleanCityHouseB, pos: { x: 4, y: 6 } },
+      27: { map: MapId.CeruleanCityHouseB, pos: { x: 3, y: 1 } },
     },
     11: {
-      4: { map: MapId.CeruleanCave1f, pos: { x: 17, y: 16 } },
-      27: { map: MapId.CeruleanCityHouseB, pos: { x: 4, y: 6 } },
+      4: { map: MapId.CeruleanCave1f, pos: { x: 25, y: 17 } },
+      27: { map: MapId.CeruleanCityHouseB, pos: { x: 3, y: 7 } },
     },
     12: {
       0: { map: MapId.Route4, pos: { x: 64, y: 23 } },
@@ -301,13 +301,13 @@ const ceruleanCity: MapType = {
       39: { map: MapId.Route9, pos: { x: 24, y: 15 } },
     },
     15: {
-      13: { map: MapId.CeruleanCityHouseA, pos: { x: 4, y: 6 } },
+      13: { map: MapId.CeruleanCityHouseA, pos: { x: 3, y: 7 } },
     },
     16: {
       39: { map: MapId.Route9, pos: { x: 24, y: 15 } },
     },
     17: {
-      19: { map: MapId.CeruleanCityPokemonCenter, pos: { x: 7, y: 5 } },
+      19: { map: MapId.CeruleanCityPokemonCenter, pos: { x: 4, y: 7 } },
       39: { map: MapId.Route9, pos: { x: 24, y: 15 } },
     },
     18: {
@@ -315,7 +315,7 @@ const ceruleanCity: MapType = {
     },
     19: {
       0: { map: MapId.Route4, pos: { x: 64, y: 23 } },
-      30: { map: MapId.CeruleanCityGym, pos: { x: 9, y: 13 } },
+      30: { map: MapId.CeruleanCityGym, pos: { x: 5, y: 13 } },
       39: { map: MapId.Route9, pos: { x: 24, y: 15 } },
     },
     20: {
@@ -339,8 +339,8 @@ const ceruleanCity: MapType = {
     },
     25: {
       0: { map: MapId.Route4, pos: { x: 64, y: 23 } },
-      13: { map: MapId.CeruleanCityBikeShop, pos: { x: 4, y: 6 } },
-      25: { map: MapId.CeruleanCityPokeMart, pos: { x: 4, y: 6 } },
+      13: { map: MapId.CeruleanCityBikeShop, pos: { x: 3, y: 7 } },
+      25: { map: MapId.CeruleanCityPokeMart, pos: { x: 4, y: 7 } },
       39: { map: MapId.Route9, pos: { x: 24, y: 15 } },
     },
     26: {
