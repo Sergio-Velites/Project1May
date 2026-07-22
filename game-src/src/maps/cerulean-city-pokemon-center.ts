@@ -18,16 +18,22 @@ const ceruleanCityPokemonCenter: MapType = {
     7: [0, 1, 6, 7, 12, 13],
   },
   text: {},
-  maps: {
-
-  },
-  exits: {
-    7: [3, 4],
-  },
+  maps: {},
+  exits: {},
   exitReturnMap: MapId.CeruleanCity,
   exitReturnPos: { x: 19, y: 18 },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
+  fences: {},
+  teleports: {
+    8: {
+      3: { map: MapId.CeruleanCity, pos: { x: 19, y: 18 } },
+      4: { map: MapId.CeruleanCity, pos: { x: 19, y: 18 } },
+    },
+  },
+  pokemonCenter: { x: 3, y: 2 },
+  onlineBattleNpc: { x: 11, y: 2 },
+  trainers: [],
 };
 
 export default ceruleanCityPokemonCenter;
