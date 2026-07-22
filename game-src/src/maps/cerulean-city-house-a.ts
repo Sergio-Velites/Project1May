@@ -16,16 +16,20 @@ const ceruleanCityHouseA: MapType = {
     7: [0, 7],
   },
   text: {},
-  maps: {
-
-  },
-  exits: {
-    7: [2, 3],
-  },
+  maps: {},
+  exits: {},
   exitReturnMap: MapId.CeruleanCity,
   exitReturnPos: { x: 13, y: 16 },
   music: "/game/music/maps-original/cerulean-city.mp3",
   grass: {},
+  fences: {},
+  teleports: {
+    8: {
+      2: { map: MapId.CeruleanCity, pos: { x: 13, y: 16 } },
+      3: { map: MapId.CeruleanCity, pos: { x: 13, y: 16 } },
+    },
+  },
+  trainers: [],
 };
 
 export default ceruleanCityHouseA;
