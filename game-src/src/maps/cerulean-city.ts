@@ -1,6 +1,6 @@
 import image from "../assets/map/cerulean-city.png";
 import { MapId, MapType } from "./map-types";
-import { scientist, tamer, teamRocketGrunt } from "../app/npcs";
+import { scientist, tamer, teamRocketGrunt, youngster, beauty, blackBelt, jrTrainerFemale, lass, gentleman } from "../app/npcs";
 import { Direction } from "../state/state-types";
 
 const ceruleanCity: MapType = {
@@ -159,6 +159,72 @@ const ceruleanCity: MapType = {
     ],
     money: 0,
     persistent: true,
+  },
+  {
+    npc: youngster,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Down,
+    pos: { x: 10, y: 18 },
+    intro: [],
+    outtro: ["¿Dorsal? ¿No? Entonces… ¿qué haces con energía?"],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: beauty,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Down,
+    pos: { x: 14, y: 18 },
+    intro: [],
+    outtro: ["Si todavía puedes hablar, es que no has calentado."],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: lass,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Down,
+    pos: { x: 10, y: 26 },
+    intro: [],
+    outtro: ["Llevo cuatro estaciones y sigo sin encontrar la meta."],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: blackBelt,
+    pokemon: [{ id: 66, level: 18 }, { id: 56, level: 18 }],
+    facing: Direction.Left,
+    pos: { x: 28, y: 20 },
+    intro: [
+      "¿Tú corres maratones? Qué monada.",
+      "Yo arrastro trineos. Tipo HYROX, chaval."
+    ],
+    outtro: ["Ganas… pero seguro que no sabes hacer un wall ball."],
+    money: 360,
+  },
+  {
+    npc: jrTrainerFemale,
+    pokemon: [{ id: 61, level: 19 }, { id: 67, level: 20 }],
+    facing: Direction.Down,
+    pos: { x: 30, y: 26 },
+    intro: [
+      "Un runner me dijo 'esto es fácil'.",
+      "Ya no está entre nosotros."
+    ],
+    outtro: ["Vale, vale… pero eso NO es funcional."],
+    money: 400,
+  },
+  {
+    npc: gentleman,
+    pokemon: [{ id: 107, level: 20 }, { id: 106, level: 20 }],
+    facing: Direction.Up,
+    pos: { x: 20, y: 30 },
+    intro: [
+      "Rango de movimiento incompleto.",
+      "Repetición no contada. Empezamos de cero."
+    ],
+    outtro: ["Repetición… válida. Enhorabuena, supongo."],
+    money: 400,
   }
   ],
   water: {

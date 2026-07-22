@@ -1,5 +1,7 @@
 import image from "../assets/map/vermilion-city.png";
 import { MapId, MapType } from "./map-types";
+import { beauty, engineer, rocker, superNerd, sailor } from "../app/npcs";
+import { Direction } from "../state/state-types";
 
 const vermilionCity: MapType = {
   name: "Ciudad Carmin",
@@ -81,6 +83,84 @@ const vermilionCity: MapType = {
     35: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
   },
   text: {},
+  trainers: [
+    {
+      npc: beauty,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 5, y: 14 },
+      intro: [],
+      outtro: ["Te dibujo un PIKACHU en la espuma del café. Cobrar, cobro igual."],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: engineer,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 9, y: 14 },
+      intro: [],
+      outtro: ["Impreso en 3D, pintado a mano… y aún así no vendo. ¡Vacaciones!"],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: rocker,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 13, y: 14 },
+      intro: [],
+      outtro: ["Pincho de todo menos lo que me piden. Es mi arte, tío."],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: superNerd,
+      pokemon: [{ id: 137, level: 29 }, { id: 81, level: 29 }],
+      facing: Direction.Down,
+      pos: { x: 20, y: 14 },
+      intro: [
+        "Disparo en ráfaga. En combate y con la cámara.",
+        "¡Sonríe al perder!"
+      ],
+      outtro: ["Esta derrota tuya… digo mía… queda genial en la galería."],
+      money: 580,
+    },
+    {
+      npc: beauty,
+      pokemon: [{ id: 201, level: 29 }, { id: 233, level: 31 }],
+      facing: Direction.Down,
+      pos: { x: 24, y: 15 },
+      intro: [
+        "Si el combate no está centrado y alineado, no empiezo."
+      ],
+      outtro: ["Pixel perfect. Mi derrota, digo. Impecable."],
+      money: 600,
+    },
+    {
+      npc: engineer,
+      pokemon: [{ id: 82, level: 31 }, { id: 100, level: 30 }, { id: 101, level: 30 }],
+      facing: Direction.Down,
+      pos: { x: 7, y: 7 },
+      intro: [
+        "Funciona en mi máquina.",
+        "Veamos si funciona contra ti."
+      ],
+      outtro: ["Vale, era un caso límite. Añado un test y me piro."],
+      money: 620,
+    },
+    {
+      npc: sailor,
+      pokemon: [{ id: 73, level: 31 }, { id: 99, level: 31 }],
+      facing: Direction.Down,
+      pos: { x: 30, y: 15 },
+      intro: [
+        "Puerto o no puerto, el mar sigue siendo mío, grumete."
+      ],
+      outtro: ["Bien jugado. Invito a un vermut en la terraza."],
+      money: 600,
+    }
+  ],
   maps: {
     0: { 18: MapId.Route6, 19: MapId.Route6, 24: MapId.Route6, 25: MapId.Route6, 26: MapId.Route6, 27: MapId.Route6, 28: MapId.Route6, 29: MapId.Route6, 30: MapId.Route6, 31: MapId.Route6, 32: MapId.Route6, 33: MapId.Route6, 34: MapId.Route6, 35: MapId.Route6, 36: MapId.Route6, 37: MapId.Route6, 38: MapId.Route6, 39: MapId.Route11 },
     1: { 39: MapId.Route11 },

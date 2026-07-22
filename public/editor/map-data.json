@@ -2890,7 +2890,122 @@
     "minimapPos": null,
     "minimapParent": null,
     "music": null,
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "hiker",
+        "pos": {
+          "x": 16,
+          "y": 16
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Baja despacio. Aquí el vino y las prisas no se llevan."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "psychic",
+        "pos": {
+          "x": 15,
+          "y": 14
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Notas de fruta… de roble… y de algo que no debería existir."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "pokeManiac",
+        "pos": {
+          "x": 13,
+          "y": 12
+        },
+        "facing": "down",
+        "money": 1200,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Busco la cepa prohibida.",
+          "Quien estorba… se decanta."
+        ],
+        "outtro": [
+          "Bebes mejor de lo que combato. Y eso me duele."
+        ],
+        "pokemon": [
+          {
+            "id": 42,
+            "level": 32
+          },
+          {
+            "id": 93,
+            "level": 33
+          },
+          {
+            "id": 169,
+            "level": 34
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "aceTrainerFemale",
+        "pos": {
+          "x": 12,
+          "y": 9
+        },
+        "facing": "down",
+        "money": 1400,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Nadie llega al fondo sin pasar por mí.",
+          "Ni sobrio ni borracho."
+        ],
+        "outtro": [
+          "Pasa… pero no toques la última barrica. Esa es SUYA."
+        ],
+        "pokemon": [
+          {
+            "id": 31,
+            "level": 34
+          },
+          {
+            "id": 94,
+            "level": 35
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -3238,7 +3353,23 @@
     "textRewards": {},
     "items": [],
     "gifts": [],
-    "staticPokemon": [],
+    "staticPokemon": [
+      {
+        "pokemonId": 251,
+        "level": 40,
+        "pos": {
+          "x": 11,
+          "y": 11
+        },
+        "sprite": "grass-b",
+        "questId": "bodega-ancestral-celebi",
+        "intro": [
+          "Entre las barricas más viejas, algo diminuto flota en la penumbra.",
+          "Huele a mosto, a bosque… y a suerte.",
+          "CELEBI te mira. Parece que llevara esperándote toda la vida."
+        ]
+      }
+    ],
     "boulders": [],
     "berryTrees": [],
     "cuttableTrees": [],
@@ -4241,7 +4372,153 @@
     "minimapPos": null,
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-gym.mp3\"",
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "blackBelt",
+        "pos": {
+          "x": 4,
+          "y": 9
+        },
+        "facing": "down",
+        "money": 420,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Bienvenido al gimnasio TIPO HYROX.",
+          "Aquí no se corre: se sufre con estilo."
+        ],
+        "outtro": [
+          "Bien… pero esto sigue sin ser CrossFit, ¿eh?"
+        ],
+        "pokemon": [
+          {
+            "id": 66,
+            "level": 20
+          },
+          {
+            "id": 57,
+            "level": 21
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "cueBall",
+        "pos": {
+          "x": 5,
+          "y": 6
+        },
+        "facing": "down",
+        "money": 440,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Yo solo reparto agua… y collejas.",
+          "Un runner llegó hasta aquí. UNO."
+        ],
+        "outtro": [
+          "Te has ganado el gatorade. No el de los buenos."
+        ],
+        "pokemon": [
+          {
+            "id": 62,
+            "level": 21
+          },
+          {
+            "id": 56,
+            "level": 21
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "sergioNpc",
+        "pos": {
+          "x": 4,
+          "y": 2
+        },
+        "facing": "down",
+        "money": 3000,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": 0,
+        "intro": [
+          "¡Anda, si eres tú! MARTA, mira quién se ha colado.",
+          "Paramos en Bilbao camino de Japón a competir.",
+          "Última pulla y competimos:",
+          "un runner es un HYROX que se rindió pronto."
+        ],
+        "outtro": [
+          "¡Buah! Y encima sin calentar tú.",
+          "Qué vergüenza para el gremio."
+        ],
+        "pokemon": [
+          {
+            "id": 68,
+            "level": 23
+          },
+          {
+            "id": 57,
+            "level": 22
+          },
+          {
+            "id": 237,
+            "level": 23
+          },
+          {
+            "id": 214,
+            "level": 24
+          }
+        ],
+        "postGame": "{\n        message: [\n          \"¡Toma la MEDALLA CELESTE!\",\n          \"Te la has currado más que muchos con dorsal.\",\n        ],\n        items: [ItemType.CascadeBadge, ItemType.Tm34],\n      }"
+      },
+      {
+        "npcKey": "martaNpc",
+        "pos": {
+          "x": 5,
+          "y": 2
+        },
+        "facing": "down",
+        "money": 3000,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": 0,
+        "intro": [
+          "¡Soy MARTA! Y no todo lo gana SERGIO, ¿eh?",
+          "Nosotros paramos aquí de camino a Japón.",
+          "¡Un roto para un descosido!"
+        ],
+        "outtro": [
+          "Vale, vale… nos has ganado a los dos.",
+          "Nos vemos en la meta. Y en la boda."
+        ],
+        "pokemon": [
+          {
+            "id": 62,
+            "level": 22
+          },
+          {
+            "id": 67,
+            "level": 23
+          },
+          {
+            "id": 106,
+            "level": 23
+          },
+          {
+            "id": 107,
+            "level": 24
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -4907,6 +5184,171 @@
           {
             "id": 19,
             "level": 2
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "youngster",
+        "pos": {
+          "x": 10,
+          "y": 18
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "¿Dorsal? ¿No? Entonces… ¿qué haces con energía?"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 14,
+          "y": 18
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Si todavía puedes hablar, es que no has calentado."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 10,
+          "y": 26
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Llevo cuatro estaciones y sigo sin encontrar la meta."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "blackBelt",
+        "pos": {
+          "x": 28,
+          "y": 20
+        },
+        "facing": "left",
+        "money": 360,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "¿Tú corres maratones? Qué monada.",
+          "Yo arrastro trineos. Tipo HYROX, chaval."
+        ],
+        "outtro": [
+          "Ganas… pero seguro que no sabes hacer un wall ball."
+        ],
+        "pokemon": [
+          {
+            "id": 66,
+            "level": 18
+          },
+          {
+            "id": 56,
+            "level": 18
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "jrTrainerFemale",
+        "pos": {
+          "x": 30,
+          "y": 26
+        },
+        "facing": "down",
+        "money": 400,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Un runner me dijo 'esto es fácil'.",
+          "Ya no está entre nosotros."
+        ],
+        "outtro": [
+          "Vale, vale… pero eso NO es funcional."
+        ],
+        "pokemon": [
+          {
+            "id": 61,
+            "level": 19
+          },
+          {
+            "id": 67,
+            "level": 20
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "gentleman",
+        "pos": {
+          "x": 20,
+          "y": 30
+        },
+        "facing": "up",
+        "money": 400,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Rango de movimiento incompleto.",
+          "Repetición no contada. Empezamos de cero."
+        ],
+        "outtro": [
+          "Repetición… válida. Enhorabuena, supongo."
+        ],
+        "pokemon": [
+          {
+            "id": 107,
+            "level": 20
+          },
+          {
+            "id": 106,
+            "level": 20
           }
         ],
         "postGame": null
@@ -46404,7 +46846,142 @@
     "minimapPos": null,
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-24-welcome.mp3\"",
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "gentleman",
+        "pos": {
+          "x": 6,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Qué boda más bonita… ¿tú de parte de quién eras?"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 7,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "De la novia. Creo. O del vino. Uno de los dos."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "gambler",
+        "pos": {
+          "x": 8,
+          "y": 13
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Ayer dije que bailaba bien. Hoy no me creo nada."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "gentleman",
+        "pos": {
+          "x": 5,
+          "y": 16
+        },
+        "facing": "down",
+        "money": 440,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Necesito quemar la barra libre de ayer.",
+          "¿Me ayudas con un combate?"
+        ],
+        "outtro": [
+          "Uf. Creo que he sudado vino. Gracias, campeón."
+        ],
+        "pokemon": [
+          {
+            "id": 58,
+            "level": 22
+          },
+          {
+            "id": 17,
+            "level": 22
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "aceTrainerFemale",
+        "pos": {
+          "x": 7,
+          "y": 18
+        },
+        "facing": "down",
+        "money": 420,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Cogimos el ramo entre las tres.",
+          "Esto lo arreglamos combatiendo."
+        ],
+        "outtro": [
+          "Vale, quédate tú el ramo. Nosotras la barra."
+        ],
+        "pokemon": [
+          {
+            "id": 35,
+            "level": 21
+          },
+          {
+            "id": 182,
+            "level": 22
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -47161,7 +47738,193 @@
     "minimapPos": null,
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-24-welcome.mp3\"",
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "youngster",
+        "pos": {
+          "x": 10,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "No preguntes. Sigue caminando. Por favor."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "lass",
+        "pos": {
+          "x": 14,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "¡Cogí el ramo y lo solté! ¿Ahora me caso o no?"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "superNerd",
+        "pos": {
+          "x": 18,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Sé que aparqué. Lo que no sé es en qué provincia."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "blackBelt",
+        "pos": {
+          "x": 30,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 420,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "¿La meta es por aquí? Llevo desde ayer.",
+          "¿Esto sigue siendo Bilbao?"
+        ],
+        "outtro": [
+          "¡Lo sabía! Esto NO era lo mío."
+        ],
+        "pokemon": [
+          {
+            "id": 66,
+            "level": 21
+          },
+          {
+            "id": 56,
+            "level": 21
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "biker",
+        "pos": {
+          "x": 34,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 460,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "En la boda dije que era el más duro, cuñao.",
+          "Toca demostrarlo."
+        ],
+        "outtro": [
+          "…me piro antes de que se lo cuentes a nadie."
+        ],
+        "pokemon": [
+          {
+            "id": 109,
+            "level": 22
+          },
+          {
+            "id": 88,
+            "level": 23
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "superNerd",
+        "pos": {
+          "x": 42,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "¡Ah! ¡Los novios! No me abracéis, tengo las manos ocupadas.",
+          "Soy BILL, vuestro fotógrafo. Tengo 14.000 fotos vuestras.",
+          "CATORCE MIL. Y la buena… sé que está ahí.",
+          "Backup del backup del backup. Volved mañana."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 46,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "En esta salgo yo. Y en esta. Y… anda, en esta también."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -50205,7 +50968,81 @@
     "minimapPos": null,
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-3.mp3\"",
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 8,
+          "y": 10
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Aquí todo crece: unos entrenan… otros maduran."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "gentleman",
+        "pos": {
+          "x": 11,
+          "y": 10
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Un POKéMON también necesita buenos tomates, ¿eh?",
+          "GOÑI cosecha uno nuevo cada día. Habla con él."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "youngster",
+        "pos": {
+          "x": 16,
+          "y": 10
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "GOÑI le habla a las gallinas. Y le RESPONDEN, te juro."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -50588,12 +51425,18 @@
     "berryTrees": [],
     "cuttableTrees": [],
     "pokemonCenter": null,
-    "pc": null,
+    "pc": {
+      "x": 10,
+      "y": 8
+    },
     "store": null,
     "storeItems": [],
     "recoverLocation": null,
     "onlineBattleNpc": null,
-    "dayCareNpc": null,
+    "dayCareNpc": {
+      "x": 10,
+      "y": 8
+    },
     "spinners": {},
     "stoppers": {},
     "maps": {
@@ -50671,7 +51514,152 @@
     "minimapPos": null,
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-3.mp3\"",
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 7,
+          "y": 15
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Llevo tres horas moviendo este logo dos píxeles. Perfecto."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "rocker",
+        "pos": {
+          "x": 15,
+          "y": 15
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "¿Propina o petición? Por dos monedas te toco lo que sea."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "fisher",
+        "pos": {
+          "x": 3,
+          "y": 15
+        },
+        "facing": "down",
+        "money": 520,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Vengo aquí desde crío.",
+          "Al mar se le respeta, chaval."
+        ],
+        "outtro": [
+          "Buena mano. ¿Seguro que no eres de puerto?"
+        ],
+        "pokemon": [
+          {
+            "id": 98,
+            "level": 26
+          },
+          {
+            "id": 222,
+            "level": 27
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "superNerd",
+        "pos": {
+          "x": 11,
+          "y": 15
+        },
+        "facing": "down",
+        "money": 540,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "En producción todo peta.",
+          "Aquí al menos peto yo primero."
+        ],
+        "outtro": [
+          "Reproducido el fallo: era yo. Siempre soy yo."
+        ],
+        "pokemon": [
+          {
+            "id": 81,
+            "level": 27
+          },
+          {
+            "id": 100,
+            "level": 27
+          },
+          {
+            "id": 137,
+            "level": 28
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "swimmer",
+        "pos": {
+          "x": 5,
+          "y": 1
+        },
+        "facing": "down",
+        "money": 520,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Vigilo la playa… y a los que se creen Michael Phelps."
+        ],
+        "outtro": [
+          "Tú nadas… en batallas. En el agua ya veríamos."
+        ],
+        "pokemon": [
+          {
+            "id": 120,
+            "level": 27
+          },
+          {
+            "id": 61,
+            "level": 28
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         9,
@@ -64266,7 +65254,110 @@
     "minimapPos": null,
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pokemon-gym.mp3\"",
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "superNerd",
+        "pos": {
+          "x": 4,
+          "y": 11
+        },
+        "facing": "down",
+        "money": 600,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Bienvenido al ESTUDIO. Aquí se crea… y se combate.",
+          "¿Traes brief? No. Valiente."
+        ],
+        "outtro": [
+          "Vale, iteramos. La próxima gano yo."
+        ],
+        "pokemon": [
+          {
+            "id": 81,
+            "level": 30
+          },
+          {
+            "id": 100,
+            "level": 30
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "engineer",
+        "pos": {
+          "x": 4,
+          "y": 7
+        },
+        "facing": "down",
+        "money": 640,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Soldé, imprimí y versioné mi equipo.",
+          "El tuyo… ¿tiene backup?"
+        ],
+        "outtro": [
+          "Rollback aceptado. Enhorabuena."
+        ],
+        "pokemon": [
+          {
+            "id": 82,
+            "level": 32
+          },
+          {
+            "id": 101,
+            "level": 32
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "ltSurge",
+        "pos": {
+          "x": 4,
+          "y": 2
+        },
+        "facing": "down",
+        "money": 3400,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": 0,
+        "intro": [
+          "Soy EL CREADOR. Este estudio lo monté en un finde.",
+          "Mi equipo está optimizado, versionado y con backup.",
+          "El deadline era ayer. ¿Empezamos?"
+        ],
+        "outtro": [
+          "Vaya… esto no estaba en el roadmap."
+        ],
+        "pokemon": [
+          {
+            "id": 82,
+            "level": 32
+          },
+          {
+            "id": 101,
+            "level": 32
+          },
+          {
+            "id": 233,
+            "level": 33
+          },
+          {
+            "id": 26,
+            "level": 34
+          }
+        ],
+        "postGame": "{\n        message: [\n          \"¡Toma la MEDALLA CARMÍN!\",\n          \"Te la has renderizado en tiempo récord.\",\n        ],\n        items: [ItemType.ThunderBadge, ItemType.Tm34],\n      }"
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -64819,7 +65910,206 @@
     "minimapPos": null,
     "minimapParent": null,
     "music": "\"/game/music/maps-original/vermilion-city.mp3\"",
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 5,
+          "y": 14
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Te dibujo un PIKACHU en la espuma del café. Cobrar, cobro igual."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "engineer",
+        "pos": {
+          "x": 9,
+          "y": 14
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Impreso en 3D, pintado a mano… y aún así no vendo. ¡Vacaciones!"
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "rocker",
+        "pos": {
+          "x": 13,
+          "y": 14
+        },
+        "facing": "down",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "Pincho de todo menos lo que me piden. Es mi arte, tío."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 1
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "superNerd",
+        "pos": {
+          "x": 20,
+          "y": 14
+        },
+        "facing": "down",
+        "money": 580,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Disparo en ráfaga. En combate y con la cámara.",
+          "¡Sonríe al perder!"
+        ],
+        "outtro": [
+          "Esta derrota tuya… digo mía… queda genial en la galería."
+        ],
+        "pokemon": [
+          {
+            "id": 137,
+            "level": 29
+          },
+          {
+            "id": 81,
+            "level": 29
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "beauty",
+        "pos": {
+          "x": 24,
+          "y": 15
+        },
+        "facing": "down",
+        "money": 600,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Si el combate no está centrado y alineado, no empiezo."
+        ],
+        "outtro": [
+          "Pixel perfect. Mi derrota, digo. Impecable."
+        ],
+        "pokemon": [
+          {
+            "id": 201,
+            "level": 29
+          },
+          {
+            "id": 233,
+            "level": 31
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "engineer",
+        "pos": {
+          "x": 7,
+          "y": 7
+        },
+        "facing": "down",
+        "money": 620,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Funciona en mi máquina.",
+          "Veamos si funciona contra ti."
+        ],
+        "outtro": [
+          "Vale, era un caso límite. Añado un test y me piro."
+        ],
+        "pokemon": [
+          {
+            "id": 82,
+            "level": 31
+          },
+          {
+            "id": 100,
+            "level": 30
+          },
+          {
+            "id": 101,
+            "level": 30
+          }
+        ],
+        "postGame": null
+      },
+      {
+        "npcKey": "sailor",
+        "pos": {
+          "x": 30,
+          "y": 15
+        },
+        "facing": "down",
+        "money": 600,
+        "persistent": false,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [
+          "Puerto o no puerto, el mar sigue siendo mío, grumete."
+        ],
+        "outtro": [
+          "Bien jugado. Invito a un vermut en la terraza."
+        ],
+        "pokemon": [
+          {
+            "id": 73,
+            "level": 31
+          },
+          {
+            "id": 99,
+            "level": 31
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         6,

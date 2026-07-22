@@ -1,5 +1,6 @@
 import image from "../assets/map/route-5.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
+import { beauty, gentleman, youngster } from "../app/npcs";
 
 const route5: MapType = {
   name: "Ruta 5",
@@ -60,6 +61,42 @@ const route5: MapType = {
     23: [6, 7, 8, 9, 10, 11, 12, 13],
   },
   text: {},
+  dayCareNpc: { x: 10, y: 8 },
+  trainers: [
+    {
+      npc: beauty,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 8, y: 10 },
+      intro: [],
+      outtro: ["Aquí todo crece: unos entrenan… otros maduran."],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: gentleman,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 11, y: 10 },
+      intro: [],
+      outtro: [
+        "Un POKéMON también necesita buenos tomates, ¿eh?",
+        "GOÑI cosecha uno nuevo cada día. Habla con él."
+      ],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: youngster,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 16, y: 10 },
+      intro: [],
+      outtro: ["GOÑI le habla a las gallinas. Y le RESPONDEN, te juro."],
+      money: 0,
+      persistent: true,
+    }
+  ],
   maps: {
     0: { 1: MapId.CeruleanCity, 2: MapId.CeruleanCity, 3: MapId.CeruleanCity, 4: MapId.CeruleanCity, 6: MapId.CeruleanCity, 7: MapId.CeruleanCity, 8: MapId.CeruleanCity, 9: MapId.CeruleanCity, 10: MapId.CeruleanCity, 11: MapId.CeruleanCity, 12: MapId.CeruleanCity, 13: MapId.CeruleanCity, 15: MapId.CeruleanCity, 16: MapId.CeruleanCity, 17: MapId.CeruleanCity, 18: MapId.CeruleanCity },
     35: { 0: MapId.SaffronCity, 2: MapId.SaffronCity, 3: MapId.SaffronCity, 4: MapId.SaffronCity, 5: MapId.SaffronCity, 6: MapId.SaffronCity, 7: MapId.SaffronCity, 8: MapId.SaffronCity, 9: MapId.SaffronCity, 10: MapId.SaffronCity, 11: MapId.SaffronCity, 12: MapId.SaffronCity, 13: MapId.SaffronCity, 14: MapId.SaffronCity, 15: MapId.SaffronCity, 16: MapId.SaffronCity, 17: MapId.SaffronCity, 19: MapId.SaffronCity },

@@ -1,5 +1,8 @@
 import image from "../assets/map/vermilion-city-gym.png";
 import { MapId, MapType } from "./map-types";
+import { superNerd, engineer, ltSurge } from "../app/npcs";
+import { ItemType } from "../app/use-item-data";
+import { Direction } from "../state/state-types";
 
 const vermilionCityGym: MapType = {
   name: "Gimnasio Ciudad Carmin",
@@ -21,6 +24,56 @@ const vermilionCityGym: MapType = {
     14: [3, 6],
   },
   text: {},
+  trainers: [
+    {
+      npc: superNerd,
+      pokemon: [{ id: 81, level: 30 }, { id: 100, level: 30 }],
+      facing: Direction.Down,
+      pos: { x: 4, y: 11 },
+      intro: [
+        "Bienvenido al ESTUDIO. Aquí se crea… y se combate.",
+        "¿Traes brief? No. Valiente."
+      ],
+      outtro: ["Vale, iteramos. La próxima gano yo."],
+      money: 600,
+    },
+    {
+      npc: engineer,
+      pokemon: [{ id: 82, level: 32 }, { id: 101, level: 32 }],
+      facing: Direction.Down,
+      pos: { x: 4, y: 7 },
+      intro: [
+        "Soldé, imprimí y versioné mi equipo.",
+        "El tuyo… ¿tiene backup?"
+      ],
+      outtro: ["Rollback aceptado. Enhorabuena."],
+      money: 640,
+    },
+    {
+      npc: ltSurge,
+      pokemon: [{ id: 82, level: 32 }, { id: 101, level: 32 }, { id: 233, level: 33 }, { id: 26, level: 34 }],
+      facing: Direction.Down,
+      pos: { x: 4, y: 2 },
+      intro: [
+        "Soy EL CREADOR. Este estudio lo monté en un finde.",
+        "Mi equipo está optimizado, versionado y con backup.",
+        "El deadline era ayer. ¿Empezamos?"
+      ],
+      outtro: [
+        "Vaya… esto no estaba en el roadmap."
+      ],
+      money: 3400,
+      persistent: true,
+      sightRange: 0,
+      postGame: {
+        message: [
+          "¡Toma la MEDALLA CARMÍN!",
+          "Te la has renderizado en tiempo récord.",
+        ],
+        items: [ItemType.ThunderBadge, ItemType.Tm34],
+      },
+    }
+  ],
   maps: {
 
   },

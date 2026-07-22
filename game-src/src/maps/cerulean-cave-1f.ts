@@ -1,5 +1,7 @@
 import image from "../assets/map/cerulean-cave-1f.png";
 import { MapId, MapType } from "./map-types";
+import { hiker, psychic, pokeManiac, aceTrainerFemale } from "../app/npcs";
+import { Direction } from "../state/state-types";
 
 const ceruleanCave1f: MapType = {
   name: "Cueva Celeste 1F",
@@ -28,6 +30,66 @@ const ceruleanCave1f: MapType = {
     17: [0, 1, 17, 18, 19, 20, 21, 22, 23, 26, 27, 28, 29],
   },
   text: {},
+  trainers: [
+    {
+      npc: hiker,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 16, y: 16 },
+      intro: [],
+      outtro: ["Baja despacio. Aquí el vino y las prisas no se llevan."],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: psychic,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 15, y: 14 },
+      intro: [],
+      outtro: ["Notas de fruta… de roble… y de algo que no debería existir."],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: pokeManiac,
+      pokemon: [{ id: 42, level: 32 }, { id: 93, level: 33 }, { id: 169, level: 34 }],
+      facing: Direction.Down,
+      pos: { x: 13, y: 12 },
+      intro: [
+        "Busco la cepa prohibida.",
+        "Quien estorba… se decanta."
+      ],
+      outtro: ["Bebes mejor de lo que combato. Y eso me duele."],
+      money: 1200,
+    },
+    {
+      npc: aceTrainerFemale,
+      pokemon: [{ id: 31, level: 34 }, { id: 94, level: 35 }],
+      facing: Direction.Down,
+      pos: { x: 12, y: 9 },
+      intro: [
+        "Nadie llega al fondo sin pasar por mí.",
+        "Ni sobrio ni borracho."
+      ],
+      outtro: ["Pasa… pero no toques la última barrica. Esa es SUYA."],
+      money: 1400,
+    }
+  ],
+  staticPokemon: [
+    {
+      pokemonId: 251,
+      level: 40,
+      sprite: "grass-b",
+      pos: { x: 11, y: 11 },
+      questId: "bodega-ancestral-celebi",
+      intro: [
+        "Entre las barricas más viejas, algo diminuto flota en la penumbra.",
+        "Huele a mosto, a bosque… y a suerte.",
+        "CELEBI te mira. Parece que llevara esperándote toda la vida.",
+      ],
+    },
+  ],
   maps: {
 
   },

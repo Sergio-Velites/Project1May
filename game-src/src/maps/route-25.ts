@@ -1,5 +1,6 @@
 import image from "../assets/map/route-25.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
+import { youngster, lass, superNerd, blackBelt, biker, beauty } from "../app/npcs";
 
 const route25: MapType = {
   name: "Ruta 25",
@@ -58,6 +59,87 @@ const route25: MapType = {
     7: [1, 2, 3, 4, 5, 6, 7],
   },
   text: {},
+  trainers: [
+    {
+      npc: youngster,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 10, y: 11 },
+      intro: [],
+      outtro: ["No preguntes. Sigue caminando. Por favor."],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: lass,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 14, y: 11 },
+      intro: [],
+      outtro: ["¡Cogí el ramo y lo solté! ¿Ahora me caso o no?"],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: superNerd,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 18, y: 11 },
+      intro: [],
+      outtro: ["Sé que aparqué. Lo que no sé es en qué provincia."],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: blackBelt,
+      pokemon: [{ id: 66, level: 21 }, { id: 56, level: 21 }],
+      facing: Direction.Down,
+      pos: { x: 30, y: 11 },
+      intro: [
+        "¿La meta es por aquí? Llevo desde ayer.",
+        "¿Esto sigue siendo Bilbao?"
+      ],
+      outtro: ["¡Lo sabía! Esto NO era lo mío."],
+      money: 420,
+    },
+    {
+      npc: biker,
+      pokemon: [{ id: 109, level: 22 }, { id: 88, level: 23 }],
+      facing: Direction.Down,
+      pos: { x: 34, y: 11 },
+      intro: [
+        "En la boda dije que era el más duro, cuñao.",
+        "Toca demostrarlo."
+      ],
+      outtro: ["…me piro antes de que se lo cuentes a nadie."],
+      money: 460,
+    },
+    {
+      npc: superNerd,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 42, y: 11 },
+      intro: [],
+      outtro: [
+        "¡Ah! ¡Los novios! No me abracéis, tengo las manos ocupadas.",
+        "Soy BILL, vuestro fotógrafo. Tengo 14.000 fotos vuestras.",
+        "CATORCE MIL. Y la buena… sé que está ahí.",
+        "Backup del backup del backup. Volved mañana."
+      ],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: beauty,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 46, y: 11 },
+      intro: [],
+      outtro: ["En esta salgo yo. Y en esta. Y… anda, en esta también."],
+      money: 0,
+      persistent: true,
+    }
+  ],
   maps: {
     3: { 0: MapId.Route24 },
     4: { 0: MapId.Route24 },

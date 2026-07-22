@@ -1,5 +1,6 @@
 import image from "../assets/map/route-24.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
+import { gentleman, beauty, gambler, aceTrainerFemale } from "../app/npcs";
 
 const route24: MapType = {
   name: "Ruta 24",
@@ -100,6 +101,62 @@ const route24: MapType = {
     21: [16, 17, 18],
   },
   text: {},
+  trainers: [
+    {
+      npc: gentleman,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 6, y: 11 },
+      intro: [],
+      outtro: ["Qué boda más bonita… ¿tú de parte de quién eras?"],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: beauty,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 7, y: 11 },
+      intro: [],
+      outtro: ["De la novia. Creo. O del vino. Uno de los dos."],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: gambler,
+      pokemon: [{ id: 19, level: 1 }],
+      facing: Direction.Down,
+      pos: { x: 8, y: 13 },
+      intro: [],
+      outtro: ["Ayer dije que bailaba bien. Hoy no me creo nada."],
+      money: 0,
+      persistent: true,
+    },
+    {
+      npc: gentleman,
+      pokemon: [{ id: 58, level: 22 }, { id: 17, level: 22 }],
+      facing: Direction.Down,
+      pos: { x: 5, y: 16 },
+      intro: [
+        "Necesito quemar la barra libre de ayer.",
+        "¿Me ayudas con un combate?"
+      ],
+      outtro: ["Uf. Creo que he sudado vino. Gracias, campeón."],
+      money: 440,
+    },
+    {
+      npc: aceTrainerFemale,
+      pokemon: [{ id: 35, level: 21 }, { id: 182, level: 22 }],
+      facing: Direction.Down,
+      pos: { x: 7, y: 18 },
+      intro: [
+        "Cogimos el ramo entre las tres.",
+        "Esto lo arreglamos combatiendo."
+      ],
+      outtro: ["Vale, quédate tú el ramo. Nosotras la barra."],
+      money: 420,
+    }
+  ],
   maps: {
     3: { 19: MapId.Route25 },
     4: { 19: MapId.Route25 },
