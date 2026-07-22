@@ -66,6 +66,8 @@ export interface MapWriteState {
   allowBicycle?: boolean;
   flyable?: boolean;
   flySpot?: Pos | null;
+  flyAlwaysAvailable?: boolean;
+  flyUnlockTiles?: Record<string, number[]>;
   music?: string | null;
   trainers?: TrainerState[];
   walls?: Record<string, number[]>;
@@ -421,6 +423,9 @@ function buildFieldOps(state: MapWriteState, resolve: (t: string) => string): Fi
   // la MO Vuelo (mapa de Kanto). flyable:false / flySpot null → se elimina.
   if (state.flyable !== undefined) push('flyable', state.flyable ? 'flyable: true' : null);
   if (state.flySpot !== undefined) push('flySpot', state.flySpot ? serPos('flySpot', state.flySpot) : null);
+  // flyAlwaysAvailable:false / flyUnlockTiles vacío → se eliminan del .ts.
+  if (state.flyAlwaysAvailable !== undefined) push('flyAlwaysAvailable', state.flyAlwaysAvailable ? 'flyAlwaysAvailable: true' : null);
+  if (state.flyUnlockTiles !== undefined) push('flyUnlockTiles', Object.keys(state.flyUnlockTiles).length ? serRowColMap(state.flyUnlockTiles, 'flyUnlockTiles') : null);
   if (state.music !== undefined) push('music', state.music && state.music.trim() ? `music: ${state.music.trim()}` : null);
   if (state.start !== undefined && state.start) push('start', serPos('start', state.start));
   if (state.walls !== undefined) push('walls', serRowColMap(state.walls, 'walls'));

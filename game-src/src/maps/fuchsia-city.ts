@@ -89,9 +89,6 @@ const fuchsiaCity: MapType = {
   },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
-  minimapPos: { x: 124, y: 171 },
-  flyable: true,
-  flySpot: { x: 19, y: 28 },
 };
 
 export default fuchsiaCity;

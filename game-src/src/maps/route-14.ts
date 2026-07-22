@@ -161,7 +161,6 @@ const route14: MapType = {
   },
   music: "/game/music/maps-original/route-11.mp3",
   grass: {},
-  minimapPos: { x: 158, y: 158 },
 };
 
 export default route14;

@@ -24,7 +24,6 @@ const vermilionCityFanClub: MapType = {
   exitReturnPos: { x: 9, y: 14 },
   music: "/game/music/maps-original/vermilion-city.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 124 },
 };
 
 export default vermilionCityFanClub;

@@ -30,7 +30,6 @@ const route2Gate: MapType = {
       5: { map: MapId.Route2, pos: { x: 3, y: 44 } },
     },
   },
-  minimapPos: { x: 53, y: 82 },
   trainers: [],
 };
 

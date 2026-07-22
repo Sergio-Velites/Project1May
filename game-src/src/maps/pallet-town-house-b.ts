@@ -49,7 +49,6 @@ items: [
       pos: { x: 4, y: 3 },
     },
   ],
-  minimapPos: { x: 53, y: 147 },
   fences: {},
   teleports: {
     8: {

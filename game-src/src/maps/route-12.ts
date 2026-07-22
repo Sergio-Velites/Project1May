@@ -286,7 +286,6 @@ const route12: MapType = {
   },
   music: "/game/music/maps-original/route-11.mp3",
   grass: {},
-  minimapPos: { x: 196, y: 105 },
 };
 
 export default route12;

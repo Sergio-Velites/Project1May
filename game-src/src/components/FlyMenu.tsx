@@ -9,7 +9,7 @@ import {
   showTextThenAction,
   startFlyAnimation,
 } from "../state/uiSlice";
-import { selectMapId, selectPokemon, selectVisitedMaps } from "../state/gameSlice";
+import { selectMapId, selectPokemon, selectUnlockedFlyMaps } from "../state/gameSlice";
 import { getPokemonMetadata } from "../app/use-pokemon-metadata";
 import useEvent from "../app/use-event";
 import { Event } from "../app/emitter";
@@ -209,25 +209,29 @@ const BirdCursor = styled.img<{ $x: number; $y: number }>`
  * más cercana en esa dirección), A para volar y B para salir.
  *
  * Las ciudades disponibles = mapas con `flyable` + `minimapPos` + `flySpot`
- * (configurado desde el Map Editor) Y que el jugador haya visitado
- * (`visitedMaps`). El punto en el mapa lo da `minimapPos`; el aterrizaje,
- * `flySpot`.
+ * (configurado desde el Map Editor) Y desbloqueados: `flyAlwaysAvailable` o
+ * haber pisado sus `flyUnlockTiles` (`unlockedFlyMaps`). El punto en el mapa
+ * lo da `minimapPos`; el aterrizaje, `flySpot`.
  */
 const FlyMenu = () => {
   const dispatch = useDispatch();
   const show = useSelector(selectFlyMenu);
-  const visited = useSelector(selectVisitedMaps);
+  const unlocked = useSelector(selectUnlockedFlyMaps);
   const currentMap = useSelector(selectMapId);
   const pokemon = useSelector(selectPokemon);
 
-  // Destinos disponibles: flyable + minimapPos + flySpot + visitado, y que no
-  // sea el mapa en el que ya estás (no tiene sentido volar a tu propia casilla).
+  // Destinos disponibles: flyable + minimapPos + flySpot y, además, que estén
+  // DESBLOQUEADOS — o bien `flyAlwaysAvailable` (disponible desde el inicio), o
+  // bien el jugador pisó sus casillas de desbloqueo (`unlockedFlyMaps`). Nunca
+  // el mapa en el que ya estás (no tiene sentido volar a tu propia casilla).
   const destinations = useMemo(
     () =>
       getAllFlyDestinations().filter(
-        (d) => visited.includes(d.map) && d.map !== currentMap
+        (d) =>
+          d.map !== currentMap &&
+          (d.alwaysAvailable || unlocked.includes(d.map))
       ),
-    [visited, currentMap]
+    [unlocked, currentMap]
   );
 
   const [index, setIndex] = useState(0);

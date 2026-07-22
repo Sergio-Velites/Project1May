@@ -1,17 +1,35 @@
-# Vuelo futuro desde Map Editor
+# MO Vuelo — configuración desde el Map Editor
 
-El juego no consume estos campos todavía. El Map Editor los guarda como metadatos editor-only en `public/editor/map-data.json` y en los `overrides` de Supabase:
+El juego SÍ consume estos campos (ver `game-src/src/app/fly-helper.ts`,
+`components/FlyMenu.tsx` y `components/FlyUnlockHandler.tsx`).
 
-- `flyable: boolean`: el mapa puede aparecer como destino de Vuelo.
-- `flySpot: { x, y } | null`: tile donde aterriza el jugador al volar.
-- `minimapPos: { x, y } | null`: posicion del mapa en `kanto_region.png` para UI de seleccion.
+## Campos en `MapType` (editables desde el Map Editor)
 
-Implementacion recomendada en el juego:
+- `flyable: boolean` — el mapa es destino de Vuelo.
+- `flySpot: { x, y }` — casilla de aterrizaje al volar aquí.
+- `minimapPos: { x, y }` — punto sobre `kanto_region.png` (237×213) para el menú.
+- `flyAlwaysAvailable?: boolean` — si `true`, el destino está disponible desde
+  el inicio (sin pisar casillas). Por defecto `false`.
+- `flyUnlockTiles?: Record<fila, col[]>` — casillas (formato `walls`) que, al
+  pisarlas, DESBLOQUEAN este destino. Se colocan normalmente en la entrada.
 
-1. Extender `MapType` con `flyable?: boolean` y `flySpot?: PosType`.
-2. Crear un catalogo de destinos a partir de `mapData`, filtrando `map.flyable === true`.
-3. Mostrar solo destinos cuyo `MapId` este en `state.visitedMaps`.
-4. Al confirmar destino, usar `setMapWithPos({ map, pos: map.flySpot ?? map.start })`.
-5. Si el mapa no tiene `flySpot`, usar `start` como fallback y registrar el warning en desarrollo.
+## Regla de disponibilidad (en `FlyMenu`)
 
-Regla funcional: que un mapa sea `flyable` no lo desbloquea por si mismo. El desbloqueo real siempre debe depender de `visitedMaps`, igual que en Gen I.
+Un destino aparece en el menú de Vuelo si:
+`flyable && minimapPos && flySpot` (configuración) **y** además
+`flyAlwaysAvailable === true` **o** el mapa está en `unlockedFlyMaps` del save.
+
+## Desbloqueo por pisada
+
+`FlyUnlockHandler` (montado en `Game.tsx`) observa la posición del jugador; al
+pisar una `flyUnlockTiles` del mapa actual, despacha `registerFlyUnlock(mapId)`,
+que añade el mapa a `state.unlockedFlyMaps` (persistido al guardar la partida).
+
+## Editor
+
+- Checkbox **"Destino de Vuelo"** (`flyable`) + inputs/overlay del `flySpot`.
+- Checkbox **"Siempre disponible"** (`flyAlwaysAvailable`, por defecto vacío).
+- Modo de pintado **🛫 Vuelo** (`fly-unlock`): pinta/arrastra las casillas de
+  desbloqueo (repinta para borrar). Mismo formato/serialización que `walls`.
+- Serialización: `ts-codegen.ts`, `scripts/setup-editor.mjs`, override keys en
+  `app/api/admin/map-data/route.ts`.

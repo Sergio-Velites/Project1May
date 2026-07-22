@@ -34,7 +34,6 @@ const fuchsiaCityGym: MapType = {
   exitReturnPos: { x: 5, y: 28 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
-  minimapPos: { x: 124, y: 171 },
 };
 
 export default fuchsiaCityGym;

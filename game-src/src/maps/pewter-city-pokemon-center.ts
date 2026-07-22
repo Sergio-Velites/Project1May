@@ -37,7 +37,6 @@ const pewterCityPokemonCenter: MapType = {
   pc: { x: 13, y: 3 },
     onlineBattleNpc: { x: 11, y: 2 },
   trainers: [],
-  minimapPos: { x: 53, y: 52 },
   fences: {},
   teleports: {
     8: {

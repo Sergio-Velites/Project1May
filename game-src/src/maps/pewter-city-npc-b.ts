@@ -78,7 +78,6 @@ trainers: [
     persistent: true,
   }
   ],
-  minimapPos: { x: 53, y: 52 },
   fences: {},
   teleports: {
     8: {

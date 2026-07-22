@@ -36,7 +36,6 @@ const viridianCityPokemonCenter: MapType = {
   pc: { x: 13, y: 3 },
   onlineBattleNpc: { x: 11, y: 2 },
   trainers: [],
-  minimapPos: { x: 53, y: 112 },
   fences: {},
   teleports: {
     8: {

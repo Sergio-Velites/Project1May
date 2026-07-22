@@ -119,7 +119,6 @@ trainers: [
       questId: "viridian-city-gym-gift-2-2",
     },
   ],
-  minimapPos: { x: 53, y: 112 },
   fences: {},
   teleports: {
     18: {

@@ -132,7 +132,6 @@ const route4: MapType = {
       item: ItemType.MysteryBerry,
     },
   ],
-  minimapPos: { x: 120, y: 41 },
   trainers: [
   {
     npc: youngster,

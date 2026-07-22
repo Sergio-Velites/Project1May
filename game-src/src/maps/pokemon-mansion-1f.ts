@@ -52,7 +52,6 @@ const pokemonMansion1f: MapType = {
   exitReturnPos: { x: 6, y: 4 },
   music: "/game/music/maps-original/pokemon-mansion.mp3",
   grass: {},
-  minimapPos: { x: 47, y: 191 },
 };
 
 export default pokemonMansion1f;

@@ -52,7 +52,6 @@ text: {
       questId: "viridian-city-npc-house-static-7-7",
     },
   ],
-  minimapPos: { x: 53, y: 112 },
   fences: {},
   teleports: {
     8: {

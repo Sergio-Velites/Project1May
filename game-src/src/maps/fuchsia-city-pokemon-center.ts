@@ -28,7 +28,6 @@ const fuchsiaCityPokemonCenter: MapType = {
   exitReturnPos: { x: 19, y: 28 },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
-  minimapPos: { x: 124, y: 171 },
 };
 
 export default fuchsiaCityPokemonCenter;

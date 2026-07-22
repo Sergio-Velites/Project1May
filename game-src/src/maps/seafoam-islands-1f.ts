@@ -39,7 +39,6 @@ const seafoamIslands1f: MapType = {
     17: { 4: { map: MapId.Route20, pos: { x: 48, y: 6 } }, 5: { map: MapId.Route20, pos: { x: 48, y: 6 } }, 26: { map: MapId.Route20, pos: { x: 58, y: 10 } }, 27: { map: MapId.Route20, pos: { x: 58, y: 10 } } },
   },
   grass: {},
-  minimapPos: { x: 89, y: 190 },
 };
 
 export default seafoamIslands1f;

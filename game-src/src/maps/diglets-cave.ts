@@ -23,7 +23,6 @@ const digletsCave: MapType = {
   exitReturnMap: MapId.Route2,
   exitReturnPos: { x: 12, y: 10 },
   grass: {},
-  minimapPos: { x: 53, y: 60 },
   fences: {},
   teleports: {
     8: {

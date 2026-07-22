@@ -59,7 +59,6 @@ const lab: MapType = {
     hideCondition: "trainer-defeated:pewter-city-gym-4-1",
   }
   ],
-  minimapPos: { x: 53, y: 147 },
   teleports: {
     12: {
       4: { map: MapId.PalletTown, pos: { x: 12, y: 12 } },

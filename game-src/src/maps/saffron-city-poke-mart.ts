@@ -26,7 +26,6 @@ const saffronCityPokeMart: MapType = {
   exitReturnPos: { x: 25, y: 12 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
-  minimapPos: { x: 148, y: 76 },
 };
 
 export default saffronCityPokeMart;

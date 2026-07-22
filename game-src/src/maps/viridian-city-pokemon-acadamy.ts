@@ -37,7 +37,6 @@ const viridianCityAcadamy: MapType = {
   grass: {},
   exitReturnMap: MapId.ViridianCity,
   exitReturnPos: { x: 21, y: 16 },
-  minimapPos: { x: 53, y: 112 },
   fences: {},
   teleports: {
     8: {

@@ -404,6 +404,24 @@ ss-anne-1f · ss-anne-2f · ss-anne-3f · ss-anne-bf1
   de `spinners`), parser en `parse-ts.ts` + `setup-editor.mjs`, override key en
   `app/api/admin/map-data/route.ts`.
 
+### MO Vuelo (Fly) — destinos y desbloqueo por casillas
+
+- **Config del destino** (`MapType`, editable en el editor): `flyable`,
+  `flySpot` (aterrizaje) y `minimapPos` (punto en `kanto_region.png`).
+- **Disponibilidad** (nuevo, sustituye a `visitedMaps` para Vuelo):
+  - `flyAlwaysAvailable?: boolean` (default false) → disponible desde el inicio.
+  - `flyUnlockTiles?: Record<fila, col[]>` (formato `walls`) → al pisar cualquiera
+    de esas casillas se añade el mapa a `GameState.unlockedFlyMaps` (reducer
+    `registerFlyUnlock`, disparado por `FlyUnlockHandler` montado en `Game.tsx`);
+    se persiste al guardar. `loadFromState` lo restaura (default `[]`).
+- **Menú** (`FlyMenu`): muestra un destino si `flyable && minimapPos && flySpot`
+  **y** (`flyAlwaysAvailable` **o** `unlockedFlyMaps.includes(mapId)`).
+- **Editor**: checkbox "Destino de Vuelo" (`flyable`) + "Siempre disponible"
+  (`flyAlwaysAvailable`) + modo de pintado **🛫 Vuelo** (`fly-unlock`) para las
+  `flyUnlockTiles`. Serialización en `ts-codegen.ts`, `setup-editor.mjs` y
+  override keys `flyAlwaysAvailable`/`flyUnlockTiles` en la API route. Ver
+  `docs/future-fly-map-editor.md`.
+
 ### Cómo añadir un mapa nuevo
 
 1. Añadir valor al enum `MapId` en `maps/map-types.ts`
@@ -1304,11 +1322,6 @@ Implementar el objeto "Mapa" (ItemType.Map) usando `kanto_region.png` (237×213p
 - Al usarlo desde el menú de mochila, abrir un overlay que muestre el mapa de Kanto.
 - Mostrar la posición actual del jugador como un punto parpadeante.
 - Coordenadas de referencia en `MINIMAP_COORDS` del map-editor (ver `app/admin/map-editor/page.tsx`).
-
-### HM Vuelo (Fly)
-Destinos: lista de ciudades visitadas (`visitedMaps` en gameSlice). Al usar Vuelo, mostrar un menú con las ciudades/mapas exterior disponibles y teletransportar.
-- Usar `recoverLocation` de cada mapa como punto de aterrizaje.
-- Añadir animación de pantalla negra (como `BlackScreen.tsx`) antes del teleporte.
 
 ### Pokédex — área de captura
 En la vista detalle de la Pokédex, mostrar en qué mapas se puede encontrar cada Pokémon (hierba, pesca, surf).

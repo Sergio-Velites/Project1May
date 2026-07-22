@@ -29,7 +29,6 @@ const route4Gate: MapType = {
     },
   },
   grass: {},
-  minimapPos: { x: 53, y: 100 },
   fences: {},
   trainers: [],
 };

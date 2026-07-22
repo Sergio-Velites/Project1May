@@ -26,7 +26,6 @@ const vermilionCityHouseA: MapType = {
   exitReturnPos: { x: 7, y: 4 },
   music: "/game/music/maps-original/vermilion-city.mp3",
   grass: {},
-  minimapPos: { x: 147, y: 124 },
 };
 
 export default vermilionCityHouseA;

@@ -26,7 +26,6 @@ const fuchsiaCityHouseA: MapType = {
   exitReturnPos: { x: 11, y: 28 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
-  minimapPos: { x: 124, y: 171 },
 };
 
 export default fuchsiaCityHouseA;

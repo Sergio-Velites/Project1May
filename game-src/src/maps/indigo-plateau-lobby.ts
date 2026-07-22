@@ -27,7 +27,6 @@ const indigoPlateauLobby: MapType = {
   exitReturnMap: MapId.IndigoPlateau,
   exitReturnPos: { x: 9, y: 6 },
   grass: {},
-  minimapPos: { x: 29, y: 41 },
   fences: {},
   teleports: {
     0: {

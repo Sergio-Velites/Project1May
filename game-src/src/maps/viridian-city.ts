@@ -326,9 +326,6 @@ const viridianCity: MapType = {
     persistent: true,
   }
   ],
-  minimapPos: { x: 53, y: 112 },
-  flyable: true,
-  flySpot: { x: 23, y: 26 },
   teleports: {
     "-1": {
       17: { map: MapId.Route2, pos: { x: 7, y: 71 } },

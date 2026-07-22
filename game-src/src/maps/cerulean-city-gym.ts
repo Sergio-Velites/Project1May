@@ -32,7 +32,6 @@ const ceruleanCityGym: MapType = {
   exitReturnPos: { x: 30, y: 20 },
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
-  minimapPos: { x: 148, y: 41 },
 };
 
 export default ceruleanCityGym;

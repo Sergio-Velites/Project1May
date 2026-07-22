@@ -32,6 +32,7 @@ import Item from "./Item";
 import TextThenAction from "./TextThenAction";
 import LearnMove from "../app/LearnMove";
 import QuestHandler from "./QuestHandler";
+import FlyUnlockHandler from "./FlyUnlockHandler";
 import ConfirmationMenu from "./ConfirmationMenu";
 import Evolution from "./Evolution";
 import IntroVideo from "./IntroVideo";
@@ -222,6 +223,7 @@ const Game = () => {
       <EncounterHandler />
       <SpinningHandler />
       <QuestHandler />
+      <FlyUnlockHandler />
     </Container>
   );
 };

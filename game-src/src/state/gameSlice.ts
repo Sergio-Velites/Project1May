@@ -61,6 +61,9 @@ const initialState: GameState = {
     MapId.PalletTown,
     MapId.PalletTownLab,
   ],
+  // Destinos de Vuelo desbloqueados al pisar sus flyUnlockTiles. Vacío al
+  // empezar; los mapas con flyAlwaysAvailable están disponibles sin estar aquí.
+  unlockedFlyMaps: [],
   rsvp: undefined,
 };
 
@@ -390,6 +393,16 @@ export const gameSlice = createSlice({
       state.onSurfing = false;
       recordVisit(state, action.payload.map);
     },
+    /**
+     * Registra un mapa como destino de Vuelo desbloqueado (el jugador pisó una
+     * de sus `flyUnlockTiles`). Idempotente; se persiste al guardar la partida.
+     */
+    registerFlyUnlock: (state, action: PayloadAction<MapId>) => {
+      if (!state.unlockedFlyMaps) state.unlockedFlyMaps = [];
+      if (!state.unlockedFlyMaps.includes(action.payload)) {
+        state.unlockedFlyMaps.push(action.payload);
+      }
+    },
     setOnBicycle: (state, action: PayloadAction<boolean>) => {
       state.onBicycle = action.payload;
     },
@@ -483,6 +496,8 @@ export const gameSlice = createSlice({
           ...inferVisitedMaps(savedGameState),
         ])
       );
+      // Destinos de Vuelo desbloqueados (default [] para saves antiguos).
+      state.unlockedFlyMaps = savedGameState.unlockedFlyMaps ?? [];
       recordVisit(state, savedGameState.map);
     },
     loadFromState: (state, action: PayloadAction<GameState>) => {
@@ -526,6 +541,8 @@ export const gameSlice = createSlice({
       state.visitedMaps = Array.from(
         new Set([...(s.visitedMaps ?? []), ...inferVisitedMaps(s)])
       );
+      // Destinos de Vuelo desbloqueados (default [] para saves antiguos).
+      state.unlockedFlyMaps = s.unlockedFlyMaps ?? [];
       state.lastHealLocation = s.lastHealLocation ?? undefined;
       // Árboles de bayas (Gen II): restaurar fechas de recogida del save.
       state.berryTreesPicked = s.berryTreesPicked ?? {};
@@ -827,6 +844,7 @@ export const {
   setPos,
   setMapWithPos,
   flyTo,
+  registerFlyUnlock,
   exitMap,
   setMoving,
   addInventory,
@@ -920,6 +938,8 @@ export const selectOnBicycle = (state: RootState) => !!state.game.onBicycle;
 export const selectOnSurfing = (state: RootState) => !!state.game.onSurfing;
 export const selectVisitedMaps = (state: RootState) =>
   state.game.visitedMaps ?? [];
+export const selectUnlockedFlyMaps = (state: RootState) =>
+  state.game.unlockedFlyMaps ?? [];
 
 export const selectCollectedItems = (state: RootState) =>
   state.game.collectedItems;

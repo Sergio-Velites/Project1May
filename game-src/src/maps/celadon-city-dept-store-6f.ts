@@ -29,7 +29,6 @@ const celadonCityDeptStore6f: MapType = {
   },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
-  minimapPos: { x: 112, y: 76 },
 };
 
 export default celadonCityDeptStore6f;

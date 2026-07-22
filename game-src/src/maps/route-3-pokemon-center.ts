@@ -34,7 +34,6 @@ const route3PokemonCenter: MapType = {
   pc: { x: 13, y: 3 },
     onlineBattleNpc: { x: 11, y: 2 },
   trainers: [],
-  minimapPos: { x: 88, y: 48 },
   fences: {},
   teleports: {
     8: {

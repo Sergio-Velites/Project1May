@@ -25,7 +25,6 @@ const cinnabarIslandLab: MapType = {
   exitReturnPos: { x: 6, y: 10 },
   music: "/game/music/maps-original/pokemon-lab.mp3",
   grass: {},
-  minimapPos: { x: 53, y: 195 },
 };
 
 export default cinnabarIslandLab;

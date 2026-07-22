@@ -369,7 +369,6 @@ const leagueRoute: MapType = {
     persistent: true,
   }
   ],
-  minimapPos: { x: 29, y: 78 },
 }
 
 export default leagueRoute;

@@ -54,9 +54,13 @@ interface MapEntry {
   cave?: boolean;
   dark?: boolean;
   allowBicycle?: boolean;
-  /** Editor-only: prepara futuros destinos de Vuelo. El juego aún no lo consume. */
+  /** Destino de la MO Vuelo (el juego lo consume vía fly-helper). */
   flyable?: boolean;
   flySpot?: { x: number; y: number } | null;
+  /** Si true, el destino de Vuelo está disponible desde el inicio (sin pisar casillas). */
+  flyAlwaysAvailable?: boolean;
+  /** Casillas que, al pisarlas, desbloquean este destino de Vuelo ({fila:[cols]}). */
+  flyUnlockTiles?: Record<string, number[]>;
   music?: string | null;
   trainers: Trainer[];
   walls: Record<string, number[]>;
@@ -138,7 +142,7 @@ type EncountersOverride = Partial<Record<EncounterTableKey, EncounterTable>>;
 
 const EMPTY_TABLE = (): EncounterTable => ({ rate: 0, pokemon: [] });
 
-type EditMode = 'select' | 'npc' | 'walls' | 'fences' | 'elevations' | 'grass' | 'water' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'berry-trees' | 'boulders' | 'spots' | 'mechanics' | 'portals' | 'map';
+type EditMode = 'select' | 'npc' | 'walls' | 'fences' | 'elevations' | 'grass' | 'water' | 'fly-unlock' | 'texts' | 'items' | 'gifts' | 'static-pokemon' | 'cuttable-trees' | 'berry-trees' | 'boulders' | 'spots' | 'mechanics' | 'portals' | 'map';
 
 /** Brocha del modo elevaciones: nivel 1-3 o rampa (escalera entre planos). */
 type ElevationBrush = 1 | 2 | 3 | 'ramp';
@@ -603,6 +607,7 @@ interface MapClipboard {
   ramps: Record<string, number[]>;
   grass: Record<string, number[]>;
   water: Record<string, number[]>;
+  flyUnlockTiles?: Record<string, number[]>;
   stoppers: Record<string, number[]>;
   spinners: Record<string, Record<string, DirectionName>>;
   texts: Record<string, Record<string, string[]>>;
@@ -1990,6 +1995,8 @@ export default function MapEditor() {
   const [allowBicycle, setAllowBicycle] = useState(false);
   const [flyable, setFlyable] = useState(false);
   const [flySpot, setFlySpot] = useState<{ x: number; y: number } | null>(null);
+  const [flyAlwaysAvailable, setFlyAlwaysAvailable] = useState(false);
+  const [flyUnlockTiles, setFlyUnlockTiles] = useState<Record<string, number[]>>({});
   const [musicField, setMusicField] = useState<string | null>(null);
   // Portales
   const [portals, setPortals] = useState<PortalEntry[]>([]);
@@ -2418,6 +2425,8 @@ export default function MapEditor() {
     setAllowBicycle(!!m.allowBicycle);
     setFlyable(!!m.flyable);
     setFlySpot(m.flySpot ?? null);
+    setFlyAlwaysAvailable(!!m.flyAlwaysAvailable);
+    setFlyUnlockTiles(m.flyUnlockTiles ?? {});
     setMusicField(m.music ?? null);
     setPortals(flattenPortals(m, mapData));
     setExitReturnMap(m.exitReturnMap ?? null);
@@ -2477,8 +2486,9 @@ export default function MapEditor() {
       height: currentMap?.height,
       start: startPos,
       cave, dark, allowBicycle,
-      // flyable/flySpot SÍ se escriben al .ts: los consume la MO Vuelo.
-      flyable, flySpot,
+      // flyable/flySpot/flyAlwaysAvailable/flyUnlockTiles SÍ se escriben al .ts:
+      // los consume la MO Vuelo.
+      flyable, flySpot, flyAlwaysAvailable, flyUnlockTiles,
       music: musicField,
       trainers,
       walls, fences, fenceDirections, elevations, ramps, grass, water,
@@ -2609,6 +2619,8 @@ export default function MapEditor() {
             allowBicycle,
             flyable,
             flySpot,
+            flyAlwaysAvailable,
+            flyUnlockTiles,
             music: musicField,
             fences,
             fenceDirections,
@@ -2733,6 +2745,8 @@ export default function MapEditor() {
             allowBicycle,
             flyable,
             flySpot,
+            flyAlwaysAvailable,
+            flyUnlockTiles,
             music: musicField,
             pokemonCenter,
             pc: pcPos,
@@ -2784,6 +2798,11 @@ export default function MapEditor() {
   function doExportGrass() {
     const ts = exportRowColMapTS(grass, 'grass');
     navigator.clipboard.writeText(ts).then(() => alert('¡Grass copiadas!'));
+  }
+
+  function doExportFlyUnlock() {
+    const ts = exportRowColMapTS(flyUnlockTiles, 'flyUnlockTiles');
+    navigator.clipboard.writeText(ts).then(() => alert('¡Casillas de desbloqueo de Vuelo copiadas! Pégalas en el .ts como `flyUnlockTiles: { ... }`'));
   }
 
   function doExportWater() {
@@ -2957,6 +2976,8 @@ export default function MapEditor() {
       setAllowBicycle(!!parsed.allowBicycle);
       setFlyable(false);
       setFlySpot(null);
+      setFlyAlwaysAvailable(false);
+      setFlyUnlockTiles({});
       setMusicField(parsed.music ?? null);
       setPortals(flattenPortals({
         ...currentMap!,
@@ -3247,6 +3268,7 @@ export default function MapEditor() {
     setRamps((m) => shiftRowCols(m, dx, dy));
     setGrass((m) => shiftRowCols(m, dx, dy));
     setWater((m) => shiftRowCols(m, dx, dy));
+    setFlyUnlockTiles((m) => shiftRowCols(m, dx, dy));
     setStoppers((m) => shiftRowCols(m, dx, dy));
     setFenceDirections((m) => shiftRowColMap(m, dx, dy));
     setElevations((m) => shiftRowColMap(m, dx, dy));
@@ -3286,6 +3308,7 @@ export default function MapEditor() {
       ramps: extractRowCols(ramps, r),
       grass: extractRowCols(grass, r),
       water: extractRowCols(water, r),
+      flyUnlockTiles: extractRowCols(flyUnlockTiles, r),
       stoppers: extractRowCols(stoppers, r),
       spinners: extractRowColMap(spinners, r),
       texts: extractRowColMap(texts, r),
@@ -3310,6 +3333,7 @@ export default function MapEditor() {
     setRamps((m) => removeRowCols(m, r));
     setGrass((m) => removeRowCols(m, r));
     setWater((m) => removeRowCols(m, r));
+    setFlyUnlockTiles((m) => removeRowCols(m, r));
     setStoppers((m) => removeRowCols(m, r));
     setSpinners((m) => removeRowColMap(m, r));
     setTexts((m) => removeRowColMap(m, r));
@@ -3334,6 +3358,7 @@ export default function MapEditor() {
     setRamps((m) => mergeRowCols(m, shiftRowCols(c.ramps ?? {}, ax, ay)));
     setGrass((m) => mergeRowCols(m, shiftRowCols(c.grass, ax, ay)));
     setWater((m) => mergeRowCols(m, shiftRowCols(c.water, ax, ay)));
+    setFlyUnlockTiles((m) => mergeRowCols(m, shiftRowCols(c.flyUnlockTiles ?? {}, ax, ay)));
     setStoppers((m) => mergeRowCols(m, shiftRowCols(c.stoppers, ax, ay)));
     setSpinners((m) => mergeRowColMap(m, shiftRowColMap(c.spinners, ax, ay)));
     setTexts((m) => mergeRowColMap(m, shiftRowColMap(c.texts, ax, ay)));
@@ -3457,9 +3482,9 @@ export default function MapEditor() {
         return;
       }
 
-      // Mask paint en arrastre (walls, fences, grass, water)
+      // Mask paint en arrastre (walls, fences, grass, water, fly-unlock)
       if (
-        (editMode === 'walls' || editMode === 'fences' || editMode === 'grass' || editMode === 'water') &&
+        (editMode === 'walls' || editMode === 'fences' || editMode === 'grass' || editMode === 'water' || editMode === 'fly-unlock') &&
         wallPaint.current?.active
       ) {
         const paint = wallPaint.current;
@@ -3470,6 +3495,7 @@ export default function MapEditor() {
             editMode === 'walls' ? setWalls
             : editMode === 'fences' ? setFences
             : editMode === 'grass' ? setGrass
+            : editMode === 'fly-unlock' ? setFlyUnlockTiles
             : setWater;
           setter((prev) => setMaskAt(prev, tileX, tileY, paint.mode === 'add'));
           // Salientes: etiquetar el tile con la dirección activa (o quitarla).
@@ -3598,7 +3624,7 @@ export default function MapEditor() {
       (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
       return;
     }
-    if (editMode !== 'walls' && editMode !== 'fences' && editMode !== 'grass' && editMode !== 'water' && editMode !== 'elevations') return;
+    if (editMode !== 'walls' && editMode !== 'fences' && editMode !== 'grass' && editMode !== 'water' && editMode !== 'elevations' && editMode !== 'fly-unlock') return;
     const tile = tileFromEvent(e);
     if (!tile) return;
     // Rango EXTENDIDO (mapa + margen): permite pintar muros/hierba/etc. fuera del borde.
@@ -3623,11 +3649,13 @@ export default function MapEditor() {
       editMode === 'walls' ? walls
       : editMode === 'fences' ? fences
       : editMode === 'grass' ? grass
+      : editMode === 'fly-unlock' ? flyUnlockTiles
       : water;
     const setter =
       editMode === 'walls' ? setWalls
       : editMode === 'fences' ? setFences
       : editMode === 'grass' ? setGrass
+      : editMode === 'fly-unlock' ? setFlyUnlockTiles
       : setWater;
     const currentlyOn = hasMask(src, tile.x, tile.y);
     const mode: 'add' | 'remove' = currentlyOn ? 'remove' : 'add';
@@ -4494,7 +4522,7 @@ export default function MapEditor() {
         {/* Modo edición — flexWrap: el grupo de 16 botones era un bloque
             indivisible de ~1100px que desbordaba en cualquier portátil. */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0, border: '1px solid #3a3a5a', borderRadius: 4, overflow: 'hidden' }}>
-          {(['select', 'npc', 'walls', 'fences', 'elevations', 'grass', 'water', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'berry-trees', 'boulders', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
+          {(['select', 'npc', 'walls', 'fences', 'elevations', 'grass', 'water', 'fly-unlock', 'texts', 'items', 'gifts', 'static-pokemon', 'cuttable-trees', 'berry-trees', 'boulders', 'spots', 'mechanics', 'portals', 'map'] as EditMode[]).map((m) => {
             const colorMap: Record<EditMode, string> = {
               select: '#2a6a8a',
               npc: '#5050b0',
@@ -4503,6 +4531,7 @@ export default function MapEditor() {
               elevations: '#8a5a2a',
               grass: '#3a7a3a',
               water: '#3a5aa0',
+              'fly-unlock': '#2a7a9a',
               texts: '#3a5a7a',
               items: '#5a3a7a',
               gifts: '#7a3a5a',
@@ -4531,7 +4560,7 @@ export default function MapEditor() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {m === 'npc' ? 'NPCs' : m === 'select' ? '⬚ Sel.' : m === 'elevations' ? '⛰ Alturas' : m}
+                {m === 'npc' ? 'NPCs' : m === 'select' ? '⬚ Sel.' : m === 'elevations' ? '⛰ Alturas' : m === 'fly-unlock' ? '🛫 Vuelo' : m}
               </button>
             );
           })}
@@ -4771,6 +4800,16 @@ export default function MapEditor() {
           <button onClick={doExportEncounters} style={{ padding: '4px 12px', background: '#10202a', border: '1px solid #3a6a8a', borderRadius: 4, color: '#88ddff', cursor: 'pointer', fontSize: 12 }}>
             🐾 Encounters
           </button>
+        )}
+        {editMode === 'fly-unlock' && (
+          <>
+            <span style={{ fontSize: 11, color: '#8fd3ff', alignSelf: 'center' }}>
+              🛫 Pinta/arrastra las casillas que, al pisarlas, desbloquean volar a este mapa (guardado en la partida). Repinta para borrar.
+            </span>
+            <button onClick={doExportFlyUnlock} style={{ padding: '4px 12px', background: '#0f2530', border: '1px solid #2a7a9a', borderRadius: 4, color: '#8fd3ff', cursor: 'pointer', fontSize: 12 }}>
+              🛫 Casillas de Vuelo
+            </button>
+          </>
         )}
         {editMode === 'texts' && (
           <button onClick={doExportTexts} style={{ padding: '4px 12px', background: '#1a1a2a', border: '1px solid #3a5a7a', borderRadius: 4, color: '#88ccff', cursor: 'pointer', fontSize: 12 }}>
@@ -5447,6 +5486,39 @@ export default function MapEditor() {
                       boxSizing: 'border-box',
                     }}
                   />
+                ));
+              })}
+
+              {/* Fly-unlock overlay: casillas que desbloquean este destino de Vuelo */}
+              {Object.entries(flyUnlockTiles).flatMap(([rowKey, cols]) => {
+                const y = parseInt(rowKey, 10);
+                if (Number.isNaN(y)) return [];
+                return cols.map((x) => (
+                  <div
+                    key={`fu-${y}-${x}`}
+                    style={{
+                      position: 'absolute',
+                      left: x * zoom,
+                      top: y * zoom,
+                      width: zoom,
+                      height: zoom,
+                      background: editMode === 'fly-unlock'
+                        ? 'rgba(90, 200, 255, 0.5)'
+                        : 'rgba(90, 200, 255, 0.16)',
+                      border: editMode === 'fly-unlock'
+                        ? '1px solid rgba(90, 200, 255, 0.95)'
+                        : '1px dashed rgba(90, 200, 255, 0.4)',
+                      pointerEvents: 'none',
+                      boxSizing: 'border-box',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: Math.max(8, zoom * 0.5),
+                      lineHeight: 1,
+                    }}
+                  >
+                    {editMode === 'fly-unlock' ? '🛫' : ''}
+                  </div>
                 ));
               })}
 
@@ -6310,6 +6382,10 @@ export default function MapEditor() {
                 setFlyable={(v) => { setFlyable(v); setDirty(true); }}
                 flySpot={flySpot}
                 setFlySpot={(v) => { setFlySpot(v); setDirty(true); }}
+                flyAlwaysAvailable={flyAlwaysAvailable}
+                setFlyAlwaysAvailable={(v) => { setFlyAlwaysAvailable(v); setDirty(true); }}
+                flyUnlockCount={Object.values(flyUnlockTiles).reduce((a, b) => a + b.length, 0)}
+                onPaintFlyUnlock={() => setEditMode('fly-unlock')}
                 musicField={musicField}
                 setMusicField={(v) => { setMusicField(v); setDirty(true); }}
                 musicTracks={musicTracks}
@@ -7457,6 +7533,10 @@ function MapMetaInspector({
   setFlyable,
   flySpot,
   setFlySpot,
+  flyAlwaysAvailable,
+  setFlyAlwaysAvailable,
+  flyUnlockCount,
+  onPaintFlyUnlock,
   musicField,
   setMusicField,
   musicTracks,
@@ -7481,6 +7561,10 @@ function MapMetaInspector({
   setFlyable: (v: boolean) => void;
   flySpot: { x: number; y: number } | null;
   setFlySpot: (v: { x: number; y: number } | null) => void;
+  flyAlwaysAvailable: boolean;
+  setFlyAlwaysAvailable: (v: boolean) => void;
+  flyUnlockCount: number;
+  onPaintFlyUnlock: () => void;
   musicField: string | null;
   setMusicField: (v: string | null) => void;
   musicTracks: MusicTrack[];
@@ -7587,12 +7671,12 @@ function MapMetaInspector({
       <div style={{ ...sectionStyle, background: '#111a24', border: '1px solid #2d5674', borderRadius: 4, padding: 10 }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: flyable ? '#8fd3ff' : '#888' }}>
           <input type="checkbox" checked={flyable} onChange={(e) => setFlyable(e.target.checked)} style={{ accentColor: '#58b7ff' }} />
-          <span>Disponible para Vuelo (futuro)</span>
+          <span>Destino de Vuelo (MO Vuelo)</span>
         </label>
         <div style={{ color: '#789', fontSize: 11, marginTop: 6, lineHeight: 1.5 }}>
-          Editor-only. El juego deberá mostrar este destino solo si <code>visitedMaps.includes(mapId)</code>.
-          <br />Documentado en <code>docs/future-fly-map-editor.md</code>.
-          <br />Con este modo activo, click en el canvas fija el tile ✈.
+          Marca este mapa como destino de Vuelo. Requiere <code>minimapPos</code> (punto en Kanto)
+          y el <b>flySpot</b> de abajo (casilla de aterrizaje). El destino solo aparece en el
+          juego cuando está <b>disponible</b> (ver abajo).
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
           <label style={{ color: '#888', fontSize: 10 }}>
@@ -7639,6 +7723,33 @@ function MapMetaInspector({
           >
             Limpiar
           </button>
+        </div>
+
+        {/* Disponibilidad del destino de Vuelo */}
+        <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid #2d5674' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12, color: flyAlwaysAvailable ? '#8fd3ff' : '#aaa' }}>
+            <input type="checkbox" checked={flyAlwaysAvailable} onChange={(e) => setFlyAlwaysAvailable(e.target.checked)} style={{ accentColor: '#58b7ff' }} />
+            <span>Siempre disponible (desde el inicio)</span>
+          </label>
+          <div style={{ color: '#789', fontSize: 11, marginTop: 6, lineHeight: 1.5 }}>
+            Si está marcado, se puede volar aquí desde el principio sin pisar ninguna casilla.
+            Si NO, el destino se desbloquea cuando el jugador pisa una de las <b>casillas de desbloqueo</b>
+            (queda registrado al guardar la partida).
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+            <button
+              type="button"
+              onClick={onPaintFlyUnlock}
+              disabled={flyAlwaysAvailable}
+              title={flyAlwaysAvailable ? 'No hace falta: el destino está siempre disponible' : 'Pintar casillas de desbloqueo en el canvas'}
+              style={{ padding: '3px 10px', background: '#0f2530', border: '1px solid #2a7a9a', color: flyAlwaysAvailable ? '#456' : '#8fd3ff', borderRadius: 4, cursor: flyAlwaysAvailable ? 'not-allowed' : 'pointer', fontSize: 11, opacity: flyAlwaysAvailable ? 0.5 : 1 }}
+            >
+              🛫 Pintar casillas de desbloqueo
+            </button>
+            <span style={{ fontSize: 11, color: '#789' }}>
+              {flyUnlockCount} casilla{flyUnlockCount === 1 ? '' : 's'}
+            </span>
+          </div>
         </div>
       </div>
       <div style={sectionStyle}>

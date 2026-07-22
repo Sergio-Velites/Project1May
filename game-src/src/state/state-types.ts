@@ -128,10 +128,14 @@ export interface GameState {
   onSurfing?: boolean;
   /** Mapa y posición donde el jugador curó por última vez (recuperación tras derrota) */
   lastHealLocation?: { map: MapId; pos: PosType };
-  /** Mapas que el jugador ha pisado al menos una vez. Determina los destinos
-   *  disponibles cuando usa la MO Vuelo (Gen I): solo se puede volar a un sitio
-   *  ya visitado. */
+  /** Mapas que el jugador ha pisado al menos una vez. Histórico general (lo usa,
+   *  p. ej., la inferencia de saves antiguos). El desbloqueo de Vuelo ya NO
+   *  depende de esto: ver `unlockedFlyMaps`. */
   visitedMaps?: MapId[];
+  /** Mapas cuyo destino de Vuelo el jugador ha DESBLOQUEADO al pisar alguna de
+   *  sus `flyUnlockTiles`. Persistido en el save. Un mapa con
+   *  `flyAlwaysAvailable` está disponible aunque no aparezca aquí. */
+  unlockedFlyMaps?: MapId[];
   /** Datos de confirmación de asistencia a la boda */
   rsvp?: RSVPData;
   /** Contador de pasos para la ganancia de amistad al caminar (Gen II). Cada

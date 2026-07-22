@@ -88,7 +88,6 @@ const route9: MapType = {
   },
   music: "/game/music/maps-original/route-11.mp3",
   grass: {},
-  minimapPos: { x: 172, y: 41 },
 };
 
 export default route9;

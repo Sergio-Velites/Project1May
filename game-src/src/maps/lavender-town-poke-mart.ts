@@ -26,7 +26,6 @@ const lavenderTownPokeMart: MapType = {
   exitReturnPos: { x: 15, y: 14 },
   music: "/game/music/maps-original/lavender-town.mp3",
   grass: {},
-  minimapPos: { x: 195, y: 76 },
 };
 
 export default lavenderTownPokeMart;

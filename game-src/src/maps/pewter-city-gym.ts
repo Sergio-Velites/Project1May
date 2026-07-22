@@ -231,7 +231,6 @@ trainers: [
     sightRange: 0,
   }
   ],
-  minimapPos: { x: 53, y: 52 },
   teleports: {
     14: {
       4: { map: MapId.PewterCity, pos: { x: 16, y: 18 } },

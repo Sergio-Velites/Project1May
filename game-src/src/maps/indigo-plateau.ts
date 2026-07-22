@@ -37,7 +37,6 @@ const indigoPlateau: MapType = {
   },
   music: "/game/music/maps-original/indigo-plateau.mp3",
   grass: {},
-  minimapPos: { x: 29, y: 41 },
 };
 
 export default indigoPlateau;

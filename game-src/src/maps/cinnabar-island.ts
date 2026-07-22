@@ -66,9 +66,6 @@ const cinnabarIsland: MapType = {
   },
   music: "/game/music/maps-original/cinnabar-island.mp3",
   grass: {},
-  minimapPos: { x: 53, y: 195 },
-  flyable: true,
-  flySpot: { x: 11, y: 12 },
 };
 
 export default cinnabarIsland;

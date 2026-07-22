@@ -75,7 +75,6 @@ text: {
       ],
     },
   ],
-  minimapPos: { x: 53, y: 52 },
   trainers: [
   {
     npc: superNerd,

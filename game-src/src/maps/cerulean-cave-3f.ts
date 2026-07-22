@@ -38,7 +38,6 @@ const ceruleanCave3f: MapType = {
 
   },
   grass: {},
-  minimapPos: { x: 138, y: 33 },
 };
 
 export default ceruleanCave3f;

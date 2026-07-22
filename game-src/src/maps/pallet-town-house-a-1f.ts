@@ -46,7 +46,6 @@ const houseA1f: MapType = {
     persistent: true,
   }
   ],
-  minimapPos: { x: 53, y: 147 },
   fences: {},
   teleports: {
     1: {

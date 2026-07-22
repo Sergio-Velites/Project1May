@@ -66,9 +66,6 @@ const celadonCity: MapType = {
   },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
-  minimapPos: { x: 112, y: 76 },
-  flyable: true,
-  flySpot: { x: 41, y: 10 },
 };
 
 export default celadonCity;

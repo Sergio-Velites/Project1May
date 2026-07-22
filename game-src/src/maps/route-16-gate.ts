@@ -31,7 +31,6 @@ const route16Gate: MapType = {
     9: { 0: { map: MapId.Route16, pos: { x: 16, y: 11 } }, 7: { map: MapId.Route16, pos: { x: 25, y: 10 } } },
   },
   grass: {},
-  minimapPos: { x: 100, y: 76 },
 };
 
 export default route16Gate;

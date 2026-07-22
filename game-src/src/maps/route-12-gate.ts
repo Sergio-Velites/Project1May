@@ -28,7 +28,6 @@ const route12Gate: MapType = {
     7: { 4: { map: MapId.Route12, pos: { x: 10, y: 22 } }, 5: { map: MapId.Route12, pos: { x: 11, y: 22 } } },
   },
   grass: {},
-  minimapPos: { x: 196, y: 95 },
 };
 
 export default route12Gate;

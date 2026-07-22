@@ -51,7 +51,6 @@ const victoryRoad2f: MapType = {
   exitReturnPos: { x: 14, y: 32 },
   music: "/game/music/maps-original/victory-road.mp3",
   grass: {},
-  minimapPos: { x: 29, y: 65 },
   fences: {},
   trainers: [],
 };

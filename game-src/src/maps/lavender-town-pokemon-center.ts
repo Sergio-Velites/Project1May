@@ -28,7 +28,6 @@ const lavenderTownPokemonCenter: MapType = {
   exitReturnPos: { x: 3, y: 6 },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
-  minimapPos: { x: 195, y: 76 },
 };
 
 export default lavenderTownPokemonCenter;

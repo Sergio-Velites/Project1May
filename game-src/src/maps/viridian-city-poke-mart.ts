@@ -35,7 +35,6 @@ const viridianCityPokeMart: MapType = {
     ItemType.ParlyzHeal,
     ItemType.BurnHeal,
   ],
-  minimapPos: { x: 53, y: 112 },
   fences: {},
   teleports: {
     8: {

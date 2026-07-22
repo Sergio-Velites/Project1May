@@ -22,7 +22,6 @@ const championRoom: MapType = {
   exits: {},
   music: "/game/music/maps-original/pokemon-gym.mp3",
   grass: {},
-  minimapPos: { x: 29, y: 41 },
   fences: {},
   teleports: {
     7: {

@@ -41,7 +41,6 @@ const ssAnne1f: MapType = {
   },
   music: "/game/music/maps-original/ss-anne.mp3",
   grass: {},
-  minimapPos: { x: 150, y: 133 },
 };
 
 export default ssAnne1f;

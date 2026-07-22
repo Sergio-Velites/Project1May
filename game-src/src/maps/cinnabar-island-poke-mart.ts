@@ -26,7 +26,6 @@ const cinnabarIslandPokeMart: MapType = {
   exitReturnPos: { x: 15, y: 12 },
   music: "/game/music/maps-original/cinnabar-island.mp3",
   grass: {},
-  minimapPos: { x: 53, y: 195 },
 };
 
 export default cinnabarIslandPokeMart;

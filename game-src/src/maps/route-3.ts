@@ -263,9 +263,6 @@ const route3: MapType = {
     persistent: true,
   }
   ],
-  minimapPos: { x: 78, y: 52 },
-  flyable: true,
-  flySpot: { x: 61, y: -12 },
   teleports: {
     "-1": {
       57: { map: MapId.Route4, pos: { x: 6, y: 17 } },

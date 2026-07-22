@@ -35,6 +35,8 @@ type OverrideKey =
   | 'allowBicycle'
   | 'flyable'
   | 'flySpot'
+  | 'flyAlwaysAvailable'
+  | 'flyUnlockTiles'
   | 'music'
   | 'texts'
   | 'textRewards'
@@ -76,6 +78,8 @@ const OVERRIDE_KEYS: OverrideKey[] = [
   'allowBicycle',
   'flyable',
   'flySpot',
+  'flyAlwaysAvailable',
+  'flyUnlockTiles',
   'music',
   'texts',
   'textRewards',

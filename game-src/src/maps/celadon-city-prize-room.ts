@@ -25,7 +25,6 @@ const celadonCityPrizeRoom: MapType = {
   exitReturnPos: { x: 33, y: 20 },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
-  minimapPos: { x: 112, y: 76 },
 };
 
 export default celadonCityPrizeRoom;

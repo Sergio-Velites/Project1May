@@ -375,7 +375,6 @@ const route2: MapType = {
     persistent: true,
   }
   ],
-  minimapPos: { x: 53, y: 92 },
 }
 
 export default route2;

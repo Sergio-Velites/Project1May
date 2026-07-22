@@ -228,7 +228,6 @@ const mtMoon3f: MapType = {
   ],
 
   exitReturnMap: MapId.Route4,
-  minimapPos: { x: 99, y: 41 },
   items: [
     {
       item: ItemType.HelixFossil,

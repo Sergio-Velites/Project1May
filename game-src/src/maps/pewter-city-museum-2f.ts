@@ -50,7 +50,6 @@ text: {
   exits: {},
   exitReturnPos: { x: 7, y: 6 },
   exitReturnMap: MapId.PewterCityMuseum1f,
-  minimapPos: { x: 53, y: 52 },
   trainers: [],
 };
 

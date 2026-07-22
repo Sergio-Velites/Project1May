@@ -491,12 +491,28 @@ export interface MapType {
   minimapParent?: string;
   /**
    * Destino válido para la MO Vuelo (Gen I). Para que el jugador pueda volar
-   * aquí deben cumplirse TRES condiciones: `flyable === true`, tener `minimapPos`
-   * (punto en el mapa de Kanto) y `flySpot` (casilla de aterrizaje), y que el
-   * mapa esté en `visitedMaps` (el jugador ya ha estado). Se configura desde el
-   * Map Editor (checkbox "Disponible para Vuelo" + casilla flySpot).
+   * aquí deben cumplirse TRES condiciones de configuración: `flyable === true`,
+   * tener `minimapPos` (punto en el mapa de Kanto) y `flySpot` (casilla de
+   * aterrizaje). Además, para que el destino esté DISPONIBLE en la partida:
+   *   - `flyAlwaysAvailable === true` → disponible desde el principio, o
+   *   - el jugador ha pisado alguna casilla de `flyUnlockTiles` (queda
+   *     registrado en `unlockedFlyMaps` del save).
+   * Se configura desde el Map Editor.
    */
   flyable?: boolean;
   /** Casilla (coordenadas de tile) donde aterriza el jugador al volar a este mapa. */
   flySpot?: PosType;
+  /**
+   * Si es `true`, este destino de Vuelo está disponible desde el principio, sin
+   * que el jugador tenga que pisar ninguna casilla (para sitios accesibles ya
+   * desde el inicio). Por defecto `false`. Editor-only checkbox.
+   */
+  flyAlwaysAvailable?: boolean;
+  /**
+   * Casillas (formato `{fila: [cols]}`, igual que `walls`) que, al pisarlas,
+   * DESBLOQUEAN este mapa como destino de Vuelo (se añade a `unlockedFlyMaps`
+   * del save al pisarlas y se persiste al guardar). Normalmente se colocan en
+   * la entrada del sitio. Irrelevante si `flyAlwaysAvailable === true`.
+   */
+  flyUnlockTiles?: Record<number, number[]>;
 }

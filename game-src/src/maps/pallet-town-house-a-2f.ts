@@ -37,7 +37,6 @@ const houseA2f: MapType = {
   exitReturnPos: { x: 6, y: 2 },
   exitReturnMap: MapId.PalletTownHouseA1F,
   grass: {},
-  minimapPos: { x: 53, y: 147 },
   fences: {},
   teleports: {
     1: {

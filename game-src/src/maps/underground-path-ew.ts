@@ -31,7 +31,6 @@ const undergroundPathEW: MapType = {
 
   },
   grass: {},
-  minimapPos: { x: 133, y: 82 },
 };
 
 export default undergroundPathEW;

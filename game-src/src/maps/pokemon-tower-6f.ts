@@ -40,7 +40,6 @@ const pokemonTower6f: MapType = {
   },
   music: "/game/music/maps-original/pokemon-tower.mp3",
   grass: {},
-  minimapPos: { x: 197, y: 71 },
 };
 
 export default pokemonTower6f;

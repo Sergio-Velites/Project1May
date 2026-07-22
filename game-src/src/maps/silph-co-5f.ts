@@ -42,7 +42,6 @@ const silphCo5f: MapType = {
   },
   music: "/game/music/maps-original/silph-co.mp3",
   grass: {},
-  minimapPos: { x: 150, y: 79 },
 };
 
 export default silphCo5f;

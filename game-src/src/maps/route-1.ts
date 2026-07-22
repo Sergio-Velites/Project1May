@@ -219,7 +219,6 @@ const route1: MapType = {
     persistent: true,
   }
   ],
-  minimapPos: { x: 53, y: 130 },
   teleports: {
     "-1": {
       10: { map: MapId.ViridianCity, pos: { x: 20, y: 35 } },
