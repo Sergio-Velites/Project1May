@@ -389,6 +389,11 @@ const leagueRoute: MapType = {
     persistent: true,
   }
   ],
+  flyable: true,
+  flySpot: { x: 11, y: 6 },
+  flyUnlockTiles: {
+    6: [10, 11],
+  },
 }
 
 export default leagueRoute;
