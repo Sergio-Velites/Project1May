@@ -370,9 +370,9 @@ const leagueRoute: MapType = {
   },
   {
     npc: rival,
-    pokemon: [{ id: 119, level: 15 }],
+    pokemon: [{ id: 149, level: 99 }, { id: 6, level: 99 }, { id: 144, level: 99 }, { id: 150, level: 99 }, { id: 251, level: 150 }, { id: 145, level: 200 }],
     facing: Direction.Down,
-    pos: { x: 10, y: 7 },
+    pos: { x: 11, y: 20 },
     intro: [
       "Es frustrante llegar hasta aquí para que te digan",
       "que todo el mundo a abandonado la liga para ",
@@ -382,7 +382,8 @@ const leagueRoute: MapType = {
       "a chuparla!"
     ],
     outtro: [
-      "..."
+      "Malditos Marta y Sergio.",
+      "Puede que en Johto tenga más suerte... "
     ],
     money: 0,
     persistent: true,
@@ -390,6 +391,7 @@ const leagueRoute: MapType = {
   ],
   minimapPos: { x: 29, y: 78 },
   flySpot: { x: 11, y: 6 },
+  flyable: true,
 }
 
 export default leagueRoute;
