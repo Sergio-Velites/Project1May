@@ -365,6 +365,7 @@ const viridianCity: MapType = {
   flyable: true,
   flySpot: { x: 23, y: 26 },
   flyAlwaysAvailable: true,
+  minimapPos: { x: 53, y: 106 },
 }
 
 export default viridianCity;
