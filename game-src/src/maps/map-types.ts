@@ -475,6 +475,8 @@ export interface MapType {
   boulders?: BoulderType[];
   /** Posición del NPC de batallas online en este mapa (centros Pokémon) */
   onlineBattleNpc?: PosType;
+  /** Posición del NPC de la guardería (Goñi): regala un Pokémon bebé al día. */
+  dayCareNpc?: PosType;
   /**
    * Si está en `true`, el jugador puede usar la Bicicleta en este mapa.
    * Por defecto los mapas son interiores (sin bici). Al entrar en un mapa

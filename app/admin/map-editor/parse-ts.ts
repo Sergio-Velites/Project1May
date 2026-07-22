@@ -76,6 +76,7 @@ export interface ParsedMap {
   storeItems: string[];
   recoverLocation: { x: number; y: number } | null;
   onlineBattleNpc: { x: number; y: number } | null;
+  dayCareNpc: { x: number; y: number } | null;
   spinners: Record<string, Record<string, 'down' | 'up' | 'left' | 'right'>>;
   stoppers: Record<string, number[]>;
   maps: Record<string, Record<string, string>>;
@@ -653,6 +654,7 @@ export function parseMapTS(tsText: string): ParsedMap {
     storeItems: parseItemTypeArrayField(tsText, 'storeItems'),
     recoverLocation: parsePos(tsText, 'recoverLocation'),
     onlineBattleNpc: parsePos(tsText, 'onlineBattleNpc'),
+    dayCareNpc: parsePos(tsText, 'dayCareNpc'),
     spinners: parseDirectionRowColMap(tsText, 'spinners'),
     stoppers: parseRowColMap(tsText, 'stoppers'),
     maps: parseMapIdRowCol(tsText),

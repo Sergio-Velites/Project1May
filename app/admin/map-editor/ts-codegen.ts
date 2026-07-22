@@ -93,6 +93,7 @@ export interface MapWriteState {
   storeItems?: string[];
   recoverLocation?: Pos | null;
   onlineBattleNpc?: Pos | null;
+  dayCareNpc?: Pos | null;
   spinners?: Record<string, Record<string, DirectionName>>;
   stoppers?: Record<string, number[]>;
   maps?: Record<string, Record<string, string>>;
@@ -447,6 +448,7 @@ function buildFieldOps(state: MapWriteState, resolve: (t: string) => string): Fi
   if (state.store !== undefined) push('store', state.store ? serPos('store', state.store) : null);
   if (state.recoverLocation !== undefined) push('recoverLocation', state.recoverLocation ? serPos('recoverLocation', state.recoverLocation) : null);
   if (state.onlineBattleNpc !== undefined) push('onlineBattleNpc', state.onlineBattleNpc ? serPos('onlineBattleNpc', state.onlineBattleNpc) : null);
+  if (state.dayCareNpc !== undefined) push('dayCareNpc', state.dayCareNpc ? serPos('dayCareNpc', state.dayCareNpc) : null);
   if (state.storeItems !== undefined) push('storeItems', state.storeItems.length ? serStoreItems(state.storeItems) : null);
   if (state.spinners !== undefined) push('spinners', Object.keys(state.spinners).length ? serSpinners(state.spinners) : null);
   if (state.stoppers !== undefined) push('stoppers', Object.keys(state.stoppers).length ? serRowColMap(state.stoppers, 'stoppers') : null);

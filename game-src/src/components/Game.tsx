@@ -51,6 +51,7 @@ import Boulder from "./Boulder";
 import DarknessOverlay from "./DarknessOverlay";
 import SurfHandler from "./SurfHandler";
 import OnlineBattleNpc from "./OnlineBattleNpc";
+import DayCareNpc from "./DayCareNpc";
 import OnlineBattleMenu from "./OnlineBattleMenu";
 import CableClubMenu from "./CableClubMenu";
 import LinkBattleRoom from "./LinkBattleRoom";
@@ -189,6 +190,7 @@ const Game = () => {
       <PokeMart />
       <SurfHandler />
       <OnlineBattleNpc />
+      <DayCareNpc />
       <OnlineBattleMenu />
       <CableClubMenu />
       <LinkBattleRoom />

@@ -403,6 +403,13 @@ export const gameSlice = createSlice({
         state.unlockedFlyMaps.push(action.payload);
       }
     },
+    /**
+     * Marca que el jugador ya recogió el bebé de la guardería en la fecha dada
+     * (formato local "YYYY-M-D"). Hasta el día siguiente no habrá otro.
+     */
+    claimDayCareGift: (state, action: PayloadAction<string>) => {
+      state.dayCareLastGift = action.payload;
+    },
     setOnBicycle: (state, action: PayloadAction<boolean>) => {
       state.onBicycle = action.payload;
     },
@@ -498,6 +505,7 @@ export const gameSlice = createSlice({
       );
       // Destinos de Vuelo desbloqueados (default [] para saves antiguos).
       state.unlockedFlyMaps = savedGameState.unlockedFlyMaps ?? [];
+      state.dayCareLastGift = savedGameState.dayCareLastGift;
       recordVisit(state, savedGameState.map);
     },
     loadFromState: (state, action: PayloadAction<GameState>) => {
@@ -543,6 +551,7 @@ export const gameSlice = createSlice({
       );
       // Destinos de Vuelo desbloqueados (default [] para saves antiguos).
       state.unlockedFlyMaps = s.unlockedFlyMaps ?? [];
+      state.dayCareLastGift = s.dayCareLastGift;
       state.lastHealLocation = s.lastHealLocation ?? undefined;
       // Árboles de bayas (Gen II): restaurar fechas de recogida del save.
       state.berryTreesPicked = s.berryTreesPicked ?? {};
@@ -845,6 +854,7 @@ export const {
   setMapWithPos,
   flyTo,
   registerFlyUnlock,
+  claimDayCareGift,
   exitMap,
   setMoving,
   addInventory,
@@ -940,6 +950,8 @@ export const selectVisitedMaps = (state: RootState) =>
   state.game.visitedMaps ?? [];
 export const selectUnlockedFlyMaps = (state: RootState) =>
   state.game.unlockedFlyMaps ?? [];
+export const selectDayCareLastGift = (state: RootState) =>
+  state.game.dayCareLastGift;
 
 export const selectCollectedItems = (state: RootState) =>
   state.game.collectedItems;

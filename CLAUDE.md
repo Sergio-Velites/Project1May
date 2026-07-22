@@ -422,6 +422,25 @@ ss-anne-1f · ss-anne-2f · ss-anne-3f · ss-anne-bf1
   override keys `flyAlwaysAvailable`/`flyUnlockTiles` en la API route. Ver
   `docs/future-fly-map-editor.md`.
 
+### La Huerta de Goñi (guardería): regalo diario de un Pokémon bebé
+
+- **Única mecánica nueva del contenido de boda** (aprobada). Patrón NPC idéntico
+  a `onlineBattleNpc`: `MapType.dayCareNpc?: PosType` marca la casilla de Goñi;
+  `components/DayCareNpc.tsx` (montado en `Game.tsx`) detecta A de frente.
+- **Regalo diario determinista**: `app/day-care-helper.ts` elige el bebé del día
+  con `dailyBabyId(seed, fecha)` — `seed` = `wedding_user_id` de localStorage (o
+  el nombre). Mismo jugador ⇒ mismo bebé todo el día; jugadores distintos ⇒
+  bebés distintos. Solo `BABY_SPECIES` (Pichu, Cleffa, Igglybuff, Togepi,
+  Tyrogue, Smoochum, Elekid, Magby), nivel 5. Nunca evoluciones ni legendarios.
+- **Estado**: `GameState.dayCareLastGift` (fecha local "YYYY-M-D"); si == hoy, ya
+  se recogió → diálogo estático. Reducer `claimDayCareGift`, restaurado en
+  load/loadFromState. Regala vía `addPokemon` (a PC si el equipo está lleno).
+- **Editor**: modo Spots → "Guardería (Goñi)" (mismo cableado que
+  `onlineBattleNpc`: ts-codegen, setup-editor.mjs, parse-ts, OVERRIDE_KEYS).
+- **Guión de contenido de la boda** (7 zonas: Celeste/Hyrox, Ruta a Bill, Casa
+  del fotógrafo, Bodega Ancestral/Celebi, Ruta a Carmín, Huerta de Goñi, Carmín
+  creadores): `docs/contenido-narrativa-boda.md`.
+
 ### Cómo añadir un mapa nuevo
 
 1. Añadir valor al enum `MapId` en `maps/map-types.ts`

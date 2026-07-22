@@ -944,6 +944,7 @@ for (const file of MAP_FILES) {
   const storeItems = parseItemTypeArrayField(tsText, "storeItems");
   const recoverLocation = parsePos(tsText, "recoverLocation");
   const onlineBattleNpc = parsePos(tsText, "onlineBattleNpc");
+  const dayCareNpc = parsePos(tsText, "dayCareNpc");
   const spinners = parseDirectionRowColMap(tsText, "spinners");
   const stoppers = parseRowColMap(tsText, "stoppers");
   const maps = parseMapIdRowCol(tsText);
@@ -1038,6 +1039,7 @@ for (const file of MAP_FILES) {
     storeItems,
     recoverLocation,
     onlineBattleNpc,
+    dayCareNpc,
     spinners,
     stoppers,
     maps,

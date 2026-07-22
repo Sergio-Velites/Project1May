@@ -88,6 +88,7 @@ interface MapEntry {
   storeItems?: string[];
   recoverLocation?: { x: number; y: number } | null;
   onlineBattleNpc?: { x: number; y: number } | null;
+  dayCareNpc?: { x: number; y: number } | null;
   spinners?: Record<string, Record<string, DirectionName>>;
   stoppers?: Record<string, number[]>;
   // Portales entre mapas
@@ -159,7 +160,7 @@ const BERRY_ITEM_KEYS = [
   'IceBerry', 'BurntBerry', 'BitterBerry', 'MiracleBerry', 'MysteryBerry',
 ] as const;
 
-type SpotKey = 'start' | 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation' | 'onlineBattleNpc';
+type SpotKey = 'start' | 'pokemonCenter' | 'pc' | 'store' | 'recoverLocation' | 'onlineBattleNpc' | 'dayCareNpc';
 
 type MechanicTool = 'spinner-up' | 'spinner-down' | 'spinner-left' | 'spinner-right' | 'stopper';
 
@@ -1986,6 +1987,7 @@ export default function MapEditor() {
   const [storeItems, setStoreItems] = useState<string[]>([]);
   const [recoverLocation, setRecoverLocation] = useState<{ x: number; y: number } | null>(null);
   const [onlineBattleNpc, setOnlineBattleNpc] = useState<{ x: number; y: number } | null>(null);
+  const [dayCareNpc, setDayCareNpc] = useState<{ x: number; y: number } | null>(null);
   const [activeSpot, setActiveSpot] = useState<SpotKey>('start');
   const [spinners, setSpinners] = useState<Record<string, Record<string, DirectionName>>>({});
   const [stoppers, setStoppers] = useState<Record<string, number[]>>({});
@@ -2418,6 +2420,7 @@ export default function MapEditor() {
     setStoreItems(m.storeItems ?? []);
     setRecoverLocation(m.recoverLocation ?? null);
     setOnlineBattleNpc(m.onlineBattleNpc ?? null);
+    setDayCareNpc(m.dayCareNpc ?? null);
     setSpinners(m.spinners ?? {});
     setStoppers(m.stoppers ?? {});
     setCave(!!m.cave);
@@ -2496,7 +2499,7 @@ export default function MapEditor() {
       items: items.map((it) => ({ itemKey: it.itemKey, pos: it.pos, ...(it.hidden ? { hidden: true } : {}) })),
       gifts, staticPokemon, cuttableTrees, berryTrees, boulders,
       pokemonCenter, pc: pcPos, store: storePos, storeItems,
-      recoverLocation, onlineBattleNpc,
+      recoverLocation, onlineBattleNpc, dayCareNpc,
       spinners, stoppers,
       maps, teleports, exits, exitReturnMap, exitReturnPos,
       minimapPos, minimapParent,
@@ -2647,6 +2650,7 @@ export default function MapEditor() {
             storeItems,
             recoverLocation,
             onlineBattleNpc,
+            dayCareNpc,
             spinners,
             stoppers,
             // Portales (todo en uno: persistimos el shape MapType nativo)
@@ -2754,6 +2758,7 @@ export default function MapEditor() {
             storeItems,
             recoverLocation,
             onlineBattleNpc,
+            dayCareNpc,
             spinners,
             stoppers,
             maps,
@@ -2969,6 +2974,7 @@ export default function MapEditor() {
       setStoreItems(parsed.storeItems ?? []);
       setRecoverLocation(parsed.recoverLocation);
       setOnlineBattleNpc(parsed.onlineBattleNpc);
+      setDayCareNpc(parsed.dayCareNpc);
       setSpinners(parsed.spinners ?? {});
       setStoppers(parsed.stoppers ?? {});
       setCave(!!parsed.cave);
@@ -3253,7 +3259,7 @@ export default function MapEditor() {
     rc(walls); rc(fences); rc(ramps); rc(grass); rc(water); rc(stoppers);
     rcm(fenceDirections); rcm(elevations); rcm(spinners); rcm(texts); rcm(textRewards);
     arr(trainers); arr(items); arr(gifts); arr(staticPokemon); arr(cuttableTrees); arr(boulders); arr(berryTrees); arr(portals);
-    pt(startPos); pt(pokemonCenter); pt(pcPos); pt(storePos); pt(recoverLocation); pt(onlineBattleNpc); pt(flySpot);
+    pt(startPos); pt(pokemonCenter); pt(pcPos); pt(storePos); pt(recoverLocation); pt(onlineBattleNpc); pt(dayCareNpc); pt(flySpot);
     return { x: minX === Infinity ? 0 : minX, y: minY === Infinity ? 0 : minY };
   }
 
@@ -3291,6 +3297,7 @@ export default function MapEditor() {
     setStorePos((p) => shiftPoint(p, dx, dy));
     setRecoverLocation((p) => shiftPoint(p, dx, dy));
     setOnlineBattleNpc((p) => shiftPoint(p, dx, dy));
+    setDayCareNpc((p) => shiftPoint(p, dx, dy));
     setFlySpot((p) => shiftPoint(p, dx, dy));
     setDirty(true);
   }
@@ -3837,14 +3844,16 @@ export default function MapEditor() {
         activeSpot === 'pc' ? setPcPos :
         activeSpot === 'store' ? setStorePos :
         activeSpot === 'recoverLocation' ? setRecoverLocation :
-        setOnlineBattleNpc;
+        activeSpot === 'onlineBattleNpc' ? setOnlineBattleNpc :
+        setDayCareNpc;
       const current =
         activeSpot === 'start' ? startPos :
         activeSpot === 'pokemonCenter' ? pokemonCenter :
         activeSpot === 'pc' ? pcPos :
         activeSpot === 'store' ? storePos :
         activeSpot === 'recoverLocation' ? recoverLocation :
-        onlineBattleNpc;
+        activeSpot === 'onlineBattleNpc' ? onlineBattleNpc :
+        dayCareNpc;
       // start es obligatorio en MapType; el resto se puede borrar con click repetido.
       if (activeSpot !== 'start' && current && current.x === tile.x && current.y === tile.y) {
         setter(null);
@@ -5758,6 +5767,7 @@ export default function MapEditor() {
                 { key: 'store' as SpotKey, pos: storePos, emoji: '🛒', color: '#ffcc66' },
                 { key: 'recoverLocation' as SpotKey, pos: recoverLocation, emoji: '✨', color: '#ccff88' },
                 { key: 'onlineBattleNpc' as SpotKey, pos: onlineBattleNpc, emoji: '🌐', color: '#88aaff' },
+                { key: 'dayCareNpc' as SpotKey, pos: dayCareNpc, emoji: '🌱', color: '#88dd66' },
               ]).map((sp) => sp.pos ? (
                 <div
                   key={`sp-${sp.key}`}
@@ -6341,13 +6351,15 @@ export default function MapEditor() {
                 itemTypeKeys={itemTypeKeys}
                 recoverLocation={recoverLocation}
                 onlineBattleNpc={onlineBattleNpc}
+                dayCareNpc={dayCareNpc}
                 onClear={(k) => {
                   if (k === 'start') return;
                   if (k === 'pokemonCenter') setPokemonCenter(null);
                   else if (k === 'pc') setPcPos(null);
                   else if (k === 'store') setStorePos(null);
                   else if (k === 'recoverLocation') setRecoverLocation(null);
-                  else setOnlineBattleNpc(null);
+                  else if (k === 'onlineBattleNpc') setOnlineBattleNpc(null);
+                  else setDayCareNpc(null);
                   setDirty(true);
                 }}
                 onStoreItemsChange={(next) => {
@@ -7336,7 +7348,7 @@ function ModeHelpBlock({
 
 function SpotsInspector({
   activeSpot, setActiveSpot,
-  startPos, pokemonCenter, pcPos, storePos, storeItems, itemTypeKeys, recoverLocation, onlineBattleNpc,
+  startPos, pokemonCenter, pcPos, storePos, storeItems, itemTypeKeys, recoverLocation, onlineBattleNpc, dayCareNpc,
   onClear, onStoreItemsChange, openPicker, sourceFile,
 }: {
   activeSpot: SpotKey;
@@ -7349,6 +7361,7 @@ function SpotsInspector({
   itemTypeKeys: string[];
   recoverLocation: { x: number; y: number } | null;
   onlineBattleNpc: { x: number; y: number } | null;
+  dayCareNpc: { x: number; y: number } | null;
   onClear: (k: SpotKey) => void;
   onStoreItemsChange: (next: string[]) => void;
   openPicker: (s: PickerState) => void;
@@ -7361,6 +7374,7 @@ function SpotsInspector({
     { key: 'store', label: 'Store', emoji: '🛒', color: '#ffcc66', pos: storePos },
     { key: 'recoverLocation', label: 'Recover Location', emoji: '✨', color: '#ccff88', pos: recoverLocation },
     { key: 'onlineBattleNpc', label: 'Online Battle NPC', emoji: '🌐', color: '#88aaff', pos: onlineBattleNpc },
+    { key: 'dayCareNpc', label: 'Guardería (Goñi)', emoji: '🌱', color: '#88dd66', pos: dayCareNpc },
   ];
   return (
     <div style={{ color: '#ccc', fontSize: 13, lineHeight: 1.6 }}>

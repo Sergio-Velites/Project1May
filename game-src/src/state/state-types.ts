@@ -136,6 +136,9 @@ export interface GameState {
    *  sus `flyUnlockTiles`. Persistido en el save. Un mapa con
    *  `flyAlwaysAvailable` está disponible aunque no aparezca aquí. */
   unlockedFlyMaps?: MapId[];
+  /** Fecha local ("YYYY-M-D") del último Pokémon bebé recogido en la guardería
+   *  de Goñi. Si coincide con hoy, ya no hay regalo hasta mañana. Persistido. */
+  dayCareLastGift?: string;
   /** Datos de confirmación de asistencia a la boda */
   rsvp?: RSVPData;
   /** Contador de pasos para la ganancia de amistad al caminar (Gen II). Cada

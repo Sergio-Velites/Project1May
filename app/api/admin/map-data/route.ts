@@ -56,6 +56,7 @@ type OverrideKey =
   | 'storeItems'
   | 'recoverLocation'
   | 'onlineBattleNpc'
+  | 'dayCareNpc'
   | 'spinners'
   | 'stoppers'
   | 'maps'
@@ -99,6 +100,7 @@ const OVERRIDE_KEYS: OverrideKey[] = [
   'storeItems',
   'recoverLocation',
   'onlineBattleNpc',
+  'dayCareNpc',
   'spinners',
   'stoppers',
   'maps',
