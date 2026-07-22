@@ -1,6 +1,6 @@
 import image from "../assets/map/cerulean-city.png";
 import { MapId, MapType } from "./map-types";
-import { scientist, tamer, teamRocketGrunt, youngster, beauty, blackBelt, jrTrainerFemale, lass, gentleman } from "../app/npcs";
+import { beauty, blackBelt, gentleman, jrTrainerFemale, lass, teamRocketGrunt, youngster } from "../app/npcs";
 import { Direction } from "../state/state-types";
 
 const ceruleanCity: MapType = {
@@ -132,41 +132,14 @@ const ceruleanCity: MapType = {
     persistent: true,
   },
   {
-    npc: tamer,
-    pokemon: [{ id: 19, level: 2 }],
-    facing: Direction.Down,
-    pos: { x: 30, y: 20 },
-    intro: [],
-    outtro: [
-      "Todavía no es tu hora....",
-      "Estás seguro de que puedes mejorar el tiempo de Marta y Sergio?",
-      "Menudas patas de gallina me llevas."
-    ],
-    money: 0,
-    persistent: true,
-  },
-  {
-    npc: scientist,
-    pokemon: [{ id: 19, level: 2 }],
-    facing: Direction.Down,
-    pos: { x: 19, y: 29 },
-    intro: [],
-    outtro: [
-      "1+1 son 7... quien me lo iba a decir....",
-      "Si...",
-      "En efecto...",
-      "Solo estoy aquí para molestar"
-    ],
-    money: 0,
-    persistent: true,
-  },
-  {
     npc: youngster,
     pokemon: [{ id: 19, level: 1 }],
     facing: Direction.Down,
-    pos: { x: 10, y: 18 },
+    pos: { x: 12, y: 16 },
     intro: [],
-    outtro: ["¿Dorsal? ¿No? Entonces… ¿qué haces con energía?"],
+    outtro: [
+      "¿Dorsal? ¿No? Entonces… ¿qué haces con energía?"
+    ],
     money: 0,
     persistent: true,
   },
@@ -174,9 +147,11 @@ const ceruleanCity: MapType = {
     npc: beauty,
     pokemon: [{ id: 19, level: 1 }],
     facing: Direction.Down,
-    pos: { x: 14, y: 18 },
+    pos: { x: 21, y: 18 },
     intro: [],
-    outtro: ["Si todavía puedes hablar, es que no has calentado."],
+    outtro: [
+      "Si todavía puedes hablar, es que no has calentado."
+    ],
     money: 0,
     persistent: true,
   },
@@ -184,9 +159,11 @@ const ceruleanCity: MapType = {
     npc: lass,
     pokemon: [{ id: 19, level: 1 }],
     facing: Direction.Down,
-    pos: { x: 10, y: 26 },
+    pos: { x: 14, y: 26 },
     intro: [],
-    outtro: ["Llevo cuatro estaciones y sigo sin encontrar la meta."],
+    outtro: [
+      "Llevo cuatro estaciones y sigo sin encontrar la meta."
+    ],
     money: 0,
     persistent: true,
   },
@@ -194,12 +171,14 @@ const ceruleanCity: MapType = {
     npc: blackBelt,
     pokemon: [{ id: 66, level: 18 }, { id: 56, level: 18 }],
     facing: Direction.Left,
-    pos: { x: 28, y: 20 },
+    pos: { x: 31, y: 20 },
     intro: [
       "¿Tú corres maratones? Qué monada.",
       "Yo arrastro trineos. Tipo HYROX, chaval."
     ],
-    outtro: ["Ganas… pero seguro que no sabes hacer un wall ball."],
+    outtro: [
+      "Ganas… pero seguro que no sabes hacer un wall ball."
+    ],
     money: 360,
   },
   {
@@ -211,19 +190,23 @@ const ceruleanCity: MapType = {
       "Un runner me dijo 'esto es fácil'.",
       "Ya no está entre nosotros."
     ],
-    outtro: ["Vale, vale… pero eso NO es funcional."],
+    outtro: [
+      "Vale, vale… pero eso NO es funcional."
+    ],
     money: 400,
   },
   {
     npc: gentleman,
     pokemon: [{ id: 107, level: 20 }, { id: 106, level: 20 }],
     facing: Direction.Up,
-    pos: { x: 20, y: 30 },
+    pos: { x: 23, y: 22 },
     intro: [
       "Rango de movimiento incompleto.",
       "Repetición no contada. Empezamos de cero."
     ],
-    outtro: ["Repetición… válida. Enhorabuena, supongo."],
+    outtro: [
+      "Repetición… válida. Enhorabuena, supongo."
+    ],
     money: 400,
   }
   ],
