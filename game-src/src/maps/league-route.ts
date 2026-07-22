@@ -1,4 +1,4 @@
-import { pokeManiac } from "../app/npcs";
+import { pokeManiac, rival } from "../app/npcs";
 import image from "../assets/map/league-route.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
@@ -366,6 +366,26 @@ const leagueRoute: MapType = {
       "viajaré a cualquier rincón 🎵..."
     ],
     money: 0,
+    persistent: true,
+  },
+  {
+    npc: rival,
+    pokemon: [{ id: 149, level: 100 }, { id: 6, level: 100 }, { id: 248, level: 100 }, { id: 227, level: 100 }, { id: 242, level: 100 }, { id: 251, level: 150 }],
+    facing: Direction.Down,
+    pos: { x: 11, y: 20 },
+    intro: [
+      "Es frustrante llegar hasta aquí para que te digan",
+      "que todo el mundo a abandonado la liga para ",
+      "emborracharse en monjardín.",
+      "Esto no es serio!",
+      "Me voy a hacer entrenador digimon!",
+      "a chuparla!"
+    ],
+    outtro: [
+      "Malditos Marta y Sergio.",
+      "Puede que en Johto tenga más suerte... "
+    ],
+    money: 1000,
     persistent: true,
   }
   ],

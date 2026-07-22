@@ -898,6 +898,10 @@ for (const file of MAP_FILES) {
   // borraría del map-data.json y al guardar el editor enviaría vacío.
   const flyable = parseBooleanField(tsText, "flyable");
   const flySpot = parsePos(tsText, "flySpot");
+  // Disponibilidad del destino de Vuelo: siempre disponible, o casillas de
+  // desbloqueo ({fila:[cols]}, formato walls). CRÍTICO parsearlos (mismo motivo).
+  const flyAlwaysAvailable = parseBooleanField(tsText, "flyAlwaysAvailable");
+  const flyUnlockTiles = parseRowColMap(tsText, "flyUnlockTiles");
   const minimapPos = parsePos(tsText, "minimapPos");
   const minimapParent = parseQuotedStringField(tsText, "minimapParent");
   const music = parseMusicField(tsText);
@@ -1006,6 +1010,8 @@ for (const file of MAP_FILES) {
     allowBicycle,
     flyable,
     flySpot,
+    flyAlwaysAvailable,
+    flyUnlockTiles,
     minimapPos,
     minimapParent,
     music,

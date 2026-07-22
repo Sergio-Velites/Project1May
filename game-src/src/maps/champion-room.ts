@@ -24,9 +24,9 @@ const championRoom: MapType = {
   grass: {},
   fences: {},
   teleports: {
-    7: {
-      3: { map: MapId.EliteFour4, pos: { x: 5, y: 1 } },
-      4: { map: MapId.EliteFour4, pos: { x: 6, y: 1 } },
+    8: {
+      3: { map: MapId.EliteFour4, pos: { x: 5, y: 0 } },
+      4: { map: MapId.EliteFour4, pos: { x: 6, y: 0 } },
     },
   },
   trainers: [],
