@@ -370,7 +370,7 @@ const leagueRoute: MapType = {
   },
   {
     npc: rival,
-    pokemon: [{ id: 149, level: 99 }, { id: 6, level: 99 }, { id: 144, level: 99 }, { id: 150, level: 99 }, { id: 251, level: 150 }, { id: 145, level: 200 }],
+    pokemon: [{ id: 149, level: 100 }, { id: 6, level: 100 }, { id: 248, level: 100 }, { id: 227, level: 100 }, { id: 242, level: 100 }, { id: 251, level: 150 }],
     facing: Direction.Down,
     pos: { x: 11, y: 20 },
     intro: [
@@ -385,7 +385,7 @@ const leagueRoute: MapType = {
       "Malditos Marta y Sergio.",
       "Puede que en Johto tenga más suerte... "
     ],
-    money: 0,
+    money: 1000,
     persistent: true,
   }
   ],
