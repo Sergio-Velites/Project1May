@@ -18,16 +18,20 @@ const ceruleanCityBikeShop: MapType = {
     7: [7],
   },
   text: {},
-  maps: {
-
-  },
-  exits: {
-    7: [2, 3],
-  },
+  maps: {},
+  exits: {},
   exitReturnMap: MapId.CeruleanCity,
   exitReturnPos: { x: 13, y: 26 },
   music: "/game/music/maps-original/cerulean-city.mp3",
   grass: {},
+  fences: {},
+  teleports: {
+    8: {
+      2: { map: MapId.CeruleanCity, pos: { x: 13, y: 26 } },
+      3: { map: MapId.CeruleanCity, pos: { x: 13, y: 26 } },
+    },
+  },
+  trainers: [],
 };
 
 export default ceruleanCityBikeShop;
