@@ -226,6 +226,10 @@ encounters: {
       7: { map: MapId.Route21, pos: { x: 7, y: 0 } },
     },
   },
+  flyable: true,
+  flySpot: { x: 5, y: 6 },
+  flyAlwaysAvailable: true,
+  minimapPos: { x: 54, y: 139 },
 };
 
 export default palletTown;
