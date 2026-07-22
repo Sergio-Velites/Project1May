@@ -1,4 +1,4 @@
-import { pokeManiac } from "../app/npcs";
+import { pokeManiac, rival } from "../app/npcs";
 import image from "../assets/map/league-route.png";
 import { Direction } from "../state/state-types";
 import { MapId, MapType } from "./map-types";
@@ -367,9 +367,29 @@ const leagueRoute: MapType = {
     ],
     money: 0,
     persistent: true,
+  },
+  {
+    npc: rival,
+    pokemon: [{ id: 119, level: 15 }],
+    facing: Direction.Down,
+    pos: { x: 10, y: 7 },
+    intro: [
+      "Es frustrante llegar hasta aquí para que te digan",
+      "que todo el mundo a abandonado la liga para ",
+      "emborracharse en monjardín.",
+      "Esto no es serio!",
+      "Me voy a hacer entrenador digimon!",
+      "a chuparla!"
+    ],
+    outtro: [
+      "..."
+    ],
+    money: 0,
+    persistent: true,
   }
   ],
   minimapPos: { x: 29, y: 78 },
+  flySpot: { x: 11, y: 6 },
 }
 
 export default leagueRoute;
