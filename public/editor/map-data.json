@@ -4792,11 +4792,21 @@
     },
     "cave": false,
     "allowBicycle": true,
-    "flyable": false,
-    "flySpot": null,
+    "flyable": true,
+    "flySpot": {
+      "x": 19,
+      "y": 18
+    },
     "flyAlwaysAvailable": false,
-    "flyUnlockTiles": {},
-    "minimapPos": null,
+    "flyUnlockTiles": {
+      "18": [
+        19
+      ]
+    },
+    "minimapPos": {
+      "x": 147,
+      "y": 40
+    },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/cerulean-city.mp3\"",
     "trainers": [
@@ -5576,161 +5586,713 @@
     "dayCareNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
+    "maps": {},
+    "teleports": {
       "0": {
-        "20": "route-24",
-        "21": "route-24",
-        "23": "route-24",
-        "24": "route-24",
-        "25": "route-24"
+        "20": {
+          "map": "route-24",
+          "pos": {
+            "x": 10,
+            "y": 25
+          }
+        },
+        "21": {
+          "map": "route-24",
+          "pos": {
+            "x": 10,
+            "y": 25
+          }
+        },
+        "23": {
+          "map": "route-24",
+          "pos": {
+            "x": 10,
+            "y": 25
+          }
+        },
+        "24": {
+          "map": "route-24",
+          "pos": {
+            "x": 10,
+            "y": 25
+          }
+        },
+        "25": {
+          "map": "route-24",
+          "pos": {
+            "x": 10,
+            "y": 25
+          }
+        }
       },
       "6": {
-        "39": "route-9"
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "7": {
-        "39": "route-9"
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "8": {
-        "39": "route-9"
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "9": {
-        "27": "cerulean-city-house-b",
-        "39": "route-9"
+        "27": {
+          "map": "cerulean-city-house-b",
+          "pos": {
+            "x": 4,
+            "y": 6
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "11": {
-        "4": "cerulean-cave-1f",
-        "27": "cerulean-city-house-b"
+        "4": {
+          "map": "cerulean-cave-1f",
+          "pos": {
+            "x": 17,
+            "y": 16
+          }
+        },
+        "27": {
+          "map": "cerulean-city-house-b",
+          "pos": {
+            "x": 4,
+            "y": 6
+          }
+        }
       },
       "12": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "13": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "14": {
-        "39": "route-9"
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "15": {
-        "13": "cerulean-city-house-a"
+        "13": {
+          "map": "cerulean-city-house-a",
+          "pos": {
+            "x": 4,
+            "y": 6
+          }
+        }
       },
       "16": {
-        "39": "route-9"
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "17": {
-        "19": "cerulean-city-pokemon-center",
-        "39": "route-9"
+        "19": {
+          "map": "cerulean-city-pokemon-center",
+          "pos": {
+            "x": 7,
+            "y": 5
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "18": {
-        "0": "route-4"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        }
       },
       "19": {
-        "0": "route-4",
-        "30": "cerulean-city-gym",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "30": {
+          "map": "cerulean-city-gym",
+          "pos": {
+            "x": 9,
+            "y": 13
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "20": {
-        "39": "route-9"
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "21": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "22": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "23": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "24": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "25": {
-        "0": "route-4",
-        "13": "cerulean-city-bike-shop",
-        "25": "cerulean-city-poke-mart",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "13": {
+          "map": "cerulean-city-bike-shop",
+          "pos": {
+            "x": 4,
+            "y": 6
+          }
+        },
+        "25": {
+          "map": "cerulean-city-poke-mart",
+          "pos": {
+            "x": 4,
+            "y": 6
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "26": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "27": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "28": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "29": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "30": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "31": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "32": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "33": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "34": {
-        "0": "route-4",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       },
       "35": {
-        "0": "route-4",
-        "1": "route-5",
-        "2": "route-5",
-        "3": "route-5",
-        "4": "route-5",
-        "5": "route-5",
-        "6": "route-5",
-        "7": "route-5",
-        "8": "route-5",
-        "9": "route-5",
-        "11": "route-5",
-        "12": "route-5",
-        "13": "route-5",
-        "14": "route-5",
-        "16": "route-5",
-        "17": "route-5",
-        "18": "route-5",
-        "19": "route-5",
-        "20": "route-5",
-        "21": "route-5",
-        "22": "route-5",
-        "23": "route-5",
-        "25": "route-5",
-        "26": "route-5",
-        "27": "route-5",
-        "28": "route-5",
-        "30": "route-5",
-        "31": "route-5",
-        "32": "route-5",
-        "33": "route-5",
-        "34": "route-5",
-        "35": "route-5",
-        "36": "route-5",
-        "37": "route-5",
-        "38": "route-5",
-        "39": "route-9"
+        "0": {
+          "map": "route-4",
+          "pos": {
+            "x": 64,
+            "y": 23
+          }
+        },
+        "1": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "2": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "3": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "4": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "5": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "6": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "7": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "8": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "9": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "11": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "12": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "13": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "14": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "16": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "17": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "18": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "19": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "20": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "21": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "22": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "23": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "25": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "26": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "27": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "28": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "30": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "31": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "32": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "33": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "34": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "35": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "36": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "37": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "38": {
+          "map": "route-5",
+          "pos": {
+            "x": 14,
+            "y": 32
+          }
+        },
+        "39": {
+          "map": "route-9",
+          "pos": {
+            "x": 24,
+            "y": 15
+          }
+        }
       }
     },
-    "teleports": {},
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -11268,11 +11830,22 @@
     },
     "cave": false,
     "allowBicycle": true,
-    "flyable": false,
-    "flySpot": null,
+    "flyable": true,
+    "flySpot": {
+      "x": 11,
+      "y": 6
+    },
     "flyAlwaysAvailable": false,
-    "flyUnlockTiles": {},
-    "minimapPos": null,
+    "flyUnlockTiles": {
+      "6": [
+        10,
+        11
+      ]
+    },
+    "minimapPos": {
+      "x": 29,
+      "y": 40
+    },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/indigo-plateau.mp3\"",
     "trainers": [
@@ -16882,11 +17455,17 @@
     },
     "cave": false,
     "allowBicycle": true,
-    "flyable": false,
-    "flySpot": null,
-    "flyAlwaysAvailable": false,
+    "flyable": true,
+    "flySpot": {
+      "x": 5,
+      "y": 6
+    },
+    "flyAlwaysAvailable": true,
     "flyUnlockTiles": {},
-    "minimapPos": null,
+    "minimapPos": {
+      "x": 54,
+      "y": 139
+    },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/pallet-town.mp3\"",
     "trainers": [
@@ -17282,22 +17861,6 @@
     "stoppers": {},
     "maps": {},
     "teleports": {
-      "0": {
-        "10": {
-          "map": "route-1",
-          "pos": {
-            "x": 10,
-            "y": 35
-          }
-        },
-        "11": {
-          "map": "route-1",
-          "pos": {
-            "x": 11,
-            "y": 35
-          }
-        }
-      },
       "5": {
         "5": {
           "map": "pallet-town-house-a-1f",
@@ -18910,11 +19473,17 @@
     },
     "cave": false,
     "allowBicycle": true,
-    "flyable": false,
-    "flySpot": null,
-    "flyAlwaysAvailable": false,
+    "flyable": true,
+    "flySpot": {
+      "x": 13,
+      "y": 26
+    },
+    "flyAlwaysAvailable": true,
     "flyUnlockTiles": {},
-    "minimapPos": null,
+    "minimapPos": {
+      "x": 53,
+      "y": 50
+    },
     "minimapParent": null,
     "music": "music",
     "trainers": [
@@ -37790,7 +38359,10 @@
     "flySpot": null,
     "flyAlwaysAvailable": false,
     "flyUnlockTiles": {},
-    "minimapPos": null,
+    "minimapPos": {
+      "x": 51,
+      "y": 78
+    },
     "minimapParent": null,
     "music": "music",
     "trainers": [
@@ -47622,7 +48194,10 @@
     "flySpot": null,
     "flyAlwaysAvailable": false,
     "flyUnlockTiles": {},
-    "minimapPos": null,
+    "minimapPos": {
+      "x": 69,
+      "y": 50
+    },
     "minimapParent": null,
     "music": "music",
     "trainers": [
@@ -48551,11 +49126,21 @@
     },
     "cave": false,
     "allowBicycle": true,
-    "flyable": false,
-    "flySpot": null,
+    "flyable": true,
+    "flySpot": {
+      "x": 11,
+      "y": 6
+    },
     "flyAlwaysAvailable": false,
-    "flyUnlockTiles": {},
-    "minimapPos": null,
+    "flyUnlockTiles": {
+      "6": [
+        11
+      ]
+    },
+    "minimapPos": {
+      "x": 88,
+      "y": 39
+    },
     "minimapParent": null,
     "music": "\"/game/music/maps-original/route-3.mp3\"",
     "trainers": [
@@ -67425,11 +68010,17 @@
     },
     "cave": false,
     "allowBicycle": true,
-    "flyable": false,
-    "flySpot": null,
-    "flyAlwaysAvailable": false,
+    "flyable": true,
+    "flySpot": {
+      "x": 23,
+      "y": 26
+    },
+    "flyAlwaysAvailable": true,
     "flyUnlockTiles": {},
-    "minimapPos": null,
+    "minimapPos": {
+      "x": 53,
+      "y": 106
+    },
     "minimapParent": null,
     "music": "music",
     "trainers": [
@@ -68299,7 +68890,10 @@
     "flySpot": null,
     "flyAlwaysAvailable": false,
     "flyUnlockTiles": {},
-    "minimapPos": null,
+    "minimapPos": {
+      "x": 55,
+      "y": 79
+    },
     "minimapParent": null,
     "music": null,
     "trainers": [

@@ -303,6 +303,7 @@ trainers: [
       pos: { x: 12, y: 29 },
     },
   ],
+  minimapPos: { x: 55, y: 79 },
 };
 
 export default viridianForrest;

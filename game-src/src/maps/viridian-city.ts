@@ -362,6 +362,10 @@ const viridianCity: MapType = {
       21: { map: MapId.Route1, pos: { x: 11, y: 0 } },
     },
   },
+  flyable: true,
+  flySpot: { x: 23, y: 26 },
+  flyAlwaysAvailable: true,
+  minimapPos: { x: 53, y: 106 },
 }
 
 export default viridianCity;
