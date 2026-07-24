@@ -22,6 +22,13 @@ const ssAnneBf1: MapType = {
 
   },
   teleports: {
+    3: {
+      7: { map: MapId.SsAnneCabinB1fA, pos: { x: 1, y: 4 } },
+      11: { map: MapId.SsAnneCabinB1fB, pos: { x: 1, y: 4 } },
+      15: { map: MapId.SsAnneCabinB1fC, pos: { x: 1, y: 4 } },
+      19: { map: MapId.SsAnneCabinB1fD, pos: { x: 1, y: 4 } },
+      23: { map: MapId.SsAnneCabinB1fE, pos: { x: 1, y: 4 } },
+    },
     5: { 27: { map: MapId.SsAnne1f, pos: { x: 37, y: 15 } } },
   },
   exits: {

@@ -19,6 +19,9 @@ const ssAnne3f: MapType = {
 
   },
   teleports: {
+    2: {
+      0: { map: MapId.SsAnneCaptain, pos: { x: 1, y: 6 } },
+    },
     3: { 19: { map: MapId.SsAnne2f, pos: { x: 2, y: 12 } } },
   },
   exits: {

@@ -32,6 +32,14 @@ const ssAnne1f: MapType = {
 
   },
   teleports: {
+    8: {
+      7: { map: MapId.SsAnneCabin1fA, pos: { x: 1, y: 4 } },
+      11: { map: MapId.SsAnneCabin1fB, pos: { x: 1, y: 4 } },
+      15: { map: MapId.SsAnneCabin1fC, pos: { x: 1, y: 4 } },
+      19: { map: MapId.SsAnneCabin1fD, pos: { x: 1, y: 4 } },
+      23: { map: MapId.SsAnneCabin1fE, pos: { x: 1, y: 4 } },
+      31: { map: MapId.SsAnneKitchen, pos: { x: 6, y: 1 } },
+    },
     0: { 26: { map: MapId.VermilionCity, pos: { x: 18, y: 30 } }, 27: { map: MapId.VermilionCity, pos: { x: 19, y: 30 } } },
     6: { 2: { map: MapId.SsAnne2f, pos: { x: 2, y: 4 } } },
     15: { 37: { map: MapId.SsAnneBf1, pos: { x: 27, y: 5 } } },

@@ -5550,7 +5550,6 @@
         0,
         1,
         2,
-        3,
         4,
         5,
         6,
@@ -5558,8 +5557,7 @@
       ],
       "1": [
         0,
-        1,
-        7
+        1
       ],
       "3": [
         3,
@@ -5570,11 +5568,11 @@
         4
       ],
       "6": [
-        0,
-        7
+        0
       ],
       "7": [
         0,
+        6,
         7
       ]
     },
@@ -5604,6 +5602,15 @@
     "stoppers": {},
     "maps": {},
     "teleports": {
+      "0": {
+        "3": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 9,
+            "y": 9
+          }
+        }
+      },
       "8": {
         "2": {
           "map": "cerulean-city",
@@ -6269,7 +6276,6 @@
         5,
         7,
         8,
-        9,
         10,
         11,
         12,
@@ -6910,6 +6916,13 @@
         }
       },
       "10": {
+        "9": {
+          "map": "cerulean-city-house-c",
+          "pos": {
+            "x": 3,
+            "y": 1
+          }
+        },
         "27": {
           "map": "cerulean-city-house-b",
           "pos": {
@@ -8831,19 +8844,28 @@
     "stoppers": {},
     "maps": {},
     "teleports": {
+      "2": {
+        "5": {
+          "map": "route-11",
+          "pos": {
+            "x": 4,
+            "y": 6
+          }
+        }
+      },
       "8": {
-        "3": {
+        "2": {
           "map": "route-2",
           "pos": {
             "x": 12,
             "y": 10
           }
         },
-        "5": {
-          "map": "route-11",
+        "3": {
+          "map": "route-2",
           "pos": {
-            "x": 4,
-            "y": 6
+            "x": 12,
+            "y": 10
           }
         }
       }
@@ -66875,6 +66897,50 @@
           }
         }
       },
+      "8": {
+        "7": {
+          "map": "ss-anne-cabin-1f-a",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "11": {
+          "map": "ss-anne-cabin-1f-b",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "15": {
+          "map": "ss-anne-cabin-1f-c",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "19": {
+          "map": "ss-anne-cabin-1f-d",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "23": {
+          "map": "ss-anne-cabin-1f-e",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "31": {
+          "map": "ss-anne-kitchen",
+          "pos": {
+            "x": 6,
+            "y": 1
+          }
+        }
+      },
       "15": {
         "37": {
           "map": "ss-anne-bf1",
@@ -67587,6 +67653,57 @@
             "x": 2,
             "y": 6
           }
+        },
+        "36": {
+          "map": "ss-anne-deck",
+          "pos": {
+            "x": 15,
+            "y": 8
+          }
+        }
+      },
+      "11": {
+        "9": {
+          "map": "ss-anne-cabin-2f-a",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "13": {
+          "map": "ss-anne-cabin-2f-b",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "17": {
+          "map": "ss-anne-cabin-2f-c",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "21": {
+          "map": "ss-anne-cabin-2f-d",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "25": {
+          "map": "ss-anne-cabin-2f-e",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "29": {
+          "map": "ss-anne-cabin-2f-f",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
         }
       },
       "12": {
@@ -67746,6 +67863,15 @@
     "stoppers": {},
     "maps": {},
     "teleports": {
+      "2": {
+        "0": {
+          "map": "ss-anne-captain",
+          "pos": {
+            "x": 1,
+            "y": 6
+          }
+        }
+      },
       "3": {
         "19": {
           "map": "ss-anne-2f",
@@ -68008,6 +68134,43 @@
     "stoppers": {},
     "maps": {},
     "teleports": {
+      "3": {
+        "7": {
+          "map": "ss-anne-cabin-b1f-a",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "11": {
+          "map": "ss-anne-cabin-b1f-b",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "15": {
+          "map": "ss-anne-cabin-b1f-c",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "19": {
+          "map": "ss-anne-cabin-b1f-d",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        },
+        "23": {
+          "map": "ss-anne-cabin-b1f-e",
+          "pos": {
+            "x": 1,
+            "y": 4
+          }
+        }
+      },
       "5": {
         "27": {
           "map": "ss-anne-1f",
@@ -68022,6 +68185,2040 @@
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "ss-anne-bf1.ts"
+  },
+  "ss-anne-cabin-1f-a": {
+    "id": "ss-anne-cabin-1f-a",
+    "name": "Camarote A (1F)",
+    "imageFile": "ss-anne-cabin-1f-a.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 7,
+            "y": 7
+          }
+        },
+        "2": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 7,
+            "y": 7
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-1f",
+    "exitReturnPos": {
+      "x": 7,
+      "y": 7
+    },
+    "sourceFile": "ss-anne-cabin-1f-a.ts"
+  },
+  "ss-anne-cabin-1f-b": {
+    "id": "ss-anne-cabin-1f-b",
+    "name": "Camarote B (1F)",
+    "imageFile": "ss-anne-cabin-1f-b.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 11,
+            "y": 7
+          }
+        },
+        "2": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 11,
+            "y": 7
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-1f",
+    "exitReturnPos": {
+      "x": 11,
+      "y": 7
+    },
+    "sourceFile": "ss-anne-cabin-1f-b.ts"
+  },
+  "ss-anne-cabin-1f-c": {
+    "id": "ss-anne-cabin-1f-c",
+    "name": "Camarote C (1F)",
+    "imageFile": "ss-anne-cabin-1f-c.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 15,
+            "y": 7
+          }
+        },
+        "2": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 15,
+            "y": 7
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-1f",
+    "exitReturnPos": {
+      "x": 15,
+      "y": 7
+    },
+    "sourceFile": "ss-anne-cabin-1f-c.ts"
+  },
+  "ss-anne-cabin-1f-d": {
+    "id": "ss-anne-cabin-1f-d",
+    "name": "Camarote D (1F)",
+    "imageFile": "ss-anne-cabin-1f-d.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 19,
+            "y": 7
+          }
+        },
+        "2": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 19,
+            "y": 7
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-1f",
+    "exitReturnPos": {
+      "x": 19,
+      "y": 7
+    },
+    "sourceFile": "ss-anne-cabin-1f-d.ts"
+  },
+  "ss-anne-cabin-1f-e": {
+    "id": "ss-anne-cabin-1f-e",
+    "name": "Camarote E (1F)",
+    "imageFile": "ss-anne-cabin-1f-e.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 23,
+            "y": 7
+          }
+        },
+        "2": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 23,
+            "y": 7
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-1f",
+    "exitReturnPos": {
+      "x": 23,
+      "y": 7
+    },
+    "sourceFile": "ss-anne-cabin-1f-e.ts"
+  },
+  "ss-anne-cabin-2f-a": {
+    "id": "ss-anne-cabin-2f-a",
+    "name": "Camarote A (2F)",
+    "imageFile": "ss-anne-cabin-2f-a.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 9,
+            "y": 12
+          }
+        },
+        "2": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 9,
+            "y": 12
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-2f",
+    "exitReturnPos": {
+      "x": 9,
+      "y": 12
+    },
+    "sourceFile": "ss-anne-cabin-2f-a.ts"
+  },
+  "ss-anne-cabin-2f-b": {
+    "id": "ss-anne-cabin-2f-b",
+    "name": "Camarote B (2F)",
+    "imageFile": "ss-anne-cabin-2f-b.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 13,
+            "y": 12
+          }
+        },
+        "2": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 13,
+            "y": 12
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-2f",
+    "exitReturnPos": {
+      "x": 13,
+      "y": 12
+    },
+    "sourceFile": "ss-anne-cabin-2f-b.ts"
+  },
+  "ss-anne-cabin-2f-c": {
+    "id": "ss-anne-cabin-2f-c",
+    "name": "Camarote C (2F)",
+    "imageFile": "ss-anne-cabin-2f-c.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 17,
+            "y": 12
+          }
+        },
+        "2": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 17,
+            "y": 12
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-2f",
+    "exitReturnPos": {
+      "x": 17,
+      "y": 12
+    },
+    "sourceFile": "ss-anne-cabin-2f-c.ts"
+  },
+  "ss-anne-cabin-2f-d": {
+    "id": "ss-anne-cabin-2f-d",
+    "name": "Camarote D (2F)",
+    "imageFile": "ss-anne-cabin-2f-d.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 21,
+            "y": 12
+          }
+        },
+        "2": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 21,
+            "y": 12
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-2f",
+    "exitReturnPos": {
+      "x": 21,
+      "y": 12
+    },
+    "sourceFile": "ss-anne-cabin-2f-d.ts"
+  },
+  "ss-anne-cabin-2f-e": {
+    "id": "ss-anne-cabin-2f-e",
+    "name": "Camarote E (2F)",
+    "imageFile": "ss-anne-cabin-2f-e.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 25,
+            "y": 12
+          }
+        },
+        "2": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 25,
+            "y": 12
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-2f",
+    "exitReturnPos": {
+      "x": 25,
+      "y": 12
+    },
+    "sourceFile": "ss-anne-cabin-2f-e.ts"
+  },
+  "ss-anne-cabin-2f-f": {
+    "id": "ss-anne-cabin-2f-f",
+    "name": "Camarote F (2F)",
+    "imageFile": "ss-anne-cabin-2f-f.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 29,
+            "y": 12
+          }
+        },
+        "2": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 29,
+            "y": 12
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-2f",
+    "exitReturnPos": {
+      "x": 29,
+      "y": 12
+    },
+    "sourceFile": "ss-anne-cabin-2f-f.ts"
+  },
+  "ss-anne-cabin-b1f-a": {
+    "id": "ss-anne-cabin-b1f-a",
+    "name": "Camarote A (Bodega)",
+    "imageFile": "ss-anne-cabin-b1f-a.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 7,
+            "y": 4
+          }
+        },
+        "2": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 7,
+            "y": 4
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-bf1",
+    "exitReturnPos": {
+      "x": 7,
+      "y": 4
+    },
+    "sourceFile": "ss-anne-cabin-b1f-a.ts"
+  },
+  "ss-anne-cabin-b1f-b": {
+    "id": "ss-anne-cabin-b1f-b",
+    "name": "Camarote B (Bodega)",
+    "imageFile": "ss-anne-cabin-b1f-b.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 11,
+            "y": 4
+          }
+        },
+        "2": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 11,
+            "y": 4
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-bf1",
+    "exitReturnPos": {
+      "x": 11,
+      "y": 4
+    },
+    "sourceFile": "ss-anne-cabin-b1f-b.ts"
+  },
+  "ss-anne-cabin-b1f-c": {
+    "id": "ss-anne-cabin-b1f-c",
+    "name": "Camarote C (Bodega)",
+    "imageFile": "ss-anne-cabin-b1f-c.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 15,
+            "y": 4
+          }
+        },
+        "2": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 15,
+            "y": 4
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-bf1",
+    "exitReturnPos": {
+      "x": 15,
+      "y": 4
+    },
+    "sourceFile": "ss-anne-cabin-b1f-c.ts"
+  },
+  "ss-anne-cabin-b1f-d": {
+    "id": "ss-anne-cabin-b1f-d",
+    "name": "Camarote D (Bodega)",
+    "imageFile": "ss-anne-cabin-b1f-d.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 19,
+            "y": 4
+          }
+        },
+        "2": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 19,
+            "y": 4
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-bf1",
+    "exitReturnPos": {
+      "x": 19,
+      "y": 4
+    },
+    "sourceFile": "ss-anne-cabin-b1f-d.ts"
+  },
+  "ss-anne-cabin-b1f-e": {
+    "id": "ss-anne-cabin-b1f-e",
+    "name": "Camarote E (Bodega)",
+    "imageFile": "ss-anne-cabin-b1f-e.png",
+    "height": 6,
+    "width": 4,
+    "start": {
+      "x": 1,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "1": [
+        0,
+        3
+      ],
+      "2": [
+        3
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "1": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 23,
+            "y": 4
+          }
+        },
+        "2": {
+          "map": "ss-anne-bf1",
+          "pos": {
+            "x": 23,
+            "y": 4
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-bf1",
+    "exitReturnPos": {
+      "x": 23,
+      "y": 4
+    },
+    "sourceFile": "ss-anne-cabin-b1f-e.ts"
+  },
+  "ss-anne-captain": {
+    "id": "ss-anne-captain",
+    "name": "Camarote del Capitán",
+    "imageFile": "ss-anne-captain.png",
+    "height": 8,
+    "width": 6,
+    "start": {
+      "x": 1,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "1": [
+        1,
+        4,
+        5
+      ],
+      "2": [
+        0,
+        1,
+        2,
+        4
+      ],
+      "3": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "5": [
+        5
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "0": {
+          "map": "ss-anne-3f",
+          "pos": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        "1": {
+          "map": "ss-anne-3f",
+          "pos": {
+            "x": 1,
+            "y": 2
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-3f",
+    "exitReturnPos": {
+      "x": 1,
+      "y": 2
+    },
+    "sourceFile": "ss-anne-captain.ts"
+  },
+  "ss-anne-deck": {
+    "id": "ss-anne-deck",
+    "name": "Cubierta del S.S. Anne",
+    "imageFile": "ss-anne-deck.png",
+    "height": 18,
+    "width": 22,
+    "start": {
+      "x": 15,
+      "y": 8
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "1": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "2": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "3": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "4": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        8,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "5": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "6": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        8,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "7": [
+        0,
+        1,
+        2,
+        3,
+        8,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "8": [
+        0,
+        1,
+        2,
+        3,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "9": [
+        0,
+        1,
+        2,
+        3,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "10": [
+        0,
+        1,
+        2,
+        3,
+        8,
+        14,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "11": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        8,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "12": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "13": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        9,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "14": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "15": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "16": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "17": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "7": {
+        "15": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 36,
+            "y": 5
+          }
+        },
+        "16": {
+          "map": "ss-anne-2f",
+          "pos": {
+            "x": 36,
+            "y": 5
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-2f",
+    "exitReturnPos": {
+      "x": 36,
+      "y": 5
+    },
+    "sourceFile": "ss-anne-deck.ts"
+  },
+  "ss-anne-kitchen": {
+    "id": "ss-anne-kitchen",
+    "name": "Cocina del S.S. Anne",
+    "imageFile": "ss-anne-kitchen.png",
+    "height": 16,
+    "width": 14,
+    "start": {
+      "x": 6,
+      "y": 1
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/ss-anne.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "5": [
+        2,
+        3,
+        6,
+        7,
+        10,
+        11
+      ],
+      "6": [
+        2,
+        3,
+        6,
+        7,
+        10,
+        11
+      ],
+      "7": [
+        2,
+        3,
+        6,
+        7,
+        10,
+        11
+      ],
+      "8": [
+        0,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        10,
+        11
+      ],
+      "9": [
+        2,
+        3,
+        6,
+        7,
+        10,
+        11
+      ],
+      "10": [
+        2,
+        3,
+        6,
+        7,
+        10,
+        11
+      ],
+      "13": [
+        11
+      ],
+      "14": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "15": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "0": {
+        "6": {
+          "map": "ss-anne-1f",
+          "pos": {
+            "x": 31,
+            "y": 7
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "ss-anne-1f",
+    "exitReturnPos": {
+      "x": 31,
+      "y": 7
+    },
+    "sourceFile": "ss-anne-kitchen.ts"
   },
   "underground-path-ew": {
     "id": "underground-path-ew",

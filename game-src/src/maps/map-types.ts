@@ -228,6 +228,27 @@ export enum MapId {
   SafariZoneArea3RestHouseB = "safari-zone-area-3-rest-house-b",
   CeruleanCityHouseC = "cerulean-city-house-c",
   Route2TradeHouse = "route-2-trade-house",
+
+  // ── S.S. Anne: salas interiores + cubierta ────────────────────────────────
+  SsAnneCabin1fA = "ss-anne-cabin-1f-a",
+  SsAnneCabin1fB = "ss-anne-cabin-1f-b",
+  SsAnneCabin1fC = "ss-anne-cabin-1f-c",
+  SsAnneCabin1fD = "ss-anne-cabin-1f-d",
+  SsAnneCabin1fE = "ss-anne-cabin-1f-e",
+  SsAnneCabin2fA = "ss-anne-cabin-2f-a",
+  SsAnneCabin2fB = "ss-anne-cabin-2f-b",
+  SsAnneCabin2fC = "ss-anne-cabin-2f-c",
+  SsAnneCabin2fD = "ss-anne-cabin-2f-d",
+  SsAnneCabin2fE = "ss-anne-cabin-2f-e",
+  SsAnneCabin2fF = "ss-anne-cabin-2f-f",
+  SsAnneCabinB1fA = "ss-anne-cabin-b1f-a",
+  SsAnneCabinB1fB = "ss-anne-cabin-b1f-b",
+  SsAnneCabinB1fC = "ss-anne-cabin-b1f-c",
+  SsAnneCabinB1fD = "ss-anne-cabin-b1f-d",
+  SsAnneCabinB1fE = "ss-anne-cabin-b1f-e",
+  SsAnneKitchen = "ss-anne-kitchen",
+  SsAnneCaptain = "ss-anne-captain",
+  SsAnneDeck = "ss-anne-deck",
 }
 
 export interface PokemonMinimalType {

@@ -32,7 +32,18 @@ const ssAnne2f: MapType = {
 
   },
   teleports: {
-    4: { 2: { map: MapId.SsAnne1f, pos: { x: 2, y: 6 } } },
+    11: {
+      9: { map: MapId.SsAnneCabin2fA, pos: { x: 1, y: 4 } },
+      13: { map: MapId.SsAnneCabin2fB, pos: { x: 1, y: 4 } },
+      17: { map: MapId.SsAnneCabin2fC, pos: { x: 1, y: 4 } },
+      21: { map: MapId.SsAnneCabin2fD, pos: { x: 1, y: 4 } },
+      25: { map: MapId.SsAnneCabin2fE, pos: { x: 1, y: 4 } },
+      29: { map: MapId.SsAnneCabin2fF, pos: { x: 1, y: 4 } },
+    },
+    4: {
+      2: { map: MapId.SsAnne1f, pos: { x: 2, y: 6 } },
+      36: { map: MapId.SsAnneDeck, pos: { x: 15, y: 8 } },
+    },
     12: { 2: { map: MapId.SsAnne3f, pos: { x: 19, y: 3 } } },
   },
   exits: {

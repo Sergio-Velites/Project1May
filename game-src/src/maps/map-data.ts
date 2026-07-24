@@ -31,6 +31,25 @@ import safariZoneArea3RestHouse from "./safari-zone-area-3-rest-house";
 import safariZoneArea3RestHouseB from "./safari-zone-area-3-rest-house-b";
 import ceruleanCityHouseC from "./cerulean-city-house-c";
 import route2TradeHouse from "./route-2-trade-house";
+import ssAnneCabin1fA from "./ss-anne-cabin-1f-a";
+import ssAnneCabin1fB from "./ss-anne-cabin-1f-b";
+import ssAnneCabin1fC from "./ss-anne-cabin-1f-c";
+import ssAnneCabin1fD from "./ss-anne-cabin-1f-d";
+import ssAnneCabin1fE from "./ss-anne-cabin-1f-e";
+import ssAnneCabin2fA from "./ss-anne-cabin-2f-a";
+import ssAnneCabin2fB from "./ss-anne-cabin-2f-b";
+import ssAnneCabin2fC from "./ss-anne-cabin-2f-c";
+import ssAnneCabin2fD from "./ss-anne-cabin-2f-d";
+import ssAnneCabin2fE from "./ss-anne-cabin-2f-e";
+import ssAnneCabin2fF from "./ss-anne-cabin-2f-f";
+import ssAnneCabinB1fA from "./ss-anne-cabin-b1f-a";
+import ssAnneCabinB1fB from "./ss-anne-cabin-b1f-b";
+import ssAnneCabinB1fC from "./ss-anne-cabin-b1f-c";
+import ssAnneCabinB1fD from "./ss-anne-cabin-b1f-d";
+import ssAnneCabinB1fE from "./ss-anne-cabin-b1f-e";
+import ssAnneKitchen from "./ss-anne-kitchen";
+import ssAnneCaptain from "./ss-anne-captain";
+import ssAnneDeck from "./ss-anne-deck";
 
 import palletTown from "./pallet-town";
 import route1 from "./route-1";
@@ -449,6 +468,25 @@ const mapData: Record<string, MapType> = {
   [MapId.SafariZoneArea3RestHouseB]: safariZoneArea3RestHouseB,
   [MapId.CeruleanCityHouseC]: ceruleanCityHouseC,
   [MapId.Route2TradeHouse]: route2TradeHouse,
+  [MapId.SsAnneCabin1fA]: ssAnneCabin1fA,
+  [MapId.SsAnneCabin1fB]: ssAnneCabin1fB,
+  [MapId.SsAnneCabin1fC]: ssAnneCabin1fC,
+  [MapId.SsAnneCabin1fD]: ssAnneCabin1fD,
+  [MapId.SsAnneCabin1fE]: ssAnneCabin1fE,
+  [MapId.SsAnneCabin2fA]: ssAnneCabin2fA,
+  [MapId.SsAnneCabin2fB]: ssAnneCabin2fB,
+  [MapId.SsAnneCabin2fC]: ssAnneCabin2fC,
+  [MapId.SsAnneCabin2fD]: ssAnneCabin2fD,
+  [MapId.SsAnneCabin2fE]: ssAnneCabin2fE,
+  [MapId.SsAnneCabin2fF]: ssAnneCabin2fF,
+  [MapId.SsAnneCabinB1fA]: ssAnneCabinB1fA,
+  [MapId.SsAnneCabinB1fB]: ssAnneCabinB1fB,
+  [MapId.SsAnneCabinB1fC]: ssAnneCabinB1fC,
+  [MapId.SsAnneCabinB1fD]: ssAnneCabinB1fD,
+  [MapId.SsAnneCabinB1fE]: ssAnneCabinB1fE,
+  [MapId.SsAnneKitchen]: ssAnneKitchen,
+  [MapId.SsAnneCaptain]: ssAnneCaptain,
+  [MapId.SsAnneDeck]: ssAnneDeck,
 };
 
 export default mapData;
