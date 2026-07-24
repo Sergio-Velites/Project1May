@@ -219,14 +219,14 @@ function parseDirectionRowColMap(tsText: string, key: string): Record<string, Re
   while (i < inner.length) {
     while (i < inner.length && /\s|,/.test(inner[i])) i++;
     if (i >= inner.length) break;
-    const rowMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    const rowMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
     if (!rowMatch) { i++; continue; }
     const rowKey = rowMatch[1];
     i += rowMatch[0].length - 1;
     const rowBlk = findBalancedBlock(inner, i);
     if (!rowBlk) break;
     const row: Record<string, 'down' | 'up' | 'left' | 'right'> = {};
-    const colRe = /(-?\d+)\s*:\s*Direction\.(Down|Up|Left|Right)/g;
+    const colRe = /"?(-?\d+)"?\s*:\s*Direction\.(Down|Up|Left|Right)/g;
     let colM: RegExpExecArray | null;
     while ((colM = colRe.exec(rowBlk.text)) !== null) {
       row[colM[1]] = colM[2].toLowerCase() as 'down' | 'up' | 'left' | 'right';
@@ -250,7 +250,7 @@ function parseTextField(tsText: string): Record<string, Record<string, string[]>
   while (i < inner.length) {
     while (i < inner.length && /\s|,/.test(inner[i])) i++;
     if (i >= inner.length) break;
-    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    const numMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
     if (!numMatch) {
       i++;
       continue;
@@ -266,7 +266,7 @@ function parseTextField(tsText: string): Record<string, Record<string, string[]>
     while (j < rowInner.length) {
       while (j < rowInner.length && /\s|,/.test(rowInner[j])) j++;
       if (j >= rowInner.length) break;
-      const colMatch = rowInner.slice(j).match(/^(-?\d+)\s*:\s*\[/);
+      const colMatch = rowInner.slice(j).match(/^"?(-?\d+)"?\s*:\s*\[/);
       if (!colMatch) {
         j++;
         continue;
@@ -578,7 +578,7 @@ function parseTextRewardsField(tsText: string): Record<string, Record<string, Pa
   while (i < inner.length) {
     while (i < inner.length && /\s|,/.test(inner[i])) i++;
     if (i >= inner.length) break;
-    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    const numMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
     if (!numMatch) { i++; continue; }
     const rowKey = numMatch[1];
     i += numMatch[0].length - 1;
@@ -591,7 +591,7 @@ function parseTextRewardsField(tsText: string): Record<string, Record<string, Pa
     while (j < rowInner.length) {
       while (j < rowInner.length && /\s|,/.test(rowInner[j])) j++;
       if (j >= rowInner.length) break;
-      const colMatch = rowInner.slice(j).match(/^(-?\d+)\s*:\s*\{/);
+      const colMatch = rowInner.slice(j).match(/^"?(-?\d+)"?\s*:\s*\{/);
       if (!colMatch) { j++; continue; }
       const colKey = colMatch[1];
       j += colMatch[0].length - 1;
@@ -698,7 +698,7 @@ function parseMapIdRowCol(tsText: string): Record<string, Record<string, string>
   while (i < inner.length) {
     while (i < inner.length && /\s|,/.test(inner[i])) i++;
     if (i >= inner.length) break;
-    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    const numMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
     if (!numMatch) { i++; continue; }
     const rowKey = numMatch[1];
     i += numMatch[0].length - 1;
@@ -706,7 +706,7 @@ function parseMapIdRowCol(tsText: string): Record<string, Record<string, string>
     if (!subBlk) break;
     const rowInner = subBlk.text.slice(1, -1);
     const cols: Record<string, string> = {};
-    const colRe = /(-?\d+)\s*:\s*MapId\.([A-Za-z0-9_]+)/g;
+    const colRe = /"?(-?\d+)"?\s*:\s*MapId\.([A-Za-z0-9_]+)/g;
     let cm: RegExpExecArray | null;
     while ((cm = colRe.exec(rowInner)) !== null) {
       cols[cm[1]] = mapIdEnumToKebab(cm[2]);
@@ -730,7 +730,7 @@ function parseTeleportsField(tsText: string): Record<string, Record<string, { ma
   while (i < inner.length) {
     while (i < inner.length && /\s|,/.test(inner[i])) i++;
     if (i >= inner.length) break;
-    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    const numMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
     if (!numMatch) { i++; continue; }
     const rowKey = numMatch[1];
     i += numMatch[0].length - 1;
@@ -739,7 +739,7 @@ function parseTeleportsField(tsText: string): Record<string, Record<string, { ma
     const rowInner = subBlk.text.slice(1, -1);
     const cols: Record<string, { map: string; pos: { x: number; y: number } }> = {};
     // Cada entrada: <col>: { map: MapId.X, pos: { x: N, y: N } }
-    const colRe = /(-?\d+)\s*:\s*\{\s*map\s*:\s*MapId\.([A-Za-z0-9_]+)\s*,\s*pos\s*:\s*\{\s*x\s*:\s*(\d+)\s*,\s*y\s*:\s*(\d+)\s*,?\s*\}\s*,?\s*\}/g;
+    const colRe = /"?(-?\d+)"?\s*:\s*\{\s*map\s*:\s*MapId\.([A-Za-z0-9_]+)\s*,\s*pos\s*:\s*\{\s*x\s*:\s*(\d+)\s*,\s*y\s*:\s*(\d+)\s*,?\s*\}\s*,?\s*\}/g;
     let cm: RegExpExecArray | null;
     while ((cm = colRe.exec(rowInner)) !== null) {
       cols[cm[1]] = {

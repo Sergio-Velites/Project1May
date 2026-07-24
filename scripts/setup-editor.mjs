@@ -154,14 +154,14 @@ function parseDirectionRowColMap(tsText, key) {
   while (i < inner.length) {
     while (i < inner.length && /\s|,/.test(inner[i])) i++;
     if (i >= inner.length) break;
-    const rowMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    const rowMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
     if (!rowMatch) { i++; continue; }
     const rowKey = rowMatch[1];
     i += rowMatch[0].length - 1;
     const rowBlk = findBalancedBlock(inner, i);
     if (!rowBlk) break;
     const row = {};
-    const colRe = /(-?\d+)\s*:\s*Direction\.(Down|Up|Left|Right)/g;
+    const colRe = /"?(-?\d+)"?\s*:\s*Direction\.(Down|Up|Left|Right)/g;
     let colM;
     while ((colM = colRe.exec(rowBlk.text)) !== null) {
       row[colM[1]] = colM[2].toLowerCase();
@@ -234,7 +234,7 @@ function parseMapIdRowCol(tsText) {
   while (i < inner.length) {
     while (i < inner.length && /\s|,/.test(inner[i])) i++;
     if (i >= inner.length) break;
-    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    const numMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
     if (!numMatch) { i++; continue; }
     const rowKey = numMatch[1];
     i += numMatch[0].length - 1;
@@ -242,7 +242,7 @@ function parseMapIdRowCol(tsText) {
     if (!subBlk) break;
     const rowInner = subBlk.text.slice(1, -1);
     const cols = {};
-    const colRe = /(-?\d+)\s*:\s*MapId\.([A-Za-z0-9_]+)/g;
+    const colRe = /"?(-?\d+)"?\s*:\s*MapId\.([A-Za-z0-9_]+)/g;
     let cm;
     while ((cm = colRe.exec(rowInner)) !== null) {
       cols[cm[1]] = mapIdEnumToKebab(cm[2]);
@@ -265,7 +265,7 @@ function parseTeleportsField(tsText) {
   while (i < inner.length) {
     while (i < inner.length && /\s|,/.test(inner[i])) i++;
     if (i >= inner.length) break;
-    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    const numMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
     if (!numMatch) { i++; continue; }
     const rowKey = numMatch[1];
     i += numMatch[0].length - 1;
@@ -273,7 +273,7 @@ function parseTeleportsField(tsText) {
     if (!subBlk) break;
     const rowInner = subBlk.text.slice(1, -1);
     const cols = {};
-    const colRe = /(-?\d+)\s*:\s*\{\s*map\s*:\s*MapId\.([A-Za-z0-9_]+)\s*,\s*pos\s*:\s*\{\s*x\s*:\s*(\d+)\s*,\s*y\s*:\s*(\d+)\s*,?\s*\}\s*,?\s*\}/g;
+    const colRe = /"?(-?\d+)"?\s*:\s*\{\s*map\s*:\s*MapId\.([A-Za-z0-9_]+)\s*,\s*pos\s*:\s*\{\s*x\s*:\s*(\d+)\s*,\s*y\s*:\s*(\d+)\s*,?\s*\}\s*,?\s*\}/g;
     let cm;
     while ((cm = colRe.exec(rowInner)) !== null) {
       cols[cm[1]] = {
@@ -307,7 +307,7 @@ function parseTextField(tsText) {
     if (i >= inner.length) break;
 
     // Leer número (clave de fila)
-    const numMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    const numMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
     if (!numMatch) {
       // Avanzar para evitar bucle infinito
       i++;
@@ -325,7 +325,7 @@ function parseTextField(tsText) {
     while (j < rowInner.length) {
       while (j < rowInner.length && /\s|,/.test(rowInner[j])) j++;
       if (j >= rowInner.length) break;
-      const colMatch = rowInner.slice(j).match(/^(-?\d+)\s*:\s*\[/);
+      const colMatch = rowInner.slice(j).match(/^"?(-?\d+)"?\s*:\s*\[/);
       if (!colMatch) { j++; continue; }
       const colKey = colMatch[1];
       j += colMatch[0].length - 1; // dejar j en `[`
@@ -368,7 +368,7 @@ function parseTextRewardsField(tsText) {
   while (i < inner.length) {
     while (i < inner.length && /\s|,/.test(inner[i])) i++;
     if (i >= inner.length) break;
-    const rowMatch = inner.slice(i).match(/^(-?\d+)\s*:\s*\{/);
+    const rowMatch = inner.slice(i).match(/^"?(-?\d+)"?\s*:\s*\{/);
     if (!rowMatch) { i++; continue; }
     const rowKey = rowMatch[1];
     i += rowMatch[0].length - 1;
@@ -381,7 +381,7 @@ function parseTextRewardsField(tsText) {
     while (j < rowInner.length) {
       while (j < rowInner.length && /\s|,/.test(rowInner[j])) j++;
       if (j >= rowInner.length) break;
-      const colMatch = rowInner.slice(j).match(/^(-?\d+)\s*:\s*\{/);
+      const colMatch = rowInner.slice(j).match(/^"?(-?\d+)"?\s*:\s*\{/);
       if (!colMatch) { j++; continue; }
       const colKey = colMatch[1];
       j += colMatch[0].length - 1;
