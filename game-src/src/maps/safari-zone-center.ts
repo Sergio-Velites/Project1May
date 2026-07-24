@@ -42,6 +42,9 @@ const safariZoneCenter: MapType = {
     11: { 0: MapId.SafariZoneArea3, 29: MapId.SafariZoneArea1 },
   },
   teleports: {
+    19: {
+      17: { map: MapId.SafariZoneCenterRestHouse, pos: { x: 3, y: 6 } },
+    },
     // Hueco sur (cols 14-15) → puerta del edificio Safari en Ciudad Fucsia
     25: {
       14: { map: MapId.FuchsiaCity, pos: { x: 18, y: 4 } },

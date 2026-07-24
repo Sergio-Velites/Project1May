@@ -36,7 +36,8 @@ const route16: MapType = {
     // Caseta Ruta 16 (pasa de la mitad oeste a la este). Puerta oeste col 17,
     // puerta este col 24. Se entra en el extremo correspondiente del pasaje.
     4: { 17: { map: MapId.Route16Gate, pos: { x: 1, y: 2 } }, 24: { map: MapId.Route16Gate, pos: { x: 6, y: 2 } } },
-    5: { 17: { map: MapId.Route16Gate, pos: { x: 1, y: 3 } }, 24: { map: MapId.Route16Gate, pos: { x: 6, y: 3 } } },
+    5: {
+      7: { map: MapId.Route16FlyHouse, pos: { x: 3, y: 7 } }, 17: { map: MapId.Route16Gate, pos: { x: 1, y: 3 } }, 24: { map: MapId.Route16Gate, pos: { x: 6, y: 3 } } },
     10: { 17: { map: MapId.Route16Gate, pos: { x: 1, y: 8 } }, 24: { map: MapId.Route16Gate, pos: { x: 6, y: 8 } } },
     11: { 17: { map: MapId.Route16Gate, pos: { x: 1, y: 9 } }, 24: { map: MapId.Route16Gate, pos: { x: 6, y: 9 } } },
   },

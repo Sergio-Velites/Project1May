@@ -112,7 +112,10 @@ const route6: MapType = {
     35: { 8: MapId.VermilionCity, 9: MapId.VermilionCity, 11: MapId.VermilionCity, 12: MapId.VermilionCity, 13: MapId.VermilionCity, 14: MapId.VermilionCity, 15: MapId.VermilionCity, 16: MapId.VermilionCity, 17: MapId.VermilionCity, 18: MapId.VermilionCity, 19: MapId.VermilionCity },
   },
   teleports: {
-    13: { 17: { map: MapId.UndergroundPathNS, pos: { x: 3, y: 41 } } },
+    7: {
+      10: { map: MapId.Route6Gate, pos: { x: 3, y: 4 } },
+    },
+    13: { 17: { map: MapId.Route6UndergroundEntrance, pos: { x: 3, y: 6 } } },
   },
   exits: {
 

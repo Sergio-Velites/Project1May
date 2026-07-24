@@ -47,6 +47,11 @@ const safariZoneArea1: MapType = {
   },
   music: "/game/music/maps-original/safari-zone.mp3",
   grass: {},
+  teleports: {
+    9: {
+      25: { map: MapId.SafariZoneArea1RestHouse, pos: { x: 3, y: 6 } },
+    },
+  },
 };
 
 export default safariZoneArea1;

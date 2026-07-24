@@ -66,6 +66,14 @@ const celadonCity: MapType = {
   },
   music: "/game/music/maps-original/celadon-city.mp3",
   grass: {},
+  teleports: {
+    27: {
+      43: { map: MapId.CeladonCityHouseC, pos: { x: 3, y: 7 } },
+    },
+    9: {
+      24: { map: MapId.CeladonCityMansion1f, pos: { x: 4, y: 10 } },
+    },
+  },
 };
 
 export default celadonCity;

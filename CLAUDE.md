@@ -266,7 +266,25 @@ setTimeout(() => doSomething(), 3000);
 }
 ```
 
-### 163 mapas registrados (enum MapId + map-data.ts)
+### 189 mapas registrados (enum MapId + map-data.ts)
+
+**Interiores añadidos en la auditoría de puertas (jul 2026)** — cada puerta
+dibujada en los PNG tiene ya su interior y teleport de ida/vuelta:
+```
+route-5-day-care (guardería) · route-5-gate · route-6-gate (puertas de Azafrán)
+route-5/6/7/8-underground-entrance (casetas del Camino Subterráneo; las puertas
+  exteriores ya NO teleportan directo al túnel sino a su caseta)
+route-25-bills-house (Casa de Bill) · route-10-pokemon-center
+route-12-fisher-house · route-16-fly-house (MO Vuelo) · route-2-trade-house
+lavender-town-house-c (Juez de Nombres) · vermilion-city-old-rod-house
+fuchsia-city-good-rod-house · cerulean-city-house-c · celadon-city-house-c
+celadon-city-mansion-1f/2f/3f/roof-house (Mansión Celadon, escaleras en (2,1)/(7,1))
+safari-zone-center/area-1/area-2/area-3-rest-house (+area-3-rest-house-b)
+```
+Assets: rips Game Boy de VGMaps recoloreados a la paleta del proyecto
+(mapeo exacto de los 4 grises → 4 colores pastel; los interiores existentes
+provienen de los mismos rips). Casas genéricas = copia de
+`cerulean-city-house-a.png` con sus mismos `walls`.
 
 **Kanto — exterior**
 ```
@@ -1325,6 +1343,11 @@ Ejemplos: Diglett/Natu 50px · Pikachu 54px · Charizard 62px · Snorlax 64px ·
 **Causa raíz (de despliegue, no de código)**: las Edge Functions **empaquetan `_shared/*.ts` en el momento del deploy**. `x-recover-token` se añadió a la allowlist CORS de `_shared/cors.ts`, y `maintenance` se desplegó después (bundle nuevo), pero **`webauthn-register-start` quedó en v6 con el `cors.ts` viejo**. El preflight del navegador no autorizaba `x-recover-token` → el POST nunca se enviaba → el cliente lo trataba como fallo de vinculación. El token en sí siempre fue válido.
 **Arreglo**: redesplegar `webauthn-register-start` (v7) con el `_shared/cors.ts` actual, **preservando `verify_jwt=false`**. Verificado con un link real: preflight OK + POST 200 con challenge.
 **Regla general**: al tocar CUALQUIER archivo de `supabase/functions/_shared/`, redesplegar TODAS las funciones que dependan del cambio (cada una lleva su copia congelada). Comprobar qué bundle tiene cada función desplegada: MCP Supabase → `get_edge_function` (devuelve los ficheros empaquetados).
+
+### 27. El editor perdía los teleports con claves negativas (`"-1"`) (resuelto 2026-07-24)
+**Síntoma**: mapas con salidas por el borde (`teleports: { "-1": {...} }` o columnas `"-1"` — pallet-town, route-1, route-2, route-3, viridian-city, viridian-forrest, elite-four-4) aparecían en el editor SIN esas conexiones; un 💾 Guardar las habría borrado del `.ts`.
+**Causa**: en TypeScript las claves numéricas negativas van entre comillas (`"-1":`), y los parsers (`scripts/setup-editor.mjs` y `app/admin/map-editor/parse-ts.ts`) usaban regex `(-?\d+)\s*:` que no acepta comillas. El escritor (`ts-codegen.ts` → `objKey`) siempre las citó bien; solo fallaba la lectura.
+**Arreglo**: todos los regex de claves de fila/columna aceptan ahora `"?(-?\d+)"?`. Regla al añadir parsers nuevos: siempre tolerar claves entrecomilladas.
 
 ---
 

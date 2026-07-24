@@ -124,6 +124,9 @@ const route2: MapType = {
   },
   maps: {},
   teleports: {
+    20: {
+      15: { map: MapId.Route2TradeHouse, pos: { x: 3, y: 7 } },
+    },
     "-1": {
       8: { map: MapId.PewterCity, pos: { x: 18, y: 35 } },
       9: { map: MapId.PewterCity, pos: { x: 19, y: 35 } },

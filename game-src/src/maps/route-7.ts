@@ -63,7 +63,7 @@ const route7: MapType = {
   },
   teleports: {
     // Caseta suroeste → Camino Subterráneo E-O (escalera oeste)
-    13: { 5: { map: MapId.UndergroundPathEW, pos: { x: 3, y: 5 } } },
+    13: { 5: { map: MapId.Route7UndergroundEntrance, pos: { x: 3, y: 6 } } },
   },
   exits: {
 

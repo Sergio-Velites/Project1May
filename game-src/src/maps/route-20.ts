@@ -62,16 +62,16 @@ const route20: MapType = {
   },
   text: {},
   maps: {
-    5: { 48: MapId.SeafoamIslands1f },
-    9: { 58: MapId.SeafoamIslands1f },
-  },
+          },
   teleports: {
     4: { 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 4 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 40 } } },
-    5: { 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 5 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 41 } } },
+    5: {
+      48: { map: MapId.SeafoamIslands1f, pos: { x: 4, y: 16 } }, 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 5 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 41 } } },
     6: { 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 6 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 42 } } },
     7: { 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 7 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 43 } } },
     8: { 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 8 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 44 } } },
-    9: { 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 9 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 45 } } },
+    9: {
+      58: { map: MapId.SeafoamIslands1f, pos: { x: 26, y: 16 } }, 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 9 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 45 } } },
     10: { 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 10 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 46 } } },
     11: { 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 11 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 47 } } },
     12: { 0: { map: MapId.CinnabarIsland, pos: { x: 18, y: 12 } }, 99: { map: MapId.Route19, pos: { x: 1, y: 48 } } },

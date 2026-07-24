@@ -76,12 +76,14 @@ const fuchsiaCity: MapType = {
     13: { 5: MapId.FuchsiaCityPokeMart },
     16: { 0: MapId.Route18, 39: MapId.Route15 },
     17: { 0: MapId.Route18, 39: MapId.Route15 },
-    24: { 31: MapId.FuchsiaCityHouseB },
     27: { 5: MapId.FuchsiaCityGym, 11: MapId.FuchsiaCityHouseA, 19: MapId.FuchsiaCityPokemonCenter, 27: MapId.FuchsiaCityWardenHouse, 31: MapId.FuchsiaCityHouseB },
     34: { 0: MapId.Route18 },
     35: { 0: MapId.Route18, 1: MapId.Route19, 2: MapId.Route19, 3: MapId.Route19, 4: MapId.Route19, 5: MapId.Route19, 6: MapId.Route19, 7: MapId.Route19, 8: MapId.Route19, 9: MapId.Route19, 10: MapId.Route19, 16: MapId.Route19, 17: MapId.Route19, 18: MapId.Route19, 19: MapId.Route19, 20: MapId.Route19, 21: MapId.Route19, 22: MapId.Route19, 23: MapId.Route19, 24: MapId.Route19 },
   },
   teleports: {
+    13: {
+      22: { map: MapId.FuchsiaCityGoodRodHouse, pos: { x: 3, y: 7 } },
+    },
     3: { 18: { map: MapId.SafariZoneCenter, pos: { x: 14, y: 24 } } },
   },
   exits: {

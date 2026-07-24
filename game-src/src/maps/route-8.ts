@@ -67,7 +67,7 @@ const route8: MapType = {
     10: { 0: MapId.SaffronCity },
   },
   teleports: {
-    3: { 13: { map: MapId.UndergroundPathEW, pos: { x: 46, y: 2 } } },
+    3: { 13: { map: MapId.Route8UndergroundEntrance, pos: { x: 3, y: 6 } } },
   },
   exits: {
 

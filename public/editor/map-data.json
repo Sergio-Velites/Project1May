@@ -1564,15 +1564,639 @@
     },
     "sourceFile": "celadon-city-house-b.ts"
   },
+  "celadon-city-house-c": {
+    "id": "celadon-city-house-c",
+    "name": "Casa Ciudad Azulona C",
+    "imageFile": "celadon-city-house-c.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/celadon-city.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "celadon-city",
+          "pos": {
+            "x": 43,
+            "y": 28
+          }
+        },
+        "3": {
+          "map": "celadon-city",
+          "pos": {
+            "x": 43,
+            "y": 28
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "celadon-city",
+    "exitReturnPos": {
+      "x": 43,
+      "y": 28
+    },
+    "sourceFile": "celadon-city-house-c.ts"
+  },
+  "celadon-city-mansion-1f": {
+    "id": "celadon-city-mansion-1f",
+    "name": "Mansión Celadon 1F",
+    "imageFile": "celadon-city-mansion-1f.png",
+    "height": 12,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 10
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/celadon-city.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6
+      ],
+      "1": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6
+      ],
+      "2": [
+        5
+      ],
+      "3": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "4": [
+        5
+      ],
+      "5": [
+        0,
+        1,
+        4,
+        5
+      ],
+      "6": [
+        0,
+        1,
+        5
+      ],
+      "7": [
+        0,
+        1,
+        5
+      ],
+      "8": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "9": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        6,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "1": {
+        "2": {
+          "map": "celadon-city-mansion-2f",
+          "pos": {
+            "x": 2,
+            "y": 2
+          }
+        },
+        "7": {
+          "map": "celadon-city-mansion-2f",
+          "pos": {
+            "x": 7,
+            "y": 2
+          }
+        }
+      },
+      "11": {
+        "4": {
+          "map": "celadon-city",
+          "pos": {
+            "x": 24,
+            "y": 10
+          }
+        },
+        "5": {
+          "map": "celadon-city",
+          "pos": {
+            "x": 24,
+            "y": 10
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "celadon-city",
+    "exitReturnPos": {
+      "x": 24,
+      "y": 10
+    },
+    "sourceFile": "celadon-city-mansion-1f.ts"
+  },
+  "celadon-city-mansion-2f": {
+    "id": "celadon-city-mansion-2f",
+    "name": "Mansión Celadon 2F",
+    "imageFile": "celadon-city-mansion-2f.png",
+    "height": 12,
+    "width": 8,
+    "start": {
+      "x": 2,
+      "y": 2
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/celadon-city.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6
+      ],
+      "1": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6
+      ],
+      "2": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "3": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "5": [
+        0,
+        1,
+        5
+      ],
+      "6": [
+        0,
+        3,
+        4,
+        5
+      ],
+      "7": [
+        0,
+        3,
+        4,
+        5
+      ],
+      "8": [
+        0,
+        5
+      ],
+      "9": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        6,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "1": {
+        "2": {
+          "map": "celadon-city-mansion-1f",
+          "pos": {
+            "x": 2,
+            "y": 2
+          }
+        },
+        "7": {
+          "map": "celadon-city-mansion-3f",
+          "pos": {
+            "x": 7,
+            "y": 2
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "celadon-city",
+    "exitReturnPos": {
+      "x": 24,
+      "y": 10
+    },
+    "sourceFile": "celadon-city-mansion-2f.ts"
+  },
+  "celadon-city-mansion-3f": {
+    "id": "celadon-city-mansion-3f",
+    "name": "Mansión Celadon 3F",
+    "imageFile": "celadon-city-mansion-3f.png",
+    "height": 12,
+    "width": 8,
+    "start": {
+      "x": 2,
+      "y": 2
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/celadon-city.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6
+      ],
+      "1": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6
+      ],
+      "2": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "3": [
+        0,
+        1,
+        3,
+        4,
+        5
+      ],
+      "4": [
+        0,
+        1,
+        3,
+        4,
+        5
+      ],
+      "6": [
+        0,
+        1,
+        5
+      ],
+      "7": [
+        0,
+        1,
+        5
+      ],
+      "8": [
+        5
+      ],
+      "9": [
+        0,
+        1,
+        2,
+        3,
+        5,
+        6,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "1": {
+        "2": {
+          "map": "celadon-city-mansion-2f",
+          "pos": {
+            "x": 2,
+            "y": 2
+          }
+        },
+        "7": {
+          "map": "celadon-city-mansion-roof-house",
+          "pos": {
+            "x": 2,
+            "y": 6
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "celadon-city",
+    "exitReturnPos": {
+      "x": 24,
+      "y": 10
+    },
+    "sourceFile": "celadon-city-mansion-3f.ts"
+  },
+  "celadon-city-mansion-roof-house": {
+    "id": "celadon-city-mansion-roof-house",
+    "name": "Ático Mansión Celadon",
+    "imageFile": "celadon-city-mansion-roof-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 2,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/celadon-city.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        3,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "7": {
+        "2": {
+          "map": "celadon-city-mansion-3f",
+          "pos": {
+            "x": 7,
+            "y": 2
+          }
+        },
+        "3": {
+          "map": "celadon-city-mansion-3f",
+          "pos": {
+            "x": 7,
+            "y": 2
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "celadon-city",
+    "exitReturnPos": {
+      "x": 24,
+      "y": 10
+    },
+    "sourceFile": "celadon-city-mansion-roof-house.ts"
+  },
   "celadon-city-poke-mart": {
     "id": "celadon-city-poke-mart",
     "name": "Tienda Pokemon",
     "imageFile": "celadon-city-poke-mart.png",
-    "height": 18,
+    "height": 8,
     "width": 20,
     "start": {
       "x": 10,
-      "y": 16
+      "y": 6
     },
     "cave": false,
     "allowBicycle": false,
@@ -1615,9 +2239,19 @@
       }
     },
     "teleports": {},
-    "exits": {},
-    "exitReturnMap": null,
-    "exitReturnPos": null,
+    "exits": {
+      "7": [
+        2,
+        3,
+        16,
+        17
+      ]
+    },
+    "exitReturnMap": "celadon-city",
+    "exitReturnPos": {
+      "x": 10,
+      "y": 14
+    },
     "sourceFile": "celadon-city-poke-mart.ts"
   },
   "celadon-city-pokemon-center": {
@@ -2865,7 +3499,26 @@
         "35": "celadon-city-house-a"
       }
     },
-    "teleports": {},
+    "teleports": {
+      "9": {
+        "24": {
+          "map": "celadon-city-mansion-1f",
+          "pos": {
+            "x": 4,
+            "y": 10
+          }
+        }
+      },
+      "27": {
+        "43": {
+          "map": "celadon-city-house-c",
+          "pos": {
+            "x": 3,
+            "y": 7
+          }
+        }
+      }
+    },
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -4339,13 +4992,25 @@
     "spinners": {},
     "stoppers": {},
     "maps": {},
-    "teleports": {},
-    "exits": {
-      "7": [
-        2,
-        3
-      ]
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 13,
+            "y": 26
+          }
+        },
+        "3": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 13,
+            "y": 26
+          }
+        }
+      }
     },
+    "exits": {},
     "exitReturnMap": "cerulean-city",
     "exitReturnPos": {
       "x": 13,
@@ -4723,13 +5388,25 @@
     "spinners": {},
     "stoppers": {},
     "maps": {},
-    "teleports": {},
-    "exits": {
-      "7": [
-        2,
-        3
-      ]
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 13,
+            "y": 16
+          }
+        },
+        "3": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 13,
+            "y": 16
+          }
+        }
+      }
     },
+    "exits": {},
     "exitReturnMap": "cerulean-city",
     "exitReturnPos": {
       "x": 13,
@@ -4813,22 +5490,144 @@
     "spinners": {},
     "stoppers": {},
     "maps": {},
-    "teleports": {},
-    "exits": {
-      "0": [
-        3
-      ],
-      "7": [
-        2,
-        3
-      ]
+    "teleports": {
+      "0": {
+        "3": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 27,
+            "y": 12
+          }
+        }
+      },
+      "8": {
+        "2": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 27,
+            "y": 12
+          }
+        },
+        "3": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 27,
+            "y": 12
+          }
+        }
+      }
     },
+    "exits": {},
     "exitReturnMap": "cerulean-city",
     "exitReturnPos": {
       "x": 27,
       "y": 12
     },
     "sourceFile": "cerulean-city-house-b.ts"
+  },
+  "cerulean-city-house-c": {
+    "id": "cerulean-city-house-c",
+    "name": "Casa Ciudad Celeste C",
+    "imageFile": "cerulean-city-house-c.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/cerulean-city.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 9,
+            "y": 12
+          }
+        },
+        "3": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 9,
+            "y": 12
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "cerulean-city",
+    "exitReturnPos": {
+      "x": 9,
+      "y": 12
+    },
+    "sourceFile": "cerulean-city-house-c.ts"
   },
   "cerulean-city-poke-mart": {
     "id": "cerulean-city-poke-mart",
@@ -4849,7 +5648,32 @@
     "minimapPos": null,
     "minimapParent": null,
     "music": "\"/game/music/maps-original/cerulean-city.mp3\"",
-    "trainers": [],
+    "trainers": [
+      {
+        "npcKey": "brock",
+        "pos": {
+          "x": 0,
+          "y": 5
+        },
+        "facing": "right",
+        "money": 0,
+        "persistent": true,
+        "isOnline": false,
+        "hideCondition": null,
+        "sightRange": null,
+        "intro": [],
+        "outtro": [
+          "..."
+        ],
+        "pokemon": [
+          {
+            "id": 19,
+            "level": 2
+          }
+        ],
+        "postGame": null
+      }
+    ],
     "walls": {
       "0": [
         0,
@@ -4912,7 +5736,10 @@
     "cuttableTrees": [],
     "pokemonCenter": null,
     "pc": null,
-    "store": null,
+    "store": {
+      "x": 1,
+      "y": 5
+    },
     "storeItems": [],
     "recoverLocation": null,
     "onlineBattleNpc": null,
@@ -4920,13 +5747,25 @@
     "spinners": {},
     "stoppers": {},
     "maps": {},
-    "teleports": {},
-    "exits": {
-      "7": [
-        3,
-        4
-      ]
+    "teleports": {
+      "8": {
+        "3": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 25,
+            "y": 26
+          }
+        },
+        "4": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 25,
+            "y": 26
+          }
+        }
+      }
     },
+    "exits": {},
     "exitReturnMap": "cerulean-city",
     "exitReturnPos": {
       "x": 25,
@@ -5033,23 +5872,44 @@
     "boulders": [],
     "berryTrees": [],
     "cuttableTrees": [],
-    "pokemonCenter": null,
-    "pc": null,
+    "pokemonCenter": {
+      "x": 3,
+      "y": 2
+    },
+    "pc": {
+      "x": 11,
+      "y": 2
+    },
     "store": null,
     "storeItems": [],
     "recoverLocation": null,
-    "onlineBattleNpc": null,
+    "onlineBattleNpc": {
+      "x": 11,
+      "y": 2
+    },
     "dayCareNpc": null,
     "spinners": {},
     "stoppers": {},
     "maps": {},
-    "teleports": {},
-    "exits": {
-      "7": [
-        3,
-        4
-      ]
+    "teleports": {
+      "8": {
+        "3": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 19,
+            "y": 18
+          }
+        },
+        "4": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 19,
+            "y": 18
+          }
+        }
+      }
     },
+    "exits": {},
     "exitReturnMap": "cerulean-city",
     "exitReturnPos": {
       "x": 19,
@@ -5136,63 +5996,10 @@
         "postGame": null
       },
       {
-        "npcKey": "tamer",
-        "pos": {
-          "x": 30,
-          "y": 20
-        },
-        "facing": "down",
-        "money": 0,
-        "persistent": true,
-        "isOnline": false,
-        "hideCondition": null,
-        "sightRange": null,
-        "intro": [],
-        "outtro": [
-          "Todavía no es tu hora....",
-          "Estás seguro de que puedes mejorar el tiempo de Marta y Sergio?",
-          "Menudas patas de gallina me llevas."
-        ],
-        "pokemon": [
-          {
-            "id": 19,
-            "level": 2
-          }
-        ],
-        "postGame": null
-      },
-      {
-        "npcKey": "scientist",
-        "pos": {
-          "x": 19,
-          "y": 29
-        },
-        "facing": "down",
-        "money": 0,
-        "persistent": true,
-        "isOnline": false,
-        "hideCondition": null,
-        "sightRange": null,
-        "intro": [],
-        "outtro": [
-          "1+1 son 7... quien me lo iba a decir....",
-          "Si...",
-          "En efecto...",
-          "Solo estoy aquí para molestar"
-        ],
-        "pokemon": [
-          {
-            "id": 19,
-            "level": 2
-          }
-        ],
-        "postGame": null
-      },
-      {
         "npcKey": "youngster",
         "pos": {
-          "x": 10,
-          "y": 18
+          "x": 12,
+          "y": 16
         },
         "facing": "down",
         "money": 0,
@@ -5215,7 +6022,7 @@
       {
         "npcKey": "beauty",
         "pos": {
-          "x": 14,
+          "x": 21,
           "y": 18
         },
         "facing": "down",
@@ -5239,7 +6046,7 @@
       {
         "npcKey": "lass",
         "pos": {
-          "x": 10,
+          "x": 14,
           "y": 26
         },
         "facing": "down",
@@ -5263,7 +6070,7 @@
       {
         "npcKey": "blackBelt",
         "pos": {
-          "x": 28,
+          "x": 31,
           "y": 20
         },
         "facing": "left",
@@ -5325,8 +6132,8 @@
       {
         "npcKey": "gentleman",
         "pos": {
-          "x": 20,
-          "y": 30
+          "x": 23,
+          "y": 22
         },
         "facing": "up",
         "money": 400,
@@ -5474,7 +6281,6 @@
         18,
         19,
         26,
-        27,
         28,
         29,
         30,
@@ -6095,13 +6901,6 @@
         }
       },
       "9": {
-        "27": {
-          "map": "cerulean-city-house-b",
-          "pos": {
-            "x": 4,
-            "y": 6
-          }
-        },
         "39": {
           "map": "route-9",
           "pos": {
@@ -6110,19 +6909,35 @@
           }
         }
       },
+      "10": {
+        "27": {
+          "map": "cerulean-city-house-b",
+          "pos": {
+            "x": 3,
+            "y": 1
+          }
+        }
+      },
       "11": {
         "4": {
           "map": "cerulean-cave-1f",
           "pos": {
-            "x": 17,
-            "y": 16
+            "x": 25,
+            "y": 17
+          }
+        },
+        "9": {
+          "map": "cerulean-city-house-c",
+          "pos": {
+            "x": 3,
+            "y": 7
           }
         },
         "27": {
           "map": "cerulean-city-house-b",
           "pos": {
-            "x": 4,
-            "y": 6
+            "x": 3,
+            "y": 7
           }
         }
       },
@@ -6171,8 +6986,8 @@
         "13": {
           "map": "cerulean-city-house-a",
           "pos": {
-            "x": 4,
-            "y": 6
+            "x": 3,
+            "y": 7
           }
         }
       },
@@ -6189,8 +7004,8 @@
         "19": {
           "map": "cerulean-city-pokemon-center",
           "pos": {
-            "x": 7,
-            "y": 5
+            "x": 4,
+            "y": 7
           }
         },
         "39": {
@@ -6221,7 +7036,7 @@
         "30": {
           "map": "cerulean-city-gym",
           "pos": {
-            "x": 9,
+            "x": 5,
             "y": 13
           }
         },
@@ -6317,15 +7132,15 @@
         "13": {
           "map": "cerulean-city-bike-shop",
           "pos": {
-            "x": 4,
-            "y": 6
+            "x": 3,
+            "y": 7
           }
         },
         "25": {
           "map": "cerulean-city-poke-mart",
           "pos": {
             "x": 4,
-            "y": 6
+            "y": 7
           }
         },
         "39": {
@@ -8017,18 +8832,18 @@
     "maps": {},
     "teleports": {
       "8": {
-        "2": {
+        "3": {
           "map": "route-2",
           "pos": {
             "x": 12,
             "y": 10
           }
         },
-        "3": {
-          "map": "route-2",
+        "5": {
+          "map": "route-11",
           "pos": {
-            "x": 12,
-            "y": 10
+            "x": 4,
+            "y": 6
           }
         }
       }
@@ -9081,12 +9896,132 @@
             "y": 1
           }
         }
+      },
+      "-1": {
+        "5": {
+          "map": "champion-room",
+          "pos": {
+            "x": 3,
+            "y": 6
+          }
+        },
+        "6": {
+          "map": "champion-room",
+          "pos": {
+            "x": 4,
+            "y": 6
+          }
+        }
       }
     },
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "elite-four-4.ts"
+  },
+  "fuchsia-city-good-rod-house": {
+    "id": "fuchsia-city-good-rod-house",
+    "name": "Casa de la Caña Buena",
+    "imageFile": "fuchsia-city-good-rod-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/celadon-city.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "fuchsia-city",
+          "pos": {
+            "x": 22,
+            "y": 14
+          }
+        },
+        "3": {
+          "map": "fuchsia-city",
+          "pos": {
+            "x": 22,
+            "y": 14
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "fuchsia-city",
+    "exitReturnPos": {
+      "x": 22,
+      "y": 14
+    },
+    "sourceFile": "fuchsia-city-good-rod-house.ts"
   },
   "fuchsia-city-gym": {
     "id": "fuchsia-city-gym",
@@ -10679,9 +11614,6 @@
         "0": "route-18",
         "39": "route-15"
       },
-      "24": {
-        "31": "fuchsia-city-house-b"
-      },
       "27": {
         "5": "fuchsia-city-gym",
         "11": "fuchsia-city-house-a",
@@ -10722,6 +11654,15 @@
           "pos": {
             "x": 14,
             "y": 24
+          }
+        }
+      },
+      "13": {
+        "22": {
+          "map": "fuchsia-city-good-rod-house",
+          "pos": {
+            "x": 3,
+            "y": 7
           }
         }
       }
@@ -11614,6 +12555,110 @@
     },
     "sourceFile": "lavender-town-house-b.ts"
   },
+  "lavender-town-house-c": {
+    "id": "lavender-town-house-c",
+    "name": "Casa Pueblo Lavanda C",
+    "imageFile": "lavender-town-house-c.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/lavender-town.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "lavender-town",
+          "pos": {
+            "x": 7,
+            "y": 14
+          }
+        },
+        "3": {
+          "map": "lavender-town",
+          "pos": {
+            "x": 7,
+            "y": 14
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "lavender-town",
+    "exitReturnPos": {
+      "x": 7,
+      "y": 14
+    },
+    "sourceFile": "lavender-town-house-c.ts"
+  },
   "lavender-town-poke-mart": {
     "id": "lavender-town-poke-mart",
     "name": "Tienda Pokemon",
@@ -12254,7 +13299,17 @@
         "10": "route-12"
       }
     },
-    "teleports": {},
+    "teleports": {
+      "13": {
+        "7": {
+          "map": "lavender-town-house-c",
+          "pos": {
+            "x": 3,
+            "y": 7
+          }
+        }
+      }
+    },
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -18355,6 +19410,22 @@
           "pos": {
             "x": 7,
             "y": 0
+          }
+        }
+      },
+      "-1": {
+        "10": {
+          "map": "route-1",
+          "pos": {
+            "x": 10,
+            "y": 35
+          }
+        },
+        "11": {
+          "map": "route-1",
+          "pos": {
+            "x": 11,
+            "y": 35
           }
         }
       }
@@ -27438,6 +28509,22 @@
             "y": 0
           }
         }
+      },
+      "-1": {
+        "10": {
+          "map": "viridian-city",
+          "pos": {
+            "x": 20,
+            "y": 35
+          }
+        },
+        "11": {
+          "map": "viridian-city",
+          "pos": {
+            "x": 21,
+            "y": 35
+          }
+        }
       }
     },
     "exits": {},
@@ -27447,6 +28534,127 @@
       "y": 2
     },
     "sourceFile": "route-1.ts"
+  },
+  "route-10-pokemon-center": {
+    "id": "route-10-pokemon-center",
+    "name": "Centro Pokémon Ruta 10",
+    "imageFile": "route-10-pokemon-center.png",
+    "height": 8,
+    "width": 14,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "music",
+    "trainers": [],
+    "walls": {
+      "2": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "3": [
+        13
+      ],
+      "4": [
+        0
+      ],
+      "5": [
+        0
+      ],
+      "6": [
+        1,
+        6,
+        7,
+        12,
+        13
+      ],
+      "7": [
+        1,
+        6,
+        7,
+        12,
+        13
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": {
+      "x": 3,
+      "y": 2
+    },
+    "pc": {
+      "x": 13,
+      "y": 3
+    },
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": {
+      "x": 11,
+      "y": 2
+    },
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "3": {
+          "map": "route-10",
+          "pos": {
+            "x": 11,
+            "y": 20
+          }
+        },
+        "4": {
+          "map": "route-10",
+          "pos": {
+            "x": 11,
+            "y": 20
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-10",
+    "exitReturnPos": {
+      "x": 11,
+      "y": 20
+    },
+    "sourceFile": "route-10-pokemon-center.ts"
   },
   "route-10": {
     "id": "route-10",
@@ -29034,7 +30242,17 @@
         "10": "lavender-town"
       }
     },
-    "teleports": {},
+    "teleports": {
+      "19": {
+        "11": {
+          "map": "route-10-pokemon-center",
+          "pos": {
+            "x": 4,
+            "y": 7
+          }
+        }
+      }
+    },
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -29409,11 +30627,125 @@
         "59": "route-12"
       }
     },
-    "teleports": {},
+    "teleports": {
+      "5": {
+        "4": {
+          "map": "diglets-cave",
+          "pos": {
+            "x": 5,
+            "y": 3
+          }
+        }
+      }
+    },
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "route-11.ts"
+  },
+  "route-12-fisher-house": {
+    "id": "route-12-fisher-house",
+    "name": "Casa del Pescador",
+    "imageFile": "route-12-fisher-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/route-11.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "route-12",
+          "pos": {
+            "x": 11,
+            "y": 78
+          }
+        },
+        "3": {
+          "map": "route-12",
+          "pos": {
+            "x": 11,
+            "y": 78
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-12",
+    "exitReturnPos": {
+      "x": 11,
+      "y": 78
+    },
+    "sourceFile": "route-12-fisher-house.ts"
   },
   "route-12-gate": {
     "id": "route-12-gate",
@@ -31713,6 +33045,15 @@
             "y": 6
           }
         }
+      },
+      "77": {
+        "11": {
+          "map": "route-12-fisher-house",
+          "pos": {
+            "x": 3,
+            "y": 7
+          }
+        }
       }
     },
     "exits": {},
@@ -33849,6 +35190,110 @@
     "exitReturnPos": null,
     "sourceFile": "route-15.ts"
   },
+  "route-16-fly-house": {
+    "id": "route-16-fly-house",
+    "name": "Casa de la MO Vuelo",
+    "imageFile": "route-16-fly-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/bicycle.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "route-16",
+          "pos": {
+            "x": 7,
+            "y": 6
+          }
+        },
+        "3": {
+          "map": "route-16",
+          "pos": {
+            "x": 7,
+            "y": 6
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-16",
+    "exitReturnPos": {
+      "x": 7,
+      "y": 6
+    },
+    "sourceFile": "route-16-fly-house.ts"
+  },
   "route-16-gate": {
     "id": "route-16-gate",
     "name": "Caseta Ruta 16",
@@ -34489,6 +35934,13 @@
         }
       },
       "5": {
+        "7": {
+          "map": "route-16-fly-house",
+          "pos": {
+            "x": 3,
+            "y": 7
+          }
+        },
         "17": {
           "map": "route-16-gate",
           "pos": {
@@ -38785,6 +40237,110 @@
     "exitReturnPos": null,
     "sourceFile": "route-2-gate.ts"
   },
+  "route-2-trade-house": {
+    "id": "route-2-trade-house",
+    "name": "Casa del Intercambio",
+    "imageFile": "route-2-trade-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/viridian-city.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "route-2",
+          "pos": {
+            "x": 15,
+            "y": 21
+          }
+        },
+        "3": {
+          "map": "route-2",
+          "pos": {
+            "x": 15,
+            "y": 21
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-2",
+    "exitReturnPos": {
+      "x": 15,
+      "y": 21
+    },
+    "sourceFile": "route-2-trade-house.ts"
+  },
   "route-2": {
     "id": "route-2",
     "name": "Ruta 2",
@@ -39759,6 +41315,15 @@
           }
         }
       },
+      "20": {
+        "15": {
+          "map": "route-2-trade-house",
+          "pos": {
+            "x": 3,
+            "y": 7
+          }
+        }
+      },
       "35": {
         "16": {
           "map": "route-4-gate",
@@ -39829,6 +41394,22 @@
           "pos": {
             "x": 19,
             "y": 0
+          }
+        }
+      },
+      "-1": {
+        "8": {
+          "map": "pewter-city",
+          "pos": {
+            "x": 18,
+            "y": 35
+          }
+        },
+        "9": {
+          "map": "pewter-city",
+          "pos": {
+            "x": 19,
+            "y": 35
           }
         }
       }
@@ -41668,14 +43249,7 @@
     "dayCareNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
-      "5": {
-        "48": "seafoam-islands-1f"
-      },
-      "9": {
-        "58": "seafoam-islands-1f"
-      }
-    },
+    "maps": {},
     "teleports": {
       "4": {
         "0": {
@@ -41699,6 +43273,13 @@
           "pos": {
             "x": 18,
             "y": 5
+          }
+        },
+        "48": {
+          "map": "seafoam-islands-1f",
+          "pos": {
+            "x": 4,
+            "y": 16
           }
         },
         "99": {
@@ -41763,6 +43344,13 @@
           "pos": {
             "x": 18,
             "y": 9
+          }
+        },
+        "58": {
+          "map": "seafoam-islands-1f",
+          "pos": {
+            "x": 26,
+            "y": 16
           }
         },
         "99": {
@@ -47719,6 +49307,106 @@
     "exitReturnPos": null,
     "sourceFile": "route-24.ts"
   },
+  "route-25-bills-house": {
+    "id": "route-25-bills-house",
+    "name": "Casa de Bill",
+    "imageFile": "route-25-bills-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/route-24-welcome.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "3": [
+        0,
+        1,
+        5
+      ],
+      "4": [
+        0,
+        1
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "route-25",
+          "pos": {
+            "x": 45,
+            "y": 4
+          }
+        },
+        "3": {
+          "map": "route-25",
+          "pos": {
+            "x": 45,
+            "y": 4
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-25",
+    "exitReturnPos": {
+      "x": 45,
+      "y": 4
+    },
+    "sourceFile": "route-25-bills-house.ts"
+  },
   "route-25": {
     "id": "route-25",
     "name": "Ruta 25",
@@ -48808,7 +50496,17 @@
         "0": "route-24"
       }
     },
-    "teleports": {},
+    "teleports": {
+      "3": {
+        "45": {
+          "map": "route-25-bills-house",
+          "pos": {
+            "x": 3,
+            "y": 6
+          }
+        }
+      }
+    },
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
@@ -49746,7 +51444,95 @@
     "spinners": {},
     "stoppers": {},
     "maps": {},
-    "teleports": {},
+    "teleports": {
+      "8": {
+        "-1": {
+          "map": "pewter-city",
+          "pos": {
+            "x": 39,
+            "y": 16
+          }
+        }
+      },
+      "9": {
+        "-1": {
+          "map": "pewter-city",
+          "pos": {
+            "x": 39,
+            "y": 17
+          }
+        }
+      },
+      "10": {
+        "-1": {
+          "map": "pewter-city",
+          "pos": {
+            "x": 39,
+            "y": 18
+          }
+        }
+      },
+      "11": {
+        "-1": {
+          "map": "pewter-city",
+          "pos": {
+            "x": 39,
+            "y": 19
+          }
+        }
+      },
+      "-1": {
+        "57": {
+          "map": "route-4",
+          "pos": {
+            "x": 6,
+            "y": 17
+          }
+        },
+        "58": {
+          "map": "route-4",
+          "pos": {
+            "x": 7,
+            "y": 17
+          }
+        },
+        "59": {
+          "map": "route-4",
+          "pos": {
+            "x": 8,
+            "y": 17
+          }
+        },
+        "60": {
+          "map": "route-4",
+          "pos": {
+            "x": 9,
+            "y": 17
+          }
+        },
+        "61": {
+          "map": "route-4",
+          "pos": {
+            "x": 10,
+            "y": 17
+          }
+        },
+        "62": {
+          "map": "route-4",
+          "pos": {
+            "x": 11,
+            "y": 17
+          }
+        },
+        "63": {
+          "map": "route-4",
+          "pos": {
+            "x": 11,
+            "y": 17
+          }
+        }
+      }
+    },
     "exits": {},
     "exitReturnMap": "pewter-city",
     "exitReturnPos": {
@@ -50949,6 +52735,395 @@
     },
     "sourceFile": "route-4.ts"
   },
+  "route-5-day-care": {
+    "id": "route-5-day-care",
+    "name": "Guardería Pokémon",
+    "imageFile": "route-5-day-care.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/route-3.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "route-5",
+          "pos": {
+            "x": 10,
+            "y": 22
+          }
+        },
+        "3": {
+          "map": "route-5",
+          "pos": {
+            "x": 10,
+            "y": 22
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-5",
+    "exitReturnPos": {
+      "x": 10,
+      "y": 22
+    },
+    "sourceFile": "route-5-day-care.ts"
+  },
+  "route-5-gate": {
+    "id": "route-5-gate",
+    "name": "Puerta de Azafrán (Ruta 5)",
+    "imageFile": "route-5-gate.png",
+    "height": 6,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/route-3.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "2": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "3": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "4": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "5": [
+        0,
+        1,
+        6,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "2": {
+          "map": "route-5",
+          "pos": {
+            "x": 10,
+            "y": 34
+          }
+        },
+        "3": {
+          "map": "route-5",
+          "pos": {
+            "x": 10,
+            "y": 34
+          }
+        },
+        "4": {
+          "map": "route-5",
+          "pos": {
+            "x": 10,
+            "y": 34
+          }
+        },
+        "5": {
+          "map": "route-5",
+          "pos": {
+            "x": 10,
+            "y": 34
+          }
+        }
+      },
+      "-1": {
+        "2": {
+          "map": "route-5",
+          "pos": {
+            "x": 10,
+            "y": 29
+          }
+        },
+        "3": {
+          "map": "route-5",
+          "pos": {
+            "x": 10,
+            "y": 29
+          }
+        },
+        "4": {
+          "map": "route-5",
+          "pos": {
+            "x": 10,
+            "y": 29
+          }
+        },
+        "5": {
+          "map": "route-5",
+          "pos": {
+            "x": 10,
+            "y": 29
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-5",
+    "exitReturnPos": {
+      "x": 10,
+      "y": 34
+    },
+    "sourceFile": "route-5-gate.ts"
+  },
+  "route-5-underground-entrance": {
+    "id": "route-5-underground-entrance",
+    "name": "Entrada Camino Subterráneo (Ruta 5)",
+    "imageFile": "route-5-underground-entrance.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/route-3.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "2": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "3": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "4": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "5": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "6": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "4": {
+        "3": {
+          "map": "underground-path-ns",
+          "pos": {
+            "x": 4,
+            "y": 3
+          }
+        }
+      },
+      "8": {
+        "3": {
+          "map": "route-5",
+          "pos": {
+            "x": 17,
+            "y": 28
+          }
+        },
+        "4": {
+          "map": "route-5",
+          "pos": {
+            "x": 17,
+            "y": 28
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-5",
+    "exitReturnPos": {
+      "x": 17,
+      "y": 28
+    },
+    "sourceFile": "route-5-underground-entrance.ts"
+  },
   "route-5": {
     "id": "route-5",
     "name": "Ruta 5",
@@ -50972,8 +53147,8 @@
       {
         "npcKey": "beauty",
         "pos": {
-          "x": 8,
-          "y": 10
+          "x": 7,
+          "y": 21
         },
         "facing": "down",
         "money": 0,
@@ -50983,7 +53158,7 @@
         "sightRange": null,
         "intro": [],
         "outtro": [
-          "Aquí todo crece: unos entrenan… otros maduran."
+          "Bea: Aquí todo crece: unos entrenan… otros maduran."
         ],
         "pokemon": [
           {
@@ -50996,10 +53171,10 @@
       {
         "npcKey": "gentleman",
         "pos": {
-          "x": 11,
-          "y": 10
+          "x": 13,
+          "y": 17
         },
-        "facing": "down",
+        "facing": "left",
         "money": 0,
         "persistent": true,
         "isOnline": false,
@@ -51021,10 +53196,10 @@
       {
         "npcKey": "youngster",
         "pos": {
-          "x": 16,
-          "y": 10
+          "x": 6,
+          "y": 16
         },
-        "facing": "down",
+        "facing": "right",
         "money": 0,
         "persistent": true,
         "isOnline": false,
@@ -51425,67 +53600,282 @@
     "berryTrees": [],
     "cuttableTrees": [],
     "pokemonCenter": null,
-    "pc": {
-      "x": 10,
-      "y": 8
-    },
+    "pc": null,
     "store": null,
     "storeItems": [],
     "recoverLocation": null,
     "onlineBattleNpc": null,
-    "dayCareNpc": {
-      "x": 10,
-      "y": 8
-    },
+    "dayCareNpc": null,
     "spinners": {},
     "stoppers": {},
-    "maps": {
-      "0": {
-        "1": "cerulean-city",
-        "2": "cerulean-city",
-        "3": "cerulean-city",
-        "4": "cerulean-city",
-        "6": "cerulean-city",
-        "7": "cerulean-city",
-        "8": "cerulean-city",
-        "9": "cerulean-city",
-        "10": "cerulean-city",
-        "11": "cerulean-city",
-        "12": "cerulean-city",
-        "13": "cerulean-city",
-        "15": "cerulean-city",
-        "16": "cerulean-city",
-        "17": "cerulean-city",
-        "18": "cerulean-city"
-      },
-      "35": {
-        "0": "saffron-city",
-        "2": "saffron-city",
-        "3": "saffron-city",
-        "4": "saffron-city",
-        "5": "saffron-city",
-        "6": "saffron-city",
-        "7": "saffron-city",
-        "8": "saffron-city",
-        "9": "saffron-city",
-        "10": "saffron-city",
-        "11": "saffron-city",
-        "12": "saffron-city",
-        "13": "saffron-city",
-        "14": "saffron-city",
-        "15": "saffron-city",
-        "16": "saffron-city",
-        "17": "saffron-city",
-        "19": "saffron-city"
-      }
-    },
+    "maps": {},
     "teleports": {
+      "0": {
+        "1": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "2": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "3": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "4": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "6": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "7": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "8": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "9": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "10": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "11": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "12": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "13": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "15": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "16": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "17": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        },
+        "18": {
+          "map": "cerulean-city",
+          "pos": {
+            "x": 2,
+            "y": 18
+          }
+        }
+      },
+      "21": {
+        "10": {
+          "map": "route-5-day-care",
+          "pos": {
+            "x": 3,
+            "y": 7
+          }
+        }
+      },
       "27": {
         "17": {
-          "map": "underground-path-ns",
+          "map": "route-5-underground-entrance",
           "pos": {
-            "x": 4,
-            "y": 3
+            "x": 3,
+            "y": 6
+          }
+        }
+      },
+      "33": {
+        "10": {
+          "map": "route-5-gate",
+          "pos": {
+            "x": 3,
+            "y": 4
+          }
+        }
+      },
+      "35": {
+        "0": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "2": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "3": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "4": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "5": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "6": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "7": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "8": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "9": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "10": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "11": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "12": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "13": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "14": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "15": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "16": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "17": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "19": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
           }
         }
       }
@@ -51494,6 +53884,291 @@
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "route-5.ts"
+  },
+  "route-6-gate": {
+    "id": "route-6-gate",
+    "name": "Puerta de Azafrán (Ruta 6)",
+    "imageFile": "route-6-gate.png",
+    "height": 6,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 4
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/route-3.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "2": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "3": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "4": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "5": [
+        0,
+        1,
+        6,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "6": {
+        "2": {
+          "map": "route-6",
+          "pos": {
+            "x": 10,
+            "y": 8
+          }
+        },
+        "3": {
+          "map": "route-6",
+          "pos": {
+            "x": 10,
+            "y": 8
+          }
+        },
+        "4": {
+          "map": "route-6",
+          "pos": {
+            "x": 10,
+            "y": 8
+          }
+        },
+        "5": {
+          "map": "route-6",
+          "pos": {
+            "x": 10,
+            "y": 8
+          }
+        }
+      },
+      "-1": {
+        "2": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "3": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "4": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        },
+        "5": {
+          "map": "saffron-city",
+          "pos": {
+            "x": 20,
+            "y": 34
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-6",
+    "exitReturnPos": {
+      "x": 10,
+      "y": 8
+    },
+    "sourceFile": "route-6-gate.ts"
+  },
+  "route-6-underground-entrance": {
+    "id": "route-6-underground-entrance",
+    "name": "Entrada Camino Subterráneo (Ruta 6)",
+    "imageFile": "route-6-underground-entrance.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/route-3.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "2": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "3": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "4": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "5": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "6": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "4": {
+        "3": {
+          "map": "underground-path-ns",
+          "pos": {
+            "x": 3,
+            "y": 41
+          }
+        }
+      },
+      "8": {
+        "3": {
+          "map": "route-6",
+          "pos": {
+            "x": 17,
+            "y": 14
+          }
+        },
+        "4": {
+          "map": "route-6",
+          "pos": {
+            "x": 17,
+            "y": 14
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-6",
+    "exitReturnPos": {
+      "x": 17,
+      "y": 14
+    },
+    "sourceFile": "route-6-underground-entrance.ts"
   },
   "route-6": {
     "id": "route-6",
@@ -52025,12 +54700,21 @@
       }
     },
     "teleports": {
-      "13": {
-        "17": {
-          "map": "underground-path-ns",
+      "7": {
+        "10": {
+          "map": "route-6-gate",
           "pos": {
             "x": 3,
-            "y": 41
+            "y": 4
+          }
+        }
+      },
+      "13": {
+        "17": {
+          "map": "route-6-underground-entrance",
+          "pos": {
+            "x": 3,
+            "y": 6
           }
         }
       }
@@ -52039,6 +54723,138 @@
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "route-6.ts"
+  },
+  "route-7-underground-entrance": {
+    "id": "route-7-underground-entrance",
+    "name": "Entrada Camino Subterráneo (Ruta 7)",
+    "imageFile": "route-7-underground-entrance.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/route-11.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "2": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "3": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "4": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "5": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "6": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "4": {
+        "3": {
+          "map": "underground-path-ew",
+          "pos": {
+            "x": 3,
+            "y": 5
+          }
+        }
+      },
+      "8": {
+        "3": {
+          "map": "route-7",
+          "pos": {
+            "x": 5,
+            "y": 14
+          }
+        },
+        "4": {
+          "map": "route-7",
+          "pos": {
+            "x": 5,
+            "y": 14
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-7",
+    "exitReturnPos": {
+      "x": 5,
+      "y": 14
+    },
+    "sourceFile": "route-7-underground-entrance.ts"
   },
   "route-7": {
     "id": "route-7",
@@ -52385,10 +55201,10 @@
     "teleports": {
       "13": {
         "5": {
-          "map": "underground-path-ew",
+          "map": "route-7-underground-entrance",
           "pos": {
             "x": 3,
-            "y": 5
+            "y": 6
           }
         }
       }
@@ -52397,6 +55213,138 @@
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "route-7.ts"
+  },
+  "route-8-underground-entrance": {
+    "id": "route-8-underground-entrance",
+    "name": "Entrada Camino Subterráneo (Ruta 8)",
+    "imageFile": "route-8-underground-entrance.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/route-11.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "2": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "3": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "4": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "5": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "6": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "4": {
+        "3": {
+          "map": "underground-path-ew",
+          "pos": {
+            "x": 46,
+            "y": 2
+          }
+        }
+      },
+      "8": {
+        "3": {
+          "map": "route-8",
+          "pos": {
+            "x": 13,
+            "y": 4
+          }
+        },
+        "4": {
+          "map": "route-8",
+          "pos": {
+            "x": 13,
+            "y": 4
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "route-8",
+    "exitReturnPos": {
+      "x": 13,
+      "y": 4
+    },
+    "sourceFile": "route-8-underground-entrance.ts"
   },
   "route-8": {
     "id": "route-8",
@@ -53135,10 +56083,10 @@
     "teleports": {
       "3": {
         "13": {
-          "map": "underground-path-ew",
+          "map": "route-8-underground-entrance",
           "pos": {
-            "x": 46,
-            "y": 2
+            "x": 3,
+            "y": 6
           }
         }
       }
@@ -54184,6 +57132,113 @@
     "exitReturnPos": null,
     "sourceFile": "route-9.ts"
   },
+  "safari-zone-area-1-rest-house": {
+    "id": "safari-zone-area-1-rest-house",
+    "name": "Refugio Safari (Área 1)",
+    "imageFile": "safari-zone-area-1-rest-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/safari-zone.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        1,
+        3
+      ],
+      "3": [
+        1,
+        3
+      ],
+      "4": [
+        5,
+        6,
+        7
+      ],
+      "5": [
+        1,
+        3,
+        5
+      ],
+      "6": [
+        5
+      ],
+      "7": [
+        5
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "safari-zone-area-1",
+          "pos": {
+            "x": 25,
+            "y": 10
+          }
+        },
+        "3": {
+          "map": "safari-zone-area-1",
+          "pos": {
+            "x": 25,
+            "y": 10
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "safari-zone-area-1",
+    "exitReturnPos": {
+      "x": 25,
+      "y": 10
+    },
+    "sourceFile": "safari-zone-area-1-rest-house.ts"
+  },
   "safari-zone-area-1": {
     "id": "safari-zone-area-1",
     "name": "Zona Safari - Area 1",
@@ -54570,11 +57625,128 @@
         "0": "safari-zone-center"
       }
     },
-    "teleports": {},
+    "teleports": {
+      "9": {
+        "25": {
+          "map": "safari-zone-area-1-rest-house",
+          "pos": {
+            "x": 3,
+            "y": 6
+          }
+        }
+      }
+    },
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "safari-zone-area-1.ts"
+  },
+  "safari-zone-area-2-rest-house": {
+    "id": "safari-zone-area-2-rest-house",
+    "name": "Refugio Safari (Área 2)",
+    "imageFile": "safari-zone-area-2-rest-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/safari-zone.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        1,
+        3
+      ],
+      "3": [
+        1,
+        3
+      ],
+      "4": [
+        5,
+        6,
+        7
+      ],
+      "5": [
+        1,
+        3,
+        5
+      ],
+      "6": [
+        5
+      ],
+      "7": [
+        5
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "safari-zone-area-2",
+          "pos": {
+            "x": 35,
+            "y": 4
+          }
+        },
+        "3": {
+          "map": "safari-zone-area-2",
+          "pos": {
+            "x": 35,
+            "y": 4
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "safari-zone-area-2",
+    "exitReturnPos": {
+      "x": 35,
+      "y": 4
+    },
+    "sourceFile": "safari-zone-area-2-rest-house.ts"
   },
   "safari-zone-area-2": {
     "id": "safari-zone-area-2",
@@ -55070,11 +58242,235 @@
         "21": "safari-zone-center"
       }
     },
-    "teleports": {},
+    "teleports": {
+      "3": {
+        "35": {
+          "map": "safari-zone-area-2-rest-house",
+          "pos": {
+            "x": 3,
+            "y": 6
+          }
+        }
+      }
+    },
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "safari-zone-area-2.ts"
+  },
+  "safari-zone-area-3-rest-house-b": {
+    "id": "safari-zone-area-3-rest-house-b",
+    "name": "Refugio Safari (Área 3 Sur)",
+    "imageFile": "safari-zone-area-3-rest-house-b.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/safari-zone.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        1,
+        3
+      ],
+      "3": [
+        1,
+        3
+      ],
+      "4": [
+        5,
+        6,
+        7
+      ],
+      "5": [
+        1,
+        3,
+        5
+      ],
+      "6": [
+        5
+      ],
+      "7": [
+        5
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "safari-zone-area-3",
+          "pos": {
+            "x": 11,
+            "y": 12
+          }
+        },
+        "3": {
+          "map": "safari-zone-area-3",
+          "pos": {
+            "x": 11,
+            "y": 12
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "safari-zone-area-3",
+    "exitReturnPos": {
+      "x": 11,
+      "y": 12
+    },
+    "sourceFile": "safari-zone-area-3-rest-house-b.ts"
+  },
+  "safari-zone-area-3-rest-house": {
+    "id": "safari-zone-area-3-rest-house",
+    "name": "Refugio Safari (Área 3)",
+    "imageFile": "safari-zone-area-3-rest-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/safari-zone.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        1,
+        3
+      ],
+      "3": [
+        1,
+        3
+      ],
+      "4": [
+        5,
+        6,
+        7
+      ],
+      "5": [
+        1,
+        3,
+        5
+      ],
+      "6": [
+        5
+      ],
+      "7": [
+        5
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "safari-zone-area-3",
+          "pos": {
+            "x": 3,
+            "y": 4
+          }
+        },
+        "3": {
+          "map": "safari-zone-area-3",
+          "pos": {
+            "x": 3,
+            "y": 4
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "safari-zone-area-3",
+    "exitReturnPos": {
+      "x": 3,
+      "y": 4
+    },
+    "sourceFile": "safari-zone-area-3-rest-house.ts"
   },
   "safari-zone-area-3": {
     "id": "safari-zone-area-3",
@@ -55416,11 +58812,137 @@
         "29": "safari-zone-center"
       }
     },
-    "teleports": {},
+    "teleports": {
+      "3": {
+        "3": {
+          "map": "safari-zone-area-3-rest-house",
+          "pos": {
+            "x": 3,
+            "y": 6
+          }
+        }
+      },
+      "11": {
+        "11": {
+          "map": "safari-zone-area-3-rest-house-b",
+          "pos": {
+            "x": 3,
+            "y": 6
+          }
+        }
+      }
+    },
     "exits": {},
     "exitReturnMap": null,
     "exitReturnPos": null,
     "sourceFile": "safari-zone-area-3.ts"
+  },
+  "safari-zone-center-rest-house": {
+    "id": "safari-zone-center-rest-house",
+    "name": "Refugio Safari (Centro)",
+    "imageFile": "safari-zone-center-rest-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 3,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/safari-zone.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        1,
+        3
+      ],
+      "3": [
+        1,
+        3
+      ],
+      "4": [
+        5,
+        6,
+        7
+      ],
+      "5": [
+        1,
+        3,
+        5
+      ],
+      "6": [
+        5
+      ],
+      "7": [
+        5
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "safari-zone-center",
+          "pos": {
+            "x": 17,
+            "y": 20
+          }
+        },
+        "3": {
+          "map": "safari-zone-center",
+          "pos": {
+            "x": 17,
+            "y": 20
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "safari-zone-center",
+    "exitReturnPos": {
+      "x": 17,
+      "y": 20
+    },
+    "sourceFile": "safari-zone-center-rest-house.ts"
   },
   "safari-zone-center": {
     "id": "safari-zone-center",
@@ -55758,6 +59280,15 @@
       }
     },
     "teleports": {
+      "19": {
+        "17": {
+          "map": "safari-zone-center-rest-house",
+          "pos": {
+            "x": 3,
+            "y": 6
+          }
+        }
+      },
       "25": {
         "14": {
           "map": "fuchsia-city",
@@ -64728,19 +68259,19 @@
     "teleports": {
       "2": {
         "47": {
-          "map": "route-8",
+          "map": "route-8-underground-entrance",
           "pos": {
-            "x": 13,
-            "y": 4
+            "x": 3,
+            "y": 5
           }
         }
       },
       "5": {
         "2": {
-          "map": "route-7",
+          "map": "route-7-underground-entrance",
           "pos": {
-            "x": 5,
-            "y": 14
+            "x": 3,
+            "y": 5
           }
         }
       }
@@ -65124,19 +68655,19 @@
     "teleports": {
       "3": {
         "5": {
-          "map": "route-5",
+          "map": "route-5-underground-entrance",
           "pos": {
-            "x": 17,
-            "y": 28
+            "x": 3,
+            "y": 5
           }
         }
       },
       "41": {
         "2": {
-          "map": "route-6",
+          "map": "route-6-underground-entrance",
           "pos": {
-            "x": 17,
-            "y": 14
+            "x": 3,
+            "y": 5
           }
         }
       }
@@ -65663,6 +69194,110 @@
       "y": 20
     },
     "sourceFile": "vermilion-city-house-b.ts"
+  },
+  "vermilion-city-old-rod-house": {
+    "id": "vermilion-city-old-rod-house",
+    "name": "Casa de la Caña Vieja",
+    "imageFile": "vermilion-city-old-rod-house.png",
+    "height": 8,
+    "width": 8,
+    "start": {
+      "x": 4,
+      "y": 6
+    },
+    "cave": false,
+    "allowBicycle": false,
+    "flyable": false,
+    "flySpot": null,
+    "flyAlwaysAvailable": false,
+    "flyUnlockTiles": {},
+    "minimapPos": null,
+    "minimapParent": null,
+    "music": "\"/game/music/maps-original/vermilion-city.mp3\"",
+    "trainers": [],
+    "walls": {
+      "0": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "1": [
+        0,
+        1,
+        7
+      ],
+      "3": [
+        3,
+        4
+      ],
+      "4": [
+        3,
+        4
+      ],
+      "6": [
+        0,
+        7
+      ],
+      "7": [
+        0,
+        7
+      ]
+    },
+    "fences": {},
+    "fenceDirections": {},
+    "elevations": {},
+    "ramps": {},
+    "grass": {},
+    "water": {},
+    "encounters": null,
+    "texts": {},
+    "textRewards": {},
+    "items": [],
+    "gifts": [],
+    "staticPokemon": [],
+    "boulders": [],
+    "berryTrees": [],
+    "cuttableTrees": [],
+    "pokemonCenter": null,
+    "pc": null,
+    "store": null,
+    "storeItems": [],
+    "recoverLocation": null,
+    "onlineBattleNpc": null,
+    "dayCareNpc": null,
+    "spinners": {},
+    "stoppers": {},
+    "maps": {},
+    "teleports": {
+      "8": {
+        "2": {
+          "map": "vermilion-city",
+          "pos": {
+            "x": 15,
+            "y": 14
+          }
+        },
+        "3": {
+          "map": "vermilion-city",
+          "pos": {
+            "x": 15,
+            "y": 14
+          }
+        }
+      }
+    },
+    "exits": {},
+    "exitReturnMap": "vermilion-city",
+    "exitReturnPos": {
+      "x": 15,
+      "y": 14
+    },
+    "sourceFile": "vermilion-city-old-rod-house.ts"
   },
   "vermilion-city-poke-mart": {
     "id": "vermilion-city-poke-mart",
@@ -67281,6 +70916,15 @@
       }
     },
     "teleports": {
+      "13": {
+        "15": {
+          "map": "vermilion-city-old-rod-house",
+          "pos": {
+            "x": 3,
+            "y": 7
+          }
+        }
+      },
       "31": {
         "18": {
           "map": "ss-anne-1f",
@@ -70112,12 +73756,46 @@
           }
         }
       },
+      "14": {
+        "-1": {
+          "map": "route-22",
+          "pos": {
+            "x": 39,
+            "y": 6
+          }
+        }
+      },
       "15": {
         "21": {
           "map": "viridian-city-pokemon-acadamy",
           "pos": {
             "x": 2,
             "y": 7
+          }
+        },
+        "-1": {
+          "map": "route-22",
+          "pos": {
+            "x": 39,
+            "y": 7
+          }
+        }
+      },
+      "16": {
+        "-1": {
+          "map": "route-22",
+          "pos": {
+            "x": 39,
+            "y": 8
+          }
+        }
+      },
+      "17": {
+        "-1": {
+          "map": "route-22",
+          "pos": {
+            "x": 39,
+            "y": 9
           }
         }
       },
@@ -70152,6 +73830,29 @@
           "pos": {
             "x": 11,
             "y": 0
+          }
+        }
+      },
+      "-1": {
+        "17": {
+          "map": "route-2",
+          "pos": {
+            "x": 7,
+            "y": 71
+          }
+        },
+        "18": {
+          "map": "route-2",
+          "pos": {
+            "x": 8,
+            "y": 71
+          }
+        },
+        "19": {
+          "map": "route-2",
+          "pos": {
+            "x": 9,
+            "y": 71
           }
         }
       }
@@ -71878,6 +75579,22 @@
           "pos": {
             "x": 5,
             "y": 1
+          }
+        }
+      },
+      "-1": {
+        "1": {
+          "map": "route-2-gate-north",
+          "pos": {
+            "x": 4,
+            "y": 7
+          }
+        },
+        "2": {
+          "map": "route-2-gate-north",
+          "pos": {
+            "x": 5,
+            "y": 7
           }
         }
       }

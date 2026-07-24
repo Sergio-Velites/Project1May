@@ -155,6 +155,11 @@ const route25: MapType = {
   },
   music: "/game/music/maps-original/route-24-welcome.mp3",
   grass: {},
+  teleports: {
+    3: {
+      45: { map: MapId.Route25BillsHouse, pos: { x: 3, y: 6 } },
+    },
+  },
 };
 
 export default route25;

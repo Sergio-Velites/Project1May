@@ -146,6 +146,12 @@ const route5: MapType = {
   ],
   maps: {},
   teleports: {
+    33: {
+      10: { map: MapId.Route5Gate, pos: { x: 3, y: 4 } },
+    },
+    21: {
+      10: { map: MapId.Route5DayCare, pos: { x: 3, y: 7 } },
+    },
     0: {
       1: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
       2: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
@@ -165,7 +171,7 @@ const route5: MapType = {
       18: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
     },
     27: {
-      17: { map: MapId.UndergroundPathNS, pos: { x: 4, y: 3 } },
+      17: { map: MapId.Route5UndergroundEntrance, pos: { x: 3, y: 6 } },
     },
     35: {
       0: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },

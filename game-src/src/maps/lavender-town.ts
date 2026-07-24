@@ -86,6 +86,11 @@ const lavenderTown: MapType = {
   },
   music: "/game/music/maps-original/lavender-town.mp3",
   grass: {},
+  teleports: {
+    13: {
+      7: { map: MapId.LavenderTownHouseC, pos: { x: 3, y: 7 } },
+    },
+  },
 };
 
 export default lavenderTown;

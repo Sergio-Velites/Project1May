@@ -235,6 +235,11 @@ const route10: MapType = {
   },
   music: "/game/music/maps-original/route-11.mp3",
   grass: {},
+  teleports: {
+    19: {
+      11: { map: MapId.Route10PokemonCenter, pos: { x: 4, y: 7 } },
+    },
+  },
 };
 
 export default route10;

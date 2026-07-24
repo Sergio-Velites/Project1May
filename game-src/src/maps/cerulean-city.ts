@@ -286,6 +286,7 @@ const ceruleanCity: MapType = {
       27: { map: MapId.CeruleanCityHouseB, pos: { x: 3, y: 1 } },
     },
     11: {
+      9: { map: MapId.CeruleanCityHouseC, pos: { x: 3, y: 7 } },
       4: { map: MapId.CeruleanCave1f, pos: { x: 25, y: 17 } },
       27: { map: MapId.CeruleanCityHouseB, pos: { x: 3, y: 7 } },
     },

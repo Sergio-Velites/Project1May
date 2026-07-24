@@ -278,6 +278,9 @@ const route12: MapType = {
     107: { 0: MapId.Route11, 1: MapId.Route13, 2: MapId.Route13, 4: MapId.Route13, 5: MapId.Route13, 6: MapId.Route13, 7: MapId.Route13, 8: MapId.Route13, 10: MapId.Route13, 11: MapId.Route13 },
   },
   teleports: {
+    77: {
+      11: { map: MapId.Route12FisherHouse, pos: { x: 3, y: 7 } },
+    },
     15: { 10: { map: MapId.Route12Gate, pos: { x: 4, y: 1 } }, 11: { map: MapId.Route12Gate, pos: { x: 5, y: 1 } } },
     21: { 10: { map: MapId.Route12Gate, pos: { x: 4, y: 6 } } },
   },

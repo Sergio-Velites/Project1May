@@ -5,6 +5,33 @@ import houseA2f from "./pallet-town-house-a-2f";
 import houseB from "./pallet-town-house-b";
 import lab from "./pallet-town-lab";
 import { MapId, MapType } from "./map-types";
+import route5DayCare from "./route-5-day-care";
+import route5Gate from "./route-5-gate";
+import route6Gate from "./route-6-gate";
+import route5UndergroundEntrance from "./route-5-underground-entrance";
+import route6UndergroundEntrance from "./route-6-underground-entrance";
+import route7UndergroundEntrance from "./route-7-underground-entrance";
+import route8UndergroundEntrance from "./route-8-underground-entrance";
+import route10PokemonCenter from "./route-10-pokemon-center";
+import route12FisherHouse from "./route-12-fisher-house";
+import route16FlyHouse from "./route-16-fly-house";
+import route25BillsHouse from "./route-25-bills-house";
+import lavenderTownHouseC from "./lavender-town-house-c";
+import vermilionCityOldRodHouse from "./vermilion-city-old-rod-house";
+import fuchsiaCityGoodRodHouse from "./fuchsia-city-good-rod-house";
+import celadonCityHouseC from "./celadon-city-house-c";
+import celadonCityMansion1f from "./celadon-city-mansion-1f";
+import celadonCityMansion2f from "./celadon-city-mansion-2f";
+import celadonCityMansion3f from "./celadon-city-mansion-3f";
+import celadonCityMansionRoofHouse from "./celadon-city-mansion-roof-house";
+import safariZoneCenterRestHouse from "./safari-zone-center-rest-house";
+import safariZoneArea1RestHouse from "./safari-zone-area-1-rest-house";
+import safariZoneArea2RestHouse from "./safari-zone-area-2-rest-house";
+import safariZoneArea3RestHouse from "./safari-zone-area-3-rest-house";
+import safariZoneArea3RestHouseB from "./safari-zone-area-3-rest-house-b";
+import ceruleanCityHouseC from "./cerulean-city-house-c";
+import route2TradeHouse from "./route-2-trade-house";
+
 import palletTown from "./pallet-town";
 import route1 from "./route-1";
 import route2 from "./route-2";
@@ -396,6 +423,32 @@ const mapData: Record<string, MapType> = {
   [MapId.CeruleanCave1f]: ceruleanCave1f,
   [MapId.CeruleanCave2f]: ceruleanCave2f,
   [MapId.CeruleanCave3f]: ceruleanCave3f,
+  [MapId.Route5DayCare]: route5DayCare,
+  [MapId.Route5Gate]: route5Gate,
+  [MapId.Route6Gate]: route6Gate,
+  [MapId.Route5UndergroundEntrance]: route5UndergroundEntrance,
+  [MapId.Route6UndergroundEntrance]: route6UndergroundEntrance,
+  [MapId.Route7UndergroundEntrance]: route7UndergroundEntrance,
+  [MapId.Route8UndergroundEntrance]: route8UndergroundEntrance,
+  [MapId.Route10PokemonCenter]: route10PokemonCenter,
+  [MapId.Route12FisherHouse]: route12FisherHouse,
+  [MapId.Route16FlyHouse]: route16FlyHouse,
+  [MapId.Route25BillsHouse]: route25BillsHouse,
+  [MapId.LavenderTownHouseC]: lavenderTownHouseC,
+  [MapId.VermilionCityOldRodHouse]: vermilionCityOldRodHouse,
+  [MapId.FuchsiaCityGoodRodHouse]: fuchsiaCityGoodRodHouse,
+  [MapId.CeladonCityHouseC]: celadonCityHouseC,
+  [MapId.CeladonCityMansion1f]: celadonCityMansion1f,
+  [MapId.CeladonCityMansion2f]: celadonCityMansion2f,
+  [MapId.CeladonCityMansion3f]: celadonCityMansion3f,
+  [MapId.CeladonCityMansionRoofHouse]: celadonCityMansionRoofHouse,
+  [MapId.SafariZoneCenterRestHouse]: safariZoneCenterRestHouse,
+  [MapId.SafariZoneArea1RestHouse]: safariZoneArea1RestHouse,
+  [MapId.SafariZoneArea2RestHouse]: safariZoneArea2RestHouse,
+  [MapId.SafariZoneArea3RestHouse]: safariZoneArea3RestHouse,
+  [MapId.SafariZoneArea3RestHouseB]: safariZoneArea3RestHouseB,
+  [MapId.CeruleanCityHouseC]: ceruleanCityHouseC,
+  [MapId.Route2TradeHouse]: route2TradeHouse,
 };
 
 export default mapData;

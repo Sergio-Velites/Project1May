@@ -62,6 +62,11 @@ const route11: MapType = {
   },
   music: "/game/music/maps-original/route-11.mp3",
   grass: {},
+  teleports: {
+    5: {
+      4: { map: MapId.DiglettsCave, pos: { x: 5, y: 3 } },
+    },
+  },
 };
 
 export default route11;

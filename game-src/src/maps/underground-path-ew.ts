@@ -23,9 +23,9 @@ const undergroundPathEW: MapType = {
   },
   teleports: {
     // Escalera este (47,2) → caseta de Ruta 8
-    2: { 47: { map: MapId.Route8, pos: { x: 13, y: 4 } } },
+    2: { 47: { map: MapId.Route8UndergroundEntrance, pos: { x: 3, y: 5 } } },
     // Escalera oeste (2,5) → caseta de Ruta 7
-    5: { 2: { map: MapId.Route7, pos: { x: 5, y: 14 } } },
+    5: { 2: { map: MapId.Route7UndergroundEntrance, pos: { x: 3, y: 5 } } },
   },
   exits: {
 

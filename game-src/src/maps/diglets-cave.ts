@@ -25,6 +25,9 @@ const digletsCave: MapType = {
   grass: {},
   fences: {},
   teleports: {
+    2: {
+      5: { map: MapId.Route11, pos: { x: 4, y: 6 } },
+    },
     8: {
       2: { map: MapId.Route2, pos: { x: 12, y: 10 } },
       3: { map: MapId.Route2, pos: { x: 12, y: 10 } },
