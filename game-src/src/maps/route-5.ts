@@ -1,7 +1,6 @@
 import image from "../assets/map/route-5.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
 import { beauty, gentleman, youngster } from "../app/npcs";
-
 const route5: MapType = {
   name: "Ruta 5",
   image,
@@ -47,11 +46,56 @@ const route5: MapType = {
     35: [1, 18],
   },
   fenceDirections: {
-    3: { 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down },
-    7: { 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down },
-    11: { 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down },
-    15: { 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down },
-    23: { 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down },
+    3: {
+      6: Direction.Down,
+      7: Direction.Down,
+      8: Direction.Down,
+      9: Direction.Down,
+      10: Direction.Down,
+      11: Direction.Down,
+      12: Direction.Down,
+      13: Direction.Down,
+    },
+    7: {
+      6: Direction.Down,
+      7: Direction.Down,
+      8: Direction.Down,
+      9: Direction.Down,
+      10: Direction.Down,
+      11: Direction.Down,
+      12: Direction.Down,
+      13: Direction.Down,
+    },
+    11: {
+      6: Direction.Down,
+      7: Direction.Down,
+      8: Direction.Down,
+      9: Direction.Down,
+      10: Direction.Down,
+      11: Direction.Down,
+      12: Direction.Down,
+      13: Direction.Down,
+    },
+    15: {
+      6: Direction.Down,
+      7: Direction.Down,
+      8: Direction.Down,
+      9: Direction.Down,
+      10: Direction.Down,
+      11: Direction.Down,
+      12: Direction.Down,
+      13: Direction.Down,
+    },
+    23: {
+      6: Direction.Down,
+      7: Direction.Down,
+      8: Direction.Down,
+      9: Direction.Down,
+      10: Direction.Down,
+      11: Direction.Down,
+      12: Direction.Down,
+      13: Direction.Down,
+    },
   },
   fences: {
     3: [6, 7, 8, 9, 10, 11, 12, 13],
@@ -61,53 +105,90 @@ const route5: MapType = {
     23: [6, 7, 8, 9, 10, 11, 12, 13],
   },
   text: {},
-  dayCareNpc: { x: 10, y: 8 },
   trainers: [
-    {
-      npc: beauty,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 8, y: 10 },
-      intro: [],
-      outtro: ["Aquí todo crece: unos entrenan… otros maduran."],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: gentleman,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 11, y: 10 },
-      intro: [],
-      outtro: [
-        "Un POKéMON también necesita buenos tomates, ¿eh?",
-        "GOÑI cosecha uno nuevo cada día. Habla con él."
-      ],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: youngster,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 16, y: 10 },
-      intro: [],
-      outtro: ["GOÑI le habla a las gallinas. Y le RESPONDEN, te juro."],
-      money: 0,
-      persistent: true,
-    }
+  {
+    npc: beauty,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Down,
+    pos: { x: 7, y: 21 },
+    intro: [],
+    outtro: [
+      "Bea: Aquí todo crece: unos entrenan… otros maduran."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: gentleman,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Left,
+    pos: { x: 13, y: 17 },
+    intro: [],
+    outtro: [
+      "Un POKéMON también necesita buenos tomates, ¿eh?",
+      "GOÑI cosecha uno nuevo cada día. Habla con él."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: youngster,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Right,
+    pos: { x: 6, y: 16 },
+    intro: [],
+    outtro: [
+      "GOÑI le habla a las gallinas. Y le RESPONDEN, te juro."
+    ],
+    money: 0,
+    persistent: true,
+  }
   ],
-  maps: {
-    0: { 1: MapId.CeruleanCity, 2: MapId.CeruleanCity, 3: MapId.CeruleanCity, 4: MapId.CeruleanCity, 6: MapId.CeruleanCity, 7: MapId.CeruleanCity, 8: MapId.CeruleanCity, 9: MapId.CeruleanCity, 10: MapId.CeruleanCity, 11: MapId.CeruleanCity, 12: MapId.CeruleanCity, 13: MapId.CeruleanCity, 15: MapId.CeruleanCity, 16: MapId.CeruleanCity, 17: MapId.CeruleanCity, 18: MapId.CeruleanCity },
-    35: { 0: MapId.SaffronCity, 2: MapId.SaffronCity, 3: MapId.SaffronCity, 4: MapId.SaffronCity, 5: MapId.SaffronCity, 6: MapId.SaffronCity, 7: MapId.SaffronCity, 8: MapId.SaffronCity, 9: MapId.SaffronCity, 10: MapId.SaffronCity, 11: MapId.SaffronCity, 12: MapId.SaffronCity, 13: MapId.SaffronCity, 14: MapId.SaffronCity, 15: MapId.SaffronCity, 16: MapId.SaffronCity, 17: MapId.SaffronCity, 19: MapId.SaffronCity },
-  },
+  maps: {},
   teleports: {
-    // Caseta este → Camino Subterráneo N-S (escalera norte)
-    27: { 17: { map: MapId.UndergroundPathNS, pos: { x: 4, y: 3 } } },
+    0: {
+      1: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      2: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      3: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      4: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      6: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      7: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      8: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      9: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      10: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      11: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      12: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      13: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      15: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      16: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      17: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      18: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+    },
+    27: {
+      17: { map: MapId.UndergroundPathNS, pos: { x: 4, y: 3 } },
+    },
+    35: {
+      0: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      2: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      3: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      4: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      5: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      6: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      7: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      8: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      9: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      10: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      11: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      12: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      13: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      14: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      15: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      16: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      17: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+      19: { map: MapId.SaffronCity, pos: { x: 20, y: 34 } },
+    },
   },
-  exits: {
-
-  },
+  exits: {},
   music: "/game/music/maps-original/route-3.mp3",
   grass: {},
 };
