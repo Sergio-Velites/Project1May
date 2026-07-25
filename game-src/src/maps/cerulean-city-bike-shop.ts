@@ -1,5 +1,7 @@
 import image from "../assets/map/cerulean-city-bike-shop.png";
 import { MapId, MapType } from "./map-types";
+import { blaine } from "../app/npcs";
+import { Direction } from "../state/state-types";
 
 const ceruleanCityBikeShop: MapType = {
   name: "Ciclo Club",
@@ -9,11 +11,9 @@ const ceruleanCityBikeShop: MapType = {
   start: { x: 4, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7],
-    1: [0, 1, 2, 3, 5],
-    2: [0, 1, 2, 3, 5],
+    1: [5],
+    2: [5],
     3: [5, 6, 7],
-    4: [0, 1],
-    5: [0, 1],
     6: [6],
     7: [7],
   },
@@ -31,7 +31,24 @@ const ceruleanCityBikeShop: MapType = {
       3: { map: MapId.CeruleanCity, pos: { x: 13, y: 26 } },
     },
   },
-  trainers: [],
+  trainers: [
+  {
+    npc: blaine,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Down,
+    pos: { x: 3, y: 3 },
+    intro: [],
+    outtro: [
+      "Querías gastar dinero?",
+      "Que pena...",
+      "No nos queda stock.",
+      "Por si quieres,",
+      "puedes invertir!"
+    ],
+    money: 0,
+    persistent: true,
+  }
+  ],
 };
 
 export default ceruleanCityBikeShop;
