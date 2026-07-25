@@ -484,8 +484,25 @@ ss-anne-1f · ss-anne-2f · ss-anne-3f · ss-anne-bf1
   hideCondition?: "has-pokemon",
   isOnline?: boolean,
   postGame?: { message: string[], items?: ItemType[] },
+  defeatQuestId?: string,   // logro: se añade a completedQuests al derrotarlo
 }
 ```
+
+### Recompensas y logros al derrotar (editables en el map-editor, jul 2026)
+
+En el inspector de entrenador del editor, sección **"🏆 Recompensas al derrotar"**:
+- **Mensaje post-combate** (`postGame.message`) — diálogo tras la derrota.
+- **Objetos que entrega** (`postGame.items`) — con el picker de objetos; incluye
+  **medallas** (`…Badge`) y MTs/MOs (así dan la medalla Marta y Sergio en los gimnasios).
+- **Logro al derrotar** (`defeatQuestId`) — quest id que se marca en
+  `completedQuests` al ganar (visible en el panel admin). Los **regalos** y
+  **static Pokémon** ya tienen su propio quest id en sus modos del editor.
+
+Serialización en las 3 capas (`setup-editor.mjs`, `parse-ts.ts`, `ts-codegen.ts`):
+`postGame` se parsea ESTRUCTURADO `{message, items}` si el bloque solo tiene esas
+claves; cualquier otro contenido se conserva como texto raw (solo lectura en el
+editor, se re-emite tal cual — cero pérdidas). El dispatch del logro vive en
+`PokemonEncounter.tsx` junto al procesado de `postGame`.
 
 ### ID de un trainer
 

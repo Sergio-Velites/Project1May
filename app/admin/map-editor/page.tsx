@@ -38,9 +38,12 @@ interface Trainer {
   intro: string[];
   outtro: string[];
   pokemon: Pokemon[];
-  // Raw TypeScript text preservado del fuente (ej: ItemType.BoulderBadge).
-  // El editor no edita este campo — solo lo preserva y lo re-emite en el export.
-  postGame?: string | null;
+  // Recompensas tras la derrota: estructurado { message, items } (items =
+  // claves de ItemType, incl. medallas/MTs) cuando el editor lo gestiona;
+  // string = texto raw legado que solo se preserva.
+  postGame?: string | { message: string[]; items: string[] } | null;
+  // Logro/quest que se marca en completedQuests al derrotar al entrenador.
+  defeatQuestId?: string | null;
   isGymLeader?: boolean;
 }
 
@@ -344,7 +347,15 @@ function exportTrainersArrayTS(trainers: Trainer[]): string {
     if (t.isGymLeader) opts.push('  isGymLeader: true,');
     if (t.sightRange !== null && t.sightRange !== undefined)
       opts.push(`  sightRange: ${t.sightRange},`);
-    if (t.postGame) opts.push(`  postGame: ${t.postGame},`);
+    if (t.postGame) {
+      if (typeof t.postGame === 'string') opts.push(`  postGame: ${t.postGame},`);
+      else {
+        const msg = t.postGame.message.map((s) => `      "${s.replace(/"/g, '\\"')}",`).join('\n');
+        const its = t.postGame.items.length ? `\n    items: [${t.postGame.items.map((k) => `ItemType.${k}`).join(', ')}],` : '';
+        opts.push(`  postGame: {\n    message: [\n${msg}\n    ],${its}\n  },`);
+      }
+    }
+    if (t.defeatQuestId) opts.push(`  defeatQuestId: "${t.defeatQuestId.replace(/"/g, '\\"')}",`);
     return `  {
   npc: ${npc},
   pokemon: [${pokemon}],
@@ -6447,6 +6458,7 @@ export default function MapEditor() {
                 openPicker={setPicker}
                 onAutofill={() => setAutofillTr({ scope: 'one', index: selectedIdx! })}
                 currentMapId={selectedMapId}
+                itemOptions={itemTypeKeys}
               />
             )}
           </div>
@@ -6728,7 +6740,7 @@ function AutofillTrainersModal({ scope, count, onApply, onClose }: {
 
 // ── Inspector Panel ────────────────────────────────────────────────────────
 
-function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, onAutofill, currentMapId }: {
+function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, onAutofill, currentMapId, itemOptions }: {
   trainer: Trainer;
   idx: number;
   onChange: (patch: Partial<Trainer>) => void;
@@ -6736,10 +6748,14 @@ function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, onAutofi
   openPicker: (s: PickerState) => void;
   onAutofill: () => void;
   currentMapId: string;
+  itemOptions: string[];
 }) {
   const reg = NPC_REGISTRY[trainer.npcKey];
   const sprite = spriteUrl(trainer.npcKey, trainer.facing);
   const portrait = portraitUrl(trainer.npcKey);
+  // postGame: string = bloque raw legado (solo lectura); objeto = editable.
+  const pgLegacy = typeof trainer.postGame === 'string' ? trainer.postGame : null;
+  const pg = trainer.postGame && typeof trainer.postGame === 'object' ? trainer.postGame : null;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -6849,18 +6865,78 @@ function InspectorPanel({ trainer, idx, onChange, onDelete, openPicker, onAutofi
         </div>
       </div>
 
-      {/* postGame (solo lectura) */}
-      {trainer.postGame && (
+      {/* Recompensas al derrotar (postGame + defeatQuestId) */}
+      {pgLegacy ? (
         <div style={{ ...sectionStyle, background: '#1a1a0a', border: '1px solid #5a5a00', borderRadius: 6, padding: '10px 12px', marginTop: 12 }}>
           <div style={{ color: '#cccc00', fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 }}>
-            ⚠ postGame (solo lectura)
+            ⚠ postGame (solo lectura — formato no estándar)
           </div>
           <div style={{ color: '#888', fontSize: 11, marginBottom: 6 }}>
-            Este trainer da ítems/insignias tras ganar. Se preserva en el export automáticamente.
+            Este bloque tiene claves fuera de message/items y se preserva tal cual en el export.
           </div>
           <pre style={{ color: '#aaaa44', fontSize: 10, background: '#0a0a00', padding: 8, borderRadius: 4, overflow: 'auto', maxHeight: 120, margin: 0, fontFamily: 'monospace' }}>
-            {trainer.postGame}
+            {pgLegacy}
           </pre>
+        </div>
+      ) : (
+        <div style={{ ...sectionStyle, background: '#101a10', border: '1px solid #2a4a2a', borderRadius: 6, padding: '10px 12px', marginTop: 12 }}>
+          <div style={{ color: '#88cc88', fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 }}>
+            🏆 Recompensas al derrotar
+          </div>
+          <label style={labelStyle}>Mensaje post-combate (1 línea = 1 texto)</label>
+          <textarea
+            value={(pg?.message ?? []).join('\n')}
+            onChange={(e) => {
+              const message = e.target.value ? e.target.value.split('\n') : [];
+              const items = pg?.items ?? [];
+              onChange({ postGame: message.length || items.length ? { message, items } : null });
+            }}
+            placeholder="Se muestra tras la derrota, antes de entregar los objetos"
+            rows={2}
+            style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6, marginBottom: 8 }}
+          />
+          <label style={labelStyle}>Objetos / medallas / MTs que entrega</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 6 }}>
+            {(pg?.items ?? []).map((key: string, i: number) => (
+              <span key={`${key}-${i}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#0d0d22', border: '1px solid #2a2a4a', borderRadius: 4, padding: '2px 6px', fontSize: 11, color: '#cdf' }}>
+                {key.toLowerCase().includes('badge') ? '🏅 ' : ''}{key}
+                <button
+                  onClick={() => {
+                    const items = (pg?.items ?? []).filter((_: string, j: number) => j !== i);
+                    const message = pg?.message ?? [];
+                    onChange({ postGame: message.length || items.length ? { message, items } : null });
+                  }}
+                  style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: 13, padding: 0, lineHeight: 1 }}
+                >×</button>
+              </span>
+            ))}
+            <button
+              onClick={() => openPicker({
+                kind: 'item',
+                title: 'Objeto que entrega al ser derrotado',
+                subtitle: 'Medallas (…Badge), MTs/MOs y objetos normales',
+                options: itemOptions,
+                onPick: (key) => {
+                  const items = [...(pg?.items ?? []), key];
+                  const message = pg?.message ?? [];
+                  onChange({ postGame: { message, items } });
+                },
+              })}
+              style={{ fontSize: 12, background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, color: '#88ff88', cursor: 'pointer', padding: '3px 10px' }}
+            >+ objeto</button>
+          </div>
+          <label style={labelStyle}>Logro al derrotar (quest id)</label>
+          <input
+            type="text"
+            value={trainer.defeatQuestId ?? ''}
+            onChange={(e) => onChange({ defeatQuestId: e.target.value.trim() || null })}
+            placeholder="p.ej. gimnasio-celeste-superado (se añade a completedQuests)"
+            style={inputStyle}
+          />
+          <div style={{ color: '#667', fontSize: 10, marginTop: 4 }}>
+            El logro se marca al ganar el combate; visible en el panel admin. Los regalos y
+            static Pokémon tienen su propio quest id en sus modos respectivos.
+          </div>
         </div>
       )}
 

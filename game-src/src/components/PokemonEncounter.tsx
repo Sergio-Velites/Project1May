@@ -1041,6 +1041,11 @@ const PokemonEncounter = () => {
       if (trainerPokemonIndex === 10) {
         dispatch(defeatTrainer());
 
+        // Logro asociado a la derrota (editable desde el map-editor)
+        if (trainer.defeatQuestId) {
+          dispatch(completeQuest(trainer.defeatQuestId));
+        }
+
         // Handling post game
         if (trainer.postGame) {
           dispatch(

@@ -3566,7 +3566,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "psychic",
@@ -3590,7 +3591,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "pokeManiac",
@@ -3625,7 +3627,8 @@
             "level": 34
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "aceTrainerFemale",
@@ -3656,7 +3659,8 @@
             "level": 35
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -5067,7 +5071,8 @@
             "level": 21
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "cueBall",
@@ -5098,7 +5103,8 @@
             "level": 21
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "sergioNpc",
@@ -5140,7 +5146,17 @@
             "level": 24
           }
         ],
-        "postGame": "{\n        message: [\n          \"¡Toma la MEDALLA CELESTE!\",\n          \"Te la has currado más que muchos con dorsal.\",\n        ],\n        items: [ItemType.CascadeBadge, ItemType.Tm34],\n      }"
+        "postGame": {
+          "message": [
+            "¡Toma la MEDALLA CELESTE!",
+            "Te la has currado más que muchos con dorsal."
+          ],
+          "items": [
+            "CascadeBadge",
+            "Tm34"
+          ]
+        },
+        "defeatQuestId": null
       },
       {
         "npcKey": "martaNpc",
@@ -5181,7 +5197,8 @@
             "level": 24
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -5678,7 +5695,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -5976,7 +5994,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -6000,7 +6019,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "youngster",
@@ -6024,7 +6044,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "beauty",
@@ -6048,7 +6069,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -6072,7 +6094,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "blackBelt",
@@ -6103,7 +6126,8 @@
             "level": 18
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "jrTrainerFemale",
@@ -6134,7 +6158,8 @@
             "level": 20
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "gentleman",
@@ -6165,7 +6190,8 @@
             "level": 20
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -11737,7 +11763,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "superNerd",
@@ -11764,7 +11791,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "scientist",
@@ -11791,7 +11819,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -13391,7 +13420,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "rival",
@@ -13443,7 +13473,8 @@
             "level": 150
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -15442,7 +15473,8 @@
             "level": 28
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -15472,7 +15504,8 @@
             "level": 29
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "superNerd",
@@ -15502,7 +15535,8 @@
             "level": 29
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "bugCatcher",
@@ -15536,7 +15570,8 @@
             "level": 28
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -15566,7 +15601,8 @@
             "level": 25
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "hiker",
@@ -15601,7 +15637,8 @@
             "level": 29
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "youngster",
@@ -15632,7 +15669,8 @@
             "level": 28
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -17222,7 +17260,8 @@
             "level": 32
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -17256,7 +17295,8 @@
             "level": 33
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -17286,7 +17326,8 @@
             "level": 28
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -17320,7 +17361,8 @@
             "level": 31
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "superNerd",
@@ -17354,7 +17396,8 @@
             "level": 29
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -18351,7 +18394,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -18652,7 +18696,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -18810,7 +18855,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -19011,7 +19057,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -19037,7 +19084,8 @@
             "level": 3
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -19065,7 +19113,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -19093,7 +19142,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "rocker",
@@ -19117,7 +19167,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "gambler",
@@ -19143,7 +19194,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -19511,7 +19563,8 @@
             "level": 14
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "misty",
@@ -19543,7 +19596,8 @@
             "level": 17
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "ltSurge",
@@ -19577,7 +19631,8 @@
             "level": 20
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "erica",
@@ -19614,7 +19669,8 @@
             "level": 22
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "koga",
@@ -19651,7 +19707,8 @@
             "level": 23
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "sabrina",
@@ -19684,7 +19741,8 @@
             "level": 25
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "blaine",
@@ -19721,7 +19779,8 @@
             "level": 27
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "giovanni",
@@ -19764,7 +19823,8 @@
             "level": 30
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "sergioNpc",
@@ -19815,7 +19875,18 @@
             "level": 31
           }
         ],
-        "postGame": "{\n        message: [\n          \"¡Toma la INSIGNIA DEL VINO!\",\n          \"Es el símbolo de que mereces brindar.\",\n          \"¡Úsala bien, y que el vino fluya!\",\n        ],\n        items: [ItemType.BoulderBadge, ItemType.Tm34],\n      }"
+        "postGame": {
+          "message": [
+            "¡Toma la INSIGNIA DEL VINO!",
+            "Es el símbolo de que mereces brindar.",
+            "¡Úsala bien, y que el vino fluya!"
+          ],
+          "items": [
+            "BoulderBadge",
+            "Tm34"
+          ]
+        },
+        "defeatQuestId": null
       },
       {
         "npcKey": "martaNpc",
@@ -19866,7 +19937,8 @@
             "level": 40
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -20064,7 +20136,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -20436,7 +20509,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -20573,7 +20647,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "jrTrainerMale",
@@ -20598,7 +20673,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "youngster",
@@ -20622,7 +20698,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "beauty",
@@ -20649,7 +20726,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -21046,7 +21124,8 @@
             "level": 10
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "jrTrainerMale",
@@ -21078,7 +21157,8 @@
             "level": 13
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "beauty",
@@ -21104,7 +21184,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "scientist",
@@ -21135,7 +21216,8 @@
             "level": 14
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "aceTrainerMale",
@@ -21161,7 +21243,8 @@
             "level": 15
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -21188,7 +21271,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -27973,7 +28057,8 @@
             "level": 4
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "beauty",
@@ -27997,7 +28082,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -28022,7 +28108,8 @@
             "level": 6
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "fisher",
@@ -28053,7 +28140,8 @@
             "level": 5
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "sailor",
@@ -28084,7 +28172,8 @@
             "level": 6
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -39992,7 +40081,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "blackBelt",
@@ -40021,7 +40111,8 @@
             "level": 20
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -40415,7 +40506,8 @@
             "level": 7
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "youngster",
@@ -40447,7 +40539,8 @@
             "level": 8
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "bugCatcher",
@@ -40479,7 +40572,8 @@
             "level": 9
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "jrTrainerMale",
@@ -40511,7 +40605,8 @@
             "level": 10
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "youngster",
@@ -40537,7 +40632,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -40564,7 +40660,8 @@
             "level": 36
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -40592,7 +40689,8 @@
             "level": 34
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -40623,7 +40721,8 @@
             "level": 33
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -40656,7 +40755,8 @@
             "level": 33
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -45644,7 +45744,8 @@
             "level": 12
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "youngster",
@@ -45676,7 +45777,8 @@
             "level": 9
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -45707,7 +45809,8 @@
             "level": 8
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "fisher",
@@ -45743,7 +45846,8 @@
             "level": 12
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -48479,7 +48583,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "beauty",
@@ -48503,7 +48608,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "gambler",
@@ -48527,7 +48633,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "gentleman",
@@ -48558,7 +48665,8 @@
             "level": 22
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "aceTrainerFemale",
@@ -48589,7 +48697,8 @@
             "level": 22
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -49471,7 +49580,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -49495,7 +49605,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "superNerd",
@@ -49519,7 +49630,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "blackBelt",
@@ -49550,7 +49662,8 @@
             "level": 21
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "biker",
@@ -49581,7 +49694,8 @@
             "level": 23
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "superNerd",
@@ -49608,7 +49722,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "beauty",
@@ -49632,7 +49747,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -50714,7 +50830,8 @@
             "level": 26
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "youngster",
@@ -50750,7 +50867,8 @@
             "level": 25
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "bugCatcher",
@@ -50782,7 +50900,8 @@
             "level": 19
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "youngster",
@@ -50814,7 +50933,8 @@
             "level": 27
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -50847,7 +50967,8 @@
             "level": 21
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "bugCatcher",
@@ -50879,7 +51000,8 @@
             "level": 20
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -50912,7 +51034,8 @@
             "level": 25
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "birdKeeper",
@@ -50947,7 +51070,8 @@
             "level": 30
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -50979,7 +51103,8 @@
             "level": 30
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -51752,7 +51877,8 @@
             "level": 30
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "jrTrainerMale",
@@ -51787,7 +51913,8 @@
             "level": 34
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "oak",
@@ -51838,7 +51965,19 @@
             "level": 40
           }
         ],
-        "postGame": "{\n          message: [\n            \"¡Toma, para que sigas con tus andanzas!\",\n            \"Gracias por contribuir al juego.\",\n            \"Y por supuesto, a la boda!\",\n            \"¡Bebe más anís!\",\n          ],\n          items: [ItemType.MasterBall, ItemType.Hm01],\n        }"
+        "postGame": {
+          "message": [
+            "¡Toma, para que sigas con tus andanzas!",
+            "Gracias por contribuir al juego.",
+            "Y por supuesto, a la boda!",
+            "¡Bebe más anís!"
+          ],
+          "items": [
+            "MasterBall",
+            "Hm01"
+          ]
+        },
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -51870,7 +52009,8 @@
             "level": 29
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "burglar",
@@ -51897,7 +52037,8 @@
             "level": 30
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -53188,7 +53329,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "gentleman",
@@ -53213,7 +53355,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "youngster",
@@ -53237,7 +53380,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -54234,7 +54378,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "rocker",
@@ -54258,7 +54403,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "fisher",
@@ -54289,7 +54435,8 @@
             "level": 27
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "superNerd",
@@ -54324,7 +54471,8 @@
             "level": 28
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "swimmer",
@@ -54354,7 +54502,8 @@
             "level": 28
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -71012,7 +71161,8 @@
             "level": 30
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "engineer",
@@ -71043,7 +71193,8 @@
             "level": 32
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "ltSurge",
@@ -71083,7 +71234,17 @@
             "level": 34
           }
         ],
-        "postGame": "{\n        message: [\n          \"¡Toma la MEDALLA CARMÍN!\",\n          \"Te la has renderizado en tiempo récord.\",\n        ],\n        items: [ItemType.ThunderBadge, ItemType.Tm34],\n      }"
+        "postGame": {
+          "message": [
+            "¡Toma la MEDALLA CARMÍN!",
+            "Te la has renderizado en tiempo récord."
+          ],
+          "items": [
+            "ThunderBadge",
+            "Tm34"
+          ]
+        },
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -71765,7 +71926,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "engineer",
@@ -71789,7 +71951,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "rocker",
@@ -71813,7 +71976,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "superNerd",
@@ -71844,7 +72008,8 @@
             "level": 29
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "beauty",
@@ -71874,7 +72039,8 @@
             "level": 31
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "engineer",
@@ -71909,7 +72075,8 @@
             "level": 30
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "sailor",
@@ -71939,7 +72106,8 @@
             "level": 31
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -74325,7 +74493,8 @@
             "level": 2
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -75181,7 +75350,8 @@
             "level": 6
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "jrTrainerFemale",
@@ -75208,7 +75378,8 @@
             "level": 7
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -75239,7 +75410,8 @@
             "level": 6
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "gentleman",
@@ -75265,7 +75437,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "rocker",
@@ -75290,7 +75463,8 @@
             "level": 1
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -75315,7 +75489,8 @@
             "level": 3
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "sailor",
@@ -75340,7 +75515,8 @@
             "level": 5
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "fisher",
@@ -75371,7 +75547,8 @@
             "level": 6
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {
@@ -76119,7 +76296,8 @@
             "level": 10
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "bugCatcher",
@@ -76155,7 +76333,8 @@
             "level": 8
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "bugCatcher",
@@ -76191,7 +76370,8 @@
             "level": 11
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "beauty",
@@ -76215,7 +76395,8 @@
             "level": 6
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -76239,7 +76420,8 @@
             "level": 4
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "teamRocketGrunt",
@@ -76271,7 +76453,8 @@
             "level": 9
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "hiker",
@@ -76297,7 +76480,8 @@
             "level": 7
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "pokeManiac",
@@ -76329,7 +76513,8 @@
             "level": 10
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       },
       {
         "npcKey": "lass",
@@ -76355,7 +76540,8 @@
             "level": 5
           }
         ],
-        "postGame": null
+        "postGame": null,
+        "defeatQuestId": null
       }
     ],
     "walls": {

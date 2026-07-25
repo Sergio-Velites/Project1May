@@ -713,7 +713,8 @@ function parseTrainerObject(text) {
     // pokemon
     const pokemon = parsePokemonArray(text);
 
-    // postGame — extraer como texto raw (puede contener ItemType.xxx)
+    // postGame — intentar parseo ESTRUCTURADO {message, items}; si el bloque
+    // tiene otras claves, se conserva como texto raw (comportamiento previo).
     const postGameM = text.match(/postGame\s*:/);
     let postGame = null;
     if (postGameM) {
@@ -728,9 +729,14 @@ function parseTrainerObject(text) {
             if (depth === 0) { end = i; break; }
           }
         }
-        postGame = text.slice(start, end + 1).trim();
+        const raw = text.slice(start, end + 1).trim();
+        postGame = parsePostGameStructured(raw) ?? raw;
       }
     }
+
+    // defeatQuestId — logro que se completa al derrotar al entrenador
+    const defeatM = text.match(/defeatQuestId\s*:\s*"([^"]+)"/);
+    const defeatQuestId = defeatM ? defeatM[1] : null;
 
     return {
       npcKey,
@@ -745,7 +751,42 @@ function parseTrainerObject(text) {
       outtro,
       pokemon,
       postGame,
+      defeatQuestId,
     };
+  } catch {
+    return null;
+  }
+}
+
+// Intenta convertir el bloque raw de postGame en { message, items }.
+// Devuelve null si el bloque tiene claves distintas de message/items
+// (en ese caso se conserva como texto raw para no perder nada).
+function parsePostGameStructured(raw) {
+  try {
+    const inner = raw.slice(1, -1);
+    // claves de primer nivel del objeto
+    const keys = [];
+    let depth = 0;
+    for (let i = 0; i < inner.length; i++) {
+      const ch = inner[i];
+      if (ch === "{" || ch === "[") depth++;
+      else if (ch === "}" || ch === "]") depth--;
+      else if (depth === 0) {
+        const m = inner.slice(i).match(/^([A-Za-z_]\w*)\s*:/);
+        if (m) { keys.push(m[1]); i += m[0].length - 1; }
+      }
+    }
+    if (keys.length === 0 || keys.some((k) => k !== "message" && k !== "items")) return null;
+    const message = parseStringArray(raw, "message");
+    if (!message.length) return null;
+    const items = [];
+    const itemsM = raw.match(/items\s*:\s*\[([^\]]*)\]/);
+    if (itemsM) {
+      const re = /ItemType\.([A-Za-z0-9_]+)/g;
+      let im;
+      while ((im = re.exec(itemsM[1])) !== null) items.push(im[1]);
+    }
+    return { message, items };
   } catch {
     return null;
   }

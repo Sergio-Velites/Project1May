@@ -35,8 +35,14 @@ export interface TrainerState {
   isGymLeader?: boolean;
   hideCondition?: string | null;
   sightRange?: number | null;
-  /** Texto crudo del objeto postGame (se conserva tal cual). */
-  postGame?: string | null;
+  /**
+   * Recompensas tras la derrota. Estructurado { message, items } (items =
+   * claves de ItemType, p.ej. "CascadeBadge") cuando el editor lo gestiona;
+   * string = texto crudo legado que se conserva tal cual.
+   */
+  postGame?: string | { message: string[]; items?: string[] } | null;
+  /** Logro/quest que se completa al derrotar al entrenador. */
+  defeatQuestId?: string | null;
 }
 
 export interface TextRewardState {
@@ -369,6 +375,18 @@ function serTeleports(teleports: Record<string, Record<string, { map: string; po
   return `teleports: {\n${rowLines.join('\n')}\n  }`;
 }
 
+// postGame: objeto estructurado → bloque canónico; string → verbatim (legado).
+function serPostGame(pg: string | { message: string[]; items?: string[] }): string {
+  if (typeof pg === 'string') return pg;
+  const msg = pg.message.map((s) => `        "${escapeTSString(s)}",`).join('\n');
+  const lines = [`{`, `      message: [`, msg, `      ],`];
+  if (pg.items && pg.items.length) {
+    lines.push(`      items: [${pg.items.map((k) => `ItemType.${k}`).join(', ')}],`);
+  }
+  lines.push(`    }`);
+  return lines.join('\n');
+}
+
 function serTrainers(trainers: TrainerState[]): string {
   if (trainers.length === 0) return 'trainers: []';
   const lines = trainers.map((t) => {
@@ -381,7 +399,8 @@ function serTrainers(trainers: TrainerState[]): string {
     if (t.isOnline) opts.push('    isOnline: true,');
     if (t.isGymLeader) opts.push('    isGymLeader: true,');
     if (t.sightRange !== null && t.sightRange !== undefined) opts.push(`    sightRange: ${t.sightRange},`);
-    if (t.postGame) opts.push(`    postGame: ${t.postGame},`);
+    if (t.postGame) opts.push(`    postGame: ${serPostGame(t.postGame)},`);
+    if (t.defeatQuestId) opts.push(`    defeatQuestId: "${escapeTSString(t.defeatQuestId)}",`);
     const body = [
       `    npc: ${t.npcKey},`,
       `    pokemon: [${pokemon}],`,

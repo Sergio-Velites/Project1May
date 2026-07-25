@@ -326,6 +326,11 @@ export interface TrainerType {
     message: string[];
     items?: ItemType[];
   };
+  /**
+   * Logro/quest que se marca como completado (`completedQuests`) al derrotar
+   * a este entrenador. Editable desde el map-editor.
+   */
+  defeatQuestId?: string;
 }
 
 export interface MapItemType {

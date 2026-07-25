@@ -15,7 +15,9 @@ export interface ParsedTrainer {
   intro: string[];
   outtro: string[];
   pokemon: { id: number; level: number }[];
-  postGame: string | null;
+  /** Estructurado {message, items} si el bloque solo tiene esas claves; si no, texto raw. */
+  postGame: string | { message: string[]; items: string[] } | null;
+  defeatQuestId: string | null;
   isGymLeader: boolean;
 }
 
@@ -503,15 +505,21 @@ function parseTrainerObject(text: string): ParsedTrainer | null {
     const outtro = parseStringArray(text, 'outtro');
     const pokemon = parsePokemonArray(text);
 
-    let postGame: string | null = null;
+    let postGame: string | { message: string[]; items: string[] } | null = null;
     const postGameM = text.match(/(?<![\w])postGame\s*:/);
     if (postGameM && postGameM.index !== undefined) {
       const start = text.indexOf('{', postGameM.index + postGameM[0].length);
       if (start !== -1) {
         const blk = findBalancedBlock(text, start);
-        if (blk) postGame = blk.text.trim();
+        if (blk) {
+          const raw = blk.text.trim();
+          postGame = parsePostGameStructured(raw) ?? raw;
+        }
       }
     }
+
+    const defeatM = text.match(/(?<![\w])defeatQuestId\s*:\s*"([^"]+)"/);
+    const defeatQuestId = defeatM ? defeatM[1] : null;
 
     return {
       npcKey,
@@ -527,7 +535,41 @@ function parseTrainerObject(text: string): ParsedTrainer | null {
       outtro,
       pokemon,
       postGame,
+      defeatQuestId,
     };
+  } catch {
+    return null;
+  }
+}
+
+// Intenta convertir el bloque raw de postGame en { message, items }.
+// Devuelve null si el bloque tiene claves distintas de message/items
+// (en ese caso el llamador conserva el texto raw, sin pérdidas).
+function parsePostGameStructured(raw: string): { message: string[]; items: string[] } | null {
+  try {
+    const inner = raw.slice(1, -1);
+    const keys: string[] = [];
+    let depth = 0;
+    for (let i = 0; i < inner.length; i++) {
+      const ch = inner[i];
+      if (ch === '{' || ch === '[') depth++;
+      else if (ch === '}' || ch === ']') depth--;
+      else if (depth === 0) {
+        const m = inner.slice(i).match(/^([A-Za-z_]\w*)\s*:/);
+        if (m) { keys.push(m[1]); i += m[0].length - 1; }
+      }
+    }
+    if (keys.length === 0 || keys.some((k) => k !== 'message' && k !== 'items')) return null;
+    const message = parseStringArray(raw, 'message');
+    if (!message.length) return null;
+    const items: string[] = [];
+    const itemsM = raw.match(/items\s*:\s*\[([^\]]*)\]/);
+    if (itemsM) {
+      const re = /ItemType\.([A-Za-z0-9_]+)/g;
+      let im: RegExpExecArray | null;
+      while ((im = re.exec(itemsM[1])) !== null) items.push(im[1]);
+    }
+    return { message, items };
   } catch {
     return null;
   }
