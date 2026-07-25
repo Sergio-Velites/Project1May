@@ -1,6 +1,6 @@
 import image from "../assets/map/cerulean-city-bike-shop.png";
 import { MapId, MapType } from "./map-types";
-import { blaine } from "../app/npcs";
+import { blaine, juggler } from "../app/npcs";
 import { Direction } from "../state/state-types";
 
 const ceruleanCityBikeShop: MapType = {
@@ -44,6 +44,18 @@ const ceruleanCityBikeShop: MapType = {
       "No nos queda stock.",
       "Por si quieres,",
       "puedes invertir!"
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: juggler,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Right,
+    pos: { x: 0, y: 6 },
+    intro: [],
+    outtro: [
+      "Hazte partner!"
     ],
     money: 0,
     persistent: true,
