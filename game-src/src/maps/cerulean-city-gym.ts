@@ -7,30 +7,28 @@ import { Direction } from "../state/state-types";
 const ceruleanCityGym: MapType = {
   name: "Gimnasio Ciudad Celeste",
   image,
-  height: 14,
-  width: 10,
+  height: 11,
+  width: 9,
   start: { x: 9, y: 13 },
   walls: {
-    0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    1: [4, 5],
-    2: [1, 2, 3, 6, 7, 8],
-    3: [1, 8],
-    4: [1, 2, 3, 4, 5, 6, 8],
-    5: [1, 8],
-    6: [1, 3, 4, 6, 7, 8],
-    7: [1, 3, 4, 6, 7, 8],
-    8: [1, 6, 7, 8],
-    9: [1, 2, 3, 6, 7, 8],
-    10: [1, 2, 3, 6, 8],
-    11: [1, 2, 3, 6, 8],
+    0: [3, 4, 5],
+    1: [3, 4, 5],
+    3: [3, 5],
+    4: [3, 5],
+    5: [3, 5],
+    6: [2, 3, 5, 6],
+    7: [2, 3, 5, 6],
+    8: [2, 3, 5, 6],
+    9: [2, 6],
+    10: [2, 6],
   },
   text: {},
   trainers: [
   {
     npc: blackBelt,
     pokemon: [{ id: 66, level: 20 }, { id: 57, level: 21 }],
-    facing: Direction.Down,
-    pos: { x: 4, y: 9 },
+    facing: Direction.Left,
+    pos: { x: 5, y: 9 },
     intro: [
       "Bienvenido al gimnasio TIPO HYROX.",
       "Aquí no se corre: se sufre con estilo."
@@ -43,8 +41,8 @@ const ceruleanCityGym: MapType = {
   {
     npc: cueBall,
     pokemon: [{ id: 62, level: 21 }, { id: 56, level: 21 }],
-    facing: Direction.Down,
-    pos: { x: 5, y: 6 },
+    facing: Direction.Right,
+    pos: { x: 2, y: 2 },
     intro: [
       "Yo solo reparto agua… y collejas.",
       "Un runner llegó hasta aquí. UNO."
@@ -58,7 +56,7 @@ const ceruleanCityGym: MapType = {
     npc: sergioNpc,
     pokemon: [{ id: 68, level: 23 }, { id: 57, level: 22 }, { id: 237, level: 23 }, { id: 214, level: 24 }],
     facing: Direction.Down,
-    pos: { x: 4, y: 2 },
+    pos: { x: 3, y: 1 },
     intro: [
       "¡Anda, si eres tú! MARTA, mira quién se ha colado.",
       "Paramos en Bilbao camino de Japón a competir.",
@@ -85,7 +83,7 @@ const ceruleanCityGym: MapType = {
     npc: martaNpc,
     pokemon: [{ id: 62, level: 22 }, { id: 67, level: 23 }, { id: 106, level: 23 }, { id: 107, level: 24 }],
     facing: Direction.Down,
-    pos: { x: 5, y: 2 },
+    pos: { x: 5, y: 1 },
     intro: [
       "¡Soy MARTA! Y no todo lo gana SERGIO, ¿eh?",
       "Nosotros paramos aquí de camino a Japón.",
@@ -108,9 +106,8 @@ const ceruleanCityGym: MapType = {
   grass: {},
   fences: {},
   teleports: {
-    14: {
+    11: {
       4: { map: MapId.CeruleanCity, pos: { x: 30, y: 20 } },
-      5: { map: MapId.CeruleanCity, pos: { x: 30, y: 20 } },
     },
   },
 };
