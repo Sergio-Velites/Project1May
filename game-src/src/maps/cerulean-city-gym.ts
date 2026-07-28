@@ -108,7 +108,7 @@ const ceruleanCityGym: MapType = {
   grass: {},
   fences: {},
   teleports: {
-    13: {
+    14: {
       4: { map: MapId.CeruleanCity, pos: { x: 30, y: 20 } },
       5: { map: MapId.CeruleanCity, pos: { x: 30, y: 20 } },
     },
