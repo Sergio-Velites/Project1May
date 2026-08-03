@@ -214,6 +214,7 @@ const route9: MapType = {
       pos: { x: 51, y: 2 },
     },
   ],
+  minimapPos: { x: 172, y: 39 },
 };
 
 export default route9;
