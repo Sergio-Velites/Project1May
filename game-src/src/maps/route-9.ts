@@ -1,6 +1,6 @@
 import image from "../assets/map/route-9.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
-import { pokeManiac, youngster } from "../app/npcs";
+import { blackBelt, pokeManiac, youngster } from "../app/npcs";
 const route9: MapType = {
   name: "Ruta 9",
   image,
@@ -73,6 +73,9 @@ const route9: MapType = {
       11: Direction.Down,
       12: Direction.Down,
       13: Direction.Down,
+      34: Direction.Down,
+      35: Direction.Down,
+      40: Direction.Down,
       46: Direction.Down,
       47: Direction.Down,
       52: Direction.Down,
@@ -115,7 +118,7 @@ const route9: MapType = {
     5: [20, 21, 22, 23, 24, 30, 32, 33, 38, 40, 41, 42, 43, 44, 45, 50, 51],
     7: [6, 7, 8, 9, 10, 11, 12, 13],
     9: [20, 21, 22, 23, 24, 25, 26, 27, 28],
-    11: [10, 11, 12, 13, 46, 47, 52, 53],
+    11: [10, 11, 12, 13, 34, 35, 40, 46, 47, 52, 53],
     13: [10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 46, 47, 52, 53],
   },
   text: {},
@@ -173,6 +176,22 @@ const route9: MapType = {
       "PEC"
     ],
     money: 250,
+    persistent: true,
+  },
+  {
+    npc: blackBelt,
+    pokemon: [{ id: 67, level: 60 }, { id: 106, level: 63 }, { id: 107, level: 65 }, { id: 237, level: 68 }, { id: 57, level: 70 }],
+    facing: Direction.Down,
+    pos: { x: 41, y: 6 },
+    intro: [
+      "A un tal juanle tu vel?",
+      "Muchas ostias tenel que dal!",
+      "Celveza bebel, ostia que dal!"
+    ],
+    outtro: [
+      "Juanle ya en tailandia estal?"
+    ],
+    money: 280,
     persistent: true,
   }
   ],
