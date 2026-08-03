@@ -21,9 +21,38 @@ import {
   setHeldItem,
 } from "../state/gameSlice";
 import { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
 import useItemData, { ItemData } from "../app/use-item-data";
 import { InventoryItemType } from "../state/state-types";
 import { getPokemonMetadata } from "../app/use-pokemon-metadata";
+import {
+  getItemDescription,
+  BAG_EXIT_DESCRIPTION,
+} from "../app/item-descriptions";
+
+// Caja de descripción del objeto resaltado, al estilo de la MOCHILA de
+// Oro/Plata (Gen II): la misma caja de diálogo inferior del juego muestra
+// qué hace el objeto bajo el cursor. En Rojo/Azul no existían descripciones;
+// este es el patrón con el que Game Freak las introdujo en Game Boy.
+// Mismo estilo que StyledText (Text.tsx), sin typewriter ni flecha:
+// las descripciones aparecen al instante, como en el original.
+const DescriptionBox = styled.div`
+  position: absolute !important;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 30%;
+  background: var(--bg);
+  /* Por encima de los menús (100) y por debajo de los diálogos reales (1000),
+     que deben taparla cuando aparecen. */
+  z-index: 150;
+
+  h1 {
+    color: black;
+    font-size: 2.4cqw;
+    font-family: "PokemonGB";
+  }
+`;
 
 // Gen II: casi CUALQUIER objeto puede equiparse (aunque solo los de
 // held-item-helper.ts tienen efecto en combate — el resto simplemente "lo
@@ -48,6 +77,9 @@ const ItemsMenu = () => {
   const tossing = !!useSelector(selectConfirmationMenu);
 
   const [selected, setSelected] = useState<ItemData | null>(null);
+  // Índice global del elemento resaltado en la lista de la mochila
+  // (incluye la fila "Salir" al final, índice === bagItems.length).
+  const [hovered, setHovered] = useState(0);
 
   // Tracking de uso de objeto en combate. Cuando el jugador pulsa "Usar"
   // sobre un objeto usable en combate, marcamos `pendingBattleConsume`. Al
@@ -68,25 +100,43 @@ const ItemsMenu = () => {
     }
   }, [usingItem, dispatch]);
 
+  // Lista visible de la mochila: fuente ÚNICA tanto para el menú como para
+  // la descripción del elemento resaltado (mismo filtro, mismo orden).
+  const bagItems = inventory.filter(
+    (item: InventoryItemType) => item.amount > 0 && !itemData[item.item].badge
+  );
+
+  // Descripción del objeto bajo el cursor. La fila extra "Salir" (índice
+  // bagItems.length) muestra su propio texto, como CANCELAR en Oro/Plata.
+  // Si el índice quedara fuera de rango (p. ej. la lista encogió al agotarse
+  // un objeto), no se muestra nada.
+  const hoveredDescription =
+    hovered < bagItems.length
+      ? getItemDescription(bagItems[hovered].item)
+      : hovered === bagItems.length
+      ? BAG_EXIT_DESCRIPTION
+      : "";
+
   return (
     <>
       <Menu
         disabled={!!selected || usingItem || learningMove}
         show={show}
         close={() => dispatch(hideItemsMenu())}
-        menuItems={inventory
-          .filter(
-            (item: InventoryItemType) =>
-              item.amount > 0 && !itemData[item.item].badge
-          )
-          .map((item: InventoryItemType) => {
-            return {
-              label: itemData[item.item].name,
-              value: item.amount,
-              action: () => setSelected(itemData[item.item]),
-            };
-          })}
+        setHovered={setHovered}
+        menuItems={bagItems.map((item: InventoryItemType) => {
+          return {
+            label: itemData[item.item].name,
+            value: item.amount,
+            action: () => setSelected(itemData[item.item]),
+          };
+        })}
       />
+      {show && !usingItem && !learningMove && !tossing && hoveredDescription && (
+        <DescriptionBox className="framed no-hd">
+          <h1>{hoveredDescription}</h1>
+        </DescriptionBox>
+      )}
       {selected && (
         <Menu
           disabled={tossing || usingItem}

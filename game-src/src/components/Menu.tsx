@@ -128,9 +128,11 @@ const Menu = ({
 
   const requiresScrolling = totalItems > MENU_MAX_HEIGHT;
 
+  // Índice GLOBAL del elemento resaltado (con listas scrolleadas el elemento
+  // real es activeIndex + scrollIndex, igual que en el handler de Event.A).
   useEffect(() => {
-    if (setHovered) setHovered(activeIndex);
-  }, [activeIndex, setHovered]);
+    if (setHovered) setHovered(activeIndex + scrollIndex);
+  }, [activeIndex, scrollIndex, setHovered]);
 
   useEvent(Event.Up, () => {
     if (disabled) return;
