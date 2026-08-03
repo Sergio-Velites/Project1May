@@ -50,7 +50,7 @@ const pewterCityPokeMart: MapType = {
   trainers: [
   {
     npc: superNerd,
-    pokemon: [{ id: 19, level: 2 }],
+    pokemon: [{ id: 1, level: 5 }],
     facing: Direction.Right,
     pos: { x: 0, y: 5 },
     intro: [],
