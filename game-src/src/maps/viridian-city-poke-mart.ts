@@ -3,6 +3,8 @@ import { MapId, MapType } from "./map-types";
 
 import music from "../assets/music/maps/pokemon-center.mp3";
 import { ItemType } from "../app/use-item-data";
+import { birdKeeper } from "../app/npcs";
+import { Direction } from "../state/state-types";
 
 const viridianCityPokeMart: MapType = {
   name: "Tienda del Soto",
@@ -42,7 +44,20 @@ const viridianCityPokeMart: MapType = {
       4: { map: MapId.ViridianCity, pos: { x: 29, y: 20 } },
     },
   },
-  trainers: [],
+  trainers: [
+  {
+    npc: birdKeeper,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Right,
+    pos: { x: 0, y: 5 },
+    intro: [],
+    outtro: [
+      "..."
+    ],
+    money: 0,
+    persistent: true,
+  }
+  ],
 };
 
 export default viridianCityPokeMart;
