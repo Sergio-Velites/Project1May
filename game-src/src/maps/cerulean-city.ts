@@ -115,7 +115,7 @@ const ceruleanCity: MapType = {
     pos: { x: 21, y: 9 },
     intro: [],
     outtro: [
-      "Deja desarrollar al team rocket!"
+      "Pues habla con perroproblemas!"
     ],
     money: 0,
     persistent: true,
@@ -128,7 +128,7 @@ const ceruleanCity: MapType = {
     pos: { x: 20, y: 9 },
     intro: [],
     outtro: [
-      "Deja desarrollar al team rocket!"
+      "¿Queréis problemas?"
     ],
     money: 0,
     persistent: true,
