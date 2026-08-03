@@ -119,6 +119,7 @@ const ceruleanCity: MapType = {
     ],
     money: 0,
     persistent: true,
+    hideCondition: "trainer-defeated:cerulean-city-gym-3-1",
   },
   {
     npc: teamRocketGrunt,
@@ -131,6 +132,7 @@ const ceruleanCity: MapType = {
     ],
     money: 0,
     persistent: true,
+    hideCondition: "trainer-defeated:cerulean-city-gym-3-1",
   },
   {
     npc: youngster,
