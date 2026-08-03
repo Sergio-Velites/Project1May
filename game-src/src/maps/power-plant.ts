@@ -56,9 +56,9 @@ const powerPlant: MapType = {
   fences: {},
   teleports: {
     11: {
-      0: { map: MapId.Route10, pos: { x: 6, y: 40 } },
+      "-1": { map: MapId.Route10, pos: { x: 2, y: 40 } },
     },
-    35: {
+    36: {
       4: { map: MapId.Route10, pos: { x: 6, y: 40 } },
       5: { map: MapId.Route10, pos: { x: 6, y: 40 } },
     },
