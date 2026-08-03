@@ -46,16 +46,24 @@ const powerPlant: MapType = {
     35: [0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
   },
   text: {},
-  maps: {
-
-  },
-  exits: {
-    11: [0],
-    35: [4, 5],
-  },
+  maps: {},
+  exits: {},
   exitReturnMap: MapId.Route10,
   exitReturnPos: { x: 6, y: 40 },
   grass: {},
+  cave: true,
+  music: "/game/music/maps-original/silph-co.mp3",
+  fences: {},
+  teleports: {
+    11: {
+      0: { map: MapId.Route10, pos: { x: 6, y: 40 } },
+    },
+    35: {
+      4: { map: MapId.Route10, pos: { x: 6, y: 40 } },
+      5: { map: MapId.Route10, pos: { x: 6, y: 40 } },
+    },
+  },
+  trainers: [],
 };
 
 export default powerPlant;
