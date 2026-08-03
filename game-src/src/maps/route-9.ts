@@ -1,6 +1,7 @@
 import image from "../assets/map/route-9.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
 import { blackBelt, pokeManiac, youngster } from "../app/npcs";
+import { ItemType } from "../app/use-item-data";
 const route9: MapType = {
   name: "Ruta 9",
   image,
@@ -194,6 +195,24 @@ const route9: MapType = {
     money: 280,
     persistent: true,
   }
+  ],
+  items: [
+    {
+      item: ItemType.UltraBall,
+      pos: { x: 7, y: 3 },
+    },
+    {
+      item: ItemType.BlackBelt,
+      pos: { x: 32, y: 3 },
+    },
+    {
+      item: ItemType.QuickClaw,
+      pos: { x: 53, y: 15 },
+    },
+    {
+      item: ItemType.ScopeLens,
+      pos: { x: 51, y: 2 },
+    },
   ],
 };
 
