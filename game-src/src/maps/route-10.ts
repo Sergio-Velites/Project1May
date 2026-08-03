@@ -222,6 +222,11 @@ const route10: MapType = {
   },
   trainers: [],
   minimapPos: { x: 197, y: 50 },
+  flyable: true,
+  flySpot: { x: 11, y: 20 },
+  flyUnlockTiles: {
+    20: [11],
+  },
 };
 
 export default route10;
