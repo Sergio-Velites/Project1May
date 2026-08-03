@@ -1,7 +1,6 @@
 import image from "../assets/map/route-9.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
-import { youngster } from "../app/npcs";
-
+import { pokeManiac, youngster } from "../app/npcs";
 const route9: MapType = {
   name: "Ruta 9",
   image,
@@ -159,6 +158,21 @@ const route9: MapType = {
       "Igual es mejor que beba anís..."
     ],
     money: 100,
+    persistent: true,
+  },
+  {
+    npc: pokeManiac,
+    pokemon: [{ id: 131, level: 55 }, { id: 233, level: 57 }, { id: 142, level: 59 }, { id: 112, level: 61 }, { id: 208, level: 63 }, { id: 221, level: 65 }],
+    facing: Direction.Left,
+    pos: { x: 23, y: 12 },
+    intro: [
+      "Pensaba que todo friki entraba en la boda. ",
+      "Pero me dejaron fuera..."
+    ],
+    outtro: [
+      "PEC"
+    ],
+    money: 250,
     persistent: true,
   }
   ],
