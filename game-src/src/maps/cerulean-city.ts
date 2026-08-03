@@ -1,6 +1,6 @@
 import image from "../assets/map/cerulean-city.png";
 import { MapId, MapType } from "./map-types";
-import { beauty, blackBelt, gentleman, jrTrainerFemale, lass, teamRocketGrunt, youngster } from "../app/npcs";
+import { beauty, blackBelt, gentleman, jrTrainerFemale, lass, ltSurge, teamRocketGrunt, youngster } from "../app/npcs";
 import { Direction } from "../state/state-types";
 import { ItemType } from "../app/use-item-data";
 
@@ -90,7 +90,7 @@ const ceruleanCity: MapType = {
   cuttableTrees: [
     {
       pos: { x: 19, y: 28 },
-      questId: "cut-tree-cerulean-city-19-28",
+      questId: "cut-tree-cerulean-city-17-28",
     },
   ],
   boulders: [
@@ -209,6 +209,19 @@ const ceruleanCity: MapType = {
       "Repetición… válida. Enhorabuena, supongo."
     ],
     money: 400,
+  },
+  {
+    npc: ltSurge,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Down,
+    pos: { x: 4, y: 12 },
+    intro: [],
+    outtro: [
+      "De verdad te crees que ya puedes entrar por aquí??",
+      "Aún te queda mucho anís por beber chaval!"
+    ],
+    money: 0,
+    persistent: true,
   }
   ],
   water: {
@@ -332,24 +345,6 @@ const ceruleanCity: MapType = {
     },
   },
   minimapPos: { x: 147, y: 40 },
-  berryTrees: [
-    {
-      pos: { x: 17, y: 7 },
-      item: ItemType.Berry,
-    },
-    {
-      pos: { x: 14, y: 7 },
-      item: ItemType.MintBerry,
-    },
-    {
-      pos: { x: 11, y: 7 },
-      item: ItemType.PrzCureBerry,
-    },
-    {
-      pos: { x: 8, y: 7 },
-      item: ItemType.IceBerry,
-    },
-  ],
 };
 
 export default ceruleanCity;
