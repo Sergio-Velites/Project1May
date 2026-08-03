@@ -87,6 +87,12 @@ interface Props {
   wide?: boolean;
   /** Ancho fijo del menú (override del de compact/wide). */
   width?: string;
+  /**
+   * Nº máximo de filas visibles (default MENU_MAX_HEIGHT). Con listas más
+   * largas se scrollea igual que siempre. Lo usa la mochila para dejar
+   * libre la caja de descripción inferior (patrón Oro/Plata).
+   */
+  maxVisible?: number;
   setHovered?: (index: number) => void;
 }
 
@@ -108,6 +114,7 @@ const Menu = ({
   tight,
   wide,
   width,
+  maxVisible,
   setHovered,
 }: Props) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -126,7 +133,8 @@ const Menu = ({
       ? padd
       : menuItems.length;
 
-  const requiresScrolling = totalItems > MENU_MAX_HEIGHT;
+  const visibleRows = maxVisible ?? MENU_MAX_HEIGHT;
+  const requiresScrolling = totalItems > visibleRows;
 
   // Índice GLOBAL del elemento resaltado (con listas scrolleadas el elemento
   // real es activeIndex + scrollIndex, igual que en el handler de Event.A).
@@ -172,7 +180,7 @@ const Menu = ({
     if (requiresScrolling) {
       if (
         activeIndex === 2 &&
-        scrollIndex + MENU_MAX_HEIGHT < totalItems
+        scrollIndex + visibleRows < totalItems
       ) {
         setScrollIndex((prev) => prev + 1);
         return;
@@ -271,7 +279,7 @@ const Menu = ({
         style={{ width: "100%", paddingRight: padding || "0" }}
       >
         {items
-          .slice(scrollIndex, MENU_MAX_HEIGHT + scrollIndex)
+          .slice(scrollIndex, visibleRows + scrollIndex)
           .map((item: MenuItemType, index: number) => {
             return (
               <li key={index} style={{ position: "relative" }}>

@@ -124,6 +124,11 @@ const ItemsMenu = () => {
         show={show}
         close={() => dispatch(hideItemsMenu())}
         setHovered={setHovered}
+        // Como la MOCHILA de Oro/Plata: lista anclada arriba con menos filas
+        // visibles, para que la caja de descripción inferior (30%) no tape
+        // los últimos objetos ni la fila "Salir". El scroll funciona igual.
+        top="0"
+        maxVisible={6}
         menuItems={bagItems.map((item: InventoryItemType) => {
           return {
             label: itemData[item.item].name,
