@@ -1,5 +1,6 @@
 import image from "../assets/map/route-9.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
+import { youngster } from "../app/npcs";
 
 const route9: MapType = {
   name: "Ruta 9",
@@ -144,7 +145,23 @@ const route9: MapType = {
       questId: "cut-tree-route-9-5-8",
     },
   ],
-  trainers: [],
+  trainers: [
+  {
+    npc: youngster,
+    pokemon: [{ id: 12, level: 50 }, { id: 241, level: 57 }, { id: 128, level: 63 }, { id: 217, level: 70 }],
+    facing: Direction.Down,
+    pos: { x: 10, y: 8 },
+    intro: [
+      "Estaba en la mesa de los niños durante la boda!",
+      "Mientras todos bebíais anís, yo entrené duro!"
+    ],
+    outtro: [
+      "Igual es mejor que beba anís..."
+    ],
+    money: 100,
+    persistent: true,
+  }
+  ],
 };
 
 export default route9;
