@@ -1,6 +1,6 @@
 import image from "../assets/map/cerulean-city-poke-mart.png";
 import { MapId, MapType } from "./map-types";
-import { jrTrainerMale } from "../app/npcs";
+import { jrTrainerFemale } from "../app/npcs";
 import { Direction } from "../state/state-types";
 
 const ceruleanCityPokeMart: MapType = {
@@ -34,7 +34,7 @@ const ceruleanCityPokeMart: MapType = {
   store: { x: 1, y: 5 },
   trainers: [
   {
-    npc: jrTrainerMale,
+    npc: jrTrainerFemale,
     pokemon: [{ id: 19, level: 2 }],
     facing: Direction.Right,
     pos: { x: 0, y: 5 },
