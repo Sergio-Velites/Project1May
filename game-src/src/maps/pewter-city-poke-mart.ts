@@ -3,6 +3,8 @@ import { MapId, MapType } from "./map-types";
 
 import music from "../assets/music/maps/pokemon-center.mp3";
 import { ItemType } from "../app/use-item-data";
+import { superNerd } from "../app/npcs";
+import { Direction } from "../state/state-types";
 
 const pewterCityPokeMart: MapType = {
   name: "Tienda de Villamayor",
@@ -45,7 +47,20 @@ const pewterCityPokeMart: MapType = {
       4: { map: MapId.PewterCity, pos: { x: 23, y: 18 } },
     },
   },
-  trainers: [],
+  trainers: [
+  {
+    npc: superNerd,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Right,
+    pos: { x: 0, y: 5 },
+    intro: [],
+    outtro: [
+      "..."
+    ],
+    money: 0,
+    persistent: true,
+  }
+  ],
 };
 
 export default pewterCityPokeMart;
