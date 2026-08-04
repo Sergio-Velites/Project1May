@@ -154,7 +154,7 @@ const route4: MapType = {
   },
   {
     npc: jrTrainerMale,
-    pokemon: [{ id: 106, level: 31 }, { id: 107, level: 32 }, { id: 237, level: 34 }],
+    pokemon: [{ id: 106, level: 43 }, { id: 107, level: 51 }, { id: 237, level: 56 }],
     facing: Direction.Down,
     pos: { x: 77, y: 10 },
     intro: [
@@ -188,14 +188,14 @@ const route4: MapType = {
     isGymLeader: true,
     sightRange: 0,
     postGame: {
-          message: [
-            "¡Toma, para que sigas con tus andanzas!",
-            "Gracias por contribuir al juego.",
-            "Y por supuesto, a la boda!",
-            "¡Bebe más anís!",
-          ],
-          items: [ItemType.MasterBall, ItemType.Hm01],
-        },
+      message: [
+        "¡Toma, para que sigas con tus andanzas!",
+        "Gracias por contribuir al juego.",
+        "Y por supuesto, a la boda!",
+        "¡Bebe más anís!",
+      ],
+      items: [ItemType.MasterBall, ItemType.Hm01],
+    },
   },
   {
     npc: lass,
