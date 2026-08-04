@@ -219,6 +219,14 @@ const route24: MapType = {
       14: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
     },
   },
+  gifts: [
+    {
+      pokemonId: 155,
+      level: 5,
+      pos: { x: 18, y: 5 },
+      questId: "route-24-gift-18-5",
+    },
+  ],
 };
 
 export default route24;
