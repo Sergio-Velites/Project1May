@@ -172,7 +172,7 @@ const ceruleanCity: MapType = {
   },
   {
     npc: blackBelt,
-    pokemon: [{ id: 66, level: 18 }, { id: 56, level: 18 }],
+    pokemon: [{ id: 66, level: 44 }, { id: 56, level: 50 }],
     facing: Direction.Left,
     pos: { x: 31, y: 20 },
     intro: [
@@ -186,7 +186,7 @@ const ceruleanCity: MapType = {
   },
   {
     npc: jrTrainerFemale,
-    pokemon: [{ id: 61, level: 19 }, { id: 67, level: 20 }],
+    pokemon: [{ id: 61, level: 47 }, { id: 67, level: 56 }],
     facing: Direction.Down,
     pos: { x: 30, y: 26 },
     intro: [
@@ -200,7 +200,7 @@ const ceruleanCity: MapType = {
   },
   {
     npc: gentleman,
-    pokemon: [{ id: 107, level: 20 }, { id: 106, level: 20 }],
+    pokemon: [{ id: 107, level: 42 }, { id: 106, level: 51 }],
     facing: Direction.Up,
     pos: { x: 23, y: 22 },
     intro: [
