@@ -63,7 +63,7 @@ const mtMoon2f: MapType = {
       25: { map: MapId.MtMoon1f, pos: { x: 25, y: 16 } },
     },
     17: {
-      21: { map: MapId.MtMoon3f, pos: { x: 21, y: 17 } },
+      21: { map: MapId.MtMoon3f, pos: { x: 21, y: 18 } },
     },
     27: {
       13: { map: MapId.MtMoon3f, pos: { x: 15, y: 26 } },
