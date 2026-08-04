@@ -1,7 +1,6 @@
 import image from "../assets/map/route-25.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
-import { youngster, lass, superNerd, blackBelt, biker, beauty } from "../app/npcs";
-
+import { beauty, biker, blackBelt, lass, superNerd, youngster } from "../app/npcs";
 const route25: MapType = {
   name: "Ruta 25",
   image,
@@ -9,10 +8,10 @@ const route25: MapType = {
   width: 60,
   start: { x: 21, y: 11 },
   walls: {
-    0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
-    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 44, 45, 46, 47],
+    0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
+    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
     2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 15, 21, 27, 37, 44, 45, 46, 47],
-    3: [11, 15, 21, 26, 27, 37, 38, 39, 40, 41, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55],
+    3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 15, 21, 27, 37, 38, 39, 40, 41, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55],
     4: [21, 22, 23, 25, 31, 55],
     5: [12, 14, 16, 21, 25, 31, 55],
     6: [10, 11, 16, 18, 19, 21, 55],
@@ -47,117 +46,144 @@ const route25: MapType = {
     17: [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
   },
   fenceDirections: {
-    0: { 48: Direction.Left },
-    1: { 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down, 14: Direction.Down, 15: Direction.Down, 16: Direction.Down, 17: Direction.Down, 18: Direction.Down, 19: Direction.Down, 20: Direction.Down, 21: Direction.Down, 22: Direction.Down, 23: Direction.Down, 24: Direction.Down, 25: Direction.Down, 26: Direction.Down, 27: Direction.Down, 28: Direction.Down, 29: Direction.Down, 30: Direction.Down, 31: Direction.Down, 32: Direction.Down, 33: Direction.Down, 34: Direction.Down, 35: Direction.Down, 36: Direction.Down, 37: Direction.Down, 38: Direction.Down, 39: Direction.Down, 40: Direction.Down, 41: Direction.Down, 42: Direction.Down, 43: Direction.Down, 48: Direction.Down, 49: Direction.Down, 50: Direction.Down, 51: Direction.Down, 52: Direction.Down, 53: Direction.Down, 54: Direction.Down, 55: Direction.Down, 56: Direction.Down, 57: Direction.Down, 58: Direction.Down, 59: Direction.Down },
-    3: { 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down, 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down },
-    7: { 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down, 6: Direction.Down, 7: Direction.Down },
+    7: {
+      0: Direction.Down,
+      1: Direction.Down,
+      2: Direction.Down,
+      3: Direction.Down,
+      4: Direction.Down,
+      5: Direction.Down,
+      6: Direction.Down,
+      7: Direction.Down,
+    },
   },
   fences: {
-    0: [48],
-    1: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
-    3: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    7: [1, 2, 3, 4, 5, 6, 7],
+    7: [0, 1, 2, 3, 4, 5, 6, 7],
   },
   text: {},
   trainers: [
-    {
-      npc: youngster,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 10, y: 11 },
-      intro: [],
-      outtro: ["No preguntes. Sigue caminando. Por favor."],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: lass,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 14, y: 11 },
-      intro: [],
-      outtro: ["¡Cogí el ramo y lo solté! ¿Ahora me caso o no?"],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: superNerd,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 18, y: 11 },
-      intro: [],
-      outtro: ["Sé que aparqué. Lo que no sé es en qué provincia."],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: blackBelt,
-      pokemon: [{ id: 66, level: 21 }, { id: 56, level: 21 }],
-      facing: Direction.Down,
-      pos: { x: 30, y: 11 },
-      intro: [
-        "¿La meta es por aquí? Llevo desde ayer.",
-        "¿Esto sigue siendo Bilbao?"
-      ],
-      outtro: ["¡Lo sabía! Esto NO era lo mío."],
-      money: 420,
-    },
-    {
-      npc: biker,
-      pokemon: [{ id: 109, level: 22 }, { id: 88, level: 23 }],
-      facing: Direction.Down,
-      pos: { x: 34, y: 11 },
-      intro: [
-        "En la boda dije que era el más duro, cuñao.",
-        "Toca demostrarlo."
-      ],
-      outtro: ["…me piro antes de que se lo cuentes a nadie."],
-      money: 460,
-    },
-    {
-      npc: superNerd,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 42, y: 11 },
-      intro: [],
-      outtro: [
-        "¡Ah! ¡Los novios! No me abracéis, tengo las manos ocupadas.",
-        "Soy BILL, vuestro fotógrafo. Tengo 14.000 fotos vuestras.",
-        "CATORCE MIL. Y la buena… sé que está ahí.",
-        "Backup del backup del backup. Volved mañana."
-      ],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: beauty,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 46, y: 11 },
-      intro: [],
-      outtro: ["En esta salgo yo. Y en esta. Y… anda, en esta también."],
-      money: 0,
-      persistent: true,
-    }
+  {
+    npc: youngster,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Right,
+    pos: { x: 20, y: 4 },
+    intro: [],
+    outtro: [
+      "No preguntes. Sigue caminando. Por favor."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: lass,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Down,
+    pos: { x: 9, y: 6 },
+    intro: [],
+    outtro: [
+      "¡Cogí el ramo y lo solté! ¿Ahora me caso o no?"
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: superNerd,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Down,
+    pos: { x: 19, y: 7 },
+    intro: [],
+    outtro: [
+      "Sé que aparqué. Lo que no sé es en qué provincia."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: blackBelt,
+    pokemon: [{ id: 66, level: 51 }, { id: 56, level: 57 }],
+    facing: Direction.Down,
+    pos: { x: 27, y: 4 },
+    intro: [
+      "¿La meta es por aquí? Llevo desde ayer.",
+      "¿Esto sigue siendo Bilbao?"
+    ],
+    outtro: [
+      "¡Lo sabía! Esto NO era lo mío."
+    ],
+    money: 420,
+  },
+  {
+    npc: biker,
+    pokemon: [{ id: 109, level: 56 }, { id: 88, level: 59 }],
+    facing: Direction.Down,
+    pos: { x: 44, y: 4 },
+    intro: [
+      "En la boda dije que era el más duro, cuñao.",
+      "Toca demostrarlo."
+    ],
+    outtro: [
+      "…me piro antes de que se lo cuentes a nadie."
+    ],
+    money: 460,
+  },
+  {
+    npc: superNerd,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Up,
+    pos: { x: 46, y: 4 },
+    intro: [],
+    outtro: [
+      "¡Ah!",
+      "Tu eres el representante de los novios?",
+      "No me abraces, tengo las manos ocupadas.",
+      "Soy BILL, vuestro fotógrafo. Tengo 14.000 fotos vuestras.",
+      "CATORCE MIL. Y la buena… sé que está ahí.",
+      "Backup del backup del backup. Volved mañana."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: beauty,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Down,
+    pos: { x: 47, y: 8 },
+    intro: [],
+    outtro: [
+      "En esta salgo yo. Y en esta. Y… anda, en esta también."
+    ],
+    money: 0,
+    persistent: true,
+  }
   ],
-  maps: {
-    3: { 0: MapId.Route24 },
-    4: { 0: MapId.Route24 },
-    5: { 0: MapId.Route24 },
-    6: { 0: MapId.Route24 },
-    7: { 0: MapId.Route24 },
-    8: { 0: MapId.Route24 },
-    9: { 0: MapId.Route24 },
-    11: { 0: MapId.Route24 },
-  },
-  exits: {
-
-  },
+  maps: {},
+  exits: {},
   music: "/game/music/maps-original/route-24-welcome.mp3",
-  grass: {},
+  grass: {
+    4: [2, 3, 4, 5, 6, 7],
+    5: [2, 3, 4, 5, 6, 7],
+  },
   teleports: {
     3: {
-      45: { map: MapId.Route25BillsHouse, pos: { x: 3, y: 6 } },
+      45: { map: MapId.Route25BillsHouse, pos: { x: 3, y: 7 } },
+    },
+    4: {
+      "-1": { map: MapId.Route24, pos: { x: 19, y: 4 } },
+    },
+    5: {
+      "-1": { map: MapId.Route24, pos: { x: 19, y: 5 } },
+    },
+    6: {
+      "-1": { map: MapId.Route24, pos: { x: 19, y: 6 } },
+    },
+    8: {
+      "-1": { map: MapId.Route24, pos: { x: 19, y: 8 } },
+    },
+    9: {
+      "-1": { map: MapId.Route24, pos: { x: 19, y: 9 } },
+    },
+    11: {
+      "-1": { map: MapId.Route24, pos: { x: 19, y: 11 } },
     },
   },
 };
