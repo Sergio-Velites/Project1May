@@ -78,7 +78,7 @@ const route4: MapType = {
     5: {
       11: { map: MapId.Route3PokemonCenter, pos: { x: 4, y: 7 } },
       18: { map: MapId.MtMoon1f, pos: { x: 14, y: 35 } },
-      24: { map: MapId.MtMoon3f, pos: { x: 5, y: 8 } },
+      24: { map: MapId.MtMoon2f, pos: { x: 27, y: 2 } },
     },
     6: {
       90: { map: MapId.CeruleanCity, pos: { x: 0, y: 14 } },
