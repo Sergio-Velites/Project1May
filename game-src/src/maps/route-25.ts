@@ -1,6 +1,7 @@
 import image from "../assets/map/route-25.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
 import { beauty, biker, blackBelt, lass, superNerd, youngster } from "../app/npcs";
+import { ItemType } from "../app/use-item-data";
 const route25: MapType = {
   name: "Ruta 25",
   image,
@@ -186,10 +187,24 @@ const route25: MapType = {
       "-1": { map: MapId.Route24, pos: { x: 19, y: 11 } },
     },
   },
-  cuttableTrees: [
+  items: [
     {
-      pos: { x: 26, y: 3 },
-      questId: "cut-tree-route-25-26-3",
+      item: ItemType.GreatBall,
+      pos: { x: 17, y: 9 },
+    },
+    {
+      item: ItemType.UltraBall,
+      pos: { x: 54, y: 5 },
+    },
+  ],
+  berryTrees: [
+    {
+      pos: { x: 13, y: 2 },
+      item: ItemType.GoldBerry,
+    },
+    {
+      pos: { x: 24, y: 2 },
+      item: ItemType.PsnCureBerry,
     },
   ],
 };
