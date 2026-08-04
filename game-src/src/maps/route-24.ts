@@ -238,12 +238,6 @@ const route24: MapType = {
       pos: { x: 15, y: 21 },
     },
   ],
-  berryTrees: [
-    {
-      pos: { x: 11, y: 5 },
-      item: ItemType.Berry,
-    },
-  ],
 };
 
 export default route24;
