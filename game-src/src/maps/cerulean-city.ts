@@ -280,6 +280,11 @@ const ceruleanCity: MapType = {
   },
   teleports: {
     "-1": {
+      14: { map: MapId.Route24, pos: { x: 4, y: 35 } },
+      15: { map: MapId.Route24, pos: { x: 5, y: 35 } },
+      16: { map: MapId.Route24, pos: { x: 6, y: 35 } },
+      17: { map: MapId.Route24, pos: { x: 7, y: 35 } },
+      18: { map: MapId.Route24, pos: { x: 8, y: 35 } },
       20: { map: MapId.Route24, pos: { x: 10, y: 35 } },
       21: { map: MapId.Route24, pos: { x: 11, y: 35 } },
       23: { map: MapId.Route24, pos: { x: 13, y: 35 } },
