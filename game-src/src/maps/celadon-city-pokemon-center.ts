@@ -10,7 +10,7 @@ const celadonCityPokemonCenter: MapType = {
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13],
     1: [0, 1, 2, 5, 6, 7],
-    2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13],
+    2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
     3: [13],
     4: [0],
     5: [0],
@@ -18,16 +18,20 @@ const celadonCityPokemonCenter: MapType = {
     7: [0, 1, 6, 7, 12, 13],
   },
   text: {},
-  maps: {
-
-  },
-  exits: {
-    7: [3, 4],
-  },
+  maps: {},
+  exits: {},
   exitReturnMap: MapId.CeladonCity,
   exitReturnPos: { x: 41, y: 10 },
   music: "/game/music/maps-original/pokemon-center.mp3",
   grass: {},
+  fences: {},
+  teleports: {
+    7: {
+      3: { map: MapId.CeladonCity, pos: { x: 41, y: 10 } },
+      4: { map: MapId.CeladonCity, pos: { x: 41, y: 10 } },
+    },
+  },
+  trainers: [],
 };
 
 export default celadonCityPokemonCenter;
