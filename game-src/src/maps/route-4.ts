@@ -135,7 +135,7 @@ const route4: MapType = {
   trainers: [
   {
     npc: youngster,
-    pokemon: [{ id: 25, level: 29 }, { id: 17, level: 31 }, { id: 180, level: 30 }],
+    pokemon: [{ id: 25, level: 29 }, { id: 17, level: 31 }, { id: 180, level: 36 }],
     facing: Direction.Down,
     pos: { x: 55, y: 10 },
     intro: [
