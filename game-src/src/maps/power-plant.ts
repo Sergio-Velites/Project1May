@@ -114,7 +114,7 @@ const powerPlant: MapType = {
   staticPokemon: [
     {
       pokemonId: 243,
-      level: 70,
+      level: 95,
       sprite: "dog-a",
       pos: { x: 4, y: 9 },
       questId: "power-plant-static-4-9",
