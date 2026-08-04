@@ -46,18 +46,25 @@ const rockTunnel2f: MapType = {
     35: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
   },
   text: {},
-  maps: {
-
-  },
+  maps: {},
   teleports: {
-    3: { 3: { map: MapId.RockTunnel1f, pos: { x: 5, y: 3 } }, 27: { map: MapId.RockTunnel1f, pos: { x: 37, y: 3 } } },
-    11: { 23: { map: MapId.RockTunnel1f, pos: { x: 17, y: 11 } } },
-    25: { 33: { map: MapId.RockTunnel1f, pos: { x: 37, y: 17 } } },
+    3: {
+      3: { map: MapId.RockTunnel1f, pos: { x: 5, y: 4 } },
+      27: { map: MapId.RockTunnel1f, pos: { x: 37, y: 4 } },
+    },
+    11: {
+      23: { map: MapId.RockTunnel1f, pos: { x: 17, y: 12 } },
+    },
+    25: {
+      33: { map: MapId.RockTunnel1f, pos: { x: 37, y: 18 } },
+    },
   },
-  exits: {
-
-  },
+  exits: {},
   grass: {},
+  cave: true,
+  dark: true,
+  fences: {},
+  trainers: [],
 };
 
 export default rockTunnel2f;
