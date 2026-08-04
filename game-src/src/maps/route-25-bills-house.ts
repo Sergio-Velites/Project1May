@@ -9,9 +9,12 @@ const route25BillsHouse: MapType = {
   start: { x: 4, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7],
-    1: [0, 1, 2, 3, 4, 5],
-    3: [0, 1, 5],
-    4: [0, 1]
+    1: [0, 1, 2, 3, 4, 5, 6, 7],
+    2: [0, 2, 3],
+    4: [1, 2, 7],
+    5: [1, 2, 7],
+    6: [5],
+    7: [7],
   },
   text: {},
   maps: {},
@@ -28,6 +31,14 @@ const route25BillsHouse: MapType = {
     },
   },
   trainers: [],
+  gifts: [
+    {
+      pokemonId: 158,
+      level: 5,
+      pos: { x: 5, y: 3 },
+      questId: "route-25-bills-house-gift-5-3",
+    },
+  ],
 };
 
 export default route25BillsHouse;
