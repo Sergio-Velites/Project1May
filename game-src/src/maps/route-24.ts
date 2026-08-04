@@ -1,6 +1,7 @@
 import image from "../assets/map/route-24.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
 import { aceTrainerFemale, beauty, gambler, gentleman } from "../app/npcs";
+import { ItemType } from "../app/use-item-data";
 const route24: MapType = {
   name: "Ruta 24",
   image,
@@ -225,6 +226,16 @@ const route24: MapType = {
       level: 5,
       pos: { x: 18, y: 5 },
       questId: "route-24-gift-18-5",
+    },
+  ],
+  items: [
+    {
+      item: ItemType.GreatBall,
+      pos: { x: 5, y: 29 },
+    },
+    {
+      item: ItemType.GreatBall,
+      pos: { x: 15, y: 21 },
     },
   ],
 };
