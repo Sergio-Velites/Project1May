@@ -235,12 +235,6 @@ const route10: MapType = {
       questId: "cut-tree-route-10-9-18",
     },
   ],
-  boulders: [
-    {
-      pos: { x: 8, y: 18 },
-      id: "boulder-route-10-8-18",
-    },
-  ],
 };
 
 export default route10;
