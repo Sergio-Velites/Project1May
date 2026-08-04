@@ -71,6 +71,48 @@ const rockTunnel1f: MapType = {
   dark: true,
   fences: {},
   trainers: [],
+  boulders: [
+    {
+      pos: { x: 10, y: 31 },
+      id: "boulder-rock-tunnel-1f-10-31",
+    },
+    {
+      pos: { x: 11, y: 31 },
+      id: "boulder-rock-tunnel-1f-11-31",
+    },
+    {
+      pos: { x: 12, y: 31 },
+      id: "boulder-rock-tunnel-1f-12-31",
+    },
+    {
+      pos: { x: 13, y: 31 },
+      id: "boulder-rock-tunnel-1f-13-31",
+    },
+    {
+      pos: { x: 14, y: 31 },
+      id: "boulder-rock-tunnel-1f-14-31",
+    },
+    {
+      pos: { x: 15, y: 31 },
+      id: "boulder-rock-tunnel-1f-15-31",
+    },
+    {
+      pos: { x: 16, y: 31 },
+      id: "boulder-rock-tunnel-1f-16-31",
+    },
+    {
+      pos: { x: 17, y: 31 },
+      id: "boulder-rock-tunnel-1f-17-31",
+    },
+    {
+      pos: { x: 18, y: 31 },
+      id: "boulder-rock-tunnel-1f-18-31",
+    },
+    {
+      pos: { x: 19, y: 31 },
+      id: "boulder-rock-tunnel-1f-19-31",
+    },
+  ],
 };
 
 export default rockTunnel1f;
