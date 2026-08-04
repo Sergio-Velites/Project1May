@@ -1,7 +1,6 @@
 import image from "../assets/map/route-24.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
-import { gentleman, beauty, gambler, aceTrainerFemale } from "../app/npcs";
-
+import { aceTrainerFemale, beauty, gambler, gentleman } from "../app/npcs";
 const route24: MapType = {
   name: "Ruta 24",
   image,
@@ -12,7 +11,7 @@ const route24: MapType = {
     0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
     1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
     2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-    3: [0, 1, 2, 3],
+    3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
     4: [0, 1, 2, 3],
     5: [0, 1, 2, 3],
     6: [0, 1, 2, 3],
@@ -22,15 +21,15 @@ const route24: MapType = {
     10: [0, 1, 2, 3, 12, 13, 14, 15, 16, 17, 18, 19],
     11: [0, 1, 2, 3, 12],
     12: [0, 1, 2, 3, 12, 16, 17, 18, 19],
-    13: [0, 1, 2, 3, 12, 17, 18, 19],
-    14: [0, 1, 2, 3, 12, 17, 18, 19],
-    15: [0, 1, 2, 3, 12, 17, 18, 19],
-    16: [0, 1, 2, 3, 9, 12, 17, 18, 19],
-    17: [0, 1, 2, 3, 9, 12, 17, 18, 19],
-    18: [0, 1, 2, 3, 9, 12, 17, 18, 19],
-    19: [0, 1, 2, 3, 9, 12, 17, 18, 19],
-    20: [0, 1, 2, 3, 9, 12, 17, 18, 19],
-    21: [0, 1, 2, 3, 9, 12],
+    13: [0, 1, 2, 3, 12, 16, 17, 18, 19],
+    14: [0, 1, 2, 3, 12, 16, 17, 18, 19],
+    15: [0, 1, 2, 3, 12, 16, 17, 18, 19],
+    16: [0, 1, 2, 3, 9, 12, 16, 17, 18, 19],
+    17: [0, 1, 2, 3, 9, 12, 16, 17, 18, 19],
+    18: [0, 1, 2, 3, 9, 12, 16, 17, 18, 19],
+    19: [0, 1, 2, 3, 9, 12, 16, 17, 18, 19],
+    20: [0, 1, 2, 3, 9, 12, 16, 17, 18, 19],
+    21: [0, 1, 2, 3, 9, 12, 16, 17, 18, 19],
     22: [0, 1, 2, 3, 9, 12, 15],
     23: [0, 1, 2, 3, 9, 12, 15],
     24: [0, 1, 2, 3, 9, 12, 15],
@@ -41,7 +40,7 @@ const route24: MapType = {
     29: [0, 1, 2, 3, 9, 12, 15],
     30: [0, 1, 2, 3, 9, 12, 15],
     31: [0, 1, 2, 3, 9, 12, 15],
-    32: [0, 1, 2, 3, 6, 9, 12, 15],
+    32: [0, 1, 2, 3, 9, 12, 15],
     33: [0, 1, 2, 3, 9, 12, 15],
     34: [0, 1, 2, 3, 9, 12, 15],
     35: [0, 1, 2, 3, 9, 12, 15],
@@ -63,117 +62,163 @@ const route24: MapType = {
     29: [6, 7, 8, 16, 17, 18, 19],
     30: [6, 7, 8, 16, 17, 18, 19],
     31: [6, 7, 8, 16, 17, 18, 19],
-    32: [4, 5, 7, 8, 16, 17, 18, 19],
+    32: [4, 5, 6, 7, 8, 16, 17, 18, 19],
     33: [4, 5, 6, 7, 8, 16, 17, 18, 19],
     34: [4, 5, 6, 7, 8, 16, 17, 18, 19],
     35: [4, 5, 6, 7, 8, 16, 17, 18, 19],
   },
   fenceDirections: {
-    3: { 4: Direction.Down, 5: Direction.Down, 6: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down, 14: Direction.Down, 15: Direction.Down, 16: Direction.Down, 17: Direction.Down, 18: Direction.Down },
-    4: { 13: Direction.Right, 16: Direction.Left },
-    5: { 13: Direction.Right, 16: Direction.Left },
-    6: { 13: Direction.Right, 16: Direction.Left },
-    7: { 4: Direction.Down, 5: Direction.Down, 7: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down, 16: Direction.Down, 17: Direction.Down, 18: Direction.Down },
-    13: { 16: Direction.Left },
-    14: { 16: Direction.Left },
-    15: { 16: Direction.Left },
-    16: { 16: Direction.Left },
-    17: { 16: Direction.Left },
-    18: { 16: Direction.Left },
-    19: { 16: Direction.Left },
-    20: { 16: Direction.Left },
-    21: { 16: Direction.Down, 17: Direction.Down, 18: Direction.Down },
+    4: {
+      13: Direction.Right,
+      16: Direction.Left,
+    },
+    5: {
+      13: Direction.Right,
+      16: Direction.Left,
+    },
+    6: {
+      13: Direction.Right,
+      16: Direction.Left,
+    },
+    7: {
+      4: Direction.Down,
+      5: Direction.Down,
+      7: Direction.Down,
+      8: Direction.Down,
+      9: Direction.Down,
+      10: Direction.Down,
+      11: Direction.Down,
+      12: Direction.Down,
+      13: Direction.Down,
+      16: Direction.Down,
+      17: Direction.Down,
+      18: Direction.Down,
+      19: Direction.Down,
+    },
   },
   fences: {
-    3: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
     4: [13, 16],
     5: [13, 16],
     6: [13, 16],
-    7: [4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18],
-    13: [16],
-    14: [16],
-    15: [16],
-    16: [16],
-    17: [16],
-    18: [16],
-    19: [16],
-    20: [16],
-    21: [16, 17, 18],
+    7: [4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19],
   },
   text: {},
   trainers: [
-    {
-      npc: gentleman,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 6, y: 11 },
-      intro: [],
-      outtro: ["Qué boda más bonita… ¿tú de parte de quién eras?"],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: beauty,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 7, y: 11 },
-      intro: [],
-      outtro: ["De la novia. Creo. O del vino. Uno de los dos."],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: gambler,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 8, y: 13 },
-      intro: [],
-      outtro: ["Ayer dije que bailaba bien. Hoy no me creo nada."],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: gentleman,
-      pokemon: [{ id: 58, level: 22 }, { id: 17, level: 22 }],
-      facing: Direction.Down,
-      pos: { x: 5, y: 16 },
-      intro: [
-        "Necesito quemar la barra libre de ayer.",
-        "¿Me ayudas con un combate?"
-      ],
-      outtro: ["Uf. Creo que he sudado vino. Gracias, campeón."],
-      money: 440,
-    },
-    {
-      npc: aceTrainerFemale,
-      pokemon: [{ id: 35, level: 21 }, { id: 182, level: 22 }],
-      facing: Direction.Down,
-      pos: { x: 7, y: 18 },
-      intro: [
-        "Cogimos el ramo entre las tres.",
-        "Esto lo arreglamos combatiendo."
-      ],
-      outtro: ["Vale, quédate tú el ramo. Nosotras la barra."],
-      money: 420,
-    }
+  {
+    npc: gentleman,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Right,
+    pos: { x: 6, y: 5 },
+    intro: [],
+    outtro: [
+      "Qué boda más bonita… ¿tú de parte de quién eras?"
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: beauty,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Left,
+    pos: { x: 7, y: 5 },
+    intro: [],
+    outtro: [
+      "De la novia. Creo. O del vino. Uno de los dos."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: gambler,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Up,
+    pos: { x: 14, y: 4 },
+    intro: [],
+    outtro: [
+      "Ayer dije que bailaba bien. Hoy digo que gomito mejor."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: gentleman,
+    pokemon: [{ id: 58, level: 50 }, { id: 17, level: 57 }],
+    facing: Direction.Down,
+    pos: { x: 16, y: 8 },
+    intro: [
+      "Necesito quemar la barra libre de ayer.",
+      "¿Me ayudas con un combate?"
+    ],
+    outtro: [
+      "Uf. Creo que he sudado vino. Gracias, campeón."
+    ],
+    money: 440,
+  },
+  {
+    npc: aceTrainerFemale,
+    pokemon: [{ id: 35, level: 45 }, { id: 182, level: 57 }],
+    facing: Direction.Down,
+    pos: { x: 11, y: 13 },
+    intro: [
+      "Cogimos el ramo entre las tres.",
+      "Esto lo arreglamos combatiendo."
+    ],
+    outtro: [
+      "Vale, quédate tú el ramo. Nosotras la barra."
+    ],
+    money: 420,
+  }
   ],
-  maps: {
-    3: { 19: MapId.Route25 },
-    4: { 19: MapId.Route25 },
-    5: { 19: MapId.Route25 },
-    6: { 19: MapId.Route25 },
-    7: { 19: MapId.Route25 },
-    8: { 19: MapId.Route25 },
-    9: { 19: MapId.Route25 },
-    11: { 19: MapId.Route25 },
-    21: { 19: MapId.Route25 },
-    35: { 10: MapId.CeruleanCity, 11: MapId.CeruleanCity, 13: MapId.CeruleanCity, 14: MapId.CeruleanCity },
-  },
-  exits: {
-
-  },
+  maps: {},
+  exits: {},
   music: "/game/music/maps-original/route-24-welcome.mp3",
-  grass: {},
+  grass: {
+    18: [4, 5],
+    19: [4, 5],
+    20: [4, 5],
+    21: [4, 5],
+    22: [4, 5],
+    23: [4, 5],
+    24: [4, 5],
+    25: [4, 5],
+    26: [4, 5],
+    27: [4, 5],
+    28: [4, 5],
+    29: [4, 5],
+    30: [4, 5],
+    31: [4, 5],
+  },
+  teleports: {
+    4: {
+      20: { map: MapId.Route25, pos: { x: 0, y: 4 } },
+    },
+    5: {
+      20: { map: MapId.Route25, pos: { x: 0, y: 5 } },
+    },
+    6: {
+      20: { map: MapId.Route25, pos: { x: 0, y: 6 } },
+    },
+    8: {
+      20: { map: MapId.Route25, pos: { x: 0, y: 8 } },
+    },
+    9: {
+      20: { map: MapId.Route25, pos: { x: 0, y: 9 } },
+    },
+    11: {
+      20: { map: MapId.Route25, pos: { x: 0, y: 11 } },
+    },
+    36: {
+      4: { map: MapId.CeruleanCity, pos: { x: 14, y: 0 } },
+      5: { map: MapId.CeruleanCity, pos: { x: 15, y: 0 } },
+      6: { map: MapId.CeruleanCity, pos: { x: 16, y: 0 } },
+      7: { map: MapId.CeruleanCity, pos: { x: 17, y: 0 } },
+      8: { map: MapId.CeruleanCity, pos: { x: 18, y: 0 } },
+      10: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      11: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      13: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+      14: { map: MapId.CeruleanCity, pos: { x: 2, y: 18 } },
+    },
+  },
 };
 
 export default route24;
