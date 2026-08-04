@@ -16,7 +16,13 @@ const route10PokemonCenter: MapType = {
     6: [1, 6, 7, 12, 13],
     7: [1, 6, 7, 12, 13],
   },
-  text: {},
+  text: {
+    4: {
+      0: [
+        "Qué miras pichafloja?"
+      ],
+    },
+  },
   maps: {},
   exits: {},
   music: music,
