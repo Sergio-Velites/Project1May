@@ -1,5 +1,6 @@
 import image from "../assets/map/power-plant.png";
 import { MapId, MapType } from "./map-types";
+import { ItemType } from "../app/use-item-data";
 
 const powerPlant: MapType = {
   name: "Central Electrica",
@@ -64,6 +65,89 @@ const powerPlant: MapType = {
     },
   },
   trainers: [],
+  items: [
+    {
+      item: ItemType.ParlyzHeal,
+      pos: { x: 1, y: 25 },
+    },
+    {
+      item: ItemType.SuperPotion,
+      pos: { x: 11, y: 14 },
+    },
+    {
+      item: ItemType.UltraBall,
+      pos: { x: 10, y: 28 },
+    },
+    {
+      item: ItemType.GreatBall,
+      pos: { x: 22, y: 34 },
+    },
+    {
+      item: ItemType.UltraBall,
+      pos: { x: 38, y: 32 },
+    },
+    {
+      item: ItemType.UltraBall,
+      pos: { x: 26, y: 20 },
+    },
+    {
+      item: ItemType.GreatBall,
+      pos: { x: 35, y: 6 },
+    },
+    {
+      item: ItemType.GreatBall,
+      pos: { x: 27, y: 5 },
+    },
+    {
+      item: ItemType.UltraBall,
+      pos: { x: 23, y: 2 },
+    },
+    {
+      item: ItemType.Charcoal,
+      pos: { x: 11, y: 11 },
+    },
+    {
+      item: ItemType.Tm39,
+      pos: { x: 6, y: 2 },
+    },
+  ],
+  staticPokemon: [
+    {
+      pokemonId: 243,
+      level: 70,
+      sprite: "dog-a",
+      pos: { x: 4, y: 9 },
+      questId: "power-plant-static-4-9",
+    },
+    {
+      pokemonId: 100,
+      level: 90,
+      sprite: "ball-0",
+      pos: { x: 1, y: 3 },
+      questId: "power-plant-static-1-3",
+    },
+    {
+      pokemonId: 100,
+      level: 90,
+      sprite: "ball-0",
+      pos: { x: 21, y: 24 },
+      questId: "power-plant-static-21-24",
+    },
+    {
+      pokemonId: 100,
+      level: 90,
+      sprite: "ball-0",
+      pos: { x: 16, y: 13 },
+      questId: "power-plant-static-16-13",
+    },
+    {
+      pokemonId: 100,
+      level: 90,
+      sprite: "ball-0",
+      pos: { x: 12, y: 2 },
+      questId: "power-plant-static-12-2",
+    },
+  ],
 };
 
 export default powerPlant;
