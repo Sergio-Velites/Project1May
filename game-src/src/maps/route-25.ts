@@ -186,6 +186,12 @@ const route25: MapType = {
       "-1": { map: MapId.Route24, pos: { x: 19, y: 11 } },
     },
   },
+  cuttableTrees: [
+    {
+      pos: { x: 26, y: 3 },
+      questId: "cut-tree-route-25-26-3",
+    },
+  ],
 };
 
 export default route25;
