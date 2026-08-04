@@ -9,11 +9,10 @@ const ceruleanCityHouseC: MapType = {
   start: { x: 4, y: 6 },
   walls: {
     0: [0, 1, 2, 4, 5, 6, 7],
-    1: [0, 1],
     3: [3, 4],
     4: [3, 4],
     6: [0],
-    7: [0, 6, 7],
+    7: [0, 7],
   },
   text: {},
   maps: {},
@@ -33,6 +32,14 @@ const ceruleanCityHouseC: MapType = {
     },
   },
   trainers: [],
+  gifts: [
+    {
+      pokemonId: 152,
+      level: 5,
+      pos: { x: 4, y: 3 },
+      questId: "cerulean-city-house-c-gift-4-3",
+    },
+  ],
 };
 
 export default ceruleanCityHouseC;
