@@ -26,7 +26,7 @@ const ceruleanCityGym: MapType = {
   trainers: [
   {
     npc: blackBelt,
-    pokemon: [{ id: 66, level: 20 }, { id: 57, level: 21 }],
+    pokemon: [{ id: 66, level: 54 }, { id: 57, level: 58 }],
     facing: Direction.Left,
     pos: { x: 5, y: 9 },
     intro: [
@@ -40,7 +40,7 @@ const ceruleanCityGym: MapType = {
   },
   {
     npc: cueBall,
-    pokemon: [{ id: 62, level: 21 }, { id: 56, level: 21 }],
+    pokemon: [{ id: 62, level: 60 }, { id: 56, level: 65 }],
     facing: Direction.Right,
     pos: { x: 2, y: 2 },
     intro: [
@@ -54,7 +54,7 @@ const ceruleanCityGym: MapType = {
   },
   {
     npc: sergioNpc,
-    pokemon: [{ id: 68, level: 23 }, { id: 57, level: 22 }, { id: 237, level: 23 }, { id: 214, level: 24 }],
+    pokemon: [{ id: 68, level: 60 }, { id: 57, level: 64 }, { id: 237, level: 70 }, { id: 214, level: 75 }],
     facing: Direction.Down,
     pos: { x: 3, y: 1 },
     intro: [
@@ -81,7 +81,7 @@ const ceruleanCityGym: MapType = {
   },
   {
     npc: martaNpc,
-    pokemon: [{ id: 62, level: 22 }, { id: 67, level: 23 }, { id: 106, level: 23 }, { id: 107, level: 24 }],
+    pokemon: [{ id: 62, level: 53 }, { id: 67, level: 60 }, { id: 106, level: 70 }, { id: 107, level: 75 }],
     facing: Direction.Down,
     pos: { x: 5, y: 1 },
     intro: [
