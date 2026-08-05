@@ -1,7 +1,6 @@
 import image from "../assets/map/route-6.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
-import { fisher, beauty, superNerd, rocker, swimmer } from "../app/npcs";
-
+import { beauty, fisher, rocker, superNerd, swimmer } from "../app/npcs";
 const route6: MapType = {
   name: "Ruta 6",
   image,
@@ -9,7 +8,6 @@ const route6: MapType = {
   width: 20,
   start: { x: 9, y: 35 },
   walls: {
-    0: [9, 11],
     1: [11],
     2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
     3: [8, 9, 10, 11, 12, 13],
@@ -42,8 +40,37 @@ const route6: MapType = {
     35: [0, 1, 2, 3, 4, 5, 6],
   },
   fenceDirections: {
-    7: { 0: Direction.Down, 1: Direction.Down, 2: Direction.Down, 4: Direction.Down, 5: Direction.Down, 6: Direction.Down, 7: Direction.Down, 14: Direction.Down, 15: Direction.Down, 16: Direction.Down, 18: Direction.Down, 19: Direction.Down },
-    11: { 0: Direction.Down, 1: Direction.Down, 2: Direction.Down, 3: Direction.Down, 4: Direction.Down, 5: Direction.Down, 6: Direction.Down, 8: Direction.Down, 9: Direction.Down, 10: Direction.Down, 11: Direction.Down, 12: Direction.Down, 13: Direction.Down, 14: Direction.Down, 15: Direction.Down },
+    7: {
+      0: Direction.Down,
+      1: Direction.Down,
+      2: Direction.Down,
+      4: Direction.Down,
+      5: Direction.Down,
+      6: Direction.Down,
+      7: Direction.Down,
+      14: Direction.Down,
+      15: Direction.Down,
+      16: Direction.Down,
+      18: Direction.Down,
+      19: Direction.Down,
+    },
+    11: {
+      0: Direction.Down,
+      1: Direction.Down,
+      2: Direction.Down,
+      3: Direction.Down,
+      4: Direction.Down,
+      5: Direction.Down,
+      6: Direction.Down,
+      8: Direction.Down,
+      9: Direction.Down,
+      10: Direction.Down,
+      11: Direction.Down,
+      12: Direction.Down,
+      13: Direction.Down,
+      14: Direction.Down,
+      15: Direction.Down,
+    },
   },
   fences: {
     7: [0, 1, 2, 4, 5, 6, 7, 14, 15, 16, 18, 19],
@@ -51,75 +78,95 @@ const route6: MapType = {
   },
   text: {},
   trainers: [
-    {
-      npc: beauty,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 7, y: 15 },
-      intro: [],
-      outtro: ["Llevo tres horas moviendo este logo dos píxeles. Perfecto."],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: rocker,
-      pokemon: [{ id: 19, level: 1 }],
-      facing: Direction.Down,
-      pos: { x: 15, y: 15 },
-      intro: [],
-      outtro: ["¿Propina o petición? Por dos monedas te toco lo que sea."],
-      money: 0,
-      persistent: true,
-    },
-    {
-      npc: fisher,
-      pokemon: [{ id: 98, level: 26 }, { id: 222, level: 27 }],
-      facing: Direction.Down,
-      pos: { x: 3, y: 15 },
-      intro: [
-        "Vengo aquí desde crío.",
-        "Al mar se le respeta, chaval."
-      ],
-      outtro: ["Buena mano. ¿Seguro que no eres de puerto?"],
-      money: 520,
-    },
-    {
-      npc: superNerd,
-      pokemon: [{ id: 81, level: 27 }, { id: 100, level: 27 }, { id: 137, level: 28 }],
-      facing: Direction.Down,
-      pos: { x: 11, y: 15 },
-      intro: [
-        "En producción todo peta.",
-        "Aquí al menos peto yo primero."
-      ],
-      outtro: ["Reproducido el fallo: era yo. Siempre soy yo."],
-      money: 540,
-    },
-    {
-      npc: swimmer,
-      pokemon: [{ id: 120, level: 27 }, { id: 61, level: 28 }],
-      facing: Direction.Down,
-      pos: { x: 5, y: 1 },
-      intro: [
-        "Vigilo la playa… y a los que se creen Michael Phelps."
-      ],
-      outtro: ["Tú nadas… en batallas. En el agua ya veríamos."],
-      money: 520,
-    }
-  ],
-  maps: {
-    0: { 0: MapId.SaffronCity, 1: MapId.SaffronCity, 2: MapId.SaffronCity, 3: MapId.SaffronCity, 4: MapId.SaffronCity, 5: MapId.SaffronCity, 6: MapId.SaffronCity, 7: MapId.SaffronCity, 8: MapId.SaffronCity, 10: MapId.SaffronCity, 12: MapId.SaffronCity, 13: MapId.SaffronCity, 14: MapId.SaffronCity, 15: MapId.SaffronCity, 16: MapId.SaffronCity, 17: MapId.SaffronCity, 18: MapId.SaffronCity, 19: MapId.SaffronCity },
-    35: { 8: MapId.VermilionCity, 9: MapId.VermilionCity, 11: MapId.VermilionCity, 12: MapId.VermilionCity, 13: MapId.VermilionCity, 14: MapId.VermilionCity, 15: MapId.VermilionCity, 16: MapId.VermilionCity, 17: MapId.VermilionCity, 18: MapId.VermilionCity, 19: MapId.VermilionCity },
+  {
+    npc: beauty,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Down,
+    pos: { x: 7, y: 15 },
+    intro: [],
+    outtro: [
+      "Llevo tres horas moviendo este logo dos píxeles. Perfecto."
+    ],
+    money: 0,
+    persistent: true,
   },
+  {
+    npc: rocker,
+    pokemon: [{ id: 19, level: 1 }],
+    facing: Direction.Down,
+    pos: { x: 15, y: 15 },
+    intro: [],
+    outtro: [
+      "¿Propina o petición? Por dos monedas te toco lo que sea."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: fisher,
+    pokemon: [{ id: 98, level: 26 }, { id: 222, level: 27 }],
+    facing: Direction.Down,
+    pos: { x: 3, y: 15 },
+    intro: [
+      "Vengo aquí desde crío.",
+      "Al mar se le respeta, chaval."
+    ],
+    outtro: [
+      "Buena mano. ¿Seguro que no eres de puerto?"
+    ],
+    money: 520,
+  },
+  {
+    npc: superNerd,
+    pokemon: [{ id: 81, level: 27 }, { id: 100, level: 27 }, { id: 137, level: 28 }],
+    facing: Direction.Down,
+    pos: { x: 11, y: 15 },
+    intro: [
+      "En producción todo peta.",
+      "Aquí al menos peto yo primero."
+    ],
+    outtro: [
+      "Reproducido el fallo: era yo. Siempre soy yo."
+    ],
+    money: 540,
+  },
+  {
+    npc: swimmer,
+    pokemon: [{ id: 120, level: 27 }, { id: 61, level: 28 }],
+    facing: Direction.Down,
+    pos: { x: 12, y: 26 },
+    intro: [
+      "Vigilo la playa… y a los que se creen Michael Phelps."
+    ],
+    outtro: [
+      "Tú nadas… en batallas. En el agua ya veríamos."
+    ],
+    money: 520,
+  }
+  ],
+  maps: {},
   teleports: {
     7: {
       10: { map: MapId.Route6Gate, pos: { x: 3, y: 4 } },
     },
-    13: { 17: { map: MapId.Route6UndergroundEntrance, pos: { x: 3, y: 6 } } },
+    13: {
+      17: { map: MapId.Route6UndergroundEntrance, pos: { x: 3, y: 6 } },
+    },
+    35: {
+      8: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+      9: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+      11: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+      12: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+      13: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+      14: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+      15: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+      16: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+      17: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+      18: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+      19: { map: MapId.VermilionCity, pos: { x: 19, y: 31 } },
+    },
   },
-  exits: {
-
-  },
+  exits: {},
   music: "/game/music/maps-original/route-3.mp3",
   grass: {},
 };
