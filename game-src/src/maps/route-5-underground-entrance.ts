@@ -17,7 +17,14 @@ const route5UndergroundEntrance: MapType = {
     6: [0, 1, 6, 7],
     7: [0, 7],
   },
-  text: {},
+  text: {
+    3: {
+      2: [
+        "uno más uno son sieteeeee...",
+        "Quien me lo iba a decir?"
+      ],
+    },
+  },
   maps: {},
   exits: {},
   exitReturnMap: MapId.Route5,
