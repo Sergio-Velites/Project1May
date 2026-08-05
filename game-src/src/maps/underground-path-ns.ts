@@ -58,19 +58,19 @@ const undergroundPathNS: MapType = {
     47: [0, 1, 2, 3, 4, 5, 6, 7],
   },
   text: {},
-  maps: {
-
-  },
+  maps: {},
   teleports: {
-    // Escalera norte (5,3) → caseta de Ruta 5
-    3: { 5: { map: MapId.Route5UndergroundEntrance, pos: { x: 3, y: 5 } } },
-    // Escalera sur (2,41) → caseta de Ruta 6
-    41: { 2: { map: MapId.Route6UndergroundEntrance, pos: { x: 3, y: 5 } } },
+    4: {
+      5: { map: MapId.Route5UndergroundEntrance, pos: { x: 5, y: 4 } },
+    },
+    41: {
+      2: { map: MapId.Route6UndergroundEntrance, pos: { x: 5, y: 4 } },
+    },
   },
-  exits: {
-
-  },
+  exits: {},
   grass: {},
+  fences: {},
+  trainers: [],
 };
 
 export default undergroundPathNS;
