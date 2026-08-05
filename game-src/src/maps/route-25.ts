@@ -61,7 +61,13 @@ const route25: MapType = {
   fences: {
     7: [0, 1, 2, 3, 4, 5, 6, 7],
   },
-  text: {},
+  text: {
+    3: {
+      43: [
+        "Estudio de Bill, el fotógrafo de bodas."
+      ],
+    },
+  },
   trainers: [
   {
     npc: youngster,
