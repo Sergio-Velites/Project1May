@@ -1,6 +1,6 @@
 import image from "../assets/map/route-5.png";
 import { Direction } from "../state/state-types";import { MapId, MapType } from "./map-types";
-import { beauty, gentleman, youngster } from "../app/npcs";
+import { beauty, gentleman, teamRocketGrunt, youngster } from "../app/npcs";
 const route5: MapType = {
   name: "Ruta 5",
   image,
@@ -139,6 +139,32 @@ const route5: MapType = {
     intro: [],
     outtro: [
       "GOÑI le habla a las gallinas. Y le RESPONDEN, te juro."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: teamRocketGrunt,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Up,
+    pos: { x: 9, y: 28 },
+    intro: [],
+    outtro: [
+      "Que me dejehhh oztia!",
+      "Quiereh sentirla en el pesho?"
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: teamRocketGrunt,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Up,
+    pos: { x: 10, y: 28 },
+    intro: [],
+    outtro: [
+      "Mejor que vayas por otro lado.",
+      "Si no quieres perroproblemas."
     ],
     money: 0,
     persistent: true,
