@@ -15,7 +15,7 @@ const route6UndergroundEntrance: MapType = {
     4: [0, 1, 6, 7],
     5: [0, 1, 6, 7],
     6: [0, 1, 6, 7],
-    7: [0, 7]
+    7: [0, 7],
   },
   text: {},
   maps: {},
@@ -27,7 +27,7 @@ const route6UndergroundEntrance: MapType = {
   fences: {},
   teleports: {
     4: {
-      3: { map: MapId.UndergroundPathNS, pos: { x: 3, y: 41 } },
+      4: { map: MapId.UndergroundPathNS, pos: { x: 3, y: 41 } },
     },
     8: {
       3: { map: MapId.Route6, pos: { x: 17, y: 14 } },
