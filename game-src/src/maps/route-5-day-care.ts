@@ -6,11 +6,11 @@ const route5DayCare: MapType = {
   image,
   height: 8,
   width: 8,
-  start: { x: 4, y: 6 },
+  start: { x: 2, y: 3 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7],
     1: [0, 1, 7],
-    3: [3, 4],
+    3: [2, 3, 4],
     4: [3, 4],
     6: [0, 7],
     7: [0, 7],
