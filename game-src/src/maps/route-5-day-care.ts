@@ -30,6 +30,7 @@ const route5DayCare: MapType = {
     },
   },
   trainers: [],
+  dayCareNpc: { x: 2, y: 3 },
 };
 
 export default route5DayCare;
