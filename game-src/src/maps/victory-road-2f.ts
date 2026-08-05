@@ -150,6 +150,8 @@ const victoryRoad2f: MapType = {
       id: "boulder-victory-road-2f-23-14",
     },
   ],
+  cave: true,
+  dark: true,
 };
 
 export default victoryRoad2f;
