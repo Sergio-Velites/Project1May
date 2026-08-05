@@ -134,6 +134,10 @@ const victoryRoad3f: MapType = {
       pos: { x: 13, y: 11 },
       id: "boulder-victory-road-3f-13-11",
     },
+    {
+      pos: { x: 24, y: 10 },
+      id: "boulder-victory-road-3f-24-10",
+    },
   ],
 };
 
