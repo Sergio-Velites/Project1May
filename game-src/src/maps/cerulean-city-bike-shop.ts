@@ -2,6 +2,7 @@ import image from "../assets/map/cerulean-city-bike-shop.png";
 import { MapId, MapType } from "./map-types";
 import { blaine, juggler } from "../app/npcs";
 import { Direction } from "../state/state-types";
+import { ItemType } from "../app/use-item-data";
 
 const ceruleanCityBikeShop: MapType = {
   name: "Ciclo Club",
@@ -60,6 +61,20 @@ const ceruleanCityBikeShop: MapType = {
     money: 0,
     persistent: true,
   }
+  ],
+  items: [
+    {
+      item: ItemType.Iron,
+      pos: { x: 0, y: 1 },
+    },
+    {
+      item: ItemType.Protein,
+      pos: { x: 2, y: 1 },
+    },
+    {
+      item: ItemType.Calcium,
+      pos: { x: 4, y: 1 },
+    },
   ],
 };
 
