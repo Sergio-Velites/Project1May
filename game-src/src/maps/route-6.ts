@@ -76,7 +76,14 @@ const route6: MapType = {
     7: [0, 1, 2, 4, 5, 6, 7, 14, 15, 16, 18, 19],
     11: [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15],
   },
-  text: {},
+  text: {
+    15: {
+      19: [
+        "Tunel hacia Bilbao.",
+        "Actualmente, invadida por una Hyrox."
+      ],
+    },
+  },
   trainers: [
   {
     npc: beauty,
