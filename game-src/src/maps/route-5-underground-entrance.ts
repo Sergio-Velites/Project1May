@@ -34,7 +34,7 @@ const route5UndergroundEntrance: MapType = {
   fences: {},
   teleports: {
     4: {
-      4: { map: MapId.UndergroundPathNS, pos: { x: 4, y: 3 } },
+      4: { map: MapId.UndergroundPathNS, pos: { x: 4, y: 4 } },
     },
     8: {
       3: { map: MapId.Route5, pos: { x: 17, y: 28 } },
