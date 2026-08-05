@@ -104,7 +104,14 @@ const route5: MapType = {
     15: [6, 7, 8, 9, 10, 11, 12, 13],
     23: [6, 7, 8, 9, 10, 11, 12, 13],
   },
-  text: {},
+  text: {
+    29: {
+      17: [
+        "Tunel hacia el Barrio de Desarrolladores.",
+        "A tu izquierda, la Huerta de Goñi."
+      ],
+    },
+  },
   trainers: [
   {
     npc: beauty,
