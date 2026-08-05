@@ -34,6 +34,7 @@ const ceruleanCityPokemonCenter: MapType = {
   pokemonCenter: { x: 3, y: 2 },
   onlineBattleNpc: { x: 11, y: 2 },
   trainers: [],
+  pc: { x: 13, y: 3 },
 };
 
 export default ceruleanCityPokemonCenter;
