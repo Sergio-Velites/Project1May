@@ -9,15 +9,22 @@ const route6UndergroundEntrance: MapType = {
   start: { x: 3, y: 6 },
   walls: {
     0: [0, 1, 2, 3, 4, 5, 6, 7],
-    1: [0, 1, 6, 7],
-    2: [0, 1, 6, 7],
-    3: [0, 1, 6, 7],
+    1: [0, 7],
+    2: [0, 1, 2, 5, 6, 7],
+    3: [0, 1, 2, 6, 7],
     4: [0, 1, 6, 7],
     5: [0, 1, 6, 7],
-    6: [0, 1, 6, 7],
+    6: [0, 1, 2, 5, 6, 7],
     7: [0, 7],
   },
-  text: {},
+  text: {
+    3: {
+      2: [
+        "Que era tan facil...",
+        "Ser feliz.."
+      ],
+    },
+  },
   maps: {},
   exits: {},
   exitReturnMap: MapId.Route6,
