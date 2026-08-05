@@ -48,20 +48,29 @@ const championRoom: MapType = {
     outtro: [
       "Me vuelvo a mi tiempo!"
     ],
-    money: 0,
+    money: 1000,
     persistent: true,
+    sightRange: 0,
   },
   {
     npc: chetaNpc,
-    pokemon: [{ id: 19, level: 2 }],
+    pokemon: [{ id: 242, level: 146 }, { id: 145, level: 152 }, { id: 150, level: 158 }, { id: 59, level: 164 }, { id: 103, level: 170 }, { id: 151, level: 176 }],
     facing: Direction.Down,
     pos: { x: 4, y: 0 },
-    intro: [],
-    outtro: [
-      "..."
+    intro: [
+      "Yo soy Cheta. ",
+      "Estoy buscando a mi Padre junto con mi hermano ",
+      "para evitar que haga una atrozidad.",
+      "Venimos de un futuro próximo.",
+      "Nos puedes ayudar?"
     ],
-    money: 0,
+    outtro: [
+      "Pues parece que la atrocidad se cometerá...",
+      "No podemos frenarlo."
+    ],
+    money: 1000,
     persistent: true,
+    sightRange: 0,
   }
   ],
 };
