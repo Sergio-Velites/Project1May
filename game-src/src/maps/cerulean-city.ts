@@ -327,7 +327,7 @@ const ceruleanCity: MapType = {
     },
     19: {
       "-1": { map: MapId.Route4, pos: { x: 89, y: 11 } },
-      30: { map: MapId.CeruleanCityGym, pos: { x: 5, y: 13 } },
+      30: { map: MapId.CeruleanCityGym, pos: { x: 4, y: 10 } },
     },
     25: {
       13: { map: MapId.CeruleanCityBikeShop, pos: { x: 3, y: 7 } },
