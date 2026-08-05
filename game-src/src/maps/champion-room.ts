@@ -1,5 +1,7 @@
 import image from "../assets/map/champion-room.png";
 import { MapId, MapType } from "./map-types";
+import { chetaNpc, chinNpc } from "../app/npcs";
+import { Direction } from "../state/state-types";
 
 const championRoom: MapType = {
   name: "Campeon",
@@ -29,7 +31,32 @@ const championRoom: MapType = {
       4: { map: MapId.EliteFour4, pos: { x: 6, y: 0 } },
     },
   },
-  trainers: [],
+  trainers: [
+  {
+    npc: chinNpc,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Down,
+    pos: { x: 3, y: 0 },
+    intro: [],
+    outtro: [
+      "..."
+    ],
+    money: 0,
+    persistent: true,
+  },
+  {
+    npc: chetaNpc,
+    pokemon: [{ id: 19, level: 2 }],
+    facing: Direction.Down,
+    pos: { x: 4, y: 0 },
+    intro: [],
+    outtro: [
+      "..."
+    ],
+    money: 0,
+    persistent: true,
+  }
+  ],
 };
 
 export default championRoom;
