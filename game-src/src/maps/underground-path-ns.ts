@@ -1,5 +1,6 @@
 import image from "../assets/map/underground-path-ns.png";
 import { MapId, MapType } from "./map-types";
+import { ItemType } from "../app/use-item-data";
 
 const undergroundPathNS: MapType = {
   name: "Camino Subterráneo N-S",
@@ -71,6 +72,12 @@ const undergroundPathNS: MapType = {
   grass: {},
   fences: {},
   trainers: [],
+  items: [
+    {
+      item: ItemType.GreatBall,
+      pos: { x: 5, y: 41 },
+    },
+  ],
 };
 
 export default undergroundPathNS;
