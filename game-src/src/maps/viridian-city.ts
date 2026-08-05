@@ -198,6 +198,13 @@ const viridianCity: MapType = {
         "Priiii",
       ],
     },
+    {
+      pokemonId: 250,
+      level: 80,
+      sprite: "bird-a",
+      pos: { x: 35, y: 14 },
+      questId: "viridian-city-static-35-14",
+    },
   ],
   cuttableTrees: [
     {
