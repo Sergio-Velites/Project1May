@@ -28,7 +28,7 @@ import { showText, selectMenuOpen } from "../state/uiSlice";
 import { Direction } from "../state/state-types";
 import {
   beauty, channeler, aceTrainerFemale, jrTrainerFemale, lass,
-  misty, erica, sabrina, martaNpc, swimmer, psychic,
+  misty, erica, sabrina, martaNpc, chetaNpc, swimmer, psychic,
   teamRocketGrunt,
   NpcType,
 } from "../app/npcs";
@@ -42,7 +42,7 @@ const oppositeDirection = (dir: Direction): Direction => {
 
 const FEMALE_NPCS: NpcType[] = [
   beauty, channeler, aceTrainerFemale, jrTrainerFemale, lass,
-  misty, erica, sabrina, martaNpc, swimmer, psychic,
+  misty, erica, sabrina, martaNpc, chetaNpc, swimmer, psychic,
 ];
 
 function getTrainerAppearsVariant(npc: NpcType): "boy" | "girl" | "rocket" {

@@ -865,6 +865,7 @@ const NPC_ALIASES = {
   brock: "brock", misty: "misty", ltSurge: "ltSurge", erica: "erica",
   koga: "koga", sabrina: "sabrina", blaine: "blaine", giovanni: "giovanni",
   sergioNpc: "sergioNpc", martaNpc: "martaNpc",
+  chinNpc: "chinNpc", chetaNpc: "chetaNpc",
 };
 
 // Mapeo MapId string → nombre de archivo PNG del mapa

@@ -587,7 +587,7 @@ const NPC_EXPORTS = new Set([
   'gambler', 'gentleman', 'hiker', 'jrTrainerMale', 'jrTrainerFemale', 'juggler', 'lass',
   'pokeManiac', 'psychic', 'rocker', 'teamRocketGrunt', 'sailor', 'scientist', 'superNerd',
   'swimmer', 'tamer', 'youngster', 'biker', 'brock', 'misty', 'ltSurge', 'erica', 'koga',
-  'sabrina', 'blaine', 'giovanni', 'sergioNpc', 'martaNpc',
+  'sabrina', 'blaine', 'giovanni', 'sergioNpc', 'martaNpc', 'chinNpc', 'chetaNpc',
 ]);
 
 /** Escanea los `npc:` usados dentro del bloque trainers del texto. */

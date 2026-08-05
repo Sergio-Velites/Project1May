@@ -313,6 +313,8 @@ const NPC_REGISTRY: Record<string, { label: string; sprite: string; portrait: st
   giovanni:        { label: 'Giovanni',      sprite: 'an',   portrait: 'giovanni.png'         },
   sergioNpc:       { label: 'Sergio',        sprite: 'g',    portrait: 'sergio.png'           },
   martaNpc:        { label: 'Marta',         sprite: 'l',    portrait: 'marta.png'            },
+  chinNpc:         { label: 'Chin',          sprite: 'f',    portrait: 'chin.png'             },
+  chetaNpc:        { label: 'Cheta',         sprite: 'l',    portrait: 'cheta.png'            },
 };
 
 function spriteUrl(npcKey: string, facing: string) {

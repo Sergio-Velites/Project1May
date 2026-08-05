@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/game/static/css/main.84e6e57a.css",
-    "main.js": "/game/static/js/main.3dc65e3c.js",
+    "main.js": "/game/static/js/main.8e74297b.js",
     "static/media/pewter-city.mp3": "/game/static/media/pewter-city.dbfe2794208a91f807e7.mp3",
     "static/media/intro.mp4": "/game/static/media/intro.635c67d841e2fe0b7a4e.mp4",
     "static/media/battle.mp3": "/game/static/media/battle.e1882961bf442d7c3f9c.mp3",
@@ -53,13 +53,13 @@
     "static/media/safari-zone-area-3.png": "/game/static/media/safari-zone-area-3.c299450db4295e8eae8a.png",
     "static/media/power-plant.png": "/game/static/media/power-plant.4aecc4c0fc4ccf33491b.png",
     "static/media/route-5.png": "/game/static/media/route-5.f7c03f21d40041d02b45.png",
+    "static/media/victory-road-3f.png": "/game/static/media/victory-road-3f.db5118de27556708a754.png",
     "static/media/cerulean-cave-1f.png": "/game/static/media/cerulean-cave-1f.b7424f2be2af561918f6.png",
     "static/media/cerulean-cave-2f.png": "/game/static/media/cerulean-cave-2f.4b129422238d1aa18cff.png",
     "static/media/route-1.png": "/game/static/media/route-1.0f80f4de06128faa9cc6.png",
     "static/media/route-15.png": "/game/static/media/route-15.5a8e230569bd0e54c90a.png",
     "static/media/route-22.png": "/game/static/media/route-22.436f816f9fdffc796e80.png",
     "static/media/route-16.png": "/game/static/media/route-16.b47add124d76e91273f3.png",
-    "static/media/victory-road-3f.png": "/game/static/media/victory-road-3f.39b7123f2c40364df26d.png",
     "static/media/route-19.png": "/game/static/media/route-19.faa9c84e946fcd10076a.png",
     "static/media/kanto_region.png": "/game/static/media/kanto_region.ae1c844749e976b19116.png",
     "static/media/route-24.png": "/game/static/media/route-24.b51b66f856c1a7351058.png",
@@ -78,6 +78,6 @@
   },
   "entrypoints": [
     "static/css/main.84e6e57a.css",
-    "static/js/main.3dc65e3c.js"
+    "static/js/main.8e74297b.js"
   ]
 }

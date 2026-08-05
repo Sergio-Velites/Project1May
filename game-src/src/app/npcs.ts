@@ -119,6 +119,8 @@ import channelerRightWalk1 from "../assets/walk-sprites/al-right-1.png";
 import aceTrainerMalePortrait from "../assets/portraits/ace-trainer-male.png";
 import sergioPortrait from "../assets/portraits/sergio.png";
 import martaPortrait from "../assets/portraits/marta.png";
+import chinPortrait from "../assets/portraits/chin.png";
+import chetaPortrait from "../assets/portraits/cheta.png";
 import aceTrainerMaleDown from "../assets/walk-sprites/g-down.png";
 import aceTrainerMaleDownWalk1 from "../assets/walk-sprites/g-down-1.png";
 import aceTrainerMaleDownWalk2 from "../assets/walk-sprites/g-down-2.png";
@@ -1338,5 +1340,45 @@ export const martaNpc = {
     leftWalk1: aceTrainerFemaleLeftWalk1,
     right: aceTrainerFemaleRight,
     rightWalk1: aceTrainerFemaleRightWalk1,
+  },
+};
+
+// ── Niños — sprites walk de youngster/lass, portrait propio (editable) ───────
+
+export const chinNpc = {
+  canBattle: true,
+  canWalk: true,
+  name: "Chin",
+  portrait: chinPortrait,
+  sprites: {
+    down: youngsterDown,
+    downWalk1: youngsterDownWalk1,
+    downWalk2: youngsterDownWalk2,
+    up: youngsterUp,
+    upWalk1: youngsterUpWalk1,
+    upWalk2: youngsterUpWalk2,
+    left: youngsterLeft,
+    leftWalk1: youngsterLeftWalk1,
+    right: youngsterRight,
+    rightWalk1: youngsterRightWalk1,
+  },
+};
+
+export const chetaNpc = {
+  canBattle: true,
+  canWalk: true,
+  name: "Cheta",
+  portrait: chetaPortrait,
+  sprites: {
+    down: lassDown,
+    downWalk1: lassDownWalk1,
+    downWalk2: lassDownWalk2,
+    up: lassUp,
+    upWalk1: lassUpWalk1,
+    upWalk2: lassUpWalk2,
+    left: lassLeft,
+    leftWalk1: lassLeftWalk1,
+    right: lassRight,
+    rightWalk1: lassRightWalk1,
   },
 };
