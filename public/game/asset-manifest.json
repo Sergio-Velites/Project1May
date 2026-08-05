@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/game/static/css/main.84e6e57a.css",
-    "main.js": "/game/static/js/main.f7ea657c.js",
+    "main.js": "/game/static/js/main.5e91ea60.js",
     "static/media/pewter-city.mp3": "/game/static/media/pewter-city.dbfe2794208a91f807e7.mp3",
     "static/media/intro.mp4": "/game/static/media/intro.635c67d841e2fe0b7a4e.mp4",
     "static/media/battle.mp3": "/game/static/media/battle.e1882961bf442d7c3f9c.mp3",
@@ -78,6 +78,6 @@
   },
   "entrypoints": [
     "static/css/main.84e6e57a.css",
-    "static/js/main.f7ea657c.js"
+    "static/js/main.5e91ea60.js"
   ]
 }
