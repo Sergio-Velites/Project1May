@@ -34,12 +34,19 @@ const championRoom: MapType = {
   trainers: [
   {
     npc: chinNpc,
-    pokemon: [{ id: 19, level: 2 }],
+    pokemon: [{ id: 146, level: 122 }, { id: 248, level: 129 }, { id: 169, level: 136 }, { id: 144, level: 143 }, { id: 150, level: 150 }, { id: 243, level: 157 }],
     facing: Direction.Down,
     pos: { x: 3, y: 0 },
-    intro: [],
+    intro: [
+      "Hola!",
+      "Mi nombre es Chin.",
+      "Y vengo del futuro, para salvarlo",
+      "de algo que pasó en este fecha.",
+      "Sabes tu algo?",
+      "Conoces a mi padre?"
+    ],
     outtro: [
-      "..."
+      "Me vuelvo a mi tiempo!"
     ],
     money: 0,
     persistent: true,
