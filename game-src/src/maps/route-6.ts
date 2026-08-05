@@ -82,7 +82,7 @@ const route6: MapType = {
     npc: beauty,
     pokemon: [{ id: 19, level: 1 }],
     facing: Direction.Down,
-    pos: { x: 7, y: 15 },
+    pos: { x: 5, y: 12 },
     intro: [],
     outtro: [
       "Llevo tres horas moviendo este logo dos píxeles. Perfecto."
@@ -94,7 +94,7 @@ const route6: MapType = {
     npc: rocker,
     pokemon: [{ id: 19, level: 1 }],
     facing: Direction.Down,
-    pos: { x: 15, y: 15 },
+    pos: { x: 13, y: 13 },
     intro: [],
     outtro: [
       "¿Propina o petición? Por dos monedas te toco lo que sea."
@@ -105,8 +105,8 @@ const route6: MapType = {
   {
     npc: fisher,
     pokemon: [{ id: 98, level: 26 }, { id: 222, level: 27 }],
-    facing: Direction.Down,
-    pos: { x: 3, y: 15 },
+    facing: Direction.Right,
+    pos: { x: 4, y: 20 },
     intro: [
       "Vengo aquí desde crío.",
       "Al mar se le respeta, chaval."
@@ -119,8 +119,8 @@ const route6: MapType = {
   {
     npc: superNerd,
     pokemon: [{ id: 81, level: 27 }, { id: 100, level: 27 }, { id: 137, level: 28 }],
-    facing: Direction.Down,
-    pos: { x: 11, y: 15 },
+    facing: Direction.Left,
+    pos: { x: 17, y: 21 },
     intro: [
       "En producción todo peta.",
       "Aquí al menos peto yo primero."
@@ -169,6 +169,24 @@ const route6: MapType = {
   exits: {},
   music: "/game/music/maps-original/route-3.mp3",
   grass: {},
+  boulders: [
+    {
+      pos: { x: 16, y: 14 },
+      id: "boulder-route-6-16-14",
+    },
+    {
+      pos: { x: 16, y: 15 },
+      id: "boulder-route-6-16-15",
+    },
+    {
+      pos: { x: 17, y: 15 },
+      id: "boulder-route-6-17-15",
+    },
+    {
+      pos: { x: 18, y: 15 },
+      id: "boulder-route-6-18-15",
+    },
+  ],
 };
 
 export default route6;
